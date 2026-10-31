@@ -14,7 +14,7 @@
  */
 import { branchCashExpenseStream } from '../../expense-streams'
 import { dhakaDateOf } from '../../dhaka-time'
-import { postEvent, reverseEntry, type Db, type PostEventInput, type PostResult } from './post'
+import { getPeriodForDate, postEvent, reverseEntry, type Db, type PostEventInput, type PostResult } from './post'
 
 // ── Chart-of-accounts codes (seeded by seed.ts) ─────────────────────
 export const ACCT = {
@@ -377,14 +377,33 @@ export async function postForSource(
   db: Db,
   sourceTable: string,
   sourceId: string,
-  opts?: { created_by?: string | null }
+  opts?: {
+    created_by?: string | null
+    /**
+     * A3 controlled-correction path: when the source event's own
+     * period is closed/locked and its previous entry has just been
+     * reversed, the repost lands in an OPEN period instead —
+     * pass the open period's date here and a memo suffix explaining
+     * the move. Never used for first-time postings: those are
+     * refused by the engine and recorded as posting exceptions.
+     */
+    entry_date_override?: string
+    memo_suffix?: string
+  }
 ): Promise<PostResult | null> {
   const fetcher = FETCHERS[sourceTable]
   if (!fetcher) throw new Error(`ACCOUNTS: unknown source table ${sourceTable}`)
   const row = await fetcher(db, sourceId)
   if (!row) return null
-  const input = await buildInput(db, sourceTable, row)
+  let input = await buildInput(db, sourceTable, row)
   if (!input) return null
+  if (opts?.entry_date_override) {
+    input = {
+      ...input,
+      entry_date: opts.entry_date_override,
+      memo: `${input.memo ?? ''}${opts.memo_suffix ?? ''}`.trim() || input.memo,
+    }
+  }
   // Repost-after-reversal: if an earlier entry for this source was
   // reversed (a correction), the base event_type is occupied by a
   // dead entry — post the live one under a suffixed type. If an
@@ -516,10 +535,19 @@ export async function syncClosingEntry(
       memo: `Closing corrected — entry reversed (${dateStr(row.ledger_date)})`,
       created_by: opts.created_by ?? null,
     })
+    // A3 controlled-correction path: if the closing's own period
+    // has since been closed/locked, the repost cannot land there —
+    // it posts into the current open period (today) with the move
+    // stated on the entry. The original entry is never edited.
+    const ownPeriod = await getPeriodForDate(db, input.entry_date)
+    const redirected = !!ownPeriod && ownPeriod.status !== 'open'
     const repost = await postEvent(db, {
       ...input,
       event_type: `closing_r${prior.length}`,
-      memo: `Daily closing (re-posted after correction) — ${dateStr(row.ledger_date)}`,
+      entry_date: redirected ? opts.today : input.entry_date,
+      memo: redirected
+        ? `Daily closing (correction re-posted into open period ${opts.today.slice(0, 7)} — original period ${input.entry_date.slice(0, 7)} is ${ownPeriod.status}) — ${dateStr(row.ledger_date)}`
+        : `Daily closing (re-posted after correction) — ${dateStr(row.ledger_date)}`,
     })
     return { action: repost.created ? 'reposted' : 'noop' }
   }

@@ -69,6 +69,8 @@ const adminNavigation = [
       { name: 'Chart of Accounts', href: '/admin/accounts/chart' },
       { name: 'Journal', href: '/admin/accounts/journal' },
       { name: 'Opening Position', href: '/admin/accounts/opening' },
+      // Accounts A3: period close & lock, FY rollover.
+      { name: 'Periods', href: '/admin/accounts/periods' },
       // Accounts A2: statements over the journal.
       { name: 'Statements', href: '/admin/accounts/statements' },
       { name: 'Trial Balance', href: '/admin/accounts/statements/trial-balance' },

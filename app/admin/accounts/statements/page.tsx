@@ -24,8 +24,8 @@ const POSTING_MAP: Array<{ id: string; event: string; debit: string; credit: str
   { id: 'P9', event: 'Partner payout completed', debit: 'Partner Drawings — <partner>', credit: 'Cash — Head Office', status: 'Live (A1), no historical rows' },
   { id: 'P10', event: 'Bundle request completed', debit: 'Cash in Transit', credit: 'Cash — Head Office', status: 'Live (A1), no historical rows' },
   { id: 'P11', event: 'VAT / TDS on flagged events', debit: '—', credit: '—', status: 'Staged — A7 (register tables exist; dormant until rates are configured)' },
-  { id: 'P12', event: 'Opening entry (one-time)', debit: 'Assets as confirmed', credit: 'Liabilities + Equity (balancing figure shown explicitly)', status: 'Staged — position computed as DRAFT; posting is an A3 decision after owner confirmation' },
-  { id: 'P13', event: 'Period-end adjustments', debit: 'As entered', credit: 'As entered', status: 'Staged — via manual entries in a later stage' },
+  { id: 'P12', event: 'Opening entry (one-time)', debit: 'Assets as confirmed', credit: 'Liabilities + Equity (balancing figure shown explicitly)', status: 'Live (A3) — confirming the opening position posts this entry, dated the cutover (1st of the month after the as-of month)' },
+  { id: 'P13', event: 'Period-end adjustments', debit: 'As entered', credit: 'As entered', status: 'Live (A3) — fiscal-year rollover carries P&L balances to Retained Earnings from Accounts → Periods; other adjustments via manual entries in a later stage' },
 ]
 
 export default function StatementsIndexPage() {

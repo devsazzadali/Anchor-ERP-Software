@@ -8,6 +8,7 @@ import {
   taka,
 } from '@/lib/server/accounting/reports'
 import { computeOpeningPosition } from '@/lib/server/accounting/opening'
+import { listOpenExceptions } from '@/lib/server/accounting/exceptions'
 
 // GET /api/accounts/overview — Accounts A1 section home data:
 // trial-balance health, journal counts, unposted-source counts,
@@ -25,7 +26,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 })
     }
 
-    const [tb, unposted, reconciliation, position, computation, counts] = await Promise.all([
+    const [tb, unposted, reconciliation, position, computation, counts, exceptions] = await Promise.all([
       trialBalance(prisma as any),
       unpostedSources(prisma as any),
       classReconciliation(prisma as any),
@@ -38,6 +39,7 @@ export async function GET(req: Request) {
         prisma.chartAccount.count({ where: { is_active: true } }),
         prisma.accountingPeriod.count({ where: { status: 'open' } }),
       ]),
+      listOpenExceptions(prisma as any),
     ])
 
     let positionLines: any[] = []
@@ -87,11 +89,36 @@ export async function GET(req: Request) {
             })),
           }
         : null,
-      flags: computation.flags.map((f) => ({
-        code: f.code,
-        amount: f.amount != null ? f.amount.toFixed(2) : null,
-        count: f.count ?? null,
-        text: f.text,
+      flags: [
+        ...computation.flags.map((f) => ({
+          code: f.code,
+          amount: f.amount != null ? f.amount.toFixed(2) : null,
+          count: f.count ?? null,
+          text: f.text,
+        })),
+        // A3: postings refused by a closed/locked period stay
+        // visible here until resolved (the A9 inbox reads the same
+        // posting_exceptions rows).
+        ...exceptions.map((x: any) => ({
+          code: 'POSTING_BLOCKED',
+          amount: null,
+          count: null,
+          text:
+            `A ${x.event_type} posting for ${x.source_table} was refused: period ${x.period_month} is ` +
+            `${x.reason.replace('period_', '')}. The source record stands; resolve by reopening the period ` +
+            `(break-glass) and re-firing, or by a correction entry in an open period.`,
+        })),
+      ],
+      posting_exceptions: exceptions.map((x: any) => ({
+        id: x.id,
+        source_table: x.source_table,
+        source_id: x.source_id,
+        event_type: x.event_type,
+        entry_date: x.entry_date.toISOString().slice(0, 10),
+        period_month: x.period_month,
+        reason: x.reason,
+        status: x.status,
+        created_at: x.created_at.toISOString(),
       })),
     })
   } catch (err: any) {

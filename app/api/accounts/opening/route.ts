@@ -3,15 +3,19 @@ import { prisma } from '@/lib/db'
 import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { logAudit, diffFields } from '@/lib/server/audit'
 import { storeOpeningPosition } from '@/lib/server/accounting/opening'
+import { confirmOpeningPosition } from '@/lib/server/accounting/openingPost'
+import { isPeriodBlockedError } from '@/lib/server/accounting/post'
 
 // /api/accounts/opening — the opening position (Accounts A1).
 // GET: all computed positions (latest first) with lines.
 // POST {action:'recompute'}: compute + store a NEW draft from the
 //   current data (previous drafts are kept).
-// POST {action:'confirm', id}: the OWNER's confirmation — marks a
-//   draft confirmed and writes an audit row. A1 builds this action
-//   but never calls it; positions stay DRAFT until the owner
-//   confirms them himself.
+// POST {action:'confirm', id}: the OWNER's confirmation — A3
+//   completes the P12 flow: confirming ALSO posts the opening
+//   journal entry through the engine (openingPost.ts) and only
+//   then flips the position to confirmed; both steps are audited.
+//   If the entry cannot post (e.g. its cutover period is locked)
+//   the position stays DRAFT and the route answers 409.
 export const dynamic = 'force-dynamic'
 
 async function gate(req: Request) {
@@ -91,10 +95,19 @@ export async function POST(req: Request) {
       if (before.status === 'confirmed') {
         return NextResponse.json({ error: 'This position is already confirmed' }, { status: 409 })
       }
-      const updated = await prisma.openingPosition.update({
-        where: { id },
-        data: { status: 'confirmed', confirmed_by: g.caller.id, confirmed_at: new Date() },
-      })
+      let result
+      try {
+        result = await confirmOpeningPosition(prisma as any, id, g.caller.id)
+      } catch (err: any) {
+        if (isPeriodBlockedError(err)) {
+          return NextResponse.json(
+            { error: `Opening entry refused: period ${err.month} is ${err.status}. Reopen it (break-glass) or re-compute the position for a later cutover.` },
+            { status: 409 }
+          )
+        }
+        throw err
+      }
+      const updated = await prisma.openingPosition.findUnique({ where: { id } })
       await logAudit({
         caller: g.caller,
         req,
@@ -103,8 +116,12 @@ export async function POST(req: Request) {
         entityTable: 'opening_positions',
         entityId: id,
         fieldChanges: diffFields(before as any, updated as any, ['status']),
+        newValue: { opening_entry_id: result.entry_id, entry_created: result.entry_created } as any,
       })
-      return NextResponse.json({ position: { id: updated.id, status: updated.status } })
+      return NextResponse.json({
+        position: { id, status: 'confirmed' },
+        opening_entry: { entry_id: result.entry_id, created: result.entry_created },
+      })
     }
 
     return NextResponse.json({ error: "action must be 'recompute' or 'confirm'" }, { status: 400 })

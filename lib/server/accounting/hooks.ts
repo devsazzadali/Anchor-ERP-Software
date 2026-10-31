@@ -14,8 +14,9 @@
 import { prisma } from '@/lib/db'
 import { logAudit } from '../audit'
 import { dhakaToday } from '../../dhaka-time'
-import { postEvent, uuidFromString, type Db } from './post'
+import { getPeriodForDate, postEvent, uuidFromString, type Db } from './post'
 import { postForSource, reverseForSource, syncClosingEntry, ACCT } from './events'
+import { recordIfPeriodBlocked } from './exceptions'
 import { toPoishaExact } from './reports'
 
 type Caller = Parameters<typeof logAudit>[0]['caller']
@@ -46,6 +47,9 @@ export async function hookPostSource(
       await auditPost(caller, res.entry_id, sourceTable, sourceId, eventTypeLabel ?? sourceTable)
     }
   } catch (err: any) {
+    // A3: a posting refused by a closed/locked period becomes a
+    // durable posting exception (the source write stands).
+    await recordIfPeriodBlocked(prisma as Db, err, { source_table: sourceTable, source_id: sourceId })
     console.error(`[accounts] hookPostSource ${sourceTable}/${sourceId} failed (fail-soft):`, err?.message || err)
   }
 }
@@ -67,6 +71,7 @@ export async function hookReverseSource(
       await auditPost(caller, res.entry_id, sourceTable, sourceId, 'reversal')
     }
   } catch (err: any) {
+    await recordIfPeriodBlocked(prisma as Db, err, { source_table: sourceTable, source_id: sourceId })
     console.error(`[accounts] hookReverseSource ${sourceTable}/${sourceId} failed (fail-soft):`, err?.message || err)
   }
 }
@@ -123,18 +128,44 @@ export async function hookResyncSource(
       })))
       if (current === wanted) return
     }
+    let reversedActive = false
     if (active) {
       await reverseForSource(prisma as Db, sourceTable, sourceId, {
         entry_date: dhakaToday(),
         memo: 'Source record edited — entry reversed for repost',
         created_by: caller?.id ?? null,
       })
+      reversedActive = true
     }
     if (desired) {
-      const res = await postForSource(prisma as Db, sourceTable, sourceId, { created_by: caller?.id ?? null })
+      // A3 controlled-correction path (blueprint §D E4): when the
+      // edited record's own period is closed/locked, the repost may
+      // NOT land there. Because an active entry was just reversed,
+      // this is a correction, not a new posting: it lands in the
+      // current open period (today) with the move stated on the
+      // entry. With no prior entry to correct, the plain post runs
+      // and the engine's refusal becomes a posting exception.
+      let override: { entry_date_override: string; memo_suffix: string } | undefined
+      if (reversedActive) {
+        const ownPeriod = await getPeriodForDate(prisma as Db, desired.entry_date)
+        if (ownPeriod && ownPeriod.status !== 'open') {
+          const today = dhakaToday()
+          override = {
+            entry_date_override: today,
+            memo_suffix:
+              ` [A3 correction: original event dated ${desired.entry_date} falls in ${ownPeriod.status} period ` +
+              `${desired.entry_date.slice(0, 7)} — reversed and re-posted into open period ${today.slice(0, 7)}]`,
+          }
+        }
+      }
+      const res = await postForSource(prisma as Db, sourceTable, sourceId, {
+        created_by: caller?.id ?? null,
+        ...override,
+      })
       if (res?.created) await auditPost(caller, res.entry_id, sourceTable, sourceId, 'repost')
     }
   } catch (err: any) {
+    await recordIfPeriodBlocked(prisma as Db, err, { source_table: sourceTable, source_id: sourceId })
     console.error(`[accounts] hookResyncSource ${sourceTable}/${sourceId} failed (fail-soft):`, err?.message || err)
   }
 }
@@ -160,6 +191,10 @@ export async function hookSyncClosing(ledgerRowId: string, caller?: Caller): Pro
       })
     }
   } catch (err: any) {
+    await recordIfPeriodBlocked(prisma as Db, err, {
+      source_table: 'branch_cash_ledger',
+      source_id: ledgerRowId,
+    })
     console.error(`[accounts] hookSyncClosing ${ledgerRowId} failed (fail-soft):`, err?.message || err)
   }
 }
@@ -222,6 +257,11 @@ export async function hookCompanyPaidChange(expenseId: string, caller?: Caller):
     })
     if (res.created) await auditPost(caller, res.entry_id, 'company_expenses', expenseId, 'company_expense_payment')
   } catch (err: any) {
+    await recordIfPeriodBlocked(prisma as Db, err, {
+      source_table: 'company_expenses',
+      source_id: expenseId,
+      event_type: 'company_expense_payment',
+    })
     console.error(`[accounts] hookCompanyPaidChange ${expenseId} failed (fail-soft):`, err?.message || err)
   }
 }

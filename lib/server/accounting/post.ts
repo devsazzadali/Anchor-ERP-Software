@@ -18,6 +18,11 @@
  *    integer poisha (lib/money) and stored as Decimal(15,2) strings.
  *  - Amounts are the source rows' own figures — the posting service
  *    never recomputes money.
+ *  - Period enforcement (A3): an entry only lands in an OPEN
+ *    period. A closed/locked period refuses the posting with a
+ *    PeriodBlockedError — operational hooks turn that into a
+ *    durable posting exception; corrections travel as reversal +
+ *    repost into an open period, never as edits to posted entries.
  *
  * The `db` argument is the root Prisma client (routes pass
  * `@/lib/db`'s prisma; scripts pass their own client). It is a
@@ -78,11 +83,68 @@ async function resolveAccountIds(db: Db, codes: string[]): Promise<Map<string, s
   return map
 }
 
-async function resolvePeriodId(db: Db, entryDate: string): Promise<string> {
-  const month = entryDate.slice(0, 7)
+/**
+ * A3 — a posting was refused because its period is closed/locked.
+ * Carries the full posting context so fail-soft callers (hooks.ts)
+ * can record a durable posting exception (exceptions.ts) instead of
+ * losing the blocked posting silently. Admin-facing callers
+ * (opening confirm, FY rollover) let it propagate to the route,
+ * which answers 409.
+ */
+export class PeriodBlockedError extends Error {
+  code = 'ACCOUNTS_PERIOD_BLOCKED'
+  entry_date: string
+  month: string
+  status: string // 'closed' | 'locked'
+  source_table: string | null
+  source_id: string | null
+  event_type: string
+  memo: string | null
+  constructor(args: {
+    entry_date: string
+    month: string
+    status: string
+    source_table?: string | null
+    source_id?: string | null
+    event_type: string
+    memo?: string | null
+  }) {
+    super(`ACCOUNTS: period ${args.month} is ${args.status} — posting refused`)
+    this.name = 'PeriodBlockedError'
+    this.entry_date = args.entry_date
+    this.month = args.month
+    this.status = args.status
+    this.source_table = args.source_table ?? null
+    this.source_id = args.source_id ?? null
+    this.event_type = args.event_type
+    this.memo = args.memo ?? null
+  }
+}
+
+export function isPeriodBlockedError(err: unknown): err is PeriodBlockedError {
+  return !!err && typeof err === 'object' && (err as any).code === 'ACCOUNTS_PERIOD_BLOCKED'
+}
+
+/** The accounting period a YYYY-MM-DD date falls in, or null. */
+export async function getPeriodForDate(db: Db, entryDate: string): Promise<any | null> {
+  return db.accountingPeriod.findUnique({ where: { month: entryDate.slice(0, 7) } })
+}
+
+async function resolvePeriodId(db: Db, input: PostEventInput): Promise<string> {
+  const month = input.entry_date.slice(0, 7)
   const period = await db.accountingPeriod.findUnique({ where: { month } })
   if (!period) throw new Error(`ACCOUNTS: no accounting period for ${month}`)
-  if (period.status === 'locked') throw new Error(`ACCOUNTS: period ${month} is locked`)
+  if (period.status !== 'open') {
+    throw new PeriodBlockedError({
+      entry_date: input.entry_date,
+      month,
+      status: period.status,
+      source_table: input.source_table,
+      source_id: input.source_id,
+      event_type: input.event_type,
+      memo: input.memo,
+    })
+  }
   return period.id
 }
 
@@ -129,7 +191,7 @@ export async function postEvent(db: Db, input: PostEventInput): Promise<PostResu
   }
 
   const accountIds = await resolveAccountIds(db, prepared.map((l) => l.account_code))
-  const periodId = await resolvePeriodId(db, input.entry_date)
+  const periodId = await resolvePeriodId(db, input)
 
   const entry = await db.$transaction(async (tx: Db) => {
     const created = await tx.journalEntry.create({

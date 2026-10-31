@@ -81,7 +81,11 @@ export default function OpeningPositionPage() {
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Confirmation failed')
-      setNotice('Opening position confirmed.')
+      setNotice(
+        json.opening_entry
+          ? `Opening position confirmed — opening journal entry posted (${json.opening_entry.entry_id.slice(0, 8)}…).`
+          : 'Opening position confirmed.'
+      )
       setConfirmArmed(null)
       await load()
     } catch (e: any) {
@@ -172,7 +176,8 @@ export default function OpeningPositionPage() {
             <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
               <p className="text-sm text-slate-700 mb-3">
                 <strong>Owner action:</strong> confirm this position only after checking the bank candidates against the real
-                bank statements and the branch cash against the physical drawers. Confirming is recorded in the audit log.
+                bank statements and the branch cash against the physical drawers. Confirming posts the opening journal entry
+                (P12, dated the cutover — the 1st of the month after this position's as-of month) and is recorded in the audit log.
                 Incomplete history (uncosted chalans, the SOTIBARI deposit drift) stays flagged — it is NOT absorbed into these figures.
               </p>
               {confirmArmed === p.id ? (
