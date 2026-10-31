@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '../app/context/AuthContext';
 import SidebarClient from './SidebarClient';
@@ -40,6 +40,27 @@ export default function SidebarWrapper() {
     if (role || profileType) setIsLoggingOut(false);
   }, [role, profileType]);
 
+  // F1 FIX (safety net): AuthProvider's loadProfile() runs once on
+  // mount — on the login page, before any session exists — and
+  // nothing re-runs it on client-side navigation afterwards (the
+  // login page's localStorage cache write neither updates provider
+  // state nor fires a same-tab 'storage' event). So when the route
+  // changes INTO a non-public route while role/profileType are
+  // still empty, re-validate the session once per pathname. This
+  // covers every sign-in path (login-page refresh(), the 2FA flow,
+  // registration), changes no auth check — /api/auth/me remains the
+  // authority and a logged-out user simply resolves to no role —
+  // and the per-pathname guard prevents a fetch loop when there is
+  // genuinely no session.
+  const revalidatedPathRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!pathname || isPublicRoute(pathname)) return;
+    if (loading || role || profileType) return;
+    if (revalidatedPathRef.current === pathname) return;
+    revalidatedPathRef.current = pathname;
+    void refresh();
+  }, [pathname, role, profileType, loading, refresh]);
+
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
@@ -74,7 +95,7 @@ export default function SidebarWrapper() {
     return (
       <>
         <SidebarClient onLogout={handleLogout} forcedRole={role as 'admin' | 'super_admin'} />
-        <div className="hidden md:flex md:flex-col md:w-64 md:shrink-0">
+        <div className="hidden md:flex md:flex-col md:w-72 md:shrink-0">
           <DesktopSidebar onLogout={handleLogout} forcedRole={role as 'admin' | 'super_admin'} />
         </div>
       </>
@@ -111,7 +132,7 @@ export default function SidebarWrapper() {
   return (
     <>
       <SidebarClient onLogout={handleLogout} forcedRole={effectiveRole} />
-      <div className="hidden md:flex md:flex-col md:w-64 md:shrink-0">
+      <div className="hidden md:flex md:flex-col md:w-72 md:shrink-0">
         <DesktopSidebar onLogout={handleLogout} forcedRole={effectiveRole} />
       </div>
     </>

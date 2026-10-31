@@ -13,10 +13,22 @@
  * system's signed-URL handling is replaced by a session check:
  * owner or admin only).
  *
- * Driver: the local build stores objects on disk under STORAGE_ROOT
- * (default ./storage). Production wiring (e.g. Vercel Blob) is
- * owner-account work; it slots in behind this same interface
- * (putObject / getObject / deleteObject) without touching callers.
+ * Driver: selected by the STORAGE_DRIVER env var, behind this same
+ * interface (putObject / getObject / deleteObject / objectUrl), so
+ * no caller changes when the driver switches.
+ *  - unset or 'local' (the default): objects are stored on disk
+ *    under STORAGE_ROOT (default ./storage) — the original
+ *    behaviour, unchanged.
+ *  - 'vercel-blob': objects are stored in Vercel Blob under the
+ *    SAME stable pathname <bucket>/<path>, as PRIVATE blobs. This
+ *    mode requires BLOB_READ_WRITE_TOKEN; a MissingBlobTokenError
+ *    is thrown without it. getObject() fetches the bytes
+ *    server-side with that token, and objectUrl() returns
+ *    '/api/files/<bucket>/<path>' in BOTH modes — the raw blob URL
+ *    is never exposed to clients, so all serving still goes
+ *    through the /api/files route, which enforces the
+ *    BUCKET_READ_ACCESS privacy map below (kyc + kyc-documents
+ *    stay owner-or-admin only).
  */
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
@@ -74,18 +86,91 @@ function objectFilePath(bucket: string, objectPath: string): string {
   return path.join(storageRoot(), bucket, objectPath)
 }
 
+/** Thrown when STORAGE_DRIVER=vercel-blob but no blob token is set. */
+export class MissingBlobTokenError extends Error {
+  constructor() {
+    super(
+      'BLOB_READ_WRITE_TOKEN is required when STORAGE_DRIVER=vercel-blob. ' +
+        'Create a Vercel Blob store for this project and connect it so Vercel ' +
+        'sets BLOB_READ_WRITE_TOKEN, or set the token manually in the environment.'
+    )
+    this.name = 'MissingBlobTokenError'
+  }
+}
+
+/** Thrown when STORAGE_DRIVER is set to a value that is not a known driver. */
+export class UnknownStorageDriverError extends Error {
+  constructor(value: string) {
+    super(`Unknown STORAGE_DRIVER "${value}" — expected "local" or "vercel-blob".`)
+    this.name = 'UnknownStorageDriverError'
+  }
+}
+
+type StorageDriverName = 'local' | 'vercel-blob'
+
+function storageDriver(): StorageDriverName {
+  const raw = (process.env.STORAGE_DRIVER || 'local').trim().toLowerCase()
+  if (raw === '' || raw === 'local') return 'local'
+  if (raw === 'vercel-blob') return 'vercel-blob'
+  throw new UnknownStorageDriverError(raw)
+}
+
+function requireBlobToken(): string {
+  const token = process.env.BLOB_READ_WRITE_TOKEN
+  if (!token) throw new MissingBlobTokenError()
+  return token
+}
+
+/** Blob pathname for an object: the same stable key, <bucket>/<path>. */
+function blobPathname(bucket: string, objectPath: string): string {
+  return bucket + '/' + objectPath
+}
+
 export async function putObject(
   bucket: string,
   objectPath: string,
   data: Buffer,
-  _contentType?: string
+  contentType?: string
 ): Promise<void> {
+  if (storageDriver() === 'vercel-blob') {
+    const token = requireBlobToken()
+    const { put } = await import('@vercel/blob')
+    await put(blobPathname(bucket, objectPath), data, {
+      // Private: the blob is only reachable server-side with the
+      // token; clients always go through /api/files (see header).
+      access: 'private',
+      token,
+      // Keep the stable key exactly — no suffix — and match the
+      // local driver, which overwrites an existing object silently.
+      addRandomSuffix: false,
+      allowOverwrite: true,
+      ...(contentType ? { contentType } : {}),
+    })
+    return
+  }
   const fp = objectFilePath(bucket, objectPath)
   await fs.mkdir(path.dirname(fp), { recursive: true })
   await fs.writeFile(fp, data)
 }
 
 export async function getObject(bucket: string, objectPath: string): Promise<Buffer | null> {
+  if (storageDriver() === 'vercel-blob') {
+    const token = requireBlobToken()
+    const { get } = await import('@vercel/blob')
+    // Fetches the bytes server-side with the token; the SDK returns
+    // null when the object does not exist. The blob URL in the
+    // result is deliberately never returned to callers/clients.
+    const result = await get(blobPathname(bucket, objectPath), { access: 'private', token })
+    if (!result || result.statusCode !== 200 || !result.stream) return null
+    const chunks: Uint8Array[] = []
+    const reader = result.stream.getReader()
+    for (;;) {
+      const { done, value } = await reader.read()
+      if (done) break
+      if (value) chunks.push(value)
+    }
+    return Buffer.concat(chunks)
+  }
   try {
     return await fs.readFile(objectFilePath(bucket, objectPath))
   } catch {
@@ -94,6 +179,12 @@ export async function getObject(bucket: string, objectPath: string): Promise<Buf
 }
 
 export async function deleteObject(bucket: string, objectPath: string): Promise<void> {
+  if (storageDriver() === 'vercel-blob') {
+    const token = requireBlobToken()
+    const { del } = await import('@vercel/blob')
+    await del(blobPathname(bucket, objectPath), { token })
+    return
+  }
   await fs.rm(objectFilePath(bucket, objectPath), { force: true })
 }
 

@@ -33,6 +33,9 @@ export default function AdminUsersDirectory() {
   const searchParams = useSearchParams()
 
   const [users, setUsers] = useState<any[]>([])
+  // F5: directory figures/list must not flash "Directory (0)" or the
+  // empty state before the first /api/admin/users load completes.
+  const [isUsersLoading, setIsUsersLoading] = useState(true)
   const [selectedUser, setSelectedUser] = useState<any | null>(null)
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
@@ -59,6 +62,9 @@ export default function AdminUsersDirectory() {
   // Extra Details for selected user
   const [kycDetails, setKycDetails] = useState<any | null>(null)
   const [financialStats, setFinancialStats] = useState<{ totalPaid: number, count: number }>({ totalPaid: 0, count: 0 })
+  // F5: per-user detail figures (Total Paid / frequency / ledger list)
+  // show skeletons until /api/admin/user-details has loaded, not 0 BDT.
+  const [isDetailsLoading, setIsDetailsLoading] = useState(false)
   const [salaryHistory, setSalaryHistory] = useState<any[]>([]); // kept for backward compat; use paymentHistory
   // New: payment history list
   const [paymentHistory, setPaymentHistory] = useState<any[]>([])
@@ -449,6 +455,8 @@ export default function AdminUsersDirectory() {
       }
     } catch (err: any) {
       console.error('fetchUsers failed:', err?.message || err?.toString() || 'Unknown error')
+    } finally {
+      setIsUsersLoading(false)
     }
   }
 
@@ -622,6 +630,7 @@ export default function AdminUsersDirectory() {
     setFinancialStats({ totalPaid: 0, count: 0 })
     setPaymentHistory([])
     setBranchTransfers([])
+    setIsDetailsLoading(true)
 
     try {
       const res = await fetch(`/api/admin/user-details?user_id=${encodeURIComponent(userId)}`)
@@ -675,6 +684,8 @@ export default function AdminUsersDirectory() {
 
     } catch (err) {
       console.error('Error fetching details:', err)
+    } finally {
+      setIsDetailsLoading(false)
     }
   }
 
@@ -1306,7 +1317,7 @@ export default function AdminUsersDirectory() {
             <div className="glass-panel p-4 rounded-2xl relative shadow-xl">
               <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-900/5">
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                  <Users className="w-4 h-4" /> Directory ({filteredUsers.length})
+                  <Users className="w-4 h-4" /> Directory ({isUsersLoading ? '…' : filteredUsers.length})
                 </span>
                 <div className="flex items-center gap-2">
                   {!isSelectMode ? (
@@ -1394,7 +1405,16 @@ export default function AdminUsersDirectory() {
               </div>
 
               <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-                {filteredUsers.length === 0 && (
+                {isUsersLoading ? (
+                  <div aria-busy="true" aria-label="Loading users" className="space-y-3">
+                    {[0, 1, 2, 3].map(i => (
+                      <div key={i} className="p-4 rounded-xl border border-slate-900/5 bg-slate-900/[0.03] animate-pulse">
+                        <div className="h-3.5 w-32 rounded bg-slate-900/10 mb-2" />
+                        <div className="h-2.5 w-44 rounded bg-[#d4af37]/20" />
+                      </div>
+                    ))}
+                  </div>
+                ) : filteredUsers.length === 0 && (
                   <div className="text-center py-10 text-slate-500 text-xs italic">No users found in this category.</div>
                 )}
                 {filteredUsers.map(u => {
@@ -1571,10 +1591,10 @@ export default function AdminUsersDirectory() {
                         {activeTab === 'employees' ? 'Total Salary Disbursed' : 'Total Value Transfer'}
                       </span>
                       <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2 font-serif relative z-10 tracking-tight break-all sm:break-normal">
-                        {totalPaid.toLocaleString()} <span className="text-xs font-sans font-normal text-[#8a6d1f]">BDT</span>
+                        {isDetailsLoading ? '…' : <>৳{totalPaid.toLocaleString()}</>}
                       </h3>
                       <p className="text-[10px] text-slate-500 uppercase tracking-widest relative z-10 border-t border-[#d4af37]/10 pt-3 mt-1">
-                        Across <span className="text-[#8a6d1f] font-bold">{transactionCount}</span> successful records
+                        Across <span className="text-[#8a6d1f] font-bold">{isDetailsLoading ? '…' : transactionCount}</span> successful records
                       </p>
                     </div>
                   </div>
@@ -2015,11 +2035,11 @@ export default function AdminUsersDirectory() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-xl bg-slate-900/[0.04] border border-slate-900/5">
                         <div>
                           <span className="text-[9px] uppercase tracking-wider text-slate-500 font-semibold block mb-0.5">Total Paid (Selected Filter)</span>
-                          <span className="text-xl font-bold text-slate-900 font-serif break-all sm:break-normal">{totalPaid.toLocaleString()} BDT</span>
+                          <span className="text-xl font-bold text-slate-900 font-serif break-all sm:break-normal">{isDetailsLoading ? '…' : `${totalPaid.toLocaleString()} BDT`}</span>
                         </div>
                         <div>
                           <span className="text-[9px] uppercase tracking-wider text-slate-500 font-semibold block mb-0.5">Disbursement Frequency</span>
-                          <span className="text-xl font-bold text-slate-900 font-serif">{transactionCount} times</span>
+                          <span className="text-xl font-bold text-slate-900 font-serif">{isDetailsLoading ? '…' : `${transactionCount} times`}</span>
                         </div>
                       </div>
 
@@ -2043,7 +2063,16 @@ export default function AdminUsersDirectory() {
 
                       {/* Ledger list */}
                       <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                        {filteredHistory.length === 0 ? (
+                        {isDetailsLoading ? (
+                          <div aria-busy="true" aria-label="Loading payment history" className="space-y-3">
+                            {[0, 1].map(i => (
+                              <div key={i} className="p-4 rounded-xl border border-slate-900/5 bg-white animate-pulse">
+                                <div className="h-3.5 w-36 rounded bg-slate-900/10 mb-2" />
+                                <div className="h-2.5 w-24 rounded bg-[#d4af37]/20" />
+                              </div>
+                            ))}
+                          </div>
+                        ) : filteredHistory.length === 0 ? (
                           <div className="text-center py-6 text-slate-500 text-xs italic">
                             No salary payments found for the selected branch filter.
                           </div>

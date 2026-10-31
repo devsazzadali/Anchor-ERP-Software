@@ -66,6 +66,20 @@
   --color-amber-accent: var(--amber);
 }
 
+/*
+  F8b contrast floor: slate-400 (#94a3b8, ~2.9:1) and slate-500 (#64748b,
+  ~4.8:1 but lighter than the #595959 AA target for small subtitle text)
+  are used across the app for subtitle/body copy on white. Raise both to
+  slate-600 (#475569, ~7.5:1 — WCAG AA) at the shared level so every page
+  inherits the fix. Unlayered author CSS wins over Tailwind's layered
+  utilities, and opacity variants (text-slate-500/80 etc.) are separate
+  utilities that keep their own rendering.
+*/
+.text-slate-400,
+.text-slate-500 {
+  color: #475569;
+}
+
 body {
   font-family: var(--font-sans);
   background: var(--background);

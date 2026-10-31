@@ -5,9 +5,9 @@ import React, { useEffect, useState, useMemo } from 'react'
 import StatsCard from '@/components/stats-card'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
-  DollarSign, Plus, Search, Check, Trash2, ShieldAlert, AlertTriangle,
+  Plus, Search, Check, Trash2, ShieldAlert, AlertTriangle,
   Loader2, RefreshCw, FileText, Edit, X, MapPin, Globe, Building2,
-  ArrowLeft, PackageOpen, ChevronRight, Download, BadgeDollarSign, Filter
+  ArrowLeft, PackageOpen, ChevronRight, Download, Filter, Wallet, Landmark
 } from 'lucide-react'
 import { expenseKindOf, type ExpenseKind } from '@/lib/expense-streams'
 import * as XLSX from 'xlsx'
@@ -524,13 +524,38 @@ export default function AdminExpenses() {
               </div>
             </div>
 
-            {/* Premium Summary StatsCards */}
+            {/* Premium Summary StatsCards — F5: figures render only once
+                data has loaded; skeletons (light + gold) stand in before
+                that so the cards never flash ৳0. */}
+            {isLoading ? (
+              <div aria-busy="true" aria-label="Loading expense totals">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                  {[0, 1, 2].map(i => (
+                    <div key={i} className="glass-panel p-5 rounded-2xl h-[155px] animate-pulse">
+                      <div className="h-2.5 w-24 rounded bg-[#d4af37]/25 mb-3" />
+                      <div className="h-7 w-36 rounded bg-slate-900/10 mb-4" />
+                      <div className="h-2.5 w-28 rounded bg-slate-900/[0.07]" />
+                    </div>
+                  ))}
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                  {[0, 1].map(i => (
+                    <div key={i} className="glass-panel p-5 rounded-2xl h-[155px] animate-pulse">
+                      <div className="h-2.5 w-32 rounded bg-[#d4af37]/25 mb-3" />
+                      <div className="h-7 w-36 rounded bg-slate-900/10 mb-4" />
+                      <div className="h-2.5 w-44 rounded bg-slate-900/[0.07]" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+            <>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
               <StatsCard
                 title="Total Spent"
                 value={`৳${(branchStats.all?.total || 0).toLocaleString()}`}
                 subtext={`Across ${1 + branches.length} branch${branches.length !== 0 ? 'es' : ''}`}
-                icon={DollarSign}
+                icon={Wallet}
                 sparklineColor="gold"
                 sparklineData={chronoSpark(expenses, e => parseFloat(String(e.total_amount)) || 0)}
               />
@@ -568,11 +593,13 @@ export default function AdminExpenses() {
                 title="Operating — Regular Company Expenses"
                 value={`৳${kindStats.operating.total.toLocaleString()}`}
                 subtext={`${kindStats.operating.count} records · ৳${kindStats.operating.paid.toLocaleString()} paid · ৳${kindStats.operating.due.toLocaleString()} due`}
-                icon={BadgeDollarSign}
+                icon={Landmark}
                 sparklineColor="emerald"
                 sparklineData={chronoSpark(expenses.filter(e => expenseKindOf(e) === 'operating'), e => parseFloat(String(e.total_amount)) || 0)}
               />
             </div>
+            </>
+            )}
 
             {isLoading ? (
               <div className="flex items-center justify-center py-24">
@@ -598,7 +625,10 @@ export default function AdminExpenses() {
                   { id: 'general', name: 'Head Office / General', icon: Building2, iconBg: 'bg-blue-500/10', iconColor: 'text-blue-600', badge: 'text-blue-600 bg-blue-500/10 border-blue-500/15' }
                 ].map(row => {
                   const st = branchStats[row.id] || { total: 0, paid: 0, due: 0, count: 0 }
-                  const paidPct = st.total > 0 ? Math.round((st.paid / st.total) * 100) : 0
+                  // F4: was Math.round(...) — 99.5–99.7% rounded UP to a
+                  // false "100% paid" while money was still due. Keep the
+                  // true fraction; display is formatted to 1 decimal.
+                  const paidPct = st.total > 0 ? (st.paid / st.total) * 100 : 0
                   return (
                     <motion.button
                       key={row.id}
@@ -617,7 +647,7 @@ export default function AdminExpenses() {
                             <div className="h-1 w-20 bg-slate-900/[0.04] rounded-full overflow-hidden">
                               <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${paidPct}%` }} />
                             </div>
-                            <span className="text-[10px] text-slate-600">{paidPct}% paid</span>
+                            <span className="text-[10px] text-slate-600">{paidPct.toFixed(1)}% paid</span>
                           </div>
                         </div>
                       </div>
@@ -635,7 +665,8 @@ export default function AdminExpenses() {
                 {/* Branch Rows */}
                 {branches.map((b, idx) => {
                   const st = branchStats[b.id] || { total: 0, paid: 0, due: 0, count: 0 }
-                  const paidPct = st.total > 0 ? Math.round((st.paid / st.total) * 100) : 0
+                  // F4: see note on the summary rows above — no integer rounding.
+                  const paidPct = st.total > 0 ? (st.paid / st.total) * 100 : 0
                   return (
                     <motion.button
                       key={b.id}
@@ -654,7 +685,7 @@ export default function AdminExpenses() {
                             <div className="h-1 w-20 bg-slate-900/[0.04] rounded-full overflow-hidden">
                               <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${paidPct}%` }} />
                             </div>
-                            <span className="text-[10px] text-slate-600">{paidPct}% paid</span>
+                            <span className="text-[10px] text-slate-600">{paidPct.toFixed(1)}% paid</span>
                           </div>
                         </div>
                       </div>
@@ -736,7 +767,7 @@ export default function AdminExpenses() {
                     title="Total Spent"
                     value={`৳${st.total.toLocaleString()}`}
                     subtext={selectedBranch.name}
-                    icon={DollarSign}
+                    icon={Wallet}
                     sparklineColor="gold"
                     sparklineData={chronoSpark(detailExpenses, e => parseFloat(String(e.total_amount)) || 0, 7)}
                   />

@@ -285,6 +285,16 @@ export default function AuthPage() {
       };
       localStorage.setItem('anchor_auth_cache', JSON.stringify(authCache));
 
+      // F1 FIX: Writing localStorage does NOT update AuthContext's
+      // React state (and 'storage' events never fire in the same
+      // tab), and the root layout / AuthProvider do not remount on
+      // client-side navigation — so without this, the provider kept
+      // the empty role from its pre-login loadProfile() and the
+      // sidebar stayed hidden on the first post-login landing.
+      // Await refresh() so the provider re-fetches /api/auth/me
+      // (the session cookie is already set) BEFORE we navigate.
+      await refresh();
+
       // A9: the legacy `aura_role` cookie write was removed — no
       // server code reads it (the layouts actively delete it); role
       // authority is the server-verified profile only.

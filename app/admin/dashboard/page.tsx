@@ -5,10 +5,10 @@ import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import StatsCard from '@/components/stats-card'
 import {
-  Users, AlertTriangle, ShieldCheck, DollarSign,
+  Users, AlertTriangle, ShieldCheck, Wallet,
   Terminal, ShieldAlert, Compass, Activity,
   Clock, Search, UserMinus, ShieldCheck as ShieldIcon,
-  Store, Building2, TrendingUp
+  Store, Building2, TrendingUp, Banknote, Landmark, Receipt
 } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ComposedChart, Area
@@ -22,6 +22,10 @@ import { sumMoney } from '@/lib/money'
 export default function AdminDashboard() {
   const [adminName, setAdminName] = useState('Chief Executive Officer')
   const [logs, setLogs] = useState<any[]>([])
+  // F5: figures must not render (as 0 / ৳0 / "0.00 BDT") before the
+  // telemetry bundle has loaded — the page shows skeletons until then,
+  // and empty states only for a genuinely empty LOADED result.
+  const [isLoading, setIsLoading] = useState(true)
 
   // Real data states
   const [activeClients, setActiveClients] = useState(0)
@@ -62,6 +66,7 @@ export default function AdminDashboard() {
         if (!res.ok) throw new Error(data.error || 'Failed to fetch telemetry')
       } catch (e) {
         console.error('[admin/dashboard] Failed to load telemetry:', e)
+        setIsLoading(false)
         return
       }
 
@@ -226,6 +231,7 @@ export default function AdminDashboard() {
         }))
         setLogs(mappedLogs)
       }
+      setIsLoading(false)
     }
 
     fetchTelemetry()
@@ -259,6 +265,27 @@ export default function AdminDashboard() {
           </div>
         </div>
 
+        {/* F5: loading skeletons (light + gold) until telemetry has
+            loaded — no 0 / ৳0 / "0.00 BDT" / empty-state flashes. */}
+        {isLoading ? (
+          <div aria-busy="true" aria-label="Loading dashboard telemetry">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-6">
+              {[0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+                <div key={i} className="glass-panel p-5 rounded-2xl h-[155px] animate-pulse">
+                  <div className="h-2.5 w-28 rounded bg-[#d4af37]/25 mb-3" />
+                  <div className="h-7 w-40 rounded bg-slate-900/10 mb-4" />
+                  <div className="h-2.5 w-32 rounded bg-slate-900/[0.07]" />
+                </div>
+              ))}
+            </div>
+            <div className="glass-panel p-6 rounded-2xl h-[320px] animate-pulse">
+              <div className="h-2.5 w-36 rounded bg-[#d4af37]/25 mb-3" />
+              <div className="h-4 w-48 rounded bg-slate-900/10 mb-6" />
+              <div className="h-[220px] rounded-xl bg-slate-900/[0.04]" />
+            </div>
+          </div>
+        ) : (
+        <>
         {/* 9 ADMIN TELEMETRY STATIONS */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-6">
           <Link href="/admin/users" className="block">
@@ -320,9 +347,9 @@ export default function AdminDashboard() {
           <Link href="/admin/payments" className="block">
             <StatsCard
               title="Active Payout Load"
-              value={`${activePayoutLoad.toLocaleString(undefined, { minimumFractionDigits: 2 })} BDT`}
+              value={`৳ ${activePayoutLoad.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
               subtext="Clearing through gateways"
-              icon={Activity}
+              icon={Wallet}
               sparklineColor="amber"
               sparklineData={telemetryData.map(d => d.payouts)}
             />
@@ -330,9 +357,9 @@ export default function AdminDashboard() {
           <Link href="/admin/payments" className="block">
             <StatsCard
               title="Total Liquidity Cleared"
-              value={`${totalLiquidityCleared.toLocaleString(undefined, { minimumFractionDigits: 2 })} BDT`}
+              value={`৳ ${totalLiquidityCleared.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
               subtext="Settled partner payouts"
-              icon={DollarSign}
+              icon={Landmark}
               sparklineColor="emerald"
               sparklineData={telemetryData.map(d => d.payouts)}
             />
@@ -340,9 +367,9 @@ export default function AdminDashboard() {
           <Link href="/admin/salaries" className="block">
             <StatsCard
               title="Total Salary Payroll"
-              value={`${totalSalaries.toLocaleString(undefined, { minimumFractionDigits: 2 })} BDT`}
+              value={`৳ ${totalSalaries.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
               subtext="All-time total disbursed to employees"
-              icon={DollarSign}
+              icon={Banknote}
               sparklineColor="blue"
               sparklineData={telemetryData.map(d => d.salaries)}
             />
@@ -350,9 +377,9 @@ export default function AdminDashboard() {
           <Link href="/admin/branch-expenses" className="block">
             <StatsCard
               title="Total OpEx (Expenses)"
-              value={`${totalExpenses.toLocaleString(undefined, { minimumFractionDigits: 2 })} BDT`}
+              value={`৳ ${totalExpenses.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
               subtext="All-time logged company expenses (gross, incl. unpaid portion)"
-              icon={DollarSign}
+              icon={Receipt}
               sparklineColor="rose"
               sparklineData={telemetryData.map(d => d.expenses)}
             />
@@ -409,10 +436,14 @@ export default function AdminDashboard() {
             <div className="h-[260px] w-full">
               {telemetryData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <ComposedChart data={telemetryData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  {/* F8c: left margin was -20 with an auto-width YAxis, so
+                      the y-axis tick labels were clipped off the left edge.
+                      Give the chart a real left margin, fix the axis width,
+                      and format ticks compactly so labels render fully. */}
+                  <ComposedChart data={telemetryData} margin={{ top: 10, right: 10, left: 8, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(15,18,25,0.08)" vertical={false} />
                     <XAxis dataKey="name" stroke="rgba(15,18,25,0.45)" fontSize={10} tickLine={false} />
-                    <YAxis stroke="rgba(15,18,25,0.45)" fontSize={10} tickLine={false} />
+                    <YAxis width={56} stroke="rgba(15,18,25,0.45)" fontSize={10} tickLine={false} axisLine={false} tickFormatter={(v: number) => `৳${Number(v).toLocaleString(undefined, { maximumFractionDigits: 0 })}`} />
                     <Tooltip
                       contentStyle={{ backgroundColor: '#ffffff', borderColor: 'rgba(15,18,25,0.1)', borderRadius: '12px', fontSize: '11px', color: '#17181c' }}
                     />
@@ -522,6 +553,8 @@ export default function AdminDashboard() {
             </table>
           </div>
         </div>
+        </>
+        )}
 
       </div>
 

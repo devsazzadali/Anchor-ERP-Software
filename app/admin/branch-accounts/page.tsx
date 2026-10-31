@@ -835,7 +835,7 @@ export default function AdminBranchAccountsPage() {
           >
             <div className="flex items-center gap-2 min-w-0">
               <Clock className="w-4 h-4 text-amber-600 shrink-0" />
-              <span className="text-[11px] sm:text-xs font-bold text-amber-600 uppercase tracking-wider truncate">Deposit Approvals</span>
+              <span className="text-[11px] sm:text-xs font-bold text-amber-600 uppercase tracking-wider leading-snug">Deposit Approvals</span>
             </div>
             <div className="flex items-center gap-1.5 shrink-0 ml-1">
               {pendingApprovalsCount > 0 && (
@@ -852,7 +852,7 @@ export default function AdminBranchAccountsPage() {
           >
             <div className="flex items-center gap-2 min-w-0">
               <Coins className="w-4 h-4 text-teal-600 shrink-0" />
-              <span className="text-[11px] sm:text-xs font-bold text-teal-600 uppercase tracking-wider truncate">Change Req</span>
+              <span className="text-[11px] sm:text-xs font-bold text-teal-600 uppercase tracking-wider leading-snug">Change Req</span>
             </div>
             <div className="flex items-center gap-1.5 shrink-0 ml-1">
               {pendingBundleRequestsCount > 0 && (
@@ -869,7 +869,7 @@ export default function AdminBranchAccountsPage() {
           >
             <div className="flex items-center gap-2 min-w-0">
               <ShieldAlert className="w-4 h-4 text-purple-600 shrink-0" />
-              <span className="text-[11px] sm:text-xs font-bold text-purple-600 uppercase tracking-wider truncate">Audit Log</span>
+              <span className="text-[11px] sm:text-xs font-bold text-purple-600 uppercase tracking-wider leading-snug">Audit Log</span>
             </div>
             <ArrowRight className="w-3.5 h-3.5 text-purple-600 group-hover:translate-x-0.5 transition-transform shrink-0 ml-1" />
           </Link>
@@ -879,7 +879,7 @@ export default function AdminBranchAccountsPage() {
           >
             <div className="flex items-center gap-2 min-w-0">
               <BarChart3 className="w-4 h-4 text-blue-600 shrink-0" />
-              <span className="text-[11px] sm:text-xs font-bold text-blue-600 uppercase tracking-wider truncate">Reports</span>
+              <span className="text-[11px] sm:text-xs font-bold text-blue-600 uppercase tracking-wider leading-snug">Reports</span>
             </div>
             <ArrowRight className="w-3.5 h-3.5 text-blue-600 group-hover:translate-x-0.5 transition-transform shrink-0 ml-1" />
           </Link>
@@ -889,7 +889,7 @@ export default function AdminBranchAccountsPage() {
           >
             <div className="flex items-center gap-2 min-w-0">
               <TrendingUp className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span className="text-[11px] sm:text-xs font-bold text-emerald-600 uppercase tracking-wider truncate">Performance</span>
+              <span className="text-[11px] sm:text-xs font-bold text-emerald-600 uppercase tracking-wider leading-snug">Performance</span>
             </div>
             <ArrowRight className="w-3.5 h-3.5 text-emerald-600 group-hover:translate-x-0.5 transition-transform shrink-0 ml-1" />
           </Link>
@@ -899,7 +899,7 @@ export default function AdminBranchAccountsPage() {
           >
             <div className="flex items-center gap-2 min-w-0">
               <Building2 className="w-4 h-4 text-[#8a6d1f] shrink-0" />
-              <span className="text-[11px] sm:text-xs font-bold text-[#8a6d1f] uppercase tracking-wider truncate">Manager Setup</span>
+              <span className="text-[11px] sm:text-xs font-bold text-[#8a6d1f] uppercase tracking-wider leading-snug">Manager Setup</span>
             </div>
             <ArrowRight className="w-3.5 h-3.5 text-[#8a6d1f] group-hover:translate-x-0.5 transition-transform shrink-0 ml-1" />
           </Link>
@@ -960,7 +960,10 @@ export default function AdminBranchAccountsPage() {
             </div>
           </div>
 
-          <div className="overflow-x-auto">
+          {/* F3: proper horizontal-scroll container for the 13-column
+              cash ledger; the Actions column is sticky right (below) so
+              it stays reachable at any scroll position. */}
+          <div className="overflow-x-auto custom-scrollbar">
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-slate-900/10 bg-slate-900/[0.04]">
@@ -970,9 +973,10 @@ export default function AdminBranchAccountsPage() {
                   <th className="text-left p-3.5 text-[9px] uppercase tracking-widest text-slate-500 font-semibold whitespace-nowrap" title="Total Sales = Cash Sales + Digital/MFS Sales">Total Sales</th>
                   <th className="text-left p-3.5 text-[9px] uppercase tracking-widest text-slate-500 font-semibold whitespace-nowrap" title="Cash deducted from the drawer for expenses">Expenses</th>
                   <th className="text-left p-3.5 text-[9px] uppercase tracking-widest text-slate-500 font-semibold whitespace-nowrap" title="Bank Deposits are transfers of physical cash and are not sales">Bank Deposits</th>
-                  {['Closing Cash', 'Discrepancy', 'Status', 'Closed By', 'Actions'].map(h => (
+                  {['Closing Cash', 'Discrepancy', 'Status', 'Closed By'].map(h => (
                     <th key={h} className="text-left p-3.5 text-[9px] uppercase tracking-widest text-slate-500 font-semibold whitespace-nowrap">{h}</th>
                   ))}
+                  <th className="text-left p-3.5 text-[9px] uppercase tracking-widest text-slate-500 font-semibold whitespace-nowrap sticky right-0 z-10 bg-[#eef0f3] shadow-[-10px_0_14px_-10px_rgba(15,18,25,0.35)]">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-900/[0.08]">
@@ -1044,7 +1048,7 @@ export default function AdminBranchAccountsPage() {
                       <td className="p-3.5 text-slate-500 whitespace-nowrap">
                         {item.closed_by_user?.full_name || (item.is_closed ? 'Admin/Manager' : '—')}
                       </td>
-                      <td className="p-3.5 whitespace-nowrap">
+                      <td className="p-3.5 whitespace-nowrap sticky right-0 z-10 bg-white shadow-[-10px_0_14px_-10px_rgba(15,18,25,0.35)]">
                         <div className="flex items-center gap-1.5">
                           <button
                             onClick={() => handleOpenEditModal(item)}
@@ -1067,7 +1071,7 @@ export default function AdminBranchAccountsPage() {
                 })}
                 {safeLedgerEntries.length === 0 && (
                   <tr>
-                    <td colSpan={12} className="p-8 text-center text-slate-500">
+                    <td colSpan={13} className="p-8 text-center text-slate-500">
                       No daily closing records found for the selected branch and date filter.
                     </td>
                   </tr>

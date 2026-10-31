@@ -131,10 +131,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Always fetch fresh profile (will update cache)
     loadProfile();
 
-    // The app has no client auth library emitting state changes;
-    // sign-in writes the cache on the login page before navigating,
-    // and sign-out clears it (see the sidebar logout handler). A
-    // cross-tab storage event keeps other tabs in sync.
+    // The app has no client auth library emitting state changes.
+    // Writing the cache alone does NOT update this provider's React
+    // state, and 'storage' events never fire in the tab that wrote
+    // them — so sign-in must also refresh state explicitly: the
+    // login page awaits refresh() after a successful sign-in before
+    // navigating, and SidebarWrapper re-validates the session when
+    // the route changes into a non-public route while the role is
+    // still empty (covers the 2FA / register flows too). Sign-out
+    // clears the cache (see the sidebar logout handler). A cross-tab
+    // storage event keeps other tabs in sync.
     const onStorage = (e: StorageEvent) => {
       if (e.key === AUTH_CACHE_KEY) {
         if (!e.newValue) {

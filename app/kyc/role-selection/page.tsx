@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { ShieldAlert, UserCircle, Globe } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/app/context/AuthContext'
+import KycSignOutButton from '@/components/KycSignOutButton'
 
 // the profile_type write goes through
 // /api/kyc/select-role (server-side whitelist, own row only — A1).
@@ -75,6 +76,7 @@ export default function RoleSelectionPage() {
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center text-slate-900 font-sans p-4 relative overflow-hidden">
+      <KycSignOutButton />
       {/* Glow Backdrops */}
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#d4af37]/5 rounded-full filter blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[55%] h-[55%] bg-amber-500/5 rounded-full filter blur-[150px] pointer-events-none" />

@@ -49,7 +49,8 @@ const adminNavigation = [
     subItems: [
       { name: 'Accounts Overview', href: '/admin/branch-accounts' },
       { name: 'Deposit Approvals', href: '/admin/branch-accounts/deposit-approvals' },
-      { name: 'Financial Reports', href: '/admin/branch-financial-reports' },
+      // F6: duplicate 'Financial Reports' (/admin/branch-financial-reports)
+      // removed from this group — it already has a main-list entry above.
       { name: 'Change Requisitions', href: '/admin/bundle-requests' },
       { name: 'Reconciliation',   href: '/admin/branch-accounts/reconciliation' },
       { name: 'Branch Performance', href: '/admin/branch-performance' }
@@ -104,7 +105,36 @@ const branchManagerNavigation = [
   { name: 'Profile Settings',   icon: User,            href: '/dashboard/settings' },
 ];
 
-// ── Helper ─────────────────────────────────────────────────────────────────
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+/**
+ * F6 FIX: Segment-boundary active matching. An item is active only
+ * when the pathname is exactly its href or a sub-route of it
+ * (href + '/') — never on a mere string prefix, so sibling routes
+ * like '/admin/expenses' and '/admin/expense-requests' can never
+ * bleed into each other.
+ */
+function isPathActive(pathname: string | null, href: string): boolean {
+  if (!pathname || !href || href === '#') return false;
+  return pathname === href || pathname.startsWith(href + '/');
+}
+
+/**
+ * Among hrefs that match segment-wise, only the LONGEST (most
+ * specific) one is active — e.g. on '/admin/branch-accounts/deposit-approvals'
+ * the Deposit Approvals item wins over Accounts Overview, and on
+ * '/dashboard/settings' Profile Settings wins over '/dashboard'.
+ * This guarantees exactly one highlighted item per list.
+ */
+function longestActiveHref(pathname: string | null, hrefs: string[]): string | null {
+  let best: string | null = null;
+  for (const href of hrefs) {
+    if (isPathActive(pathname, href) && (!best || href.length > best.length)) {
+      best = href;
+    }
+  }
+  return best;
+}
 
 function getNavigation(role: AllowedRole) {
   if (role === 'admin' || role === 'super_admin') return adminNavigation;
@@ -158,13 +188,15 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
   };
 
   const navigation = getNavigation(forcedRole);
+  // F6: the single active top-level item for this pathname (longest match)
+  const activeTopHref = longestActiveHref(pathname, navigation.map((n) => n.href));
 
   return (
     <div
       className={
         mobile
           ? 'flex flex-col justify-between h-full p-6 relative overflow-y-auto'
-          : 'hidden md:flex md:flex-col md:justify-between md:w-64 md:h-screen md:p-6 md:glass-sidebar md:border-r md:border-slate-900/5 md:sticky md:top-0 md:z-20 md:shrink-0 overflow-y-auto custom-scrollbar'
+          : 'hidden md:flex md:flex-col md:justify-between md:w-72 md:h-screen md:p-6 md:glass-sidebar md:border-r md:border-slate-900/5 md:sticky md:top-0 md:z-20 md:shrink-0 overflow-y-auto custom-scrollbar'
       }
     >
       {/* Decorative top accent */}
@@ -194,11 +226,12 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
         {/* Navigation */}
         <div className="space-y-1">
           {navigation.map((node) => {
-            // BUG-026 FIX: Use startsWith so sub-routes like /admin/dashboard/password-requests stay active.
-            // Special case: exact match for '/dashboard' to avoid it activating on every /dashboard/* page.
-            const isActive = node.href === '/dashboard'
-              ? pathname === '/dashboard'
-              : (node.href !== '#' && (pathname === node.href || pathname?.startsWith(node.href + '/')));
+            // BUG-026 + F6: segment-boundary matching (see isPathActive)
+            // so sub-routes like /admin/dashboard/password-requests stay
+            // active, and longest-match-wins so exactly one item is
+            // highlighted — this also subsumes the old '/dashboard'
+            // exact-match special case (a longer sibling always wins).
+            const isActive = node.href !== '#' && node.href === activeTopHref;
 
             const isMenuExpanded = expandedMenus[node.name] || false;
             const Icon = node.icon;
@@ -206,7 +239,8 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
             // If the item has subItems, render a collapsible menu
             if ((node as any).subItems) {
               const subItems = (node as any).subItems as { name: string, href: string }[];
-              const isChildActive = subItems.some(sub => pathname === sub.href || pathname?.startsWith(sub.href + '/'));
+              const activeSubHref = longestActiveHref(pathname, subItems.map((s) => s.href));
+              const isChildActive = activeSubHref !== null;
 
               return (
                 <React.Fragment key={node.name}>
@@ -219,9 +253,9 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
                         : 'text-slate-500 hover:text-slate-700 hover:bg-slate-900/[0.04]'
                     }`}
                   >
-                    <div className="flex items-center gap-3.5">
+                    <div className="flex items-center gap-3.5 min-w-0">
                       <Icon className={`w-4 h-4 shrink-0 transition-transform ${isChildActive ? 'text-[#8a6d1f]' : 'text-slate-500 group-hover:text-slate-900'}`} />
-                      <span>{node.name}</span>
+                      <span className="min-w-0 break-words leading-snug">{node.name}</span>
                     </div>
                     <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isMenuExpanded ? 'rotate-180' : ''}`} />
                   </button>
@@ -229,7 +263,7 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
                   {isMenuExpanded && (
                     <div className="mt-1 mb-2 ml-4 pl-3 border-l border-slate-900/10 space-y-1">
                       {subItems.map(sub => {
-                        const isSubActive = pathname === sub.href || pathname?.startsWith(sub.href + '/');
+                        const isSubActive = sub.href === activeSubHref;
                         return (
                           <Link
                             key={sub.name}
@@ -241,7 +275,7 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
                                 : 'text-slate-500 hover:text-slate-600 hover:bg-slate-900/[0.04]'
                             }`}
                           >
-                            <span>{sub.name}</span>
+                            <span className="min-w-0 break-words leading-snug">{sub.name}</span>
                           </Link>
                         );
                       })}
@@ -278,7 +312,7 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
                       isActive ? 'text-black' : 'text-slate-500 group-hover:text-[#8a6d1f]'
                     }`}
                   />
-                  <span>{node.name}</span>
+                  <span className="min-w-0 break-words leading-snug">{node.name}</span>
                 </Link>
               </React.Fragment>
             );

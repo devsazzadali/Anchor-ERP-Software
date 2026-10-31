@@ -41,7 +41,7 @@ export default function SidebarClient(props: SidebarProps) {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'tween', duration: 0.25 }}
-              className="absolute top-0 left-0 h-full w-64 bg-white backdrop-blur-2xl text-slate-900 shadow-2xl border-r border-slate-900/5"
+              className="absolute top-0 left-0 h-full w-72 bg-white backdrop-blur-2xl text-slate-900 shadow-2xl border-r border-slate-900/5"
               onClick={(e) => e.stopPropagation()}
             >
               <Sidebar

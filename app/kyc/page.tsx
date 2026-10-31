@@ -9,6 +9,7 @@ import { kycSchema } from '@/lib/validators'
 import { Shield, Upload, FileText, Check, ShieldAlert, MapPin, CreditCard } from 'lucide-react'
 import { uploadFile } from '@/lib/files-client'
 import { useRouter } from 'next/navigation'
+import KycSignOutButton from '@/components/KycSignOutButton'
 
 // ─── FileInput component ─────────────────────────────────────────────────────
 // Receives the pre-spread register return so we avoid any dynamic `register(name)`
@@ -221,6 +222,7 @@ export default function KycPage() {
       className="min-h-screen bg-white text-slate-900 font-sans relative overflow-hidden flex justify-center items-center p-6"
       suppressHydrationWarning={true}
     >
+      <KycSignOutButton />
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#d4af37]/5 rounded-full filter blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[55%] h-[55%] bg-amber-500/5 rounded-full filter blur-[150px] pointer-events-none" />
 
