@@ -28,16 +28,25 @@ export const dynamic = 'force-dynamic'
 // branches, employees (with bank_info — admin surface, same
 // exposure as GET /api/admin/salaries) and the Salary ledger heads
 // (name match, deterministic name order — C8).
+// U2: ?include_partners=1 (only the users page's partners tab,
+// whose value transfers issue through the same shared modal) adds
+// partner profiles to the employee list; the default list and the
+// response shape are unchanged.
 export async function GET(req: NextRequest) {
   try {
     const caller = await getCallerProfile(req)
     if (!caller) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     if (!isAdminRole(caller.role)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
+    const includePartners = new URL(req.url).searchParams.get('include_partners') === '1'
+    const profileTypes = includePartners
+      ? ['employee', 'head_office', 'branch_manager', 'partner']
+      : ['employee', 'head_office', 'branch_manager']
+
     const [branches, employees, heads] = await Promise.all([
       prisma.branch.findMany({ select: { id: true, name: true } }),
       prisma.profile.findMany({
-        where: { profile_type: { in: ['employee', 'head_office', 'branch_manager'] } },
+        where: { profile_type: { in: profileTypes } },
         select: { id: true, full_name: true, branch_id: true, salary: true, bank_info: true },
       }),
       prisma.ledgerHead.findMany({

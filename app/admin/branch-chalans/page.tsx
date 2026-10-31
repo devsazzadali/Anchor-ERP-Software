@@ -29,6 +29,8 @@ type ChalanItem = {
   quantity: number
   cost_price: number
   sale_price: number
+  shipping_cost?: number | null
+  total_shipping?: number
   total_cost: number
   total_sale: number
 }
@@ -77,8 +79,8 @@ export default function AdminBranchChalansPage() {
   const [showNewModal, setShowNewModal]     = useState(false)
   const [isSubmitting, setIsSubmitting]     = useState(false)
   const [formNotes, setFormNotes]           = useState('')
-  const [formItems, setFormItems]           = useState<{ code: string; name: string; quantity: string; cost_price: string; sale_price: string }[]>([
-    { code: '', name: '', quantity: '', cost_price: '', sale_price: '' },
+  const [formItems, setFormItems]           = useState<{ code: string; name: string; quantity: string; cost_price: string; sale_price: string; shipping_cost: string }[]>([
+    { code: '', name: '', quantity: '', cost_price: '', sale_price: '', shipping_cost: '' },
   ])
 
   // Delete confirm
@@ -93,7 +95,7 @@ export default function AdminBranchChalansPage() {
   const [showEditModal, setShowEditModal]   = useState(false)
   const [isEditing, setIsEditing]           = useState(false)
   const [editNotes, setEditNotes]           = useState('')
-  const [editItems, setEditItems]           = useState<{ code: string; name: string; quantity: string; cost_price: string; sale_price: string }[]>([])
+  const [editItems, setEditItems]           = useState<{ code: string; name: string; quantity: string; cost_price: string; sale_price: string; shipping_cost: string }[]>([])
 
   // ─── Auth ─────────────────────────────────────────────────────────────────
   // identity via /api/auth/me.
@@ -215,12 +217,12 @@ export default function AdminBranchChalansPage() {
   }, [chalans, selectedBranch, search])
 
   // ─── Form helpers ─────────────────────────────────────────────────────────
-  const addItemRow = () => setFormItems(prev => [...prev, { code: '', name: '', quantity: '', cost_price: '', sale_price: '' }])
+  const addItemRow = () => setFormItems(prev => [...prev, { code: '', name: '', quantity: '', cost_price: '', sale_price: '', shipping_cost: '' }])
   const removeItemRow = (idx: number) => {
     if (formItems.length <= 1) return
     setFormItems(prev => prev.filter((_, i) => i !== idx))
   }
-  const updateItem = (idx: number, field: 'code' | 'name' | 'quantity' | 'cost_price' | 'sale_price', val: string) => {
+  const updateItem = (idx: number, field: 'code' | 'name' | 'quantity' | 'cost_price' | 'sale_price' | 'shipping_cost', val: string) => {
     setFormItems(prev => prev.map((item, i) => i === idx ? { ...item, [field]: val } : item))
   }
 
@@ -231,7 +233,9 @@ export default function AdminBranchChalansPage() {
         const qty = parseFloat(i.quantity) || 0
         const cp  = parseFloat(i.cost_price) || 0
         const sp  = parseFloat(i.sale_price) || 0
-        return { code: i.code?.trim() || undefined, name: i.name.trim(), quantity: qty, cost_price: cp, sale_price: sp, total_cost: qty * cp, total_sale: qty * sp }
+        const shipRaw = (i.shipping_cost ?? '').toString().trim()
+        const ship = shipRaw === '' ? null : (parseFloat(shipRaw) || 0)
+        return { code: i.code?.trim() || undefined, name: i.name.trim(), quantity: qty, cost_price: cp, sale_price: sp, ...(ship !== null ? { shipping_cost: ship, total_shipping: qty * ship } : {}), total_cost: qty * cp, total_sale: qty * sp }
       }),
     [formItems]
   )
@@ -241,13 +245,18 @@ export default function AdminBranchChalansPage() {
     [computedItems]
   )
 
+  const grandTotalShipping = useMemo(() =>
+    computedItems.reduce((s, i) => s + (i.total_shipping ?? 0), 0),
+    [computedItems]
+  )
+
   const grandTotalSale = useMemo(() =>
     computedItems.reduce((s, i) => s + i.total_sale, 0),
     [computedItems]
   )
 
   const resetForm = () => {
-    setFormItems([{ code: '', name: '', quantity: '', cost_price: '', sale_price: '' }])
+    setFormItems([{ code: '', name: '', quantity: '', cost_price: '', sale_price: '', shipping_cost: '' }])
     setFormNotes('')
   }
 
@@ -270,6 +279,7 @@ export default function AdminBranchChalansPage() {
         quantity: String(i.quantity),
         cost_price: String(i.cost_price),
         sale_price: String(i.sale_price),
+        shipping_cost: String(i.shipping_cost ?? ''),
       }))
     )
     setShowEditModal(true)
@@ -282,7 +292,9 @@ export default function AdminBranchChalansPage() {
         const qty = parseFloat(i.quantity) || 0
         const cp  = parseFloat(i.cost_price) || 0
         const sp  = parseFloat(i.sale_price) || 0
-        return { code: i.code?.trim() || undefined, name: i.name.trim(), quantity: qty, cost_price: cp, sale_price: sp, total_cost: qty * cp, total_sale: qty * sp }
+        const shipRaw = (i.shipping_cost ?? '').toString().trim()
+        const ship = shipRaw === '' ? null : (parseFloat(shipRaw) || 0)
+        return { code: i.code?.trim() || undefined, name: i.name.trim(), quantity: qty, cost_price: cp, sale_price: sp, ...(ship !== null ? { shipping_cost: ship, total_shipping: qty * ship } : {}), total_cost: qty * cp, total_sale: qty * sp }
       }),
     [editItems]
   )
@@ -292,15 +304,20 @@ export default function AdminBranchChalansPage() {
     [computedEditItems]
   )
 
+  const grandTotalEditShipping = useMemo(() =>
+    computedEditItems.reduce((s, i) => s + (i.total_shipping ?? 0), 0),
+    [computedEditItems]
+  )
+
   const grandTotalEditSale = useMemo(() =>
     computedEditItems.reduce((s, i) => s + i.total_sale, 0),
     [computedEditItems]
   )
 
-  const updateEditItem = (idx: number, field: 'code' | 'name' | 'quantity' | 'cost_price' | 'sale_price', val: string) => {
+  const updateEditItem = (idx: number, field: 'code' | 'name' | 'quantity' | 'cost_price' | 'sale_price' | 'shipping_cost', val: string) => {
     setEditItems(prev => prev.map((item, i) => i === idx ? { ...item, [field]: val } : item))
   }
-  const addEditItemRow = () => setEditItems(prev => [...prev, { code: '', name: '', quantity: '', cost_price: '', sale_price: '' }])
+  const addEditItemRow = () => setEditItems(prev => [...prev, { code: '', name: '', quantity: '', cost_price: '', sale_price: '', shipping_cost: '' }])
   const removeEditItemRow = (idx: number) => {
     if (editItems.length <= 1) return
     setEditItems(prev => prev.filter((_, i) => i !== idx))
@@ -311,7 +328,7 @@ export default function AdminBranchChalansPage() {
     e.preventDefault()
     if (!editingChalan) return
     if (computedEditItems.length === 0) return setFeedback({ type: 'error', message: 'Add at least one product.' })
-    const invalid = computedEditItems.find(i => i.quantity <= 0 || i.cost_price < 0 || i.sale_price < 0)
+    const invalid = computedEditItems.find(i => i.quantity <= 0 || i.cost_price < 0 || i.sale_price < 0 || (i.shipping_cost != null && i.shipping_cost < 0))
     if (invalid) return setFeedback({ type: 'error', message: `"${invalid.name}" has invalid quantity or price.` })
 
     setIsEditing(true)
@@ -347,7 +364,7 @@ export default function AdminBranchChalansPage() {
     e.preventDefault()
     if (!selectedBranch) return setFeedback({ type: 'error', message: 'No branch selected.' })
     if (computedItems.length === 0) return setFeedback({ type: 'error', message: 'Add at least one product.' })
-    const invalid = computedItems.find(i => i.quantity <= 0 || i.cost_price < 0 || i.sale_price < 0)
+    const invalid = computedItems.find(i => i.quantity <= 0 || i.cost_price < 0 || i.sale_price < 0 || (i.shipping_cost != null && i.shipping_cost < 0))
     if (invalid) return setFeedback({ type: 'error', message: `Product "${invalid.name}" has invalid quantity or price.` })
 
     setIsSubmitting(true)
@@ -415,13 +432,15 @@ export default function AdminBranchChalansPage() {
       item.quantity,
       `${Number(item.cost_price).toLocaleString('en-BD')} BDT`,
       `${Number(item.sale_price).toLocaleString('en-BD')} BDT`,
+      item.shipping_cost === undefined || item.shipping_cost === null ? '—' : `${Number(item.shipping_cost).toLocaleString('en-BD')} BDT`,
       `${Number(item.total_cost).toLocaleString('en-BD')} BDT`,
+      item.total_shipping === undefined || item.total_shipping === null ? '—' : `${Number(item.total_shipping).toLocaleString('en-BD')} BDT`,
       `${Number(item.total_sale).toLocaleString('en-BD')} BDT`,
     ])
 
     generatePdf(
       'Branch Product Dispatch Chalan',
-      ['#', 'Code / Product Title', 'Qty', 'Buy Price', 'Sell Price', 'Total Cost', 'Total Sale'],
+      ['#', 'Code / Product Title', 'Qty', 'Buy Price', 'Sell Price', 'Shipping Cost', 'Total Cost', 'Total Shipping', 'Total Sale'],
       rows,
       {
         filename:    `${chalan.chalan_ref || 'Chalan'}.pdf`,
@@ -758,12 +777,13 @@ export default function AdminBranchChalansPage() {
 
                   {/* Column headers */}
                   <div className="overflow-x-auto custom-scrollbar pb-1">
-                    <div className="grid grid-cols-[80px_1fr_60px_80px_80px_40px] gap-2 mb-2 px-1 min-w-[540px]">
+                    <div className="grid grid-cols-[80px_1fr_60px_80px_80px_80px_40px] gap-2 mb-2 px-1 min-w-[640px]">
                       <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600">Code</span>
                       <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600">Product Name</span>
                       <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600 text-center">Qty</span>
                       <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600 text-center">Buy Price</span>
                       <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600 text-center">Sell Price</span>
+                      <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600 text-center">Shipping Cost</span>
                       <span />
                     </div>
 
@@ -776,7 +796,7 @@ export default function AdminBranchChalansPage() {
                         const rowSale = qty * sp
                         return (
                           <div key={idx}>
-                            <div className="grid grid-cols-[80px_1fr_60px_80px_80px_40px] gap-2 items-center min-w-[540px]">
+                            <div className="grid grid-cols-[80px_1fr_60px_80px_80px_80px_40px] gap-2 items-center min-w-[640px]">
                               <input
                                 type="text" placeholder="Code"
                                 value={item.code}
@@ -813,6 +833,12 @@ export default function AdminBranchChalansPage() {
                                 onChange={e => updateItem(idx, 'sale_price', e.target.value)}
                                 className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-right w-full"
                               />
+                              <input
+                                type="number" min="0" step="0.01" placeholder="—"
+                                value={item.shipping_cost}
+                                onChange={e => updateItem(idx, 'shipping_cost', e.target.value)}
+                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-right w-full"
+                              />
                               <button
                                 type="button"
                                 onClick={() => removeItemRow(idx)}
@@ -823,9 +849,9 @@ export default function AdminBranchChalansPage() {
                               </button>
                             </div>
                             {/* Row subtotal */}
-                            {(rowCost > 0 || rowSale > 0) && (
+                            {(rowCost > 0 || rowSale > 0 || (parseFloat(item.shipping_cost) || 0) > 0) && (
                               <div className="text-right text-[10px] text-slate-500 pr-9 mt-0.5">
-                                Cost: <span className="text-slate-900 font-semibold">৳{rowCost.toLocaleString('en-BD')}</span> | Sale: <span className="text-[#15803d] font-semibold">৳{rowSale.toLocaleString('en-BD')}</span>
+                                Cost: <span className="text-slate-900 font-semibold">৳{rowCost.toLocaleString('en-BD')}</span> | Sale: <span className="text-[#15803d] font-semibold">৳{rowSale.toLocaleString('en-BD')}</span>{(parseFloat(item.shipping_cost) || 0) > 0 && <> | Shipping: <span className="text-slate-900 font-semibold">৳{(qty * (parseFloat(item.shipping_cost) || 0)).toLocaleString('en-BD')}</span></>}
                               </div>
                             )}
                           </div>
@@ -853,6 +879,12 @@ export default function AdminBranchChalansPage() {
                       <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Total Sale</span>
                       <span className="text-xl font-bold text-[#15803d]">৳ {grandTotalSale.toLocaleString('en-BD')}</span>
                     </div>
+                    {grandTotalShipping > 0 && (
+                      <div className="p-4 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+                        <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Total Shipping Cost</span>
+                        <span className="text-xl font-bold text-slate-900">৳ {grandTotalShipping.toLocaleString('en-BD')}</span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Notes */}
@@ -996,8 +1028,8 @@ export default function AdminBranchChalansPage() {
               <div className="overflow-auto custom-scrollbar flex-1 p-5">
                 <div className="rounded-xl border border-slate-900/[0.08] overflow-hidden">
                   {/* Table header */}
-                  <div className="grid grid-cols-[2fr_80px_90px_90px_100px_100px] gap-0 bg-slate-900/[0.04] min-w-[620px] border-b border-slate-900/[0.08]">
-                    {['Product Name', 'Qty', 'Buy Price', 'Sell Price', 'Total Cost', 'Total Sale'].map((h, i) => (
+                  <div className="grid grid-cols-[2fr_70px_80px_80px_90px_90px_90px_90px] gap-0 bg-slate-900/[0.04] min-w-[820px] border-b border-slate-900/[0.08]">
+                    {['Product Name', 'Qty', 'Buy Price', 'Sell Price', 'Shipping Cost', 'Total Cost', 'Total Shipping', 'Total Sale'].map((h, i) => (
                       <div key={h} className={`px-3 py-2.5 text-[9px] font-bold uppercase tracking-[0.12em] text-slate-500 ${i > 0 ? 'text-right' : ''}`}>{h}</div>
                     ))}
                   </div>
@@ -1005,7 +1037,7 @@ export default function AdminBranchChalansPage() {
                   {(viewingChalan.items ?? []).map((item, idx) => (
                     <div
                       key={idx}
-                      className={`grid grid-cols-[2fr_80px_90px_90px_100px_100px] gap-0 items-center min-w-[620px] hover:bg-slate-900/[0.04] transition-colors ${idx < (viewingChalan.items?.length ?? 0) - 1 ? 'border-b border-slate-900/[0.08]' : ''}`}
+                      className={`grid grid-cols-[2fr_70px_80px_80px_90px_90px_90px_90px] gap-0 items-center min-w-[820px] hover:bg-slate-900/[0.04] transition-colors ${idx < (viewingChalan.items?.length ?? 0) - 1 ? 'border-b border-slate-900/[0.08]' : ''}`}
                     >
                       <div className="px-3 py-3">
                         <span className="text-xs font-semibold text-slate-900">{item.name}</span>
@@ -1019,8 +1051,14 @@ export default function AdminBranchChalansPage() {
                       <div className="px-3 py-3 text-right text-xs text-[#15803d] font-semibold">
                         ৳{Number(item.sale_price).toLocaleString('en-BD')}
                       </div>
+                      <div className="px-3 py-3 text-right text-xs text-slate-600">
+                        {item.shipping_cost === undefined || item.shipping_cost === null ? '—' : `৳${Number(item.shipping_cost).toLocaleString('en-BD')}`}
+                      </div>
                       <div className="px-3 py-3 text-right text-xs text-slate-500">
                         ৳{Number(item.total_cost).toLocaleString('en-BD')}
+                      </div>
+                      <div className="px-3 py-3 text-right text-xs text-slate-500">
+                        {item.total_shipping === undefined || item.total_shipping === null ? '—' : `৳${Number(item.total_shipping).toLocaleString('en-BD')}`}
                       </div>
                       <div className="px-3 py-3 text-right text-xs font-bold text-[#15803d]">
                         ৳{Number(item.total_sale).toLocaleString('en-BD')}
@@ -1045,6 +1083,15 @@ export default function AdminBranchChalansPage() {
                     </div>
                     <Banknote className="w-5 h-5 text-[#15803d]/40" />
                   </div>
+                  {(viewingChalan.items ?? []).some(i => i.total_shipping !== undefined && i.total_shipping !== null) && (
+                    <div className="p-4 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 flex items-center justify-between">
+                      <div>
+                        <p className="text-[9px] text-slate-500 uppercase tracking-wider">Total Shipping Cost</p>
+                        <p className="text-lg font-bold text-slate-900 mt-0.5">৳ {(viewingChalan.items ?? []).reduce((s, i) => s + Number(i.total_shipping ?? 0), 0).toLocaleString('en-BD')}</p>
+                      </div>
+                      <Banknote className="w-5 h-5 text-slate-600" />
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -1101,12 +1148,13 @@ export default function AdminBranchChalansPage() {
 
                   {/* Column headers */}
                   <div className="overflow-x-auto custom-scrollbar pb-1">
-                    <div className="grid grid-cols-[80px_1fr_60px_80px_80px_40px] gap-2 mb-2 px-1 min-w-[540px]">
+                    <div className="grid grid-cols-[80px_1fr_60px_80px_80px_80px_40px] gap-2 mb-2 px-1 min-w-[640px]">
                       <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600">Code</span>
                       <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600">Product Name</span>
                       <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600 text-center">Qty</span>
                       <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600 text-center">Buy Price</span>
                       <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600 text-center">Sell Price</span>
+                      <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600 text-center">Shipping Cost</span>
                       <span />
                     </div>
 
@@ -1119,7 +1167,7 @@ export default function AdminBranchChalansPage() {
                         const rowSale = qty * sp
                         return (
                           <div key={idx}>
-                            <div className="grid grid-cols-[80px_1fr_60px_80px_80px_40px] gap-2 items-center min-w-[540px]">
+                            <div className="grid grid-cols-[80px_1fr_60px_80px_80px_80px_40px] gap-2 items-center min-w-[640px]">
                               <input
                                 type="text" placeholder="Code"
                                 value={item.code}
@@ -1155,6 +1203,12 @@ export default function AdminBranchChalansPage() {
                                 onChange={e => updateEditItem(idx, 'sale_price', e.target.value)}
                                 className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-indigo-500/40 transition-all text-right w-full"
                               />
+                              <input
+                                type="number" min="0" step="0.01" placeholder="—"
+                                value={item.shipping_cost}
+                                onChange={e => updateEditItem(idx, 'shipping_cost', e.target.value)}
+                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-indigo-500/40 transition-all text-right w-full"
+                              />
                               <button
                                 type="button"
                                 onClick={() => removeEditItemRow(idx)}
@@ -1164,9 +1218,9 @@ export default function AdminBranchChalansPage() {
                                 <X className="w-3 h-3" />
                               </button>
                             </div>
-                            {(rowCost > 0 || rowSale > 0) && (
+                            {(rowCost > 0 || rowSale > 0 || (parseFloat(item.shipping_cost) || 0) > 0) && (
                               <div className="text-right text-[10px] text-slate-500 pr-9 mt-0.5">
-                                Cost: <span className="text-slate-900 font-semibold">৳{rowCost.toLocaleString('en-BD')}</span> | Sale: <span className="text-indigo-600 font-semibold">৳{rowSale.toLocaleString('en-BD')}</span>
+                                Cost: <span className="text-slate-900 font-semibold">৳{rowCost.toLocaleString('en-BD')}</span> | Sale: <span className="text-indigo-600 font-semibold">৳{rowSale.toLocaleString('en-BD')}</span>{(parseFloat(item.shipping_cost) || 0) > 0 && <> | Shipping: <span className="text-slate-900 font-semibold">৳{(qty * (parseFloat(item.shipping_cost) || 0)).toLocaleString('en-BD')}</span></>}
                               </div>
                             )}
                           </div>
@@ -1193,6 +1247,12 @@ export default function AdminBranchChalansPage() {
                       <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Total Sale</span>
                       <span className="text-xl font-bold text-indigo-600">৳ {grandTotalEditSale.toLocaleString('en-BD')}</span>
                     </div>
+                    {grandTotalEditShipping > 0 && (
+                      <div className="p-4 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+                        <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Total Shipping Cost</span>
+                        <span className="text-xl font-bold text-indigo-600">৳ {grandTotalEditShipping.toLocaleString('en-BD')}</span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Notes */}

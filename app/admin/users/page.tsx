@@ -4,10 +4,10 @@ export const dynamic = 'force-dynamic'
 import React, { useEffect, useState, useCallback } from 'react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Users, Landmark, MapPin, Copy, CreditCard, Check, X, Camera, ShieldCheck, UserX, UserCheck, UserCircle, Search, Image as ImageIcon, FileText, Download, CheckSquare, Square, Calendar, Building2 } from 'lucide-react'
+import { Users, Landmark, MapPin, Copy, CreditCard, Check, X, ShieldCheck, UserX, UserCheck, UserCircle, Search, Image as ImageIcon, FileText, Download, CheckSquare, Square, Calendar, Building2 } from 'lucide-react'
 import * as XLSX from 'xlsx'
 import { generatePdf } from '@/lib/pdf-generator'
-import { uploadFile } from '@/lib/files-client'
+import IssueSalaryModal from '../salaries/IssueSalaryModal'
 
 const getDuration = (dateString: string) => {
   const start = new Date(dateString);
@@ -103,24 +103,16 @@ export default function AdminUsersDirectory() {
   const [profileTypeInput, setProfileTypeInput] = useState('')
   const [joiningDateInput, setJoiningDateInput] = useState('')
 
-  // Add Salary Modal
+  // U2 unification: salary issuing (employees tab) and partner
+  // value transfers (partners tab) render the ONE shared
+  // IssueSalaryModal (../salaries/IssueSalaryModal) — this page's
+  // old inline disburse form, its /api/admin/salary-payments write
+  // and its hand-rolled branch-cash mirror are deleted; the modal's
+  // canonical route books payment + C20/C11 cash copy + ledger sync
+  // in one server transaction. (The base-salary EDIT above —
+  // salaryInput on the profile — is salary SETUP, a different job,
+  // and stays.)
   const [showSalaryModal, setShowSalaryModal] = useState(false)
-  const [amount, setAmount] = useState('')
-  const [overtimeAmount, setOvertimeAmount] = useState('')
-  const [bonusAmount, setBonusAmount] = useState('')
-  const [salesCommission, setSalesCommission] = useState('')
-  const [tiffinBill, setTiffinBill] = useState('')
-  const [ledgerHeads, setLedgerHeads] = useState<any[]>([])
-  const [ledgerHeadId, setLedgerHeadId] = useState('')
-  const [salaryNote, setSalaryNote] = useState('')
-  const [trxId, setTrxId] = useState('')
-  const [paymentDate, setPaymentDate] = useState(new Date().toISOString().split('T')[0])
-  const [proofFile, setProofFile] = useState<File | null>(null)
-
-  // Modal states for branch and account method selection
-  const [selectedSalaryBranch, setSelectedSalaryBranch] = useState<string>('')
-  const [selectedSalaryAccount, setSelectedSalaryAccount] = useState<string>('Custom')
-  const [customAccountInput, setCustomAccountInput] = useState<string>('')
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null)
@@ -159,29 +151,9 @@ export default function AdminUsersDirectory() {
       fetchBranches()
       fetchPositions()
       fetchMasterLedger()
-      fetchLedgerHeads()
     }
     initSession()
   }, [])
-
-  const fetchLedgerHeads = async () => {
-    try {
-      const res = await fetch('/api/ledger-heads')
-      if (!res.ok) return
-      const { ledger_heads } = await res.json()
-      // Old filter: name ILIKE '%Salary%' OR code_number = 11.
-      const data = (ledger_heads || []).filter((h: any) =>
-        (h.name && h.name.toLowerCase().includes('salary')) || String(h.code_number) === '11'
-      )
-      if (data.length > 0) {
-        setLedgerHeads(data)
-        const code11 = data.find((d: any) => String(d.code_number) === '11')
-        setLedgerHeadId(code11 ? code11.id : data[0].id)
-      }
-    } catch (err) {
-      console.error(err)
-    }
-  }
 
   const fetchBranches = async () => {
     try {
@@ -850,140 +822,6 @@ export default function AdminUsersDirectory() {
     navigator.clipboard.writeText(text)
     setFeedback({ type: 'success', message: 'Copied to clipboard!' })
     setTimeout(() => setFeedback(null), 2000)
-  }
-
-  const handleAddSalary = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!selectedUser) return
-    setIsSubmitting(true)
-    setFeedback(null)
-
-    const finalAccount = selectedSalaryAccount === 'Custom' ? customAccountInput : selectedSalaryAccount;
-    const basicAmountNum = Number(amount || 0);
-    const overtimeNum = Number(overtimeAmount || 0);
-    const bonusNum = Number(bonusAmount || 0);
-    const salesCommissionNum = Number(salesCommission || 0);
-    const tiffinBillNum = Number(tiffinBill || 0);
-    const totalAmount = basicAmountNum + overtimeNum + bonusNum + salesCommissionNum + tiffinBillNum;
-
-    if (totalAmount <= 0) {
-      setFeedback({ type: 'error', message: 'Total amount must be greater than zero.' });
-      setIsSubmitting(false);
-      return;
-    }
-
-    if (activeTab === 'employees' && !ledgerHeadId) {
-      setFeedback({ type: 'error', message: 'Please select a Ledger Head for this salary payment.' });
-      setIsSubmitting(false);
-      return;
-    }
-
-    try {
-      let proofUrl = null
-      if (proofFile) {
-        const fileExt = proofFile.name.split('.').pop()
-        const fileName = `${selectedUser.id}_${Date.now()}.${fileExt}`
-        // salary proof slips go through the file server —
-        // same 'salaries' bucket as the old system (now served to
-        // authenticated users only by /api/files).
-        const uploaded = await uploadFile('salaries', proofFile, fileName)
-        proofUrl = uploaded.url
-      }
-
-      const salaryRes = await fetch('/api/admin/salary-payments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          employee_id: selectedUser.id,
-          amount: totalAmount,
-          transaction_id: trxId,
-          payment_proof_url: proofUrl,
-          payment_date: new Date(paymentDate.includes('T') ? paymentDate : `${paymentDate}T12:00:00.000Z`).toISOString(),
-          branch_id: selectedSalaryBranch || null,
-          account: finalAccount || null,
-          notes: salaryNote || null,
-          base_salary_at_time: basicAmountNum,
-          overtime_amount: overtimeNum,
-          bonus_amount: bonusNum,
-          sales_commission: salesCommissionNum,
-          tiffin_bill: tiffinBillNum,
-          total_salary: totalAmount,
-          ledger_head_id: activeTab === 'employees' ? ledgerHeadId : null
-        }),
-      })
-      if (!salaryRes.ok) {
-        const data = await salaryRes.json().catch(() => ({}))
-        throw new Error(data.error || 'Failed to record salary.')
-      }
-      const { payment: salaryData } = await salaryRes.json()
-
-      if (activeTab === 'employees' && ledgerHeadId) {
-        // Mirror the payment into the branch cash ledger; the API
-        // stamps manager_id from the caller's session server-side.
-        try {
-          await fetch('/api/admin/branch-cash-expenses', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              branch_id: selectedSalaryBranch || null,
-              ledger_head_id: ledgerHeadId,
-              amount: totalAmount,
-              expense_date: new Date(paymentDate.includes('T') ? paymentDate : `${paymentDate}T12:00:00.000Z`).toISOString().split('T')[0],
-              description: `Salary Payment for ${selectedUser.full_name}`,
-              category: 'other',
-              salary_payment_id: salaryData?.id || null
-            }),
-          })
-        } catch (expenseErr) {
-          console.warn('Failed to mirror salary into branch cash expenses', expenseErr)
-        }
-      }
-
-      // Trigger Email
-      fetch('/api/email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: selectedUser.profile_type === 'partner' ? 'VALUE_TRANSFER_COMPLETED' : 'SALARY_PAID',
-          payload: {
-            userId: selectedUser.id,
-            userName: selectedUser.full_name || 'Employee',
-            email: selectedUser.email || null,
-            month: new Date(paymentDate.includes('T') ? paymentDate : `${paymentDate}T12:00:00.000Z`).toLocaleString('default', { month: 'long', year: 'numeric' }),
-            amount: totalAmount,
-            base_salary: basicAmountNum,
-            overtime: overtimeNum,
-            bonus: bonusNum,
-            sales_commission: salesCommissionNum,
-            tiffin_bill: tiffinBillNum,
-            currency: 'BDT',
-            transactionId: trxId || `SAL-${Date.now().toString().slice(-8)}`,
-            paymentMethod: finalAccount || 'Payroll Bank Account',
-            branchName: branches.find((b: any) => b.id === selectedSalaryBranch)?.name || 'Head Office'
-          }
-        })
-      }).catch(e => console.error('Failed to trigger salary email', e));
-
-      setFeedback({ type: 'success', message: 'Salary payment recorded successfully.' })
-      setTimeout(() => setFeedback(null), 3000)
-
-      setShowSalaryModal(false)
-      setAmount('')
-      setOvertimeAmount('')
-      setBonusAmount('')
-      setSalesCommission('')
-      setTiffinBill('')
-      setSalaryNote('')
-      setTrxId('')
-      setProofFile(null)
-      setCustomAccountInput('')
-      fetchUserDetails(selectedUser.id, selectedUser.profile_type || 'employee')
-      fetchMasterLedger()
-    } catch (err: any) {
-      setFeedback({ type: 'error', message: err.message || 'Failed to record salary.' })
-    } finally {
-      setIsSubmitting(false)
-    }
   }
 
   const filteredHistory = selectedHistoryBranch === 'all'
@@ -1873,21 +1711,7 @@ export default function AdminUsersDirectory() {
 
                         {!isEditing && (
                           <button
-                            onClick={() => {
-                              setAmount(selectedUser.salary && activeTab === 'employees' ? String(selectedUser.salary) : '')
-                              setSalaryNote('')
-                              setSelectedSalaryBranch(selectedUser.branch_id || '')
-                              const bankKeys = selectedUser.bank_info ? Object.keys(selectedUser.bank_info) : []
-                              if (bankKeys.length > 0) {
-                                const firstKey = bankKeys[0]
-                                const formattedKey = firstKey.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())
-                                setSelectedSalaryAccount(`${formattedKey}: ${selectedUser.bank_info[firstKey]}`)
-                              } else {
-                                setSelectedSalaryAccount('Custom')
-                              }
-                              setCustomAccountInput('')
-                              setShowSalaryModal(true)
-                            }}
+                            onClick={() => setShowSalaryModal(true)}
                             className="mt-6 w-full bg-[#1ca34c] text-white font-bold py-3 rounded-full text-xs tracking-wider uppercase flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#1ca34c]/25 transition-all hover:-translate-y-0.5"
                           >
                             <CreditCard className="w-4 h-4" /> {activeTab === 'employees' ? 'Issue Salary Payment' : 'Issue Value Transfer'}
@@ -2280,175 +2104,21 @@ export default function AdminUsersDirectory() {
         )}
       </AnimatePresence>
 
-      {/* ADD SALARY MODAL */}
-      <AnimatePresence>
-        {showSalaryModal && selectedUser && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-slate-950/50 z-[60] flex justify-center items-center p-4 backdrop-blur-sm"
-          >
-            <motion.div
-              initial={{ scale: 0.95 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.95 }}
-              className="glass-panel p-4 sm:p-6 rounded-2xl max-w-lg w-full relative shadow-2xl overflow-y-auto max-h-[90vh] border border-[#1ca34c]/30"
-            >
-              <div className="flex justify-between items-start mb-6">
-                <div>
-                  <h3 className="text-xl font-bold text-slate-900 font-serif">{activeTab === 'employees' ? 'Disburse Salary' : 'Issue Value Transfer'}</h3>
-                  <p className="text-xs text-slate-500 mt-1">{activeTab === 'employees' ? 'Record a new salary payment to the ledger.' : 'Record a value transfer to partner ledger.'}</p>
-                </div>
-                <button onClick={() => setShowSalaryModal(false)} className="text-slate-500 hover:text-slate-900 bg-slate-900/[0.04] p-2.5 rounded-full transition-colors">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* Reference Card */}
-              <div className="mb-6 p-4 rounded-xl bg-gradient-to-br from-[#1ca34c]/10 to-transparent border border-[#1ca34c]/20 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                <div>
-                  <p className="text-[10px] font-bold text-[#15803d] uppercase tracking-wider mb-0.5">{activeTab === 'employees' ? 'Employee' : 'Partner'}</p>
-                  <p className="text-sm font-semibold text-slate-900 break-all sm:break-normal">{selectedUser.full_name}</p>
-                </div>
-                <div className="sm:text-right">
-                  <p className="text-[10px] font-bold text-[#15803d] uppercase tracking-wider mb-0.5">{activeTab === 'employees' ? 'Fixed Base Salary' : 'Base Allocation'}</p>
-                  <p className="text-sm font-bold text-emerald-600">{selectedUser.salary ? `${Number(selectedUser.salary).toLocaleString()} BDT` : 'Not Set'}</p>
-                </div>
-              </div>
-
-              <form onSubmit={handleAddSalary} className="space-y-5">
-                {activeTab === 'employees' && ledgerHeads.length > 0 && (
-                  <div>
-                    <label className="block text-[10px] font-semibold text-slate-500 tracking-wider uppercase mb-1.5">Ledger Head (Expense Category) <span className="text-emerald-500">*</span></label>
-                    <select value={ledgerHeadId} onChange={(e)=>setLedgerHeadId(e.target.value)} required className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-sm font-bold text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 transition-colors">
-                      <option value="" disabled className="bg-white">Select Ledger Head</option>
-                      {ledgerHeads.map(l => <option key={l.id} value={l.id} className="bg-white">{l.name} {l.code_number ? `(Code ${l.code_number})` : ''}</option>)}
-                    </select>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
-                  <div>
-                    <label className="block text-[10px] font-semibold text-slate-500 tracking-wider uppercase mb-1.5 flex justify-between">
-                      <span>Basic (BDT)</span>
-                      <span className="text-emerald-500">*</span>
-                    </label>
-                    <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} required className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-sm font-bold text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 transition-colors" />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-semibold text-slate-500 tracking-wider uppercase mb-1.5 flex justify-between">
-                      <span>Overtime</span>
-                    </label>
-                    <input type="number" value={overtimeAmount} onChange={(e) => setOvertimeAmount(e.target.value)} className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-sm font-bold text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 transition-colors" />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-semibold text-slate-500 tracking-wider uppercase mb-1.5 flex justify-between">
-                      <span>Bonus</span>
-                    </label>
-                    <input type="number" value={bonusAmount} onChange={(e) => setBonusAmount(e.target.value)} className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-sm font-bold text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 transition-colors" />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-semibold text-slate-500 tracking-wider uppercase mb-1.5 flex justify-between">
-                      <span>Sales Comm</span>
-                    </label>
-                    <input type="number" value={salesCommission} onChange={(e) => setSalesCommission(e.target.value)} className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-sm font-bold text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 transition-colors" />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-semibold text-slate-500 tracking-wider uppercase mb-1.5 flex justify-between">
-                      <span>Tiffin Bill</span>
-                    </label>
-                    <input type="number" value={tiffinBill} onChange={(e) => setTiffinBill(e.target.value)} className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-sm font-bold text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 transition-colors" />
-                  </div>
-                </div>
-
-                <div className="p-4 bg-[#1ca34c]/5 border border-[#1ca34c]/20 rounded-xl flex justify-between items-center">
-                  <div className="flex items-center gap-2 text-[#15803d]"><span className="text-xs font-bold uppercase tracking-wider">Total Amount</span></div>
-                  <span className="text-lg font-bold text-slate-900">{(Number(amount || 0) + Number(overtimeAmount || 0) + Number(bonusAmount || 0) + Number(salesCommission || 0) + Number(tiffinBill || 0)).toLocaleString()} BDT</span>
-                </div>
-
-                <div>
-                  <label className="block text-[10px] font-semibold text-slate-500 tracking-wider uppercase mb-1.5">Remarks / Notes (Optional)</label>
-                  <textarea rows={2} value={salaryNote} onChange={(e) => setSalaryNote(e.target.value)} placeholder="e.g. Added 5k Eid Bonus" className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 transition-colors resize-none" />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div>
-                    <label className="block text-[10px] font-semibold text-slate-500 tracking-wider uppercase mb-1.5">Branch for Transaction</label>
-                    <select
-                      value={selectedSalaryBranch}
-                      onChange={(e) => setSelectedSalaryBranch(e.target.value)}
-                      required
-                      className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50"
-                    >
-                      <option value="" className="bg-white text-slate-900">Select Branch</option>
-                      {branches.map((b) => (
-                        <option key={b.id} value={b.id} className="bg-white text-slate-900">{b.name}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-[10px] font-semibold text-slate-500 tracking-wider uppercase mb-1.5">Payout Destination/Account</label>
-                    <select
-                      value={selectedSalaryAccount}
-                      onChange={(e) => setSelectedSalaryAccount(e.target.value)}
-                      className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50"
-                    >
-                      {selectedUser.bank_info && Object.entries(selectedUser.bank_info).map(([key, val]) => {
-                        if (!val) return null
-                        const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())
-                        return (
-                          <option key={key} value={`${label}: ${val}`} className="bg-white text-slate-900">
-                            {label}: {String(val)}
-                          </option>
-                        )
-                      })}
-                      <option value="Custom" className="bg-white text-slate-900">Custom / Other</option>
-                    </select>
-                  </div>
-                </div>
-
-                {selectedSalaryAccount === 'Custom' && (
-                  <div>
-                    <label className="block text-[10px] font-semibold text-slate-500 tracking-wider uppercase mb-1.5">Custom Account/Method Details</label>
-                    <input
-                      type="text"
-                      value={customAccountInput}
-                      onChange={(e) => setCustomAccountInput(e.target.value)}
-                      required
-                      placeholder="e.g. bKash: 01712345678 or Hand Cash"
-                      className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50"
-                    />
-                  </div>
-                )}
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div>
-                    <label className="block text-[10px] font-semibold text-slate-500 tracking-wider uppercase mb-1.5">Transaction ID</label>
-                    <input type="text" value={trxId} onChange={(e) => setTrxId(e.target.value)} required placeholder="e.g. TRX-1290381" className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs font-mono text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-semibold text-slate-500 tracking-wider uppercase mb-1.5">Payment Date</label>
-                    <input type="date" value={paymentDate} onChange={(e) => setPaymentDate(e.target.value)} required className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="flex flex-col items-center justify-center w-full py-6 border-2 border-dashed border-slate-900/10 hover:border-[#1ca34c]/30 rounded-xl cursor-pointer bg-slate-900/[0.04] transition-all">
-                    <Camera className="w-6 h-6 text-slate-500 mb-2" />
-                    <span className="text-xs text-slate-500 font-semibold">{proofFile ? proofFile.name : 'Upload Screenshot (PNG, JPG)'}</span>
-                    <input type="file" className="hidden" accept="image/*" onChange={(e) => { if (e.target.files && e.target.files[0]) setProofFile(e.target.files[0]) }} />
-                  </label>
-                </div>
-                <button type="submit" disabled={isSubmitting} className="w-full bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-600 font-semibold py-3.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 mt-4">
-                  {isSubmitting ? 'Processing...' : (activeTab === 'employees' ? 'Confirm Salary Disbursement' : 'Confirm Value Transfer')}
-                </button>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* ISSUE SALARY / VALUE TRANSFER — the ONE shared IssueSalaryModal (U2) */}
+      <IssueSalaryModal
+        isOpen={showSalaryModal}
+        onClose={() => setShowSalaryModal(false)}
+        onSuccess={() => {
+          setFeedback({ type: 'success', message: 'Salary payment recorded successfully.' })
+          setTimeout(() => setFeedback(null), 3000)
+          if (selectedUser) fetchUserDetails(selectedUser.id, selectedUser.profile_type || 'employee')
+          fetchMasterLedger()
+        }}
+        preselectedUserId={selectedUser?.id}
+        preselectedBranch={selectedUser?.branch_id || undefined}
+        preselectedBaseSalary={activeTab === 'employees' && selectedUser?.salary ? Number(selectedUser.salary) : undefined}
+        includePartners={activeTab === 'partners'}
+      />
 
       {/* CHANGE BRANCH MODAL */}
       <AnimatePresence>

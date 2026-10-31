@@ -18,12 +18,17 @@ function computeChalanItems(rawItems: unknown): {
       const qty = Number(i.quantity) || 0
       const cp = roundMoney(Number(i.cost_price) || 0)
       const sp = roundMoney(Number(i.sale_price) || 0)
+      // Shipping cost (per unit) — see POST /api/chalans: additive,
+      // omitted when not recorded, never folded into the totals.
+      const hasShip = i.shipping_cost !== undefined && i.shipping_cost !== null && String(i.shipping_cost).trim() !== ''
+      const ship = hasShip ? roundMoney(Number(i.shipping_cost) || 0) : null
       return {
         ...(i.code && String(i.code).trim() ? { code: String(i.code).trim() } : {}),
         name: String(i.name).trim(),
         quantity: qty,
         cost_price: cp,
         sale_price: sp,
+        ...(ship !== null ? { shipping_cost: ship, total_shipping: roundMoney(qty * ship) } : {}),
         total_cost: roundMoney(qty * cp),
         total_sale: roundMoney(qty * sp),
       }

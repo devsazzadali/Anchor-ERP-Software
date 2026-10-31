@@ -35,6 +35,8 @@ type ChalanItem = {
   quantity: number
   cost_price?: number
   sale_price?: number
+  shipping_cost?: number | null
+  total_shipping?: number
   total_cost?: number
   total_sale?: number
   // Legacy fields
@@ -89,8 +91,8 @@ export default function PartnerBranchChalansPage() {
   const [showNewModal, setShowNewModal]   = useState(false)
   const [isSubmitting, setIsSubmitting]   = useState(false)
   const [formNotes, setFormNotes]         = useState('')
-  const [formItems, setFormItems]         = useState<{ code: string; name: string; quantity: string; cost_price: string; sale_price: string }[]>([
-    { code: '', name: '', quantity: '', cost_price: '', sale_price: '' },
+  const [formItems, setFormItems]         = useState<{ code: string; name: string; quantity: string; cost_price: string; sale_price: string; shipping_cost: string }[]>([
+    { code: '', name: '', quantity: '', cost_price: '', sale_price: '', shipping_cost: '' },
   ])
 
   // ─── Edit Chalan Modal ────────────────────────────────────────────────────
@@ -98,7 +100,7 @@ export default function PartnerBranchChalansPage() {
   const [showEditModal, setShowEditModal]   = useState(false)
   const [isEditing, setIsEditing]           = useState(false)
   const [editNotes, setEditNotes]           = useState('')
-  const [editItems, setEditItems]           = useState<{ code: string; name: string; quantity: string; cost_price: string; sale_price: string }[]>([])
+  const [editItems, setEditItems]           = useState<{ code: string; name: string; quantity: string; cost_price: string; sale_price: string; shipping_cost: string }[]>([])
 
   // ─── Auth ─────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -213,13 +215,13 @@ export default function PartnerBranchChalansPage() {
   }, [chalans, selectedBranch, search])
 
   // ─── Form helpers (shared for new & edit) ─────────────────────────────────
-  const addItemRow = (setter: React.Dispatch<React.SetStateAction<{ code: string; name: string; quantity: string; cost_price: string; sale_price: string }[]>>) =>
-    setter(prev => [...prev, { code: '', name: '', quantity: '', cost_price: '', sale_price: '' }])
+  const addItemRow = (setter: React.Dispatch<React.SetStateAction<{ code: string; name: string; quantity: string; cost_price: string; sale_price: string; shipping_cost: string }[]>>) =>
+    setter(prev => [...prev, { code: '', name: '', quantity: '', cost_price: '', sale_price: '', shipping_cost: '' }])
 
   const removeItemRow = (
     idx: number,
-    items: { code: string; name: string; quantity: string; cost_price: string; sale_price: string }[],
-    setter: React.Dispatch<React.SetStateAction<{ code: string; name: string; quantity: string; cost_price: string; sale_price: string }[]>>
+    items: { code: string; name: string; quantity: string; cost_price: string; sale_price: string; shipping_cost: string }[],
+    setter: React.Dispatch<React.SetStateAction<{ code: string; name: string; quantity: string; cost_price: string; sale_price: string; shipping_cost: string }[]>>
   ) => {
     if (items.length <= 1) return
     setter(prev => prev.filter((_, i) => i !== idx))
@@ -227,34 +229,39 @@ export default function PartnerBranchChalansPage() {
 
   const updateItem = (
     idx: number,
-    field: 'code' | 'name' | 'quantity' | 'cost_price' | 'sale_price',
+    field: 'code' | 'name' | 'quantity' | 'cost_price' | 'sale_price' | 'shipping_cost',
     val: string,
-    setter: React.Dispatch<React.SetStateAction<{ code: string; name: string; quantity: string; cost_price: string; sale_price: string }[]>>
+    setter: React.Dispatch<React.SetStateAction<{ code: string; name: string; quantity: string; cost_price: string; sale_price: string; shipping_cost: string }[]>>
   ) => {
     setter(prev => prev.map((item, i) => i === idx ? { ...item, [field]: val } : item))
   }
 
-  const computeItems = (raw: { code: string; name: string; quantity: string; cost_price: string; sale_price: string }[]): ChalanItem[] =>
+  const computeItems = (raw: { code: string; name: string; quantity: string; cost_price: string; sale_price: string; shipping_cost: string }[]): ChalanItem[] =>
     raw.filter(i => i.name.trim()).map(i => {
       const qty = parseFloat(i.quantity) || 0
       const cp  = parseFloat(i.cost_price) || 0
       const sp  = parseFloat(i.sale_price) || 0
+      const shipRaw = (i.shipping_cost ?? '').toString().trim()
+      const ship = shipRaw === '' ? null : (parseFloat(shipRaw) || 0)
       return { 
         code: i.code.trim() || undefined,
         name: i.name.trim(), 
         quantity: qty, 
         cost_price: cp, 
         sale_price: sp, 
+        ...(ship !== null ? { shipping_cost: ship, total_shipping: qty * ship } : {}),
         total_cost: qty * cp, 
         total_sale: qty * sp 
       }
     })
 
   const computedNewItems = useMemo(() => computeItems(formItems), [formItems])
+  const grandTotalShippingNew = useMemo(() => computedNewItems.reduce((s, i) => s + (i.total_shipping ?? 0), 0), [computedNewItems])
   const grandTotalCostNew = useMemo(() => computedNewItems.reduce((s, i) => s + (i.total_cost ?? 0), 0), [computedNewItems])
   const grandTotalSaleNew = useMemo(() => computedNewItems.reduce((s, i) => s + (i.total_sale ?? 0), 0), [computedNewItems])
 
   const computedEditItems = useMemo(() => computeItems(editItems), [editItems])
+  const grandTotalShippingEdit = useMemo(() => computedEditItems.reduce((s, i) => s + (i.total_shipping ?? 0), 0), [computedEditItems])
   const grandTotalCostEdit = useMemo(() => computedEditItems.reduce((s, i) => s + (i.total_cost ?? 0), 0), [computedEditItems])
   const grandTotalSaleEdit = useMemo(() => computedEditItems.reduce((s, i) => s + (i.total_sale ?? 0), 0), [computedEditItems])
 
@@ -294,7 +301,7 @@ export default function PartnerBranchChalansPage() {
         const body = await res.json().catch(() => null)
         throw new Error(body?.error || 'Failed to create chalan')
       }
-      setFormItems([{ code: '', name: '', quantity: '', cost_price: '', sale_price: '' }])
+      setFormItems([{ code: '', name: '', quantity: '', cost_price: '', sale_price: '', shipping_cost: '' }])
       setFormNotes('')
       setShowNewModal(false)
       setFeedback({ type: 'success', message: '✓ Chalan created successfully!' })
@@ -317,6 +324,7 @@ export default function PartnerBranchChalansPage() {
         quantity: String(i.quantity),
         cost_price: String(i.cost_price ?? i.unit_price ?? ''),
         sale_price: String(i.sale_price ?? i.unit_price ?? ''),
+        shipping_cost: String(i.shipping_cost ?? ''),
       }))
     )
     setShowEditModal(true)
@@ -365,12 +373,13 @@ export default function PartnerBranchChalansPage() {
       item.quantity,
       `${Number(item.cost_price ?? item.unit_price ?? 0).toLocaleString('en-BD')} BDT`,
       `${Number(item.sale_price ?? item.unit_price ?? 0).toLocaleString('en-BD')} BDT`,
+      item.shipping_cost === undefined || item.shipping_cost === null ? '—' : `${Number(item.shipping_cost).toLocaleString('en-BD')} BDT`,
       `${Number(item.total_sale ?? item.total_price ?? 0).toLocaleString('en-BD')} BDT`,
     ])
 
     generatePdf(
       'Branch Product Dispatch Chalan',
-      ['#', 'Code / Product Title', 'Qty', 'Unit Cost (৳)', 'Unit Retail (৳)', 'Total Value (৳)'],
+      ['#', 'Code / Product Title', 'Qty', 'Unit Cost (৳)', 'Unit Retail (৳)', 'Shipping Cost (৳)', 'Total Value (৳)'],
       rows,
       {
         filename:    `${chalan.chalan_ref || 'Chalan'}.pdf`,
@@ -391,16 +400,17 @@ export default function PartnerBranchChalansPage() {
 
   // ─── Item form rows renderer ──────────────────────────────────────────────
   const renderItemRows = (
-    items: { code: string; name: string; quantity: string; cost_price: string; sale_price: string }[],
-    setter: React.Dispatch<React.SetStateAction<{ code: string; name: string; quantity: string; cost_price: string; sale_price: string }[]>>
+    items: { code: string; name: string; quantity: string; cost_price: string; sale_price: string; shipping_cost: string }[],
+    setter: React.Dispatch<React.SetStateAction<{ code: string; name: string; quantity: string; cost_price: string; sale_price: string; shipping_cost: string }[]>>
   ) => (
     <div>
-      <div className="grid grid-cols-[80px_1fr_60px_80px_80px_28px] md:grid-cols-[90px_1fr_72px_96px_96px_28px] gap-2 mb-2 px-1">
+      <div className="grid grid-cols-[80px_1fr_60px_80px_80px_80px_28px] md:grid-cols-[90px_1fr_72px_96px_96px_96px_28px] gap-2 mb-2 px-1">
         <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600">Code</span>
         <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600">Product Title / Name</span>
         <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600 text-center">Qty</span>
         <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600 text-center">Cost ৳</span>
         <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600 text-center">Sale ৳</span>
+        <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600 text-center">Ship ৳</span>
         <span />
       </div>
       <div className="space-y-2">
@@ -410,9 +420,11 @@ export default function PartnerBranchChalansPage() {
           const sp  = parseFloat(item.sale_price) || 0
           const rowCostTotal = qty * cp
           const rowSaleTotal = qty * sp
+          const shipParsed = parseFloat(item.shipping_cost) || 0
+          const rowShipTotal = qty * shipParsed
           return (
             <div key={idx}>
-              <div className="grid grid-cols-[80px_1fr_60px_80px_80px_28px] md:grid-cols-[90px_1fr_72px_96px_96px_28px] gap-2 items-center">
+              <div className="grid grid-cols-[80px_1fr_60px_80px_80px_80px_28px] md:grid-cols-[90px_1fr_72px_96px_96px_96px_28px] gap-2 items-center">
                 <input
                   type="text" placeholder="e.g. A-101"
                   value={item.code}
@@ -443,6 +455,12 @@ export default function PartnerBranchChalansPage() {
                   onChange={e => updateItem(idx, 'sale_price', e.target.value, setter)}
                   className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-right w-full"
                 />
+                <input
+                  type="number" min="0" step="0.01" placeholder="—"
+                  value={item.shipping_cost}
+                  onChange={e => updateItem(idx, 'shipping_cost', e.target.value, setter)}
+                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-right w-full"
+                />
                 <button
                   type="button"
                   onClick={() => removeItemRow(idx, items, setter)}
@@ -452,10 +470,11 @@ export default function PartnerBranchChalansPage() {
                   <X className="w-3 h-3" />
                 </button>
               </div>
-              {(rowCostTotal > 0 || rowSaleTotal > 0) && (
+              {(rowCostTotal > 0 || rowSaleTotal > 0 || rowShipTotal > 0) && (
                 <div className="flex justify-end gap-3 text-[10px] text-slate-500 pr-9 mt-0.5">
                   {rowCostTotal > 0 && <span>Cost: <span className="text-slate-900 font-semibold">৳{rowCostTotal.toLocaleString('en-BD')}</span></span>}
                   {rowSaleTotal > 0 && <span>Retail: <span className="text-[#15803d] font-semibold">৳{rowSaleTotal.toLocaleString('en-BD')}</span></span>}
+                  {rowShipTotal > 0 && <span>Shipping: <span className="text-slate-900 font-semibold">৳{rowShipTotal.toLocaleString('en-BD')}</span></span>}
                 </div>
               )}
             </div>
@@ -642,7 +661,7 @@ export default function PartnerBranchChalansPage() {
                 {isHeadOffice && (
                   <button
                     onClick={() => {
-                      setFormItems([{ code: '', name: '', quantity: '', cost_price: '', sale_price: '' }])
+                      setFormItems([{ code: '', name: '', quantity: '', cost_price: '', sale_price: '', shipping_cost: '' }])
                       setFormNotes('')
                       setShowNewModal(true)
                     }}
@@ -797,6 +816,12 @@ export default function PartnerBranchChalansPage() {
                       <span className="text-[10px] text-[#15803d] uppercase tracking-wider font-bold">Expected Revenue</span>
                       <span className="text-xl font-bold text-[#15803d]">৳ {grandTotalSaleNew.toLocaleString('en-BD')}</span>
                     </div>
+                    {grandTotalShippingNew > 0 && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Total Shipping Cost</span>
+                        <span className="text-sm font-bold text-slate-900">৳ {grandTotalShippingNew.toLocaleString('en-BD')}</span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Notes */}
@@ -875,6 +900,12 @@ export default function PartnerBranchChalansPage() {
                       <span className="text-[10px] text-indigo-600 uppercase tracking-wider font-bold">Expected Revenue</span>
                       <span className="text-xl font-bold text-indigo-600">৳ {grandTotalSaleEdit.toLocaleString('en-BD')}</span>
                     </div>
+                    {grandTotalShippingEdit > 0 && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Total Shipping Cost</span>
+                        <span className="text-sm font-bold text-slate-900">৳ {grandTotalShippingEdit.toLocaleString('en-BD')}</span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Notes */}

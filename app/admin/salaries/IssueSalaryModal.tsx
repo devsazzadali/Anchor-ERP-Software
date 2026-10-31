@@ -4,6 +4,12 @@ import React, { useState, useEffect } from 'react'
 import { X, UploadCloud, Calculator, Loader2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 
+// THE single salary-issue component (U2 unification): every admin
+// entry point that issues salary — Master Salary page, branch
+// expenses (ledger-head side), branches page, users/profile page —
+// renders THIS modal and nothing else. There is no second issue
+// form anywhere.
+//
 // data via the app's API layer only —
 // GET /api/admin/salaries/issue supplies branches / employees /
 // Salary ledger heads; POST /api/admin/salaries/issue issues the
@@ -19,10 +25,16 @@ interface IssueSalaryModalProps {
   preselectedUserId?: string;
   preselectedBranch?: string;
   preselectedBaseSalary?: number;
+  // U2 unification: the users page's partners tab issues partner
+  // value transfers through this SAME modal; that entry point passes
+  // includePartners so the employee list also contains partners
+  // (GET /api/admin/salaries/issue?include_partners=1). Every other
+  // entry point leaves it off and gets the employee-only list.
+  includePartners?: boolean;
 }
 
 export default function IssueSalaryModal({
-  isOpen, onClose, onSuccess, preselectedUserId, preselectedBranch, preselectedBaseSalary
+  isOpen, onClose, onSuccess, preselectedUserId, preselectedBranch, preselectedBaseSalary, includePartners
 }: IssueSalaryModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -43,18 +55,39 @@ export default function IssueSalaryModal({
 
   const [file, setFile] = useState<File | null>(null)
 
+  // U2 unification: every opening re-syncs the preselected context
+  // and clears the previous entry's components. The old code read
+  // the preselect props only in the useState initialisers, so a
+  // second opening (another employee, from the branches / users
+  // pages) kept the FIRST employee's id/branch/salary on screen.
   useEffect(() => {
     if (isOpen) {
+      setBranchId(preselectedBranch || '')
+      setEmployeeId(preselectedUserId || '')
+      setBasicSalary(preselectedBaseSalary || 0)
+      setOvertimeAmount(0)
+      setBonusAmount(0)
+      setSalesCommission(0)
+      setTiffinBill(0)
+      setFile(null)
+      setError(null)
       fetchInitialData()
     }
-  }, [isOpen])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, preselectedUserId, preselectedBranch, preselectedBaseSalary, includePartners])
 
   const fetchInitialData = async () => {
-    const res = await fetch('/api/admin/salaries/issue')
+    const res = await fetch(`/api/admin/salaries/issue${includePartners ? '?include_partners=1' : ''}`)
     if (!res.ok) return
     const data = await res.json()
     setBranches(data.branches || [])
     setEmployees(data.employees || [])
+    // A preselected employee without an explicit base-salary prop
+    // still opens with their configured salary filled in.
+    if (preselectedUserId && !preselectedBaseSalary) {
+      const emp = (data.employees || []).find((e: any) => e.id === preselectedUserId)
+      if (emp) setBasicSalary(Number(emp.salary || 0))
+    }
 
     // Silently fetch and set the Salary ledger head.
     // C8: deterministic order (see house-rent modal) — the route
@@ -108,7 +141,13 @@ export default function IssueSalaryModal({
       if (file) {
         const fileExt = file.name.split('.').pop()
         const fileName = `${employeeId}-${Date.now()}.${fileExt}`
-        fileUrl = await uploadFile('payment_proofs', file, `salaries/${fileName}`)
+        // U2 bug fix: uploadFile resolves to { url, path } — the old
+        // line stored that whole OBJECT as payment_proof_url, and the
+        // string column rejected it, so every proof-carrying issue
+        // failed. Every other uploadFile caller takes `.url`; so
+        // does this one now (a plain string, like all stored proofs).
+        const uploaded = await uploadFile('payment_proofs', file, `salaries/${fileName}`)
+        fileUrl = uploaded.url
       }
 
       // C20/C11 now live server-side: POST /api/admin/salaries/issue

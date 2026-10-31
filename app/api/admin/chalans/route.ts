@@ -17,6 +17,21 @@ async function requireAdmin(req: Request) {
   return { caller }
 }
 
+// Shipping cost is a per-item JSON field (shipping_cost, per unit —
+// alongside cost_price/sale_price). Items are stored verbatim, except
+// that total_shipping (= qty × shipping_cost) is derived here when a
+// shipping_cost was recorded, mirroring total_cost/total_sale. Items
+// without shipping_cost pass through byte-identical. Shipping is
+// display/record only: computeTotals below is unchanged, so it is NOT
+// folded into total_cost/total_amount.
+function withShippingTotals(items: any[]): any[] {
+  return (items || []).map((i: any) => {
+    if (!i || i.shipping_cost === undefined || i.shipping_cost === null || String(i.shipping_cost).trim() === '') return i
+    const ship = Number(i.shipping_cost) || 0
+    return { ...i, shipping_cost: ship, total_shipping: (Number(i.quantity) || 0) * ship }
+  })
+}
+
 function computeTotals(items: any[]): { total_amount: number; total_cost: number } {
   let total_amount = 0
   let total_cost = 0
@@ -47,7 +62,7 @@ export async function POST(req: Request) {
     if (gate.error) return gate.error
 
     const body = await req.json()
-    const items = Array.isArray(body.items) ? body.items : []
+    const items = withShippingTotals(Array.isArray(body.items) ? body.items : [])
     const { total_amount, total_cost } = computeTotals(items)
 
     const chalan = await prisma.productChalan.create({
@@ -78,7 +93,7 @@ export async function PATCH(req: Request) {
 
     const body = await req.json()
     if (!body.id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
-    const items = Array.isArray(body.items) ? body.items : []
+    const items = withShippingTotals(Array.isArray(body.items) ? body.items : [])
     const { total_amount, total_cost } = computeTotals(items)
 
     const chalan = await prisma.productChalan.update({

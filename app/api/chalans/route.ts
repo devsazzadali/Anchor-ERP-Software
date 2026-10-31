@@ -32,12 +32,19 @@ function computeChalanItems(rawItems: unknown): {
       const qty = Number(i.quantity) || 0
       const cp = roundMoney(Number(i.cost_price) || 0)
       const sp = roundMoney(Number(i.sale_price) || 0)
+      // Shipping cost (per unit, bringing the product in) — additive
+      // per-item field alongside cost_price/sale_price. Absent/blank =
+      // not recorded: the key is omitted (old items simply lack it).
+      // Display/record only — NOT folded into total_cost/total_amount.
+      const hasShip = i.shipping_cost !== undefined && i.shipping_cost !== null && String(i.shipping_cost).trim() !== ''
+      const ship = hasShip ? roundMoney(Number(i.shipping_cost) || 0) : null
       return {
         ...(i.code && String(i.code).trim() ? { code: String(i.code).trim() } : {}),
         name: String(i.name).trim(),
         quantity: qty,
         cost_price: cp,
         sale_price: sp,
+        ...(ship !== null ? { shipping_cost: ship, total_shipping: roundMoney(qty * ship) } : {}),
         total_cost: roundMoney(qty * cp),
         total_sale: roundMoney(qty * sp),
       }

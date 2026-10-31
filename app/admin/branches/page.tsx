@@ -8,12 +8,12 @@ export const dynamic = 'force-dynamic'
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import React, { useEffect, useState } from 'react'
-import { MapPin, Plus, Trash2, Users, ChevronRight, X, UserCircle, Download, FileText, ImageIcon, CreditCard, Landmark, Phone, Mail, ShieldCheck, Calendar, CheckCircle2, DollarSign, Upload, AlertCircle, Eye, ArrowLeft, Search, Filter } from 'lucide-react'
+import { MapPin, Plus, Trash2, Users, ChevronRight, X, UserCircle, Download, FileText, ImageIcon, CreditCard, Landmark, Phone, Mail, ShieldCheck, Calendar, CheckCircle2, DollarSign, AlertCircle, Eye, ArrowLeft, Search, Filter } from 'lucide-react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import * as XLSX from 'xlsx'
 import { generatePdf } from '@/lib/pdf-generator'
-import { uploadFile } from '@/lib/files-client'
+import IssueSalaryModal from '../salaries/IssueSalaryModal'
 
 type Branch = { id: string; name: string }
 type Employee = {
@@ -52,15 +52,12 @@ export default function BranchList() {
   const [ledgerMonthFilter, setLedgerMonthFilter] = useState('')
   const [showEmpExportDropdown, setShowEmpExportDropdown] = useState(false)
 
+  // U2 unification: salary issuing renders the ONE shared
+  // IssueSalaryModal (../salaries/IssueSalaryModal) — this page's
+  // old inline issue form and its /api/admin/salary-payments write
+  // path are deleted; the modal's canonical route books the
+  // payment + C20/C11 branch-cash copy + ledger sync server-side.
   const [showSalaryModal, setShowSalaryModal] = useState(false)
-  const [salaryAmount, setSalaryAmount] = useState('')
-  const [salaryDate, setSalaryDate] = useState(new Date().toISOString().split('T')[0])
-  const [salaryAccount, setSalaryAccount] = useState('')
-  const [customAccount, setCustomAccount] = useState('')
-  const [salaryTrxId, setSalaryTrxId] = useState('')
-  const [salaryNote, setSalaryNote] = useState('')
-  const [proofFile, setProofFile] = useState<File | null>(null)
-  const [isSubmittingSalary, setIsSubmittingSalary] = useState(false)
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null)
 
@@ -122,22 +119,6 @@ const isHeadOffice = (name?: string | null) => {
     setLedgerMonthFilter('')
     setShowEmpExportDropdown(false)
 
-    setSalaryAmount(emp.salary ? String(emp.salary) : '')
-    setSalaryDate(new Date().toISOString().split('T')[0])
-    setSalaryTrxId('')
-    setSalaryNote('')
-    setProofFile(null)
-
-    const bankKeys = emp.bank_info ? Object.keys(emp.bank_info) : []
-    if (bankKeys.length > 0) {
-      const firstKey = bankKeys[0]
-      const formattedKey = firstKey.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())
-      setSalaryAccount(`${formattedKey}: ${emp.bank_info[firstKey]}`)
-    } else {
-      setSalaryAccount('Custom')
-    }
-    setCustomAccount('')
-
     try {
       if (!emp.email) {
         try {
@@ -171,85 +152,6 @@ const isHeadOffice = (name?: string | null) => {
       console.error('Failed to fetch employee details', e)
     } finally {
       setEmployeeDetailsLoading(false)
-    }
-  }
-
-  const handleIssueSalary = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!selectedEmployee || !selectedBranch) return
-    setIsSubmittingSalary(true)
-    setFeedback(null)
-
-    const finalAccount = salaryAccount === 'Custom' ? customAccount : salaryAccount
-
-    try {
-      let proofUrl = null
-      if (proofFile) {
-        const fileExt = proofFile.name.split('.').pop()
-        const fileName = `${selectedEmployee.id}_${Date.now()}.${fileExt}`
-        // salary proof slips go through the file server —
-        // same 'salaries' bucket as the old system (now served to
-        // authenticated users only by /api/files).
-        const uploaded = await uploadFile('salaries', proofFile, fileName)
-        proofUrl = uploaded.url
-      }
-
-      const res = await fetch('/api/admin/salary-payments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          employee_id: selectedEmployee.id,
-          amount: Number(salaryAmount),
-          transaction_id: salaryTrxId,
-          payment_proof_url: proofUrl,
-          payment_date: new Date(salaryDate.includes('T') ? salaryDate : `${salaryDate}T12:00:00.000Z`).toISOString(),
-          branch_id: selectedBranch.id,
-          account: finalAccount || null,
-          notes: salaryNote || null,
-          base_salary_at_time: selectedEmployee.salary ? Number(selectedEmployee.salary) : null
-        }),
-      })
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data.error || 'Failed to issue salary.')
-      }
-
-      fetch('/api/email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'SALARY_PAID',
-          payload: {
-            userId: selectedEmployee.id,
-            userName: selectedEmployee.full_name || 'Employee',
-            email: selectedEmployee.email || null,
-            month: new Date(salaryDate.includes('T') ? salaryDate : `${salaryDate}T12:00:00.000Z`).toLocaleString('default', { month: 'long', year: 'numeric' }),
-            amount: Number(salaryAmount),
-            currency: 'BDT',
-            transactionId: salaryTrxId || `SAL-${Date.now().toString().slice(-8)}`,
-            paymentMethod: finalAccount || 'Payroll Bank Account',
-            branchName: selectedBranch.name || 'Head Office'
-          }
-        })
-      }).catch(e => console.error('Failed to trigger salary email', e))
-
-      setFeedback({ type: 'success', message: 'Salary payment disbursed successfully.' })
-      setTimeout(() => setFeedback(null), 4000)
-
-      setShowSalaryModal(false)
-
-      const payRes = await fetch(`/api/admin/salary-payments?employee_id=${encodeURIComponent(selectedEmployee.id)}`)
-      if (payRes.ok) {
-        const { payments: updatedPayments } = await payRes.json()
-        if (updatedPayments) setEmployeePayments(updatedPayments)
-      }
-
-      await fetchBranchPayments(selectedBranch.id)
-
-    } catch (err: any) {
-      setFeedback({ type: 'error', message: err.message || 'Failed to issue salary.' })
-    } finally {
-      setIsSubmittingSalary(false)
     }
   }
 
@@ -1048,161 +950,26 @@ const isHeadOffice = (name?: string | null) => {
           )}
         </AnimatePresence>
 
-        {/* ISSUE SALARY MODAL */}
-        <AnimatePresence>
-          {showSalaryModal && selectedEmployee && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-slate-950/50 z-[60] flex justify-center items-center p-4 backdrop-blur-md overflow-y-auto"
-            >
-              <motion.div
-                initial={{ scale: 0.95, y: 20 }}
-                animate={{ scale: 1, y: 0 }}
-                exit={{ scale: 0.95, y: 20 }}
-                className="glass-panel p-6 sm:p-8 rounded-3xl max-w-lg w-full relative shadow-2xl border border-[#1ca34c]/40 bg-white"
-              >
-                <div className="flex justify-between items-start mb-6 border-b border-slate-900/10 pb-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-slate-900 font-serif">Disburse Salary</h3>
-                    <p className="text-xs text-slate-500 mt-1">Record a new payroll transfer for {selectedEmployee.full_name}.</p>
-                  </div>
-                  <button onClick={() => setShowSalaryModal(false)} className="text-slate-500 hover:text-slate-900 bg-slate-900/[0.04] p-2.5 rounded-full transition-colors">
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-
-                <div className="mb-6 p-4 rounded-xl bg-gradient-to-br from-[#1ca34c]/15 to-transparent border border-[#1ca34c]/30 flex items-center justify-between">
-                  <div>
-                    <p className="text-[10px] font-bold text-[#15803d] uppercase tracking-wider mb-0.5">Recipient Member</p>
-                    <p className="text-sm font-semibold text-slate-900">{selectedEmployee.full_name}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[10px] font-bold text-[#15803d] uppercase tracking-wider mb-0.5">Base Salary</p>
-                    <p className="text-sm font-bold text-emerald-600 font-mono">{selectedEmployee.salary ? `${Number(selectedEmployee.salary).toLocaleString()} BDT` : 'Not Set'}</p>
-                  </div>
-                </div>
-
-                <form onSubmit={handleIssueSalary} className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-[11px] font-semibold text-slate-600 block mb-1">Amount (BDT) *</label>
-                      <input
-                        type="number"
-                        required
-                        value={salaryAmount}
-                        onChange={(e) => setSalaryAmount(e.target.value)}
-                        placeholder="e.g. 25000"
-                        className="w-full bg-white border border-slate-900/15 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 font-mono focus:outline-none focus:border-[#1ca34c] transition-colors"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[11px] font-semibold text-slate-600 block mb-1">Payment Date *</label>
-                      <input
-                        type="date"
-                        required
-                        value={salaryDate}
-                        onChange={(e) => setSalaryDate(e.target.value)}
-                        className="w-full bg-white border border-slate-900/15 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 font-mono focus:outline-none focus:border-[#1ca34c] transition-colors"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-[11px] font-semibold text-slate-600 block mb-1">Payment Account/Method</label>
-                      <select
-                        value={salaryAccount}
-                        onChange={(e) => setSalaryAccount(e.target.value)}
-                        className="w-full bg-white border border-slate-900/15 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c] transition-colors"
-                      >
-                        {selectedEmployee.bank_info && Object.keys(selectedEmployee.bank_info).length > 0 && (
-                          Object.entries(selectedEmployee.bank_info).map(([k, v]) => {
-                            if (!v) return null
-                            const label = k.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())
-                            return <option key={k} value={`${label}: ${v}`}>{label}: {String(v)}</option>
-                          })
-                        )}
-                        <option value="Cash">Cash Disbursed</option>
-                        <option value="Bank Transfer">Bank Transfer</option>
-                        <option value="bKash / Nagad">bKash / Nagad Mobile Wallet</option>
-                        <option value="Custom">Custom Account...</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-[11px] font-semibold text-slate-600 block mb-1">Transaction ID / Ref</label>
-                      <input
-                        type="text"
-                        value={salaryTrxId}
-                        onChange={(e) => setSalaryTrxId(e.target.value)}
-                        placeholder="e.g. TR6839201"
-                        className="w-full bg-white border border-slate-900/15 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 font-mono focus:outline-none focus:border-[#1ca34c] transition-colors"
-                      />
-                    </div>
-                  </div>
-
-                  {salaryAccount === 'Custom' && (
-                    <div>
-                      <label className="text-[11px] font-semibold text-slate-600 block mb-1">Specify Custom Account / Details</label>
-                      <input
-                        type="text"
-                        value={customAccount}
-                        onChange={(e) => setCustomAccount(e.target.value)}
-                        placeholder="Enter Account Name / Number"
-                        className="w-full bg-white border border-slate-900/15 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c] transition-colors"
-                      />
-                    </div>
-                  )}
-
-                  <div>
-                    <label className="text-[11px] font-semibold text-slate-600 block mb-1">Upload Voucher / Receipt Proof</label>
-                    <div className="relative border border-dashed border-slate-900/15 hover:border-[#1ca34c]/50 rounded-xl p-3 text-center bg-white transition-colors cursor-pointer">
-                      <input
-                        type="file"
-                        accept="image/*,.pdf"
-                        onChange={(e) => e.target.files && setProofFile(e.target.files[0])}
-                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                      />
-                      <div className="flex items-center justify-center gap-2 text-xs text-slate-500">
-                        <Upload className="w-4 h-4 text-[#15803d]" />
-                        <span>{proofFile ? proofFile.name : 'Click or drag receipt file to upload'}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-[11px] font-semibold text-slate-600 block mb-1">Remarks / Notes</label>
-                    <textarea
-                      value={salaryNote}
-                      onChange={(e) => setSalaryNote(e.target.value)}
-                      rows={2}
-                      placeholder="Optional notes for this payment..."
-                      className="w-full bg-white border border-slate-900/15 rounded-xl p-3 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c] transition-colors"
-                    />
-                  </div>
-
-                  <div className="pt-2 flex items-center justify-end gap-3 border-t border-slate-900/10">
-                    <button
-                      type="button"
-                      onClick={() => setShowSalaryModal(false)}
-                      className="px-4 py-2.5 rounded-xl text-xs font-bold uppercase text-slate-500 hover:text-slate-900 transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={isSubmittingSalary}
-                      className="bg-[#1ca34c] text-white font-bold px-6 py-2.5 rounded-full text-xs tracking-wider uppercase shadow-lg shadow-[#1ca34c]/25 transition-all cursor-pointer disabled:opacity-50"
-                    >
-                      {isSubmittingSalary ? 'Disbursing...' : 'Confirm Disbursement'}
-                    </button>
-                  </div>
-                </form>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* ISSUE SALARY — the ONE shared IssueSalaryModal (U2) */}
+        <IssueSalaryModal
+          isOpen={showSalaryModal}
+          onClose={() => setShowSalaryModal(false)}
+          onSuccess={async () => {
+            setFeedback({ type: 'success', message: 'Salary payment disbursed successfully.' })
+            setTimeout(() => setFeedback(null), 4000)
+            if (selectedEmployee) {
+              const payRes = await fetch(`/api/admin/salary-payments?employee_id=${encodeURIComponent(selectedEmployee.id)}`)
+              if (payRes.ok) {
+                const { payments: updatedPayments } = await payRes.json()
+                if (updatedPayments) setEmployeePayments(updatedPayments)
+              }
+            }
+            if (selectedBranch) await fetchBranchPayments(selectedBranch.id)
+          }}
+          preselectedUserId={selectedEmployee?.id}
+          preselectedBranch={selectedBranch?.id}
+          preselectedBaseSalary={selectedEmployee?.salary ? Number(selectedEmployee.salary) : undefined}
+        />
 
         {/* FULLSCREEN IMAGE MODAL */}
         <AnimatePresence>
