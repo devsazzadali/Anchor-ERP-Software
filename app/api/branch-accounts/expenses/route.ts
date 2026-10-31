@@ -1,0 +1,482 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { parseMoneyAmount, roundMoney } from '@/lib/money'
+import { dhakaToday } from '@/lib/dhaka-time'
+import { prisma } from '@/lib/db'
+import { getCallerProfile, isAdminRole } from '@/lib/server/auth'
+import { toPlain } from '@/lib/server/respond'
+import { attachExpenseLedgerHead } from '@/lib/server/attach'
+import { syncExpenseToLedger } from '@/lib/server/ledger-sync'
+
+// auth via the single role-resolution
+// function (lib/server/auth.ts) — NEVER trusts branch_id from the
+// client for managers; this route is admin-only as before. Ledger
+// movement on create/edit/delete is owned by
+// lib/server/ledger-sync.ts (the sync_expense_to_cash_ledger
+// trigger's replacement), inside the same transaction as the expense
+// write. Prisma has no 1,000-row cap, so the C38/B26 complete-list
+// guarantee holds by construction.
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Ledger Head resolver — validates UUID, confirms existence + is_active.
+// Returns the authoritative name from the database.
+// NEVER trusts a client-supplied ledger head name.
+// ─────────────────────────────────────────────────────────────────────────────
+async function resolveLedgerHead(
+  ledgerHeadId: string
+): Promise<{ id: string; name: string } | { error: string }> {
+  if (!ledgerHeadId || typeof ledgerHeadId !== 'string') {
+    return { error: 'ledger_head_id must be a non-empty string UUID' }
+  }
+
+  // Basic UUID format check
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  if (!uuidRegex.test(ledgerHeadId)) {
+    return { error: 'ledger_head_id is not a valid UUID' }
+  }
+
+  const data = await prisma.ledgerHead.findFirst({
+    where: { id: ledgerHeadId },
+    select: { id: true, name: true, is_active: true },
+  })
+
+  if (!data) return { error: 'Ledger Head not found' }
+  if (!data.is_active) return { error: 'Selected Ledger Head is no longer active and cannot be used for new entries' }
+
+  return { id: data.id, name: data.name }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Month filter helper — half-open interval to avoid timezone edge cases.
+// Input: '2026-09' → { gte: '2026-09-01', lt: '2026-10-01' }
+// ─────────────────────────────────────────────────────────────────────────────
+function parseMonthFilter(monthParam: string): { gte: string; lt: string } | null {
+  const match = monthParam.match(/^(\d{4})-(\d{2})$/)
+  if (!match) return null
+  const year = parseInt(match[1], 10)
+  const month = parseInt(match[2], 10)
+  if (month < 1 || month > 12) return null
+
+  const startDate = `${year}-${String(month).padStart(2, '0')}-01`
+  // Compute first day of next month
+  const nextMonth = month === 12 ? 1 : month + 1
+  const nextYear = month === 12 ? year + 1 : year
+  const endDate = `${nextYear}-${String(nextMonth).padStart(2, '0')}-01`
+
+  return { gte: startDate, lt: endDate }
+}
+
+const EXPENSE_COLUMNS = {
+  id: true, branch_id: true, branch_name: true, manager_id: true, manager_name: true,
+  expense_date: true, category: true, description: true, amount: true,
+  paid_amount: true, due_amount: true, recipient_account: true, rent_month: true, rent_year: true,
+  receipt_url: true, notes: true, created_at: true, updated_at: true,
+  ledger_head_id: true,
+} as const
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GET /api/branch-accounts/expenses
+// Query params:
+//   from, to           — expense_date range (YYYY-MM-DD)
+//   month              — YYYY-MM (half-open interval, takes precedence over from/to for date)
+//   branch_id          — admin only; managers always use their own branch
+//   ledger_head_id     — filter by Ledger Head UUID
+// ─────────────────────────────────────────────────────────────────────────────
+export async function GET(req: NextRequest) {
+  try {
+    const profile = await getCallerProfile(req)
+    if (!profile) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+    const isAdmin = isAdminRole(profile.role)
+    if (!isAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+
+    const { searchParams } = new URL(req.url)
+    const monthParam = searchParams.get('month')
+    const from = searchParams.get('from')
+    const to = searchParams.get('to')
+    const ledgerHeadParam = searchParams.get('ledger_head_id')
+
+    // Branch authorization: admin/head office may specify a branch_id to filter
+    const branchId = searchParams.get('branch_id')
+
+    const where: any = {}
+    if (branchId) where.branch_id = branchId
+
+    // Month filter (half-open interval — avoids end-of-day timezone bugs)
+    if (monthParam) {
+      const monthRange = parseMonthFilter(monthParam)
+      if (monthRange) {
+        where.expense_date = {
+          gte: new Date(`${monthRange.gte}T00:00:00.000Z`),
+          lt: new Date(`${monthRange.lt}T00:00:00.000Z`),
+        }
+      }
+    } else {
+      // Fallback to explicit from/to date range
+      if (from || to) {
+        where.expense_date = {
+          ...(from ? { gte: new Date(`${from}T00:00:00.000Z`) } : {}),
+          ...(to ? { lte: new Date(`${to}T00:00:00.000Z`) } : {}),
+        }
+      }
+    }
+
+    // Ledger Head filter (server-enforced)
+    if (ledgerHeadParam) {
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+      if (uuidRegex.test(ledgerHeadParam)) {
+        where.ledger_head_id = ledgerHeadParam
+      }
+    }
+
+    // C38/B26: the list fetch is complete — no silent 1,000-row cap.
+    const data = await prisma.branchCashExpense.findMany({
+      where,
+      select: EXPENSE_COLUMNS,
+      orderBy: [{ expense_date: 'desc' }, { created_at: 'desc' }, { id: 'asc' }],
+    })
+    const withHeads = await attachExpenseLedgerHead(data as any)
+
+    return NextResponse.json({ expenses: toPlain(withHeads) })
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 })
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// POST /api/branch-accounts/expenses
+// Creates a new expense entry.
+// If ledger_head_id is provided:
+//   1. Validate UUID format
+//   2. Fetch from DB — must exist and is_active = true
+//   3. Resolve authoritative name from DB
+//   4. Store both ledger_head_id AND category = resolved name
+// If ledger_head_id is NOT provided:
+//   category = body.category || 'general' (legacy behaviour preserved)
+// ─────────────────────────────────────────────────────────────────────────────
+export async function POST(req: NextRequest) {
+  try {
+    const profile = await getCallerProfile(req)
+    if (!profile) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+    const isAdmin = isAdminRole(profile.role)
+    if (!isAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+
+    const body = await req.json()
+    const { description, amount, expense_date, receipt_url, notes, rent_month, rent_year, billing_month, billing_year } = body
+    const clientLedgerHeadId = body.ledger_head_id
+    const clientCategory = body.category
+
+    // paid_amount / due_amount — used for house rent and other tracked expenses.
+    // C14: the triple must be CONSISTENT (paid + due == amount,
+    // poisha-exact). One missing side is derived; both missing means
+    // fully paid. The old code trusted a client-supplied due_amount
+    // verbatim, so inconsistent triples were stored and later summed
+    // as truth.
+    const totalAmount = parseMoneyAmount(amount, { min: 0.01 })
+    if (!description || totalAmount === null) {
+      return NextResponse.json({ error: 'description and a positive amount are required' }, { status: 400 })
+    }
+    let paidAmount: number
+    let dueAmount: number
+    if (body.paid_amount !== undefined && body.due_amount !== undefined) {
+      const p = parseMoneyAmount(body.paid_amount)
+      const d = parseMoneyAmount(body.due_amount)
+      if (p === null || d === null || roundMoney(p + d) !== totalAmount) {
+        return NextResponse.json({ error: 'paid_amount + due_amount must equal amount' }, { status: 400 })
+      }
+      paidAmount = p
+      dueAmount = d
+    } else if (body.paid_amount !== undefined) {
+      const p = parseMoneyAmount(body.paid_amount)
+      if (p === null || p > totalAmount) {
+        return NextResponse.json({ error: 'paid_amount must be between 0 and amount' }, { status: 400 })
+      }
+      paidAmount = p
+      dueAmount = roundMoney(totalAmount - p)
+    } else if (body.due_amount !== undefined) {
+      const d = parseMoneyAmount(body.due_amount)
+      if (d === null || d > totalAmount) {
+        return NextResponse.json({ error: 'due_amount must be between 0 and amount' }, { status: 400 })
+      }
+      dueAmount = d
+      paidAmount = roundMoney(totalAmount - d)
+    } else {
+      paidAmount = totalAmount
+      dueAmount = 0
+    }
+
+    // Branch authorization: Admin/Head Office must specify the branch
+    const branchId = body.branch_id
+    if (!branchId) return NextResponse.json({ error: 'branch_id required' }, { status: 400 })
+
+    // Ledger Head resolution
+    let resolvedLedgerHeadId: string | null = null
+    let resolvedCategory = clientCategory || 'general'
+
+    if (clientLedgerHeadId) {
+      const result = await resolveLedgerHead(clientLedgerHeadId)
+      if ('error' in result) {
+        return NextResponse.json({ error: result.error }, { status: 400 })
+      }
+      // Both fields set for backward compatibility:
+      // - ledger_head_id: the UUID FK relationship
+      // - category:       the authoritative name (so existing code reading category still works)
+      resolvedLedgerHeadId = result.id
+      resolvedCategory = result.name // Server-resolved — NOT from client
+    }
+
+    // C13: branch_name must be the TARGET branch's name — the old
+    // code stored the CALLER's branch (profile.branch), mislabelling
+    // every cross-branch issue at source.
+    const targetBranch = await prisma.branch.findFirst({
+      where: { id: branchId },
+      select: { name: true },
+    })
+
+    const expenseDateStr: string = expense_date || dhakaToday()
+    const insertPayload: Record<string, any> = {
+      branch_id: branchId,
+      branch_name: targetBranch?.name || null,
+      manager_id: profile.uid,
+      manager_name: profile.full_name,
+      expense_date: new Date(`${expenseDateStr}T00:00:00.000Z`),
+      category: resolvedCategory,
+      ledger_head_id: resolvedLedgerHeadId,
+      description,
+      amount: totalAmount,
+      paid_amount: paidAmount,
+      due_amount: dueAmount,
+      // C13(2): the rent modal sends the landlord's bank details as
+      // recipient_account — it was silently dropped on every POST.
+      recipient_account: body.recipient_account || null,
+      receipt_url: receipt_url || null,
+      notes: notes || null,
+      rent_month: rent_month || null,
+      rent_year: rent_year ? Number(rent_year) : null,
+      // C10: structured billing period (utility bills) — part of the
+      // app's schema from day one (Batch-3 migration columns).
+      billing_month: billing_month || null,
+      billing_year: billing_year ? Number(billing_year) : null,
+    }
+
+    const data = await prisma.$transaction(async (tx) => {
+      const created = await tx.branchCashExpense.create({ data: insertPayload as any })
+      await syncExpenseToLedger(tx, null, created as any)
+      // Return with the same column set + embed shape as the old route.
+      const full = await tx.branchCashExpense.findFirst({ where: { id: created.id } })
+      return full!
+    })
+    const [withHead] = await attachExpenseLedgerHead([data as any])
+
+    // Audit trail
+    await prisma.branchAuditTrail.create({
+      data: {
+        branch_id: branchId,
+        branch_name: targetBranch?.name || null,
+        table_name: 'branch_cash_expenses',
+        record_id: data.id,
+        action: 'create',
+        performed_by: profile.uid,
+        performed_by_name: profile.full_name,
+        new_value: {
+          category: resolvedCategory,
+          ledger_head_id: resolvedLedgerHeadId,
+          description,
+          amount,
+          expense_date,
+        },
+      },
+    })
+
+    return NextResponse.json({ success: true, expense: toPlain(withHead) })
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 })
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PATCH /api/branch-accounts/expenses?id=<uuid>
+// Edit an existing expense. Same Ledger Head resolution rules as POST.
+// If ledger_head_id changes, category is also updated to match.
+// Historical expenses (ledger_head_id IS NULL) can be updated with a new LH.
+// ─────────────────────────────────────────────────────────────────────────────
+export async function PATCH(req: NextRequest) {
+  try {
+    const profile = await getCallerProfile(req)
+    if (!profile) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+    const isAdmin = isAdminRole(profile.role)
+    if (!isAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+
+    const { searchParams } = new URL(req.url)
+    const id = searchParams.get('id')
+    if (!id) return NextResponse.json({ error: 'id query parameter is required' }, { status: 400 })
+
+    // Fetch existing expense — verify ownership. (expense_date is
+    // fetched in addition to the old route's column set: the ledger
+    // sync service needs the OLD date to move the contribution.)
+    const existing = await prisma.branchCashExpense.findFirst({
+      where: { id },
+      select: {
+        id: true, branch_id: true, manager_id: true, category: true, ledger_head_id: true,
+        amount: true, paid_amount: true, due_amount: true, expense_date: true,
+      },
+    })
+
+    if (!existing) return NextResponse.json({ error: 'Expense not found' }, { status: 404 })
+
+    const body = await req.json()
+    const patch: any = {}
+
+    // Optional editable fields
+    if ('description' in body) {
+      if (!body.description || !String(body.description).trim()) {
+        return NextResponse.json({ error: 'description cannot be empty' }, { status: 400 })
+      }
+      patch.description = String(body.description).trim()
+    }
+
+    if ('amount' in body) {
+      const amt = parseMoneyAmount(body.amount, { min: 0.01 })
+      if (amt === null) {
+        return NextResponse.json({ error: 'amount must be a positive number' }, { status: 400 })
+      }
+      patch.amount = amt
+    }
+
+    if ('paid_amount' in body) {
+      const p = parseMoneyAmount(body.paid_amount)
+      if (p === null) {
+        return NextResponse.json({ error: 'paid_amount must be a non-negative number' }, { status: 400 })
+      }
+      patch.paid_amount = p
+    }
+
+    if ('expense_date' in body && body.expense_date) {
+      patch.expense_date = new Date(`${body.expense_date}T00:00:00.000Z`)
+    }
+
+    if ('notes' in body) {
+      patch.notes = body.notes || null
+    }
+
+    if ('receipt_url' in body) {
+      patch.receipt_url = body.receipt_url || null
+    }
+
+    if ('rent_month' in body) {
+      patch.rent_month = body.rent_month || null
+    }
+
+    if ('rent_year' in body) {
+      patch.rent_year = body.rent_year ? Number(body.rent_year) : null
+    }
+
+    // Ledger Head update — must update BOTH ledger_head_id AND category atomically
+    if ('ledger_head_id' in body) {
+      if (!body.ledger_head_id) {
+        // Explicitly clearing ledger_head_id — allowed (reverts to legacy category)
+        patch.ledger_head_id = null
+        // Do NOT change existing category when clearing LH — preserve historical value
+      } else {
+        const result = await resolveLedgerHead(body.ledger_head_id)
+        if ('error' in result) {
+          return NextResponse.json({ error: result.error }, { status: 400 })
+        }
+        patch.ledger_head_id = result.id
+        patch.category = result.name // Both updated atomically — no mismatch possible
+      }
+    }
+
+    // C15: keep the money triple consistent. Editing amount alone
+    // used to leave due_amount stale (!= amount − paid). Whenever
+    // amount or paid_amount changes, due is recomputed server-side
+    // and paid may never exceed amount.
+    if ('amount' in patch || 'paid_amount' in patch) {
+      const finalAmount = patch.amount ?? Number(existing.amount)
+      const finalPaid = patch.paid_amount ?? Number(existing.paid_amount ?? finalAmount)
+      if (finalPaid > finalAmount) {
+        return NextResponse.json({ error: 'paid_amount cannot exceed amount' }, { status: 400 })
+      }
+      patch.amount = finalAmount
+      patch.paid_amount = finalPaid
+      patch.due_amount = roundMoney(finalAmount - finalPaid)
+    }
+
+    if (Object.keys(patch).length === 0) {
+      return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 })
+    }
+
+    const data = await prisma.$transaction(async (tx) => {
+      const updated = await tx.branchCashExpense.update({ where: { id }, data: patch })
+      await syncExpenseToLedger(tx, existing as any, updated as any)
+      return updated
+    })
+    const [withHead] = await attachExpenseLedgerHead([data as any])
+
+    // Audit trail
+    await prisma.branchAuditTrail.create({
+      data: {
+        branch_id: existing.branch_id,
+        table_name: 'branch_cash_expenses',
+        record_id: existing.id,
+        action: 'update',
+        performed_by: profile.uid,
+        performed_by_name: profile.full_name,
+        old_value: { category: existing.category, ledger_head_id: existing.ledger_head_id },
+        new_value: toPlain(patch),
+      },
+    })
+
+    return NextResponse.json({ success: true, expense: toPlain(withHead) })
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 })
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DELETE /api/branch-accounts/expenses?id=<uuid>
+// Manager: own branch expenses only. Admin: any expense.
+// (As in the old route, the handler enforces admin-only.)
+// ─────────────────────────────────────────────────────────────────────────────
+export async function DELETE(req: NextRequest) {
+  try {
+    const profile = await getCallerProfile(req)
+    if (!profile) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+    const isAdmin = isAdminRole(profile.role)
+    if (!isAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+
+    const { searchParams } = new URL(req.url)
+    const id = searchParams.get('id')
+    if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
+
+    const expense = await prisma.branchCashExpense.findFirst({
+      where: { id },
+      select: { id: true, branch_id: true, manager_id: true, description: true, amount: true, expense_date: true },
+    })
+
+    if (!expense) return NextResponse.json({ error: 'Expense not found' }, { status: 404 })
+
+    await prisma.$transaction(async (tx) => {
+      await tx.branchCashExpense.delete({ where: { id } })
+      await syncExpenseToLedger(tx, expense as any, null)
+    })
+
+    await prisma.branchAuditTrail.create({
+      data: {
+        branch_id: expense.branch_id,
+        table_name: 'branch_cash_expenses',
+        record_id: expense.id,
+        action: 'delete',
+        performed_by: profile.uid,
+        performed_by_name: profile.full_name,
+        old_value: { description: expense.description, amount: Number(expense.amount) },
+      },
+    })
+
+    return NextResponse.json({ success: true })
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 })
+  }
+}

@@ -1,0 +1,324 @@
+"use client";
+
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { useRouter, usePathname } from 'next/navigation';
+import {
+  Shield, LayoutDashboard, CreditCard, Receipt,
+  FileCheck, LogOut, User, Sparkles, Briefcase,
+  ListTodo, MapPin, Settings, ShieldAlert, Wallet, Package, TrendingUp,
+  Building2, PiggyBank, Banknote, Calculator, FileText, History, BarChart3, UserCog, ChevronDown,
+  Calendar, FileOutput, BookMarked
+} from 'lucide-react';
+
+export type AllowedRole = 'admin' | 'super_admin' | 'partner' | 'employee' | 'head_office' | 'branch_manager';
+
+export interface SidebarProps {
+  forcedRole: AllowedRole;           // Required — always passed by SidebarWrapper
+  mobile?: boolean;
+  closeMenu?: () => void;
+  onLogout?: () => void;
+}
+
+// ── Navigation definitions ─────────────────────────────────────────────────
+
+const adminNavigation = [
+  { name: 'System Telemetry',        icon: LayoutDashboard, href: '/admin/dashboard' },
+
+  { name: 'User Directory',          icon: User,            href: '/admin/users'     },
+  { name: 'Branch Management',       icon: MapPin,          href: '/admin/branches'  },
+  { name: 'Master Salary Ledger',    icon: Receipt,         href: '/admin/salaries'  },
+  { name: 'Unified Fin Summary',     icon: Calculator,      href: '/admin/financial-summary' },
+  { name: 'Financial Reports',       icon: Banknote,        href: '/admin/branch-financial-reports' },
+  { name: 'Payment Proofs & Payouts',icon: FileCheck,       href: '/admin/payments' },
+  { name: 'Branch Chalans',          icon: Package,         href: '/admin/branch-chalans' },
+  { name: 'KYC Verifications',       icon: ShieldAlert,     href: '/admin/kyc'       },
+  { name: 'User Settings Panel',     icon: UserCog,         href: '/admin/user-settings' },
+  { name: 'Security Audit Log',      icon: Shield,          href: '/admin/audit'     },
+  { name: 'Ledger Heads',            icon: BookMarked,      href: '/admin/branch-expenses' },
+  { name: 'Expense Requests',        icon: Receipt,         href: '/admin/expense-requests' },
+  { name: 'General Expenses',        icon: Wallet,          href: '/admin/expenses'  },
+  { name: 'Task Management',         icon: ListTodo,        href: '/admin/tasks'     },
+  { name: 'PDF Generator',           icon: FileOutput,      href: '/admin/pdf-generator' },
+  {
+    name: 'Branch Accounts',
+    icon: Building2,
+    href: '#',
+    divider: true,
+    subItems: [
+      { name: 'Accounts Overview', href: '/admin/branch-accounts' },
+      { name: 'Deposit Approvals', href: '/admin/branch-accounts/deposit-approvals' },
+      { name: 'Financial Reports', href: '/admin/branch-financial-reports' },
+      { name: 'Change Requisitions', href: '/admin/bundle-requests' },
+      { name: 'Reconciliation',   href: '/admin/branch-accounts/reconciliation' },
+      { name: 'Branch Performance', href: '/admin/branch-performance' }
+    ]
+  },
+  { name: 'System Settings',         icon: Settings,        href: '/admin/settings', divider: true },
+];
+
+const partnerNavigation = [
+  { name: 'Partner Dashboard',  icon: LayoutDashboard, href: '/dashboard'                    },
+  { name: 'Profile Settings',   icon: User,            href: '/dashboard/settings'            },
+  { name: 'Expense Requests',   icon: Wallet,          href: '/dashboard/expense-requests'    },
+  { name: 'Branch Chalans',     icon: Package,         href: '/dashboard/branch-chalans'      },
+  { name: 'Branch Performance', icon: TrendingUp,      href: '/dashboard/branch-performance'  },
+  { name: 'Salary Ledger',      icon: Receipt,         href: '/dashboard/salaries'            },
+  // Dead link removed: '/dashboard/product-chalans' never existed
+  // (404 for partners + employees). Chalan work lives under
+  // Branch Chalans above.
+  { name: 'Assigned Tasks',     icon: ListTodo,        href: '/dashboard/tasks'               },
+];
+
+const employeeNavigation = [
+  { name: 'Employee Portal',    icon: LayoutDashboard, href: '/dashboard'                    },
+  { name: 'Profile Settings',   icon: User,            href: '/dashboard/settings'            },
+  { name: 'Salary Ledger',      icon: Receipt,         href: '/dashboard/salaries'            },
+  { name: 'Branch Chalans',     icon: Package,         href: '/dashboard/branch-chalans'      },
+  { name: 'Assigned Tasks',     icon: ListTodo,        href: '/dashboard/tasks'               },
+];
+
+const headOfficeNavigation = [
+  { name: 'Corporate Portal',   icon: LayoutDashboard, href: '/dashboard'                    },
+  { name: 'Profile Settings',   icon: User,            href: '/dashboard/settings'            },
+  { name: 'Salary Ledger',      icon: Receipt,         href: '/dashboard/salaries'            },
+  { name: 'Branch Chalans',     icon: Package,         href: '/dashboard/branch-chalans'      },
+  { name: 'Branch Performance', icon: TrendingUp,      href: '/dashboard/branch-performance'  },
+  { name: 'Assigned Tasks',     icon: ListTodo,        href: '/dashboard/tasks'               },
+];
+
+// ── Branch Manager navigation (Strictly Branch Accounts & Operations) ────────
+const branchManagerNavigation = [
+  { name: 'Branch Dashboard',   icon: LayoutDashboard, href: '/dashboard/branch-accounts' },
+  { name: 'Daily Closing',      icon: Calendar,        href: '/dashboard/branch-accounts/daily-closing' },
+  { name: 'Cash Ledger',        icon: Banknote,        href: '/dashboard/branch-accounts/cash-ledger' },
+  { name: 'Bank Deposit',       icon: PiggyBank,       href: '/dashboard/branch-accounts/bank-deposit' },
+  { name: 'Deposit History',    icon: History,         href: '/dashboard/branch-accounts/deposit-history' },
+  { name: 'Change Requisition', icon: Wallet,          href: '/dashboard/branch-accounts/bundle-requests' },
+  { name: 'Bank Statements',    icon: FileText,        href: '/dashboard/branch-accounts/bank-statement' },
+  { name: 'Sales Summary',      icon: TrendingUp,      href: '/dashboard/branch-accounts/sales-summary' },
+  { name: 'Reconciliation',     icon: BarChart3,       href: '/dashboard/branch-accounts/reconciliation' },
+  { name: 'Monthly Report',     icon: FileText,        href: '/dashboard/branch-accounts/monthly-report' },
+  { name: 'Expense Requests',   icon: Wallet,          href: '/dashboard/expense-requests', divider: true },
+  { name: 'Profile Settings',   icon: User,            href: '/dashboard/settings' },
+];
+
+// ── Helper ─────────────────────────────────────────────────────────────────
+
+function getNavigation(role: AllowedRole) {
+  if (role === 'admin' || role === 'super_admin') return adminNavigation;
+  if (role === 'partner')        return partnerNavigation;
+  if (role === 'branch_manager') return branchManagerNavigation;
+  if (role === 'employee')       return employeeNavigation;
+  if (role === 'head_office')    return headOfficeNavigation;
+  return [];
+}
+
+// ── Component ──────────────────────────────────────────────────────────────
+
+export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: SidebarProps) {
+  const router   = useRouter();
+  const pathname = usePathname();
+
+  const [userName, setUserName] = useState<string>('');
+  const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({ 'Branch Accounts': true, 'Branch Management': true });
+
+  const toggleMenu = (name: string) => { setExpandedMenus(prev => ({ ...prev, [name]: !prev[name] })); };
+  const [userEmail, setUserEmail] = useState<string>('');
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        // identity via /api/auth/me — email + full_name in one call.
+        const res = await fetch('/api/auth/me');
+        const data = await res.json();
+        if (data?.user) {
+          setUserEmail(data.user.email ?? '');
+          if (data.profile) {
+            setUserName(data.profile.full_name ?? '');
+          }
+        }
+      } catch (e) {
+        console.error('Profile fetch error:', e);
+      }
+    };
+    fetchProfile();
+  }, []);
+
+  const handleLogout = () => {
+    if (onLogout) {
+      onLogout();
+    } else {
+      localStorage.removeItem('aura_session');
+      document.cookie = 'demo_admin=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      document.cookie = 'aura_role=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+      fetch('/api/auth/logout', { method: 'POST' }).then(() => router.push('/')).catch(console.error);
+    }
+  };
+
+  const navigation = getNavigation(forcedRole);
+
+  return (
+    <div
+      className={
+        mobile
+          ? 'flex flex-col justify-between h-full p-6 relative overflow-y-auto'
+          : 'hidden md:flex md:flex-col md:justify-between md:w-64 md:h-screen md:p-6 md:glass-sidebar md:border-r md:border-slate-900/5 md:sticky md:top-0 md:z-20 md:shrink-0 overflow-y-auto custom-scrollbar'
+      }
+    >
+      {/* Decorative top accent */}
+      <div className="absolute top-0 left-5 right-5 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/30 to-transparent" />
+
+      {/* ── Top section ─────────────────────────────────────── */}
+      <div>
+        {/* Brand */}
+        <div className="flex items-center gap-2 mb-8 mt-2 px-1">
+          <img src="/logos.png" alt="Anchor ERP Official Logo" className="w-12 h-12 object-contain drop-shadow-md" />
+          <div>
+            <h1 className="text-sm font-bold tracking-wider premium-text-gradient font-serif">ANCHOR ERP</h1>
+            <p className="text-[7.5px] uppercase tracking-[0.25em] text-slate-500">Enterprise Resource Planning</p>
+          </div>
+        </div>
+
+        {/* Role badge */}
+        <div className="mb-4 px-1">
+          <span className="text-[9px] uppercase tracking-widest text-[#8a6d1f]/70 font-semibold">
+            {forcedRole === 'admin' || forcedRole === 'super_admin' ? 'Admin Panel' :
+             forcedRole === 'partner'        ? 'Partner Portal' :
+             forcedRole === 'branch_manager' ? 'Branch Manager' :
+             forcedRole === 'head_office'    ? 'Head Office Portal' : 'Employee Portal'}
+          </span>
+        </div>
+
+        {/* Navigation */}
+        <div className="space-y-1">
+          {navigation.map((node) => {
+            // BUG-026 FIX: Use startsWith so sub-routes like /admin/dashboard/password-requests stay active.
+            // Special case: exact match for '/dashboard' to avoid it activating on every /dashboard/* page.
+            const isActive = node.href === '/dashboard'
+              ? pathname === '/dashboard'
+              : (node.href !== '#' && (pathname === node.href || pathname?.startsWith(node.href + '/')));
+
+            const isMenuExpanded = expandedMenus[node.name] || false;
+            const Icon = node.icon;
+
+            // If the item has subItems, render a collapsible menu
+            if ((node as any).subItems) {
+              const subItems = (node as any).subItems as { name: string, href: string }[];
+              const isChildActive = subItems.some(sub => pathname === sub.href || pathname?.startsWith(sub.href + '/'));
+
+              return (
+                <React.Fragment key={node.name}>
+                  {(node as any).divider && <div className="my-3 border-t border-slate-900/[0.08]" />}
+                  <button
+                    onClick={() => toggleMenu(node.name)}
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all group relative cursor-pointer ${
+                      isChildActive || isMenuExpanded
+                        ? 'text-slate-900 bg-slate-900/[0.04]'
+                        : 'text-slate-500 hover:text-slate-700 hover:bg-slate-900/[0.04]'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3.5">
+                      <Icon className={`w-4 h-4 shrink-0 transition-transform ${isChildActive ? 'text-[#8a6d1f]' : 'text-slate-500 group-hover:text-slate-900'}`} />
+                      <span>{node.name}</span>
+                    </div>
+                    <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isMenuExpanded ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {isMenuExpanded && (
+                    <div className="mt-1 mb-2 ml-4 pl-3 border-l border-slate-900/10 space-y-1">
+                      {subItems.map(sub => {
+                        const isSubActive = pathname === sub.href || pathname?.startsWith(sub.href + '/');
+                        return (
+                          <Link
+                            key={sub.name}
+                            href={sub.href}
+                            onClick={() => { closeMenu && closeMenu(); }}
+                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all relative ${
+                              isSubActive
+                                ? 'text-black font-semibold bg-[#d4af37]'
+                                : 'text-slate-500 hover:text-slate-600 hover:bg-slate-900/[0.04]'
+                            }`}
+                          >
+                            <span>{sub.name}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </React.Fragment>
+              );
+            }
+
+            return (
+              <React.Fragment key={node.name}>
+                {/* Divider before section header items */}
+                {(node as any).divider && (
+                  <div className="my-3 border-t border-slate-900/[0.08]" />
+                )}
+                <Link
+                  href={node.href}
+                  onClick={() => { closeMenu && closeMenu(); }}
+                  className={`flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-xs font-medium transition-all group relative cursor-pointer ${
+                    isActive
+                      ? 'text-black font-semibold bg-[#d4af37]/20'
+                      : 'text-slate-500 hover:text-slate-700 hover:bg-slate-900/[0.04]'
+                  }`}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="active-pill"
+                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                      className="absolute inset-0 bg-gradient-to-r from-[#d4af37] to-white rounded-xl -z-10 shadow"
+                    />
+                  )}
+                  <Icon
+                    className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${
+                      isActive ? 'text-black' : 'text-slate-500 group-hover:text-[#8a6d1f]'
+                    }`}
+                  />
+                  <span>{node.name}</span>
+                </Link>
+              </React.Fragment>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Footer ──────────────────────────────────────────── */}
+      <div className="space-y-4 mt-auto pt-6">
+        {/* AI widget */}
+        <div className="p-3.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 relative overflow-hidden group">
+          <div className="absolute -top-10 -right-10 w-20 h-20 bg-[#d4af37]/5 rounded-full filter blur-xl group-hover:bg-[#d4af37]/10 transition-all" />
+          <div className="flex items-center gap-2 mb-1">
+            <Sparkles className="w-3.5 h-3.5 text-[#8a6d1f]" />
+            <span className="text-[9px] font-bold text-slate-900 uppercase tracking-wider">Anchor ERP AI Fraud Risk</span>
+          </div>
+          <p className="text-[10px] text-slate-500 font-sans">Verification node secure. Zero structural anomalies detected.</p>
+        </div>
+
+        {/* Logout */}
+        <div className="flex gap-2 justify-end px-1">
+          <button
+            onClick={handleLogout}
+            className="p-2 rounded-xl bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 text-rose-600 transition-all cursor-pointer"
+          >
+            <LogOut className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Profile capsule */}
+        <div className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/5">
+          <div className="w-8 h-8 rounded-lg bg-white border border-slate-900/10 flex items-center justify-center text-xs font-semibold text-[#8a6d1f]">
+            {userName ? userName.charAt(0).toUpperCase() : <User className="w-3 h-3" />}
+          </div>
+          <div className="overflow-hidden">
+            <h4 className="text-[11px] font-bold text-slate-900 truncate">{userName || 'Loading…'}</h4>
+            <p className="text-[9px] text-slate-500 truncate">{userEmail || ''}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

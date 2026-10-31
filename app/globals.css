@@ -1,0 +1,324 @@
+@import "tailwindcss";
+
+/*
+  Light theme — the whole app uses these tokens.
+  Surfaces are white / soft grey, text is near-black, and the gold
+  primary (#d4af37) is kept from the previous identity. Where gold is
+  used as text on white it is too light to read, so components use the
+  darker --gold-text shade for text and keep #d4af37 for fills.
+*/
+:root {
+  --background: #f4f5f7;
+  --foreground: #17181c;
+  --card: #ffffff;
+  --card-foreground: #17181c;
+  --popover: #ffffff;
+  --popover-foreground: #17181c;
+  --primary: #d4af37;
+  --primary-foreground: #17181c;
+  --gold-text: #8a6d1f;
+  --secondary: #eceef1;
+  --secondary-foreground: #17181c;
+  --muted: #eceef1;
+  --muted-foreground: #59616e;
+  --accent: #f7ecd2;
+  --accent-foreground: #7a5c14;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: rgba(15, 18, 25, 0.1);
+  --input: rgba(15, 18, 25, 0.04);
+  --ring: #b8912a;
+  --radius: 0.75rem;
+
+  --emerald: #059669;
+  --rose: #e11d48;
+  --amber: #d97706;
+}
+
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-serif: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-gold-text: var(--gold-text);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-emerald-accent: var(--emerald);
+  --color-rose-accent: var(--rose);
+  --color-amber-accent: var(--amber);
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--background);
+  color: var(--foreground);
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  min-height: 100vh;
+}
+
+/* Cards and panels */
+.glass-panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 2px rgba(15, 18, 25, 0.05);
+}
+
+.glass-panel-hover {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glass-panel-hover:hover {
+  transform: translateY(-2px);
+  border-color: rgba(184, 145, 42, 0.4);
+  box-shadow: 0 12px 30px rgba(15, 18, 25, 0.1);
+}
+
+/* Sidebar */
+.glass-sidebar {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-right: 1px solid var(--border);
+}
+
+.gold-glow {
+  box-shadow: 0 0 40px -10px rgba(212, 175, 55, 0.35);
+}
+
+.gold-glow-hover:hover {
+  box-shadow: 0 0 50px -5px rgba(212, 175, 55, 0.4);
+}
+
+.premium-export-btn {
+  background: linear-gradient(135deg, #0d6efd, #2563eb);
+  color: #fff;
+  padding: 0.35rem 0.75rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.premium-export-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
+.premium-export-btn:active {
+  transform: translateY(0);
+}
+
+.premium-gradient {
+  background: linear-gradient(135deg, #d4af37 0%, #aa7c11 50%, #f3e5ab 100%);
+}
+
+/* Gold gradient text — darker stops so it stays readable on white. */
+.premium-text-gradient {
+  background: linear-gradient(135deg, #aa7c11 0%, #8a6d1f 50%, #c39a2b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Was a dark hero gradient; now a soft light one. Kept under the same
+   class name because several pages still reference it. */
+.dark-gradient {
+  background: linear-gradient(180deg, #ffffff 0%, #eef0f3 100%);
+}
+
+/* Keep any stray wide child from pushing the whole page sideways.
+   `clip` (not `hidden`) so position: sticky keeps working. */
+html, body {
+  overflow-x: clip;
+}
+
+/* Thin themed scrollbar for tab/filter strips (used as a class). */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(15, 18, 25, 0.25) transparent;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(15, 18, 25, 0.25);
+  border-radius: 999px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Hide scrollbars entirely where the design asks for it. */
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(15, 18, 25, 0.18);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ring);
+}
+
+/* Shimmer animation for skeleton load */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.shimmer::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(15, 18, 25, 0) 0%,
+    rgba(15, 18, 25, 0.04) 20%,
+    rgba(15, 18, 25, 0.07) 60%,
+    rgba(15, 18, 25, 0) 100%
+  );
+  animation: shimmer 2s infinite;
+  content: '';
+}
+
+/* ─── Bengali / Bangla font utilities ─────────────────────────────────── */
+.font-bangla {
+  font-family: var(--font-hind-siliguri), var(--font-noto-sans-bengali), 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+  font-feature-settings: normal;
+}
+.font-bangla-noto {
+  font-family: var(--font-noto-sans-bengali), 'Noto Sans Bengali', sans-serif;
+}
+
+/* ─── A4 document preview & print ─────────────────────────────────────── */
+.pdf-a4-sheet {
+  width: 210mm;
+  min-height: 297mm;
+  background: #ffffff;
+  color: #16171a;
+  box-shadow: 0 10px 40px -10px rgba(15, 18, 25, 0.25);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* On small screens the sheet shrinks to fit instead of forcing
+   horizontal scroll; the print rules below still emit a true A4 page. */
+@media (max-width: 820px) {
+  .pdf-a4-sheet {
+    width: 100%;
+    min-height: auto;
+  }
+}
+
+.pdf-watermark-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+  user-select: none;
+}
+
+.pdf-content-editable {
+  outline: none;
+  caret-color: #0f3057;
+}
+.pdf-content-editable:focus {
+  outline: none;
+}
+
+.pdf-editor-zone:focus-within {
+  box-shadow: inset 0 0 0 2px rgba(184, 145, 42, 0.45);
+}
+
+.pdf-toolbar-btn {
+  transition: all 0.15s ease;
+}
+.pdf-toolbar-btn.active {
+  background: rgba(212, 175, 55, 0.25);
+  color: #7a5c14;
+}
+.pdf-toolbar-btn:hover {
+  background: rgba(15, 18, 25, 0.06);
+}
+
+/* ─── Print ───────────────────────────────────────────────────────────── */
+@media print {
+  html, body {
+    background: #fff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  /* Visibility, not display: #pdf-print-area is nested several levels
+     deep, so hiding its ancestors would hide the sheet too. */
+  body * {
+    visibility: hidden;
+  }
+  #pdf-print-area,
+  #pdf-print-area * {
+    visibility: visible;
+  }
+  #pdf-print-area {
+    display: block !important;
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 210mm !important;
+    margin: 0 auto !important;
+    background: #fff !important;
+    box-shadow: none !important;
+  }
+  .pdf-a4-sheet {
+    width: 210mm !important;
+    min-height: 297mm !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    page-break-inside: avoid;
+  }
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+}

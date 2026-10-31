@@ -1,0 +1,1172 @@
+// ============================================================================
+// anchorerp clone — Prisma schema
+// Provenance: generated 2026-10-31 from Layer-1 backup real columns
+//   (~/workspace/aso_diag/anchorerp_backup/2026-10-31/, PostgREST-exposed rows,
+//   count- and hash-verified) cross-checked against repo DDL in
+//   the legacy migration SQL that shipped with the old codebase,
+//   cross-checked file by file. Where DDL and backup columns disagreed, the
+//   BACKUP's real columns won; conflicts are logged in
+//   ~/workspace/aso_diag/clone_schema_notes.md.
+//   Final reconciliation against the Layer-2 full dump (pg_dump) is
+//   owner-gated and has NOT happened yet — do not treat this schema as
+//   final until that reconciliation is done.
+// Views — NOT models, rebuilt in code:
+//   branch_accounts_summary, employee_verifications,
+//   partner_verifications, profiles_admin_view
+//   (employee_verifications / partner_verifications are views over
+//   verification_requests filtered by profile_type; profiles_admin_view is
+//   a view over profiles; branch_accounts_summary is an aggregate view
+//   over branches / branch_cash_ledger / branch_bank_deposits.)
+// Provisional models (shape not verified against live rows):
+//   EmployeePosition (code/DDL evidence only — see model comment),
+//   plus every 0-row table whose shape comes from DDL only, and the
+//   DDL-only non-exposed attendance set. Full list in the notes file.
+// Conventions: model names PascalCase singular; field names are exactly
+//   the DB column names (snake_case); @@map on every model; no @relation
+//   FKs are declared (relations are application-level in the source app;
+//   see the Profile/AuthUser note on the Profile model).
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Auth (blueprint §3) — populated at load time from the dump's auth.users
+// with identical UUIDs; bcrypt hashes carried in legacyBcryptHash.
+// ---------------------------------------------------------------------------
+
+model AuthUser {
+  id                 String    @id @db.Uuid
+  email              String    @unique
+  password_hash      String?
+  legacy_bcrypt_hash String?
+  email_confirmed_at DateTime? @db.Timestamptz(6)
+  last_sign_in_at    DateTime? @db.Timestamptz(6)
+  raw_user_meta_data Json?
+  raw_app_meta_data  Json?
+  created_at         DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime  @updatedAt @db.Timestamptz(6)
+
+  @@map("auth_users")
+}
+
+// Data-carry only — approximated from the legacy auth identity shape.
+model AuthIdentity {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id       String   @db.Uuid
+  provider      String
+  provider_id   String?
+  identity_data Json?
+  created_at    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+
+  @@map("auth_identities")
+}
+
+// ---------------------------------------------------------------------------
+// A. PostgREST-exposed tables (backup-verified where rows exist)
+// ---------------------------------------------------------------------------
+
+model ActivityLog {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id     String?  @db.Uuid
+  action      String
+  details     Json?
+  ip_address  String?
+  device_info String?
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("activity_logs")
+}
+
+model AdminUser {
+  id String @id @db.Uuid
+
+  @@map("admin_users")
+}
+
+model BonusLog {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  branch_id         String?  @db.Uuid
+  profile_id        String?  @db.Uuid
+  salary_payment_id String?  @db.Uuid
+  amount            Decimal  @db.Decimal(15, 2)
+  reason            String?
+  log_date          DateTime @db.Date
+  created_at        DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("bonus_logs")
+}
+
+model Branch {
+  id                     String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                   String
+  // DDL-only columns below (attendance/scratch DDL; NOT in backup rows,
+  // which expose only id, name, created_at) — kept optional for load safety.
+  address                String?
+  latitude               Float?
+  longitude              Float?
+  geofence_radius_meters Int?
+  radius_meters          Int?
+  is_active              Boolean?
+  created_by             String?   @db.Uuid
+  code                   String?   @unique
+  city                   String?
+  phone                  String?
+  manager_id             String?   @db.Uuid
+  created_at             DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at             DateTime? @db.Timestamptz(6)
+
+  @@map("branches")
+}
+
+model BranchAuditTrail {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  branch_id         String?  @db.Uuid
+  branch_name       String?
+  table_name        String
+  record_id         String   @db.Uuid
+  action            String
+  performed_by      String?  @db.Uuid
+  performed_by_name String?
+  old_value         Json?
+  new_value         Json?
+  notes             String?
+  ip_address        String?
+  created_at        DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("branch_audit_trail")
+}
+
+model BranchBankDeposit {
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  branch_id           String    @db.Uuid
+  branch_name         String?
+  manager_id          String    @db.Uuid
+  manager_name        String?
+  deposit_date        DateTime  @db.Date
+  sales_from_date     DateTime? @db.Date
+  sales_to_date       DateTime? @db.Date
+  amount              Decimal   @db.Decimal(15, 2)
+  bank_account_name   String
+  bank_account_number String?
+  deposit_slip_number String?
+  bank_transaction_id String?
+  deposited_by_name   String?
+  slip_attachment_url String?
+  bank_statement_url  String?
+  notes               String?
+  daily_breakdown     Json?
+  khuchra_amount      Decimal?  @default(0) @db.Decimal(15, 2)
+  status              String    @default("draft")
+  submitted_at        DateTime? @db.Timestamptz(6)
+  reviewed_by         String?   @db.Uuid
+  reviewed_by_name    String?
+  reviewed_at         DateTime? @db.Timestamptz(6)
+  rejection_reason    String?
+  is_reversed         Boolean   @default(false)
+  reversal_note       String?
+  reversed_by         String?   @db.Uuid
+  reversed_at         DateTime? @db.Timestamptz(6)
+  created_at          DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@map("branch_bank_deposits")
+}
+
+model BranchBundleRequest {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  branch_id         String    @db.Uuid
+  branch_name       String?
+  manager_id        String    @db.Uuid
+  manager_name      String?
+  bundle_10_count   Int       @default(0)
+  bundle_20_count   Int       @default(0)
+  bundle_50_count   Int       @default(0)
+  bundle_100_count  Int       @default(0)
+  total_amount      Decimal   @db.Decimal(15, 2)
+  urgency           String    @default("normal")
+  reason            String?
+  status            String    @default("requested")
+  task_id           String?   @db.Uuid
+  processed_by      String?   @db.Uuid
+  processed_by_name String?
+  processed_at      DateTime? @db.Timestamptz(6)
+  completed_at      DateTime? @db.Timestamptz(6)
+  admin_notes       String?
+  created_at        DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@map("branch_bundle_requests")
+}
+
+model BranchCashExpense {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  branch_id         String    @db.Uuid
+  branch_name       String?
+  manager_id        String    @db.Uuid
+  manager_name      String?
+  expense_date      DateTime  @default(now()) @db.Date
+  category          String    @default("general")
+  description       String
+  amount            Decimal   @db.Decimal(15, 2)
+  paid_amount       Decimal?  @default(0) @db.Decimal(15, 2)
+  due_amount        Decimal?  @default(0) @db.Decimal(15, 2)
+  ledger_head_id    String?   @db.Uuid
+  receipt_url       String?
+  recipient_account String?
+  notes             String?
+  rent_month        String?
+  rent_year         Int?
+  billing_month     String?
+  billing_year      Int?
+  // Cutover-only link columns (Batch-2 migration, not in backup rows).
+  salary_payment_id String?   @db.Uuid
+  expense_request_id String?  @db.Uuid
+  created_at        DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@map("branch_cash_expenses")
+}
+
+model BranchCashLedger {
+  id                    String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  branch_id             String    @db.Uuid
+  ledger_date           DateTime  @db.Date
+  opening_cash          Decimal   @default(0) @db.Decimal(15, 2)
+  cash_sales            Decimal   @default(0) @db.Decimal(15, 2)
+  bkash_sales           Decimal   @default(0) @db.Decimal(15, 2)
+  nagad_sales           Decimal   @default(0) @db.Decimal(15, 2)
+  rocket_sales          Decimal   @default(0) @db.Decimal(15, 2)
+  card_sales            Decimal   @default(0) @db.Decimal(15, 2)
+  bank_transfer_sales   Decimal   @default(0) @db.Decimal(15, 2)
+  other_cash_in         Decimal   @default(0) @db.Decimal(15, 2)
+  cash_expenses         Decimal   @default(0) @db.Decimal(15, 2)
+  bank_deposits_out     Decimal   @default(0) @db.Decimal(15, 2)
+  khuchra_amount        Decimal?  @default(0) @db.Decimal(15, 2)
+  // In Postgres this is a GENERATED ALWAYS column; Prisma cannot express
+  // that — the loader must not write it, or it must be dropped/recreated
+  // as a plain column at clone-build time. See notes.
+  expected_closing_cash Decimal?  @db.Decimal(15, 2)
+  actual_cash           Decimal?  @db.Decimal(15, 2)
+  cash_difference       Decimal?  @db.Decimal(15, 2)
+  difference_status     String?
+  difference_notes      String?
+  is_closed             Boolean   @default(false)
+  closed_by             String?   @db.Uuid
+  closed_at             DateTime? @db.Timestamptz(6)
+  created_at            DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@unique([branch_id, ledger_date])
+  @@map("branch_cash_ledger")
+}
+
+model BranchFinancialReport {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  branch_id       String   @db.Uuid
+  report_month    String
+  amount          Decimal  @default(0) @db.Decimal(15, 2)
+  notes           String?
+  created_by      String?  @db.Uuid
+  created_by_name String?
+  created_at      DateTime @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([branch_id, report_month])
+  @@map("branch_financial_reports")
+}
+
+model BranchManagerAssignment {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  employee_id String   @db.Uuid
+  branch_id   String   @db.Uuid
+  assigned_by String?  @db.Uuid
+  assigned_at DateTime @default(now()) @db.Timestamptz(6)
+  is_active   Boolean  @default(true)
+  notes       String?
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([employee_id, branch_id])
+  @@map("branch_manager_assignments")
+}
+
+model BranchPerformanceReport {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  branch_id       String?  @db.Uuid
+  branch_name     String
+  report_month    DateTime @db.Date
+  total_sales     Decimal  @default(0) @db.Decimal(15, 2)
+  total_profit    Decimal  @default(0) @db.Decimal(15, 2)
+  total_loss      Decimal  @default(0) @db.Decimal(15, 2)
+  notes           String?
+  created_by      String?  @db.Uuid
+  created_by_name String?
+  created_at      DateTime @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime @default(now()) @db.Timestamptz(6)
+
+  // B38: the batch-2 fix adds this unique (with load-time dedupe of
+  // the 147 live rows to one per branch+month) so the monthly-report
+  // sync is a true upsert and can never duplicate again.
+  @@unique([branch_id, report_month])
+  @@map("branch_performance_reports")
+}
+
+model BranchTransaction {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  branch_id  String   @db.Uuid
+  user_id    String?  @db.Uuid
+  amount     Decimal  @db.Decimal(12, 2)
+  currency   String   @default("BDT")
+  account    String
+  trx_id     String
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("branch_transactions")
+}
+
+model BranchTransfer {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id         String   @db.Uuid
+  old_branch_id   String?  @db.Uuid
+  old_branch_name String?
+  new_branch_id   String   @db.Uuid
+  new_branch_name String
+  join_date       DateTime @db.Date
+  note            String?
+  created_at      DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("branch_transfers")
+}
+
+model CompanyExpense {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  purpose         String
+  // DDL also defines `amount`; backup rows expose total/paid/due only.
+  // Kept optional — see notes (conflict C-01).
+  amount          Decimal? @default(0) @db.Decimal(15, 2)
+  total_amount    Decimal  @default(0) @db.Decimal(15, 2)
+  paid_amount     Decimal  @default(0) @db.Decimal(15, 2)
+  due_amount      Decimal  @default(0) @db.Decimal(15, 2)
+  branch_id       String?  @db.Uuid
+  branch_name     String?
+  is_all_branches Boolean? @default(false)
+  // Settled expense-model spec: 'setup' | 'operating' (migration
+  // 20261031_expense_model.sql, cutover-only in the source repo).
+  expense_kind    String   @default("operating")
+  description     String?
+  created_by      String?  @db.Uuid
+  created_by_name String?
+  created_at      DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("company_expenses")
+}
+
+model DeveloperPaymentMethod {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  method_type String
+  details     Json
+  is_active   Boolean? @default(true)
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("developer_payment_methods")
+}
+
+model EmployeeExpenseRequest {
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  employee_id         String    @db.Uuid
+  employee_name       String?
+  branch_id           String?   @db.Uuid
+  branch_name         String?
+  title               String
+  description         String?
+  amount              Decimal   @db.Decimal(15, 2)
+  currency            String    @default("BDT")
+  is_purchased        Boolean   @default(false)
+  invoice_url         String?
+  payment_method      String    @default("bkash")
+  account_holder_name String?
+  account_number      String?
+  bank_name           String?
+  bank_branch         String?
+  status              String    @default("pending")
+  admin_notes         String?
+  trx_id              String?
+  paid_amount         Decimal?  @default(0) @db.Decimal(15, 2)
+  due_amount          Decimal?  @default(0) @db.Decimal(15, 2)
+  paid_at             DateTime? @db.Timestamptz(6)
+  created_at          DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@map("employee_expense_requests")
+}
+
+// REMODELLED 2026-10-31 to the Layer-2 dump's real shape (Agent B drift
+// report, dump_schema_public.sql): a lookup table, the twin of
+// `positions` — {id uuid PK DEFAULT gen_random_uuid(), name text NOT NULL
+// UNIQUE (employee_positions_name_key), created_at timestamptz NOT NULL
+// DEFAULT now()}. The earlier provisional junction shape
+// (employee_id/profile_id/position_id/branch_id/is_active/updated_at)
+// does not exist in the source DB, and the real `name` column had no
+// counterpart in it. Source table holds 0 rows, and grep over app/ +
+// lib/ + components/ (2026-10-31) finds zero code references to
+// EmployeePosition / employee_positions, so the remodel breaks nothing.
+model EmployeePosition {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String   @unique
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("employee_positions")
+}
+
+model EmployeeSalaryAccount {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  employee_id    String   @db.Uuid
+  bank_name      String
+  account_name   String
+  account_number String
+  routing_number String?
+  is_active      Boolean? @default(true)
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("employee_salary_accounts")
+}
+
+model HouseRentAccount {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  branch_id      String   @db.Uuid
+  bank_name      String
+  account_name   String
+  account_number String
+  routing_number String?
+  rent_amount    Decimal? @default(0) @db.Decimal(15, 2)
+  is_active      Boolean? @default(true)
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("house_rent_accounts")
+}
+
+model InvoiceRequest {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_by  String   @db.Uuid
+  title       String
+  description String?
+  amount      Decimal  @db.Decimal(15, 2)
+  currency    String   @default("BDT")
+  status      String   @default("pending")
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("invoice_requests")
+}
+
+model LedgerHead {
+  id                      String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code_number             Int       @unique
+  name                    String
+  ledger_type             String    @default("All")
+  is_active               Boolean   @default(true)
+  // Backup exposes a timestamptz value here; DDL says DATE. Backup wins
+  // (conflict C-02 in notes) — modelled as timestamptz.
+  reference_creation_date DateTime? @db.Timestamptz(6)
+  created_at              DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at              DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@map("ledger_heads")
+}
+
+model Notification {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id       String?  @db.Uuid
+  title         String
+  message       String
+  // Backup column is `read`; scratch DDL uses `is_read` + action_url.
+  // Backup wins for `read`; is_read/action_url kept optional (C-03).
+  read          Boolean  @default(false)
+  is_read       Boolean?
+  action_url    String?
+  type          String   @default("general")
+  is_admin_only Boolean  @default(false)
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("notifications")
+}
+
+model OvertimeLog {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  branch_id         String?  @db.Uuid
+  profile_id        String?  @db.Uuid
+  salary_payment_id String?  @db.Uuid
+  amount            Decimal  @db.Decimal(15, 2)
+  reason            String?
+  log_date          DateTime @db.Date
+  created_at        DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("overtime_logs")
+}
+
+model PasswordResetRequest {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id        String    @db.Uuid
+  // Plain String by design — no restrictive enum (the fix widened the CHECK).
+  status         String    @default("pending")
+  otp_code       String?
+  otp_expires_at DateTime? @db.Timestamptz(6)
+  attempts       Int       @default(0)
+  created_at     DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@map("password_reset_requests")
+}
+
+model PaymentRequest {
+  id                     String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id                String    @db.Uuid
+  invoice_title          String
+  invoice_number         String
+  description            String?
+  amount                 Decimal   @db.Decimal(15, 2)
+  currency               String    @default("BDT")
+  invoice_file_url       String
+  // Postgres enum payout_method in DDL — modelled as String (see notes).
+  payment_method         String
+  payment_details        Json?     @default("{}")
+  // Postgres enum payment_status in DDL — modelled as String.
+  status                 String    @default("pending")
+  transaction_id         String?
+  payment_screenshot_url String?
+  admin_notes            String?
+  rejection_reason       String?
+  account_name           String?
+  mobile_number          String?
+  bank_name              String?
+  account_number         String?
+  routing_number         String?
+  branch_name            String?
+  swift_code             String?
+  completed_at           DateTime? @db.Timestamptz(6)
+  created_at             DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at             DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@map("payment_requests")
+}
+
+model Position {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String   @unique
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("positions")
+}
+
+model PositionTransfer {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id           String   @db.Uuid
+  old_position_id   String?  @db.Uuid
+  old_position_name String?
+  new_position_id   String   @db.Uuid
+  new_position_name String
+  join_date         DateTime @db.Date
+  note              String?
+  created_at        DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("position_transfers")
+}
+
+model ProductChalan {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  branch_id       String?  @db.Uuid
+  branch_name     String
+  chalan_ref      String?
+  // Backup rows carry items as a JSON array; DDL declares JSONB. Json wins.
+  items           Json     @default("[]")
+  total_amount    Decimal  @default(0) @db.Decimal(15, 2)
+  total_cost      Decimal  @default(0) @db.Decimal(15, 2)
+  notes           String?
+  created_by      String?  @db.Uuid
+  created_by_name String?
+  created_at      DateTime @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("product_chalans")
+}
+
+// Profile.id is the AuthUser.id (same UUID, from the legacy auth store).
+// Relation Profile -> AuthUser on id is intentionally NOT declared as a
+// Prisma @relation: adding it would force a DB foreign key on
+// profiles.id. The link is by identical UUID, enforced at load time.
+model Profile {
+  id                            String    @id @db.Uuid
+  full_name                     String
+  email                         String?
+  employee_id                   String?
+  phone_number                  String?
+  country                       String?
+  address                       String?
+  whatsapp_number               String?
+  branch                        String?
+  branch_id                     String?   @db.Uuid
+  position                      String?
+  position_id                   String?   @db.Uuid
+  role                          String    @default("employee")
+  profile_type                  String    @default("partner")
+  verification_status           String    @default("pending")
+  rejection_reason              String?
+  profile_photo_url             String?
+  account                       Json?
+  bank_info                     Json?
+  salary                        Decimal?  @db.Decimal(15, 2)
+  security_question             String?
+  security_answer               String?
+  is_2fa_enabled                Boolean   @default(false)
+  is_banned                     Boolean   @default(false)
+  is_branch_manager             Boolean   @default(false)
+  last_login                    DateTime? @db.Timestamptz(6)
+  // DDL/ALTER-only columns below (attendance migrations; not present in
+  // backup rows) — all optional, see notes conflict C-04.
+  is_active                     Boolean?
+  face_enrolled                 Boolean?
+  face_descriptor               Json?
+  facial_id                     String?
+  photo_url                     String?
+  phone                         String?
+  nid                           String?
+  nid_front_url                 String?
+  nid_back_url                  String?
+  webauthn_challenge            String?
+  webauthn_current_challenge    String?
+  fingerprint_enrolled          Boolean?
+  requires_face_reverification  Boolean?
+  face_reset_at                 DateTime? @db.Timestamptz(6)
+  face_reset_by                 String?   @db.Uuid
+  first_verified_at             DateTime? @db.Timestamptz(6)
+  first_verified_latitude       Float?
+  first_verified_longitude      Float?
+  last_known_latitude           Float?
+  last_known_longitude          Float?
+  last_location_updated_at      DateTime? @db.Timestamptz(6)
+  registration_step             String?
+  kyc_status                    String?
+  created_at                    DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at                    DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@map("profiles")
+}
+
+model RegistrationOtp {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email      String   @unique
+  otp_code   String
+  expires_at DateTime @db.Timestamptz(6)
+  attempts   Int      @default(0)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("registration_otps")
+}
+
+model SalaryPayment {
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  employee_id         String    @db.Uuid
+  // BOTH amount and total_salary are kept (owner decision pending —
+  // do not drop either).
+  amount              Decimal   @db.Decimal(15, 2)
+  total_salary        Decimal?  @default(0) @db.Decimal(15, 2)
+  base_salary_at_time Decimal?  @db.Decimal(15, 2)
+  overtime_amount     Decimal?  @default(0) @db.Decimal(15, 2)
+  bonus_amount        Decimal?  @default(0) @db.Decimal(15, 2)
+  sales_commission    Decimal?  @default(0) @db.Decimal(15, 2)
+  tiffin_bill         Decimal?  @default(0) @db.Decimal(15, 2)
+  ledger_head_id      String?   @db.Uuid
+  transaction_id      String?
+  payment_proof_url   String?
+  branch_id           String?   @db.Uuid
+  account             String?
+  notes               String?
+  payment_date        DateTime  @default(now()) @db.Timestamptz(6)
+  created_at          DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@map("salary_payments")
+}
+
+model SystemSetting {
+  key        String   @id
+  value      String
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("system_settings")
+}
+
+model Task {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title            String
+  description      String?
+  assigned_to_id   String?   @db.Uuid
+  assigned_to      String?   @db.Uuid
+  assigned_to_name String?
+  status           String    @default("pending")
+  deadline         DateTime? @db.Timestamptz(6)
+  note             String?
+  created_by       String?   @db.Uuid
+  created_at       DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@map("tasks")
+}
+
+model TaskAssignment {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  task_id     String   @db.Uuid
+  assignee_id String   @db.Uuid
+  assigned_at DateTime @default(now()) @db.Timestamptz(6)
+  status      String   @default("pending")
+
+  @@map("task_assignments")
+}
+
+model Transaction {
+  id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id            String    @db.Uuid
+  payment_request_id String?   @db.Uuid
+  reference_number   String?   @unique
+  transaction_id     String?   @unique
+  amount             Decimal   @db.Decimal(15, 2)
+  currency           String    @default("BDT")
+  // Postgres enum payout_method in DDL — modelled as String.
+  payment_method     String?
+  type               String?
+  status             String?
+  gateway_response   Json?
+  completed_at       DateTime? @default(now()) @db.Timestamptz(6)
+  created_at         DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@map("transactions")
+}
+
+model User2faOtp {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id    String   @unique @db.Uuid
+  otp_code   String
+  expires_at DateTime @db.Timestamptz(6)
+  attempts   Int?     @default(0)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("user_2fa_otps")
+}
+
+model UtilityMeter {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  branch_id      String   @db.Uuid
+  meter_number   String
+  account_number String?
+  meter_type     String
+  is_active      Boolean? @default(true)
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("utility_meters")
+}
+
+model VerificationRequest {
+  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id             String   @db.Uuid
+  full_name           String
+  phone_number        String?
+  country             String?
+  address             String?
+  district            String?
+  profile_photo_url   String?
+  profile_type        String   @default("employee")
+  nid_front_url       String
+  nid_back_url        String
+  selfie_url          String?
+  // Backup rows also carry bank_account (legacy) alongside the split
+  // bank fields from update_kyc_bank_fields.sql — both kept.
+  bank_account        String?
+  bank_account_number String?
+  bank_name           String?
+  account_holder_name String?
+  branch              String?
+  branch_name         String?
+  routing_code        String?
+  status              String   @default("pending")
+  rejection_reason    String?
+  admin_notes         String?
+  created_at          DateTime @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("verification_requests")
+}
+
+// ---------------------------------------------------------------------------
+// B. Non-exposed tables (DDL only — translated from the legacy
+//    migration SQL). None of these were in
+//    the PostgREST backup; shapes are DDL translations, unverified
+//    against live rows. Postgres enums in DDL are modelled as String.
+//    EmployeeSalaryAccount lives in section A above (it is named in the
+//    task's section B but grouped with the salary tables for readability —
+//    it IS counted in the section-B total in the notes).
+// ---------------------------------------------------------------------------
+
+model AttendanceRecord {
+  id                        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  employee_id               String    @db.Uuid
+  branch_id                 String    @db.Uuid
+  check_in_time             DateTime  @db.Timestamptz(6)
+  check_out_time            DateTime? @db.Timestamptz(6)
+  check_in_lat              Float
+  check_in_lng              Float
+  check_out_lat             Float?
+  check_out_lng             Float?
+  face_match_score          Float?
+  face_verified             Boolean   @default(false)
+  status                    String    @default("present")
+  overtime_minutes          Int       @default(0)
+  approved_overtime_minutes Int?
+  overtime_approval_status  String?   @default("auto")
+  overtime_approval_note    String?
+  is_holiday_duty           Boolean?  @default(false)
+  is_manual_override        Boolean   @default(false)
+  override_reason           String?
+  approval_status           String    @default("pending")
+  approved_by               String?   @db.Uuid
+  approved_at               DateTime? @db.Timestamptz(6)
+  approval_note             String?
+  created_at                DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at                DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@map("attendance_records")
+}
+
+model AttendanceBreak {
+  id                        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  employee_id               String    @db.Uuid
+  branch_id                 String    @db.Uuid
+  attendance_id             String?   @db.Uuid
+  break_type                String
+  out_time                  DateTime  @default(now()) @db.Timestamptz(6)
+  expected_duration_minutes Int       @default(30)
+  return_time               DateTime? @db.Timestamptz(6)
+  actual_duration_minutes   Int?
+  reason                    String
+  status                    String    @default("active")
+  approved_by               String?   @db.Uuid
+  created_at                DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at                DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@map("attendance_breaks")
+}
+
+model AuditLog {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  actor_id   String?  @db.Uuid
+  actor_role String?
+  action     String
+  table_name String
+  record_id  String   @db.Uuid
+  old_value  Json?
+  new_value  Json?
+  ip_address String?
+  user_agent String?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("audit_logs")
+}
+
+model BranchAnnouncement {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  branch_id  String   @db.Uuid
+  type       String
+  message    String
+  created_by String?  @db.Uuid
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("branch_announcements")
+}
+
+model BranchDutyHoursHistory {
+  id                         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  branch_id                  String    @db.Uuid
+  work_start_time            DateTime  @default(dbgenerated("'09:00:00'::time")) @db.Time(6)
+  work_end_time              DateTime  @default(dbgenerated("'17:00:00'::time")) @db.Time(6)
+  late_grace_minutes         Int       @default(15)
+  overtime_after_minutes     Int       @default(0)
+  half_day_hours             Float     @default(4.0)
+  overtime_slot_minutes      Int?      @default(15)
+  holiday_overtime_multiplier Decimal? @db.Decimal(4, 2)
+  require_overtime_approval  Boolean?  @default(false)
+  changed_by                 String?   @db.Uuid
+  change_reason              String?
+  effective_from             DateTime  @default(now()) @db.Timestamptz(6)
+  effective_to               DateTime? @db.Timestamptz(6)
+  created_at                 DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@map("branch_duty_hours_history")
+}
+
+model BranchSetting {
+  branch_id                   String   @id @db.Uuid
+  work_start_time             DateTime @default(dbgenerated("'09:00:00'::time")) @db.Time(6)
+  work_end_time               DateTime @default(dbgenerated("'18:00:00'::time")) @db.Time(6)
+  late_grace_minutes          Int      @default(15)
+  overtime_after_minutes      Int      @default(30)
+  half_day_hours              Float    @default(4.0)
+  weekly_off_days             Int[]    @default([5])
+  overtime_slot_minutes       Int?     @default(15)
+  holiday_overtime_multiplier Decimal? @default(2.00) @db.Decimal(4, 2)
+  require_overtime_approval   Boolean? @default(false)
+  daily_snack_allowance       Decimal? @db.Decimal(15, 2)
+  created_at                  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at                  DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("branch_settings")
+}
+
+model BranchTask {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  branch_id  String   @db.Uuid
+  task_key   String
+  label      String
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([branch_id, task_key])
+  @@map("branch_tasks")
+}
+
+model CompanyProfile {
+  id                      String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                    String   @default("Anchor Fashion")
+  logo_url                String?
+  address                 String   @default("Headquarters, Dhaka, Bangladesh")
+  default_work_start_time DateTime @default(dbgenerated("'09:00:00'::time")) @db.Time(6)
+  default_work_end_time   DateTime @default(dbgenerated("'18:00:00'::time")) @db.Time(6)
+  timezone                String   @default("Asia/Dhaka")
+  created_at              DateTime @default(now()) @db.Timestamptz(6)
+  updated_at              DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("company_profile")
+}
+
+model CorrectionRequest {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  employee_id    String    @db.Uuid
+  branch_id      String    @db.Uuid
+  record_id      String?   @db.Uuid
+  date           DateTime  @db.Date
+  type           String
+  original_time  DateTime? @db.Timestamptz(6)
+  requested_time DateTime  @db.Timestamptz(6)
+  reason         String
+  status         String    @default("pending")
+  reviewer_note  String?
+  reviewed_by    String?   @db.Uuid
+  created_at     DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@map("correction_requests")
+}
+
+model EmployeeShift {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id        String?   @db.Uuid
+  shift_id       String?   @db.Uuid
+  effective_from DateTime  @db.Date
+  effective_to   DateTime? @db.Date
+  created_at     DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@map("employee_shifts")
+}
+
+model LeaveBalance {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id       String?  @db.Uuid
+  leave_type_id String?  @db.Uuid
+  year          Int
+  allocated_days Int
+  used_days     Decimal? @default(0) @db.Decimal(5, 1)
+  created_at    DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@unique([user_id, leave_type_id, year])
+  @@map("leave_balances")
+}
+
+model LeaveRequest {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  employee_id   String    @db.Uuid
+  branch_id     String    @db.Uuid
+  // DDL type is the Postgres enum leave_type; a second DDL family uses
+  // leave_type_id -> leave_types instead. Both kept (see notes C-08).
+  type          String?
+  leave_type_id String?   @db.Uuid
+  start_date    DateTime  @db.Date
+  end_date      DateTime  @db.Date
+  reason        String
+  status        String    @default("pending")
+  approved_by   String?   @db.Uuid
+  approved_at   DateTime? @db.Timestamptz(6)
+  reviewer_note String?
+  created_at    DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@map("leave_requests")
+}
+
+model LeaveType {
+  id                    String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code                  String   @unique
+  name                  String
+  default_days_per_year Int
+  created_at            DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@map("leave_types")
+}
+
+model OffDayOvertimeRequest {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  employee_id    String    @db.Uuid
+  branch_id      String?   @db.Uuid
+  requested_date DateTime  @db.Date
+  reason         String
+  status         String    @default("pending")
+  approved_by    String?   @db.Uuid
+  approved_at    DateTime? @db.Timestamptz(6)
+  reviewer_note  String?
+  created_at     DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@map("off_day_overtime_requests")
+}
+
+model OtpCode {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email      String
+  code       String
+  expires_at DateTime @db.Timestamptz(6)
+  is_used    Boolean  @default(false)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("otp_codes")
+}
+
+model PayrollSheet {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id            String?  @db.Uuid
+  month_year         String
+  total_payable_days Decimal  @db.Decimal(5, 1)
+  gross_salary       Decimal  @db.Decimal(10, 2)
+  deductions         Decimal? @default(0) @db.Decimal(10, 2)
+  net_payable        Decimal  @db.Decimal(10, 2)
+  status             String?  @default("draft")
+  created_at         DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@unique([user_id, month_year])
+  @@map("payroll_sheets")
+}
+
+model PublicHoliday {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String
+  holiday_date DateTime @unique @db.Date
+  is_recurring Boolean? @default(false)
+  created_at   DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@map("public_holidays")
+}
+
+model SalarySetting {
+  id                          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id                     String?  @unique @db.Uuid
+  base_salary                 Decimal  @db.Decimal(10, 2)
+  house_rent_allowance        Decimal? @default(0) @db.Decimal(10, 2)
+  medical_allowance           Decimal? @default(0) @db.Decimal(10, 2)
+  transport_allowance         Decimal? @default(0) @db.Decimal(10, 2)
+  overtime_rate_per_hour      Decimal? @db.Decimal(15, 2)
+  holiday_overtime_multiplier Decimal? @db.Decimal(4, 2)
+  created_at                  DateTime? @default(now()) @db.Timestamptz(6)
+  updated_at                  DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@map("salary_settings")
+}
+
+model Shift {
+  id                   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  branch_id            String?   @db.Uuid
+  name                 String
+  start_time           DateTime  @db.Time(6)
+  end_time             DateTime  @db.Time(6)
+  grace_period_minutes Int?      @default(15)
+  created_at           DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@map("shifts")
+}
+
+model ShowroomDailyTask {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  branch_id    String   @db.Uuid
+  date         DateTime @default(now()) @db.Date
+  tasks_state  Json     @default("{}")
+  completed_by String?  @db.Uuid
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([branch_id, date])
+  @@map("showroom_daily_tasks")
+}
+
+model ShowroomTaskLog {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  branch_id     String   @db.Uuid
+  date          DateTime @default(now()) @db.Date
+  task_key      String
+  employee_id   String   @db.Uuid
+  employee_name String
+  action        String
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("showroom_task_logs")
+}
+
+model Ticket {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  complaint_id     String?   @unique
+  branch_id        String    @db.Uuid
+  ticket_datetime  DateTime  @db.Timestamptz(6)
+  customer_name    String
+  mobile_number    String
+  invoice_no       String?
+  product_details  String?
+  complaint_type   String?
+  complaint_details String?
+  employee_name    String?
+  priority         String?   @default("Medium")
+  status           String    @default("pending")
+  action_taken     String?
+  remarks          String?
+  follow_up_date   DateTime? @db.Date
+  created_by       String?   @db.Uuid
+  created_at       DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@map("tickets")
+}
+
+model WebauthnCredential {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id       String   @db.Uuid
+  credential_id String   @unique
+  // Postgres BYTEA.
+  public_key    Bytes
+  counter       BigInt   @default(0)
+  device_type   String   @default("singleDevice")
+  transports    String[] @default([])
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("webauthn_credentials")
+}
