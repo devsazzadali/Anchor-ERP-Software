@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db'
 import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { logAudit, diffFields } from '@/lib/server/audit'
+import { hookPostSource } from '@/lib/server/accounting/hooks'
 
 // /api/admin/payments/[id] — admin-only payment_requests mutations
 // from the payouts page.
@@ -61,6 +62,9 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       entityTable: 'payment_requests', entityId: id,
       fieldChanges: [{ field: 'status', old: existing.status, new: body.status }],
     })
+    // Accounts A1 (P9): posts when the new status is 'completed'
+    // (builder no-ops otherwise). Fail-soft.
+    await hookPostSource('payment_requests', id, gate.caller, 'payout')
     return NextResponse.json({ request: toPlain(updated) })
   } catch (err: any) {
     console.error('[PATCH /api/admin/payments/[id]] Error:', err)
@@ -125,6 +129,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       fieldChanges: [{ field: 'status', old: 'pending', new: 'completed' }],
       newValue: { transaction_id: body.transaction_id } as any,
     })
+    // Accounts A1 (P9): completing a payout posts Dr Drawings /
+    // Cr Cash–Head Office. Fail-soft.
+    await hookPostSource('payment_requests', id, gate.caller, 'payout')
     return NextResponse.json({ request: toPlain(updated) })
   } catch (err: any) {
     const message = err?.message || 'Failed to complete payout'

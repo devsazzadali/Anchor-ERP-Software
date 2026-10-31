@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db'
 import { callerIsAdmin, getCallerProfile } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { logAudit, diffFields } from '@/lib/server/audit'
+import { hookResyncSource } from '@/lib/server/accounting/hooks'
 
 // Same server-side totals computation as POST /api/chalans
 // (duplicated here so neither route file exports non-handlers).
@@ -82,6 +83,8 @@ export async function PATCH(req: Request, context: any) {
       entityTable: 'product_chalans', entityId: id, branchId: updated.branch_id ?? null,
       fieldChanges: diffFields(existing as any, updated as any, ['total_amount', 'total_cost', 'notes']),
     })
+    // Accounts A1 (P8): cost edits re-sync the journal entry.
+    await hookResyncSource('product_chalans', id, caller)
     return NextResponse.json({ chalan: toPlain(updated) })
   } catch (err: any) {
     console.error('[PATCH /api/chalans/[id]] Error:', err)

@@ -15,6 +15,7 @@ import {
 } from '@/lib/server/ledger-sync'
 import { branchStreamAmount } from '@/lib/expense-streams'
 import { logAudit, diffFields } from '@/lib/server/audit'
+import { hookSyncClosing, hookReverseSource } from '@/lib/server/accounting/hooks'
 
 // this route's legacy queries (anon +
 // service-role) are now Prisma queries via the single role-resolution
@@ -563,6 +564,10 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Accounts A1 (P1): keep the journal in step with the closing
+    // row's lifecycle (post / reverse-on-reopen / repost). Fail-soft.
+    await hookSyncClosing(result.id, profile as any)
+
     const [withRelations] = await attachLedgerRelations([result])
     const [plainLedger] = await withOpeningChainFlags([toPlain(withRelations)])
     return NextResponse.json({ success: true, ledger: plainLedger })
@@ -722,11 +727,14 @@ export async function PATCH(req: NextRequest) {
           where: { id: existing.id },
           data: { actual_cash: Number(finalActual), ...patch, updated_at: new Date() },
         })
+        // Accounts A1 (P1): journal sync for the edited closing row.
+        await hookSyncClosing(existing.id, profile as any)
         const [withRelations] = await attachLedgerRelations([finalData])
         const [plainLedger] = await withOpeningChainFlags([toPlain(withRelations)])
         return NextResponse.json({ success: true, ledger: plainLedger })
       }
 
+      await hookSyncClosing(existing.id, profile as any)
       const [plainRefreshed] = await withOpeningChainFlags([toPlain(refreshed)])
       return NextResponse.json({ success: true, ledger: plainRefreshed })
     }
@@ -770,6 +778,8 @@ export async function PATCH(req: NextRequest) {
         },
       })
 
+      // Accounts A1 (P1): journal sync for the edited closing row.
+      await hookSyncClosing(updated.id, profile as any)
       const [withRelations] = await attachLedgerRelations([updated])
       const [plainLedger] = await withOpeningChainFlags([toPlain(withRelations)])
       return NextResponse.json({ success: true, ledger: plainLedger })
@@ -818,6 +828,9 @@ export async function PATCH(req: NextRequest) {
           { field: 'reason', old: null, new: reason },
         ],
       })
+      // Accounts A1 (P1): reopening reverses the closing's journal
+      // entry (the row is unfinalised again). Fail-soft.
+      await hookSyncClosing(reopened.id, profile as any)
       const [withRelations] = await attachLedgerRelations([reopened])
       const [plainLedger] = await withOpeningChainFlags([toPlain(withRelations)])
       return NextResponse.json({ success: true, ledger: plainLedger })
@@ -911,6 +924,10 @@ export async function PATCH(req: NextRequest) {
     const [withRelations] = await attachLedgerRelations([data])
     await notifyAdminsOfDailyClosing({ ledger: toPlain(withRelations), profile })
 
+    // Accounts A1 (P1): finalising the day posts its journal entry
+    // (or reposts after an edit). Fail-soft.
+    await hookSyncClosing(data.id, profile as any)
+
     const [plainLedger] = await withOpeningChainFlags([toPlain(withRelations)])
     return NextResponse.json({ success: true, ledger: plainLedger })
   } catch (err: any) {
@@ -955,6 +972,10 @@ export async function DELETE(req: NextRequest) {
       entityTable: 'branch_cash_ledger', entityId: id, branchId: existing.branch_id,
       oldValue: { ledger_date: toPlain(existing).ledger_date } as any,
     })
+
+    // Accounts A1: deleting a closing row reverses its journal
+    // entry (append-only contra). Fail-soft.
+    await hookReverseSource('branch_cash_ledger', id, profile as any, 'Cash ledger row deleted')
 
     return NextResponse.json({ success: true, message: 'Deleted successfully' })
   } catch (err: any) {

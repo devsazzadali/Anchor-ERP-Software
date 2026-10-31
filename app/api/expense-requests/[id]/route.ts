@@ -6,6 +6,7 @@ import { callerIsAdmin, getCallerProfile } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { syncExpenseToLedger } from '@/lib/server/ledger-sync'
 import { logAudit, diffFields } from '@/lib/server/audit'
+import { hookPostSource } from '@/lib/server/accounting/hooks'
 
 // item actions for the dashboard
 // branch-expenses page — approve / reject / pay (the action modal)
@@ -101,6 +102,8 @@ export async function PATCH(req: Request, context: any) {
         branchId: existing.branch_id ?? null,
         fieldChanges: [{ field: 'status', old: existing.status, new: 'paid' }],
       })
+      // Accounts A1 (P6): settlement posts its journal entry. Fail-soft.
+      await hookPostSource('employee_expense_requests', id, caller, 'request_paid')
       return NextResponse.json({ request: toPlain(result.request) })
     }
 

@@ -3,6 +3,7 @@ import { sendBundleStatusEmailToManager } from '@/lib/email-service'
 import { prisma } from '@/lib/db'
 import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
+import { hookPostSource } from '@/lib/server/accounting/hooks'
 
 // caller via the single role-resolution
 // function; service-role reads/writes become server-side Prisma.
@@ -171,6 +172,12 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       } catch (notifEx) {
         console.warn('[PATCH /api/branch-accounts/bundle-requests/[id]] Notification warning:', notifEx)
       }
+    }
+
+    // Accounts A1 (P10): completing a bundle posts Dr Cash in
+    // Transit / Cr Cash — Head Office. Fail-soft.
+    if (status === 'completed') {
+      await hookPostSource('branch_bundle_requests', id, profile as any, 'bundle')
     }
 
     return NextResponse.json({

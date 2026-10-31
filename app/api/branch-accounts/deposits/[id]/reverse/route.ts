@@ -4,6 +4,7 @@ import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { syncDepositToLedger, depositDistributionMap } from '@/lib/server/ledger-sync'
 import { logAudit } from '@/lib/server/audit'
+import { hookReverseSource } from '@/lib/server/accounting/hooks'
 
 // POST /api/branch-accounts/deposits/[id]/reverse
 // Admin only — REVERSE an approved deposit (§D5 #6).
@@ -186,6 +187,10 @@ export async function POST(
         },
       })
     }
+
+    // Accounts A1 (P7): reversing the deposit posts the exact
+    // contra journal entry. Fail-soft.
+    await hookReverseSource('branch_bank_deposits', id, caller, `Deposit reversed: ${reversalNote}`)
 
     return NextResponse.json({
       success: true,

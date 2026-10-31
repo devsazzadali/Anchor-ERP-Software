@@ -6,6 +6,7 @@ import { parseMoneyAmount, roundMoney } from '@/lib/money'
 import { dhakaToday } from '@/lib/dhaka-time'
 import { syncExpenseToLedger } from '@/lib/server/ledger-sync'
 import { logAudit, diffFields } from '@/lib/server/audit'
+import { hookPostSource } from '@/lib/server/accounting/hooks'
 
 export const dynamic = 'force-dynamic'
 
@@ -108,6 +109,9 @@ export async function POST(req: NextRequest) {
       branchId: data.branch_id ?? null,
       fieldChanges: diffFields(null, data as any, ['title', 'amount', 'status', 'paid_amount', 'due_amount']),
     })
+    // Accounts A1 (P6): a request created already-paid posts its
+    // journal entry (the builder no-ops for non-paid rows). Fail-soft.
+    await hookPostSource('employee_expense_requests', data.id, caller, 'request_paid')
     return NextResponse.json({ request: toPlain(data) }, { status: 201 })
   } catch (err: any) {
     console.error('[api] app/api/admin/expense-requests/route.ts error:', err)
@@ -208,6 +212,8 @@ export async function PATCH(req: NextRequest) {
         fieldChanges: [{ field: 'status', old: 'unpaid', new: 'paid' }],
         newValue: { status: 'paid', paid_amount: Number((result.request as any).amount || 0) } as any,
       })
+      // Accounts A1 (P6): settlement posts its journal entry. Fail-soft.
+      await hookPostSource('employee_expense_requests', id, caller, 'request_paid')
       return NextResponse.json({ request: toPlain(result.request) })
     }
 

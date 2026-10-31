@@ -4,6 +4,7 @@ import { callerIsAdmin, getCallerProfile } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { syncExpenseToLedger } from '@/lib/server/ledger-sync'
 import { logAudit, diffFields } from '@/lib/server/audit'
+import { hookReverseSource } from '@/lib/server/accounting/hooks'
 
 // POST /api/admin/salary-payments/[id]/void — FR-14.1.
 //
@@ -91,6 +92,10 @@ export async function POST(req: Request, context: any) {
         { field: 'mirror_reversed', old: null, new: result.mirrorReversed },
       ],
     })
+
+    // Accounts A1: voiding reverses the salary journal entry
+    // (append-only contra). Fail-soft.
+    await hookReverseSource('salary_payments', id, caller, 'Salary payment voided')
 
     return NextResponse.json({ payment: toPlain(result.payment), mirror_reversed: result.mirrorReversed })
   } catch (err: any) {

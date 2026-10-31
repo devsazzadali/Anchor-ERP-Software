@@ -7,6 +7,7 @@ import { toPlain } from '@/lib/server/respond'
 import { attachExpenseLedgerHead } from '@/lib/server/attach'
 import { syncExpenseToLedger } from '@/lib/server/ledger-sync'
 import { logAudit, diffFields } from '@/lib/server/audit'
+import { hookPostSource, hookResyncSource, hookReverseSource } from '@/lib/server/accounting/hooks'
 
 // auth via the single role-resolution
 // function (lib/server/auth.ts). FR-1.6 CONTRACT: this route is
@@ -351,6 +352,11 @@ export async function POST(req: NextRequest) {
       fieldChanges: diffFields(null, data as any, ['category', 'description', 'amount', 'paid_amount', 'due_amount']),
     })
 
+    // Accounts A1 (P2/P3): post the journal entry for this expense
+    // (salary/request copies post from their sources; the builder
+    // no-ops for them). Fail-soft.
+    await hookPostSource('branch_cash_expenses', data.id, profile as any)
+
     return NextResponse.json({ success: true, expense: toPlain(withHead) })
   } catch (err: any) {
     console.error('[api] app/api/branch-accounts/expenses/route.ts error:', err)
@@ -506,6 +512,10 @@ export async function PATCH(req: NextRequest) {
       fieldChanges: diffFields(fullBeforeForAudit as any, data as any, ['description', 'amount', 'paid_amount', 'due_amount', 'category', 'ledger_head_id', 'notes']),
     })
 
+    // Accounts A1: if the edit changed the posted figures, the
+    // journal entry is reversed + reposted (no-op when unchanged).
+    await hookResyncSource('branch_cash_expenses', id, profile as any)
+
     return NextResponse.json({ success: true, expense: toPlain(withHead) })
   } catch (err: any) {
     console.error('[api] app/api/branch-accounts/expenses/route.ts error:', err)
@@ -564,6 +574,10 @@ export async function DELETE(req: NextRequest) {
       entityTable: 'branch_cash_expenses', entityId: id, branchId: expense.branch_id,
       oldValue: { description: expense.description, amount: Number(expense.amount) } as any,
     })
+
+    // Accounts A1: deleting reverses the journal entry (append-only
+    // contra; the journal never deletes). Fail-soft.
+    await hookReverseSource('branch_cash_expenses', id, profile as any, 'Branch expense deleted')
 
     return NextResponse.json({ success: true })
   } catch (err: any) {

@@ -8,7 +8,7 @@ import {
   FileCheck, LogOut, User, Sparkles, Briefcase,
   ListTodo, MapPin, Settings, ShieldAlert, Wallet, Package, TrendingUp,
   Building2, PiggyBank, Banknote, Calculator, FileText, History, BarChart3, UserCog, ChevronDown, Laptop,
-  Calendar, FileOutput, BookMarked
+  Calendar, FileOutput, BookMarked, Landmark
 } from 'lucide-react';
 
 export type AllowedRole = 'admin' | 'super_admin' | 'partner' | 'employee' | 'head_office' | 'branch_manager';
@@ -54,6 +54,21 @@ const adminNavigation = [
       { name: 'Change Requisitions', href: '/admin/bundle-requests' },
       { name: 'Reconciliation',   href: '/admin/branch-accounts/reconciliation' },
       { name: 'Branch Performance', href: '/admin/branch-performance' }
+    ]
+  },
+  {
+    // Accounts A1: the double-entry books section (admin-only —
+    // this navigation only renders for admins). Separate from
+    // Branch Accounts, which stays the branch cash-control module.
+    name: 'Accounts',
+    icon: Landmark,
+    href: '#',
+    divider: true,
+    subItems: [
+      { name: 'Overview', href: '/admin/accounts' },
+      { name: 'Chart of Accounts', href: '/admin/accounts/chart' },
+      { name: 'Journal', href: '/admin/accounts/journal' },
+      { name: 'Opening Position', href: '/admin/accounts/opening' },
     ]
   },
   { name: 'System Settings',         icon: Settings,        href: '/admin/settings', divider: true },

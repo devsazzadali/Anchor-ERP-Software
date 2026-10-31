@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db'
 import { callerIsAdmin, getCallerProfile } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { logAudit, diffFields } from '@/lib/server/audit'
+import { hookPostSource } from '@/lib/server/accounting/hooks'
 
 // the dashboard branch-expenses page
 // (partner surface) — ALL employee expense requests + the branch
@@ -100,6 +101,9 @@ export async function POST(req: Request) {
       branchId: created.branch_id ?? null,
       fieldChanges: diffFields(null, created as any, ['title', 'amount', 'status', 'paid_amount', 'due_amount']),
     })
+    // Accounts A1 (P6): a fully-paid created request posts its
+    // journal entry (builder no-ops otherwise). Fail-soft.
+    await hookPostSource('employee_expense_requests', created.id, caller, 'request_paid')
     return NextResponse.json({ request: toPlain(created) }, { status: 201 })
   } catch (err: any) {
     console.error('[POST /api/expense-requests/all] Error:', err)

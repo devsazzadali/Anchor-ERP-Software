@@ -5,6 +5,7 @@ import { toPlain } from '@/lib/server/respond'
 import { parseMoneyAmount, roundMoney } from '@/lib/money'
 import { expenseKindOf } from '@/lib/expense-streams'
 import { logAudit, diffFields } from '@/lib/server/audit'
+import { hookPostSource, hookCompanyPaidChange, hookResyncSource, hookReverseSource } from '@/lib/server/accounting/hooks'
 
 export const dynamic = 'force-dynamic'
 
@@ -81,6 +82,9 @@ export async function POST(req: NextRequest) {
       branchId: data.branch_id ?? null,
       fieldChanges: diffFields(null, data as any, ['purpose', 'total_amount', 'paid_amount', 'due_amount', 'expense_kind']),
     })
+    // Accounts A1 (P4): post the company-expense accrual + any
+    // initial settlement. Fail-soft.
+    await hookPostSource('company_expenses', data.id, caller, 'company_expense')
     return NextResponse.json({ expense: toPlain(data) }, { status: 201 })
   } catch (err: any) {
     console.error('[api] app/api/admin/company-expenses/route.ts error:', err)
@@ -132,6 +136,12 @@ export async function PATCH(req: NextRequest) {
       branchId: (data as any).branch_id ?? null,
       fieldChanges: diffFields(existing as any, data as any, ['paid_amount', 'due_amount', 'expense_kind']),
     })
+    // Accounts A1 (P4): a paid_amount change posts a settlement
+    // event for the delta (and the base entry if it was missed).
+    // Fail-soft.
+    await hookPostSource('company_expenses', id, caller, 'company_expense')
+    await hookResyncSource('company_expenses', id, caller)
+    await hookCompanyPaidChange(id, caller)
     return NextResponse.json({ expense: toPlain(data) })
   } catch (err: any) {
     console.error('[api] app/api/admin/company-expenses/route.ts error:', err)
@@ -158,6 +168,9 @@ export async function DELETE(req: NextRequest) {
       branchId: (before as any)?.branch_id ?? null,
       oldValue: before ? { purpose: before.purpose, total_amount: Number(before.total_amount) } as any : null,
     })
+    // Accounts A1: deleting a posted expense reverses its journal
+    // entries (the journal itself is append-only). Fail-soft.
+    await hookReverseSource('company_expenses', id, caller, 'Company expense deleted')
     return NextResponse.json({ success: true })
   } catch (err: any) {
     console.error('[api] app/api/admin/company-expenses/route.ts error:', err)

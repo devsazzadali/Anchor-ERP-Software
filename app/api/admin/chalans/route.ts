@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db'
 import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { logAudit, diffFields } from '@/lib/server/audit'
+import { hookPostSource, hookResyncSource, hookReverseSource } from '@/lib/server/accounting/hooks'
 
 // /api/admin/chalans — admin-only product_chalans management for the
 // admin branch-chalans page.
@@ -85,6 +86,9 @@ export async function POST(req: Request) {
       entityTable: 'product_chalans', entityId: chalan.id, branchId: chalan.branch_id ?? null,
       fieldChanges: diffFields(null, chalan as any, ['branch_name', 'chalan_ref', 'total_amount', 'total_cost']),
     })
+    // Accounts A1 (P8): a costed chalan posts its inventory
+    // transfer (uncosted chalans post nothing — flagged). Fail-soft.
+    await hookPostSource('product_chalans', chalan.id, gate.caller, 'chalan')
     return NextResponse.json({ chalan: toPlain(chalan) })
   } catch (err: any) {
     console.error('[POST /api/admin/chalans] Error:', err)
@@ -118,6 +122,9 @@ export async function PATCH(req: Request) {
       fieldChanges: diffFields(before as any, chalan as any, ['total_amount', 'total_cost', 'notes']),
     })
 
+    // Accounts A1 (P8): cost edits re-sync the journal entry.
+    await hookResyncSource('product_chalans', body.id, gate.caller)
+
     return NextResponse.json({ chalan: toPlain(chalan) })
   } catch (err: any) {
     console.error('[PATCH /api/admin/chalans] Error:', err)
@@ -140,6 +147,8 @@ export async function DELETE(req: Request) {
       entityTable: 'product_chalans', entityId: id, branchId: (before as any)?.branch_id ?? null,
       oldValue: before ? { branch_name: before.branch_name, total_amount: Number(before.total_amount) } as any : null,
     })
+    // Accounts A1: deleting a posted chalan reverses its entry.
+    await hookReverseSource('product_chalans', id, gate.caller, 'Chalan deleted')
     return NextResponse.json({ success: true })
   } catch (err: any) {
     console.error('[DELETE /api/admin/chalans] Error:', err)

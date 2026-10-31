@@ -1239,3 +1239,243 @@ model WebauthnCredential {
 
   @@map("webauthn_credentials")
 }
+
+// ─── Accounts module — Stage A1 Foundation (2026-10-31) ─────────────────────
+// ALL additive. Created by TARGETED DDL (scripts/accounts-a1-ddl.mjs),
+// never a full `prisma db push` — the branch_cash_ledger
+// expected_closing_cash generated-column drift must not be touched.
+// Design: ANCHORERP_ACCOUNTS_PROGRAM_BLUEPRINT.md §B. The journal is
+// APPEND-ONLY: no update/delete path exists in code for posted
+// entries; corrections are reversal (contra) entries.
+
+model ChartAccount {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code             String   @unique
+  name             String
+  name_bn          String?
+  // asset | liability | equity | income | expense
+  type             String
+  parent_id        String?  @db.Uuid
+  // Lines on this account carry a branch_id dimension (branch P&L).
+  branch_dimension Boolean  @default(false)
+  // Expense accounts mapped from ledger_heads (the P3 posting leg).
+  ledger_head_id   String?  @db.Uuid
+  // Seeded by the system (true) vs created by an admin (false).
+  is_system        Boolean  @default(false)
+  is_active        Boolean  @default(true)
+  created_at       DateTime @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("chart_accounts")
+}
+
+model FiscalYear {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  label      String   @unique
+  start_date DateTime @db.Date
+  end_date   DateTime @db.Date
+  is_current Boolean  @default(false)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("fiscal_years")
+}
+
+model AccountingPeriod {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fiscal_year_id String    @db.Uuid
+  // 'YYYY-MM'
+  month          String    @unique
+  start_date     DateTime  @db.Date
+  end_date       DateTime  @db.Date
+  // open | closed | locked (close/lock workflow is stage A3)
+  status         String    @default("open")
+  closed_by      String?   @db.Uuid
+  closed_at      DateTime? @db.Timestamptz(6)
+  lock_note      String?
+  created_at     DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@map("accounting_periods")
+}
+
+model JournalEntry {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  entry_date        DateTime  @db.Date
+  period_id         String    @db.Uuid
+  // Idempotency: an operational event can never post twice.
+  source_table      String?
+  source_id         String?   @db.Uuid
+  // closing | branch_expense | company_expense | company_expense_payment |
+  // salary | request_paid | deposit | chalan | payout | bundle |
+  // manual | opening | reversal | adjustment | closing_repost
+  event_type        String
+  memo              String?
+  // draft | posted (operational postings are born posted)
+  status            String    @default("posted")
+  is_reversal       Boolean   @default(false)
+  reverses_entry_id String?   @db.Uuid
+  created_by        String?   @db.Uuid
+  posted_by         String?   @db.Uuid
+  posted_at         DateTime? @db.Timestamptz(6)
+  created_at        DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@unique([source_table, source_id, event_type])
+  @@index([entry_date])
+  @@index([period_id])
+  @@map("journal_entries")
+}
+
+model JournalLine {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  entry_id        String   @db.Uuid
+  account_id      String   @db.Uuid
+  branch_id       String?  @db.Uuid
+  counterparty_id String?  @db.Uuid
+  debit           Decimal  @default(0) @db.Decimal(15, 2)
+  credit          Decimal  @default(0) @db.Decimal(15, 2)
+  memo            String?
+  created_at      DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([entry_id])
+  @@index([account_id])
+  @@map("journal_lines")
+}
+
+model BankAccount {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  label           String
+  bank_name       String
+  account_name    String
+  account_number  String?
+  // bank | mfs | cash-office
+  account_type    String   @default("bank")
+  chart_account_id String? @db.Uuid
+  // Owner-entered at the opening wizard; NULL until confirmed.
+  opening_balance Decimal? @db.Decimal(15, 2)
+  // System-derived hint from deposit history — NEVER a confirmed
+  // balance; shown to the owner as a draft candidate only.
+  derived_hint    Decimal? @db.Decimal(15, 2)
+  is_draft        Boolean  @default(true)
+  is_active       Boolean  @default(true)
+  created_at      DateTime @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("bank_accounts")
+}
+
+model Counterparty {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String
+  // supplier | landlord | utility | staff | customer | partner | other
+  type       String   @default("other")
+  phone      String?
+  address    String?
+  is_active  Boolean  @default(true)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("counterparties")
+}
+
+model PayableReceivable {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  counterparty_id String?   @db.Uuid
+  // payable | receivable
+  direction       String
+  source_table    String?
+  source_id       String?   @db.Uuid
+  description     String
+  amount          Decimal   @db.Decimal(15, 2)
+  paid_amount     Decimal   @default(0) @db.Decimal(15, 2)
+  due_date        DateTime? @db.Date
+  // open | partial | settled | overdue (derived in stage A5)
+  status          String    @default("open")
+  branch_id       String?   @db.Uuid
+  created_at      DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@unique([source_table, source_id, direction])
+  @@map("payables_receivables")
+}
+
+model TaxRegisterLine {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  // 'YYYY-MM'
+  period          String
+  // vat_output | vat_input | tds_salary | tds_rent | tds_professional | other
+  kind            String
+  source_table    String?
+  source_id       String?  @db.Uuid
+  base_amount     Decimal  @db.Decimal(15, 2)
+  rate            Decimal  @db.Decimal(7, 4)
+  tax_amount      Decimal  @db.Decimal(15, 2)
+  counterparty_id String?  @db.Uuid
+  created_at      DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("tax_register_lines")
+}
+
+model Cheque {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  // issued | received
+  direction       String
+  cheque_no       String
+  bank_account_id String?   @db.Uuid
+  counterparty_id String?   @db.Uuid
+  amount          Decimal   @db.Decimal(15, 2)
+  issue_date      DateTime? @db.Date
+  due_date        DateTime? @db.Date
+  // pending | cleared | bounced | cancelled
+  status          String    @default("pending")
+  cleared_at      DateTime? @db.Timestamptz(6)
+  source_table    String?
+  source_id       String?   @db.Uuid
+  created_at      DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@map("cheque_register")
+}
+
+// The computed opening position (blueprint §B.3) as a stored DRAFT.
+// A1 computes and stores it; only the owner confirms it (the confirm
+// endpoint exists but A1 never calls it). Because ALL history is
+// backfilled into the journal on the owner's order, the position is a
+// confirmation artifact over the books — NOT a second posting (a P12
+// opening entry on top of the backfill would double-count).
+model OpeningPosition {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  label        String
+  as_of_date   DateTime  @db.Date
+  // draft | confirmed
+  status       String    @default("draft")
+  computed_at  DateTime  @default(now()) @db.Timestamptz(6)
+  confirmed_by String?   @db.Uuid
+  confirmed_at DateTime? @db.Timestamptz(6)
+  notes        String?
+  created_at   DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at   DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@map("opening_positions")
+}
+
+model OpeningPositionLine {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  position_id     String   @db.Uuid
+  // cash_branch | bank_candidate | inventory_cost | payables | equity | other
+  component       String
+  label           String
+  amount          Decimal  @db.Decimal(15, 2)
+  // debit | credit (natural balance side in the position)
+  side            String
+  branch_id       String?  @db.Uuid
+  bank_account_id String?  @db.Uuid
+  source_note     String?
+  // Itemised derivation (source row ids/figures) — the honesty trail.
+  detail          Json?
+  created_at      DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([position_id])
+  @@map("opening_position_lines")
+}

@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db'
 import { callerIsAdmin, getCallerProfile } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { logAudit, diffFields } from '@/lib/server/audit'
+import { hookPostSource } from '@/lib/server/accounting/hooks'
 
 // product chalans for the dashboard
 // branch-chalans page. Reads: any approved caller (the page is
@@ -109,6 +110,9 @@ export async function POST(req: Request) {
       entityTable: 'product_chalans', entityId: created.id, branchId: created.branch_id ?? null,
       fieldChanges: diffFields(null, created as any, ['branch_name', 'chalan_ref', 'total_amount', 'total_cost']),
     })
+    // Accounts A1 (P8): a costed chalan posts its inventory
+    // transfer (uncosted chalans post nothing — flagged). Fail-soft.
+    await hookPostSource('product_chalans', created.id, caller, 'chalan')
     return NextResponse.json({ chalan: toPlain(created) }, { status: 201 })
   } catch (err: any) {
     console.error('[POST /api/chalans] Error:', err)

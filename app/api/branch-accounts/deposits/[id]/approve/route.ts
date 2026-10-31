@@ -6,6 +6,7 @@ import { toPlain } from '@/lib/server/respond'
 import { syncDepositToLedger } from '@/lib/server/ledger-sync'
 import { depositOverlapMessage, findDepositSalesOverlap } from '@/lib/server/deposit-overlap'
 import { logAudit, diffFields } from '@/lib/server/audit'
+import { hookPostSource } from '@/lib/server/accounting/hooks'
 
 // POST /api/branch-accounts/deposits/[id]/approve
 // Admin only — Approve or Reject a submitted deposit
@@ -169,6 +170,12 @@ export async function POST(
           })
         }
       })().catch((e) => console.error('Failed to send manager deposit email:', e))
+    }
+
+    // Accounts A1 (P7): an approval posts Dr Bank / Cr Branch Cash.
+    // Rejection posts nothing. Fail-soft.
+    if (action === 'approve') {
+      await hookPostSource('branch_bank_deposits', id, caller, 'deposit')
     }
 
     return NextResponse.json({
