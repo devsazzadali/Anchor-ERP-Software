@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic'
 import React, { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Landmark, RefreshCw, CheckCircle2, AlertTriangle, Scale, BookOpen, ListTree, Flag } from 'lucide-react'
+import { Landmark, RefreshCw, CheckCircle2, AlertTriangle, Scale, BookOpen, ListTree, Flag, Inbox } from 'lucide-react'
 
 // Accounts A1 — section home. Data: GET /api/accounts/overview
 // (trial-balance health, per-class reconciliation vs the source
@@ -22,6 +22,8 @@ type Overview = {
     lines: Array<{ component: string; label: string; amount: string; side: string }>
   } | null
   flags: FlagRow[]
+  // Accounts A9: exceptions inbox counts (additive).
+  inbox?: { stored_open: number; stored_acknowledged: number; stored_resolved: number; derived: number; total_active: number }
 }
 
 const taka = (v: string | number) => `৳${Number(v).toLocaleString('en-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -72,7 +74,7 @@ export default function AccountsOverviewPage() {
 
       {data && tb && (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
             <div className={`rounded-2xl border p-5 ${tb.balanced ? 'border-emerald-200 bg-emerald-50' : 'border-rose-200 bg-rose-50'}`}>
               <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
                 <Scale className="w-4 h-4" /> Trial Balance
@@ -116,6 +118,20 @@ export default function AccountsOverviewPage() {
               ) : (
                 <div className="mt-2 text-sm text-slate-600">No opening position computed yet.</div>
               )}
+            </div>
+            <div className={`rounded-2xl border p-5 ${(data.inbox?.total_active ?? 0) > 0 ? 'border-amber-200 bg-amber-50' : 'border-emerald-200 bg-emerald-50'}`}>
+              <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                <Inbox className="w-4 h-4" /> Exceptions inbox
+              </div>
+              <div className="mt-2 text-2xl font-bold text-slate-900">{data.inbox?.total_active ?? 0} open item(s)</div>
+              <div className="mt-1 text-sm text-slate-600">
+                {data.inbox
+                  ? `${data.inbox.stored_open} blocked posting(s) · ${data.inbox.stored_acknowledged} acknowledged · ${data.inbox.derived} data signal(s)`
+                  : '—'}
+              </div>
+              <Link href="/admin/accounts/exceptions" className="mt-2 inline-block text-sm font-semibold text-emerald-700 hover:underline">
+                Open the inbox →
+              </Link>
             </div>
           </div>
 

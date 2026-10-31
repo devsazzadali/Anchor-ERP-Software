@@ -66,6 +66,10 @@ const adminNavigation = [
     divider: true,
     subItems: [
       { name: 'Overview', href: '/admin/accounts' },
+      // Accounts A9: the exceptions inbox — blocked postings with
+      // a workflow + every derived data signal. The badge shows
+      // the live open-item count (fetched below, admin nav only).
+      { name: 'Exceptions', href: '/admin/accounts/exceptions' },
       { name: 'Chart of Accounts', href: '/admin/accounts/chart' },
       { name: 'Journal', href: '/admin/accounts/journal' },
       { name: 'Opening Position', href: '/admin/accounts/opening' },
@@ -227,6 +231,28 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
   };
 
   const navigation = getNavigation(forcedRole);
+
+  // Accounts A9: live open-item count for the Exceptions badge.
+  // Only fetched when the Accounts section is in this nav (admin
+  // roles); the API is admin-gated, and any failure just leaves
+  // the badge hidden.
+  const [exceptionsCount, setExceptionsCount] = useState<number>(0);
+  const hasAccountsNav = navigation.some((n) => n.name === 'Accounts');
+  useEffect(() => {
+    if (!hasAccountsNav) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/accounts/exceptions?count=1');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!cancelled && typeof data?.counts?.total_active === 'number') {
+          setExceptionsCount(data.counts.total_active);
+        }
+      } catch { /* badge is best-effort */ }
+    })();
+    return () => { cancelled = true; };
+  }, [hasAccountsNav, pathname]);
   // F6: the single active top-level item for this pathname (longest match)
   const activeTopHref = longestActiveHref(pathname, navigation.map((n) => n.href));
 
@@ -317,6 +343,11 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
                             }`}
                           >
                             <span className="min-w-0 break-words leading-snug">{sub.name}</span>
+                            {sub.href === '/admin/accounts/exceptions' && exceptionsCount > 0 && (
+                              <span className="ml-auto shrink-0 min-w-5 h-5 px-1 rounded-full bg-rose-600 text-white text-[10px] font-bold inline-flex items-center justify-center">
+                                {exceptionsCount}
+                              </span>
+                            )}
                           </Link>
                         );
                       })}

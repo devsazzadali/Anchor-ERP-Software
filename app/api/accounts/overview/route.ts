@@ -10,6 +10,7 @@ import {
 import { computeOpeningPosition } from '@/lib/server/accounting/opening'
 import { listOpenExceptions } from '@/lib/server/accounting/exceptions'
 import { chequeSummary, chequeFlags } from '@/lib/server/accounting/cheques'
+import { inboxCounts } from '@/lib/server/accounting/inbox'
 
 // GET /api/accounts/overview — Accounts A1 section home data:
 // trial-balance health, journal counts, unposted-source counts,
@@ -27,7 +28,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 })
     }
 
-    const [tb, unposted, reconciliation, position, computation, counts, exceptions, chequeSum, chequeFlagList] = await Promise.all([
+    const [tb, unposted, reconciliation, position, computation, counts, exceptions, chequeSum, chequeFlagList, inboxSummary] = await Promise.all([
       trialBalance(prisma as any),
       unpostedSources(prisma as any),
       classReconciliation(prisma as any),
@@ -43,6 +44,10 @@ export async function GET(req: Request) {
       listOpenExceptions(prisma as any),
       chequeSummary(prisma as any),
       chequeFlags(prisma as any),
+      // A9: the exceptions inbox counts, computed by the same
+      // assembly the inbox screen uses — additive key only; the
+      // flags/posting_exceptions payloads above are unchanged.
+      inboxCounts(prisma as any),
     ])
 
     let positionLines: any[] = []
@@ -126,6 +131,8 @@ export async function GET(req: Request) {
         total_count: chequeSum.total_count,
         pdc_due: chequeSum.pdc_due,
       },
+      // A9: Exceptions Inbox summary (see lib/server/accounting/inbox.ts).
+      inbox: inboxSummary,
       posting_exceptions: exceptions.map((x: any) => ({
         id: x.id,
         source_table: x.source_table,

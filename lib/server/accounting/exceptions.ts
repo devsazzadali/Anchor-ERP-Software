@@ -47,7 +47,10 @@ export async function recordPostingException(
       select: { id: true, status: true },
     })
     if (existing) {
-      // A resolved exception whose event blocks AGAIN reopens.
+      // A resolved exception whose event blocks AGAIN reopens —
+      // and the A9 workflow fields clear with it, so the row goes
+      // back to a clean 'open' state (nobody is still shown as
+      // having acknowledged/resolved a live problem).
       await db.postingException.update({
         where: { id: existing.id },
         data: {
@@ -57,6 +60,10 @@ export async function recordPostingException(
           detail: detail as any,
           status: 'open',
           resolved_at: null,
+          resolved_by: null,
+          resolution_note: null,
+          acknowledged_at: null,
+          acknowledged_by: null,
         },
       })
     } else {
