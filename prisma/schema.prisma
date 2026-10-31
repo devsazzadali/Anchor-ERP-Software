@@ -1615,6 +1615,8 @@ model Cheque {
   cleared_at      DateTime? @db.Timestamptz(6)
   source_table    String?
   source_id       String?   @db.Uuid
+  // Free-text note (A8): record note / bounce / cancel reason.
+  note            String?
   created_at      DateTime  @default(now()) @db.Timestamptz(6)
   updated_at      DateTime  @default(now()) @db.Timestamptz(6)
 

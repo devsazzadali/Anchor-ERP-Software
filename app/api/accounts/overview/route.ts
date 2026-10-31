@@ -9,6 +9,7 @@ import {
 } from '@/lib/server/accounting/reports'
 import { computeOpeningPosition } from '@/lib/server/accounting/opening'
 import { listOpenExceptions } from '@/lib/server/accounting/exceptions'
+import { chequeSummary, chequeFlags } from '@/lib/server/accounting/cheques'
 
 // GET /api/accounts/overview — Accounts A1 section home data:
 // trial-balance health, journal counts, unposted-source counts,
@@ -26,7 +27,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 })
     }
 
-    const [tb, unposted, reconciliation, position, computation, counts, exceptions] = await Promise.all([
+    const [tb, unposted, reconciliation, position, computation, counts, exceptions, chequeSum, chequeFlagList] = await Promise.all([
       trialBalance(prisma as any),
       unpostedSources(prisma as any),
       classReconciliation(prisma as any),
@@ -40,6 +41,8 @@ export async function GET(req: Request) {
         prisma.accountingPeriod.count({ where: { status: 'open' } }),
       ]),
       listOpenExceptions(prisma as any),
+      chequeSummary(prisma as any),
+      chequeFlags(prisma as any),
     ])
 
     let positionLines: any[] = []
@@ -99,6 +102,15 @@ export async function GET(req: Request) {
         // A3: postings refused by a closed/locked period stay
         // visible here until resolved (the A9 inbox reads the same
         // posting_exceptions rows).
+        // A8: cheque alerts derived live from the register —
+        // bounced cheques + PDCs falling due (the A9 inbox reads
+        // the same register conditions).
+        ...chequeFlagList.map((f: any) => ({
+          code: f.code,
+          amount: f.amount,
+          count: f.count,
+          text: f.text,
+        })),
         ...exceptions.map((x: any) => ({
           code: 'POSTING_BLOCKED',
           amount: null,
@@ -109,6 +121,11 @@ export async function GET(req: Request) {
             `(break-glass) and re-firing, or by a correction entry in an open period.`,
         })),
       ],
+      cheques: {
+        by_status: chequeSum.by_status,
+        total_count: chequeSum.total_count,
+        pdc_due: chequeSum.pdc_due,
+      },
       posting_exceptions: exceptions.map((x: any) => ({
         id: x.id,
         source_table: x.source_table,

@@ -25,6 +25,7 @@ export const ACCT = {
   mfsClearing: '1020',
   cashInTransit: '1030',
   inventory: '1040',
+  accountsReceivable: '1050',
   accountsPayable: '2000',
   vatPayable: '2030',
   tdsPayable: '2040',

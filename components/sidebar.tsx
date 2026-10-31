@@ -82,6 +82,9 @@ const adminNavigation = [
       // Accounts A7: VAT/TDS configuration + register (dormant
       // until the owner/CA enters rates).
       { name: 'VAT & TDS', href: '/admin/accounts/tax' },
+      // Accounts A8: cheque register — issued/received lifecycle,
+      // clearing posts through the journal; PDC due list.
+      { name: 'Cheques', href: '/admin/accounts/cheques' },
       // Accounts A2: statements over the journal.
       { name: 'Statements', href: '/admin/accounts/statements' },
       { name: 'Trial Balance', href: '/admin/accounts/statements/trial-balance' },
