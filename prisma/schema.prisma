@@ -396,6 +396,9 @@ model EmployeeExpenseRequest {
   account_number      String?
   bank_name           String?
   bank_branch         String?
+  // Part B (copy-buttons round): bank routing for the pay moment —
+  // nullable, existing rows read as "—".
+  routing_number      String?
   status              String    @default("pending")
   admin_notes         String?
   trx_id              String?
@@ -446,6 +449,11 @@ model HouseRentAccount {
   account_name   String
   account_number String
   routing_number String?
+  // Part B (copy-buttons round): landlord payment details that had
+  // nowhere to live — all nullable, existing rows read as "—".
+  bank_branch             String?
+  mobile_banking_provider String?
+  mobile_banking_number   String?
   rent_amount    Decimal? @default(0) @db.Decimal(15, 2)
   is_active      Boolean? @default(true)
   created_at     DateTime @default(now()) @db.Timestamptz(6)
@@ -766,6 +774,9 @@ model UtilityMeter {
   branch_id      String   @db.Uuid
   meter_number   String
   account_number String?
+  // Part B (copy-buttons round): who the bill is payable to
+  // (utility provider) — nullable, existing rows read as "—".
+  payable_to     String?
   meter_type     String
   is_active      Boolean? @default(true)
   created_at     DateTime @default(now()) @db.Timestamptz(6)

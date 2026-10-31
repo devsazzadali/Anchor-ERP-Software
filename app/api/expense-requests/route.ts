@@ -83,6 +83,9 @@ export async function POST(req: Request) {
           account_number: isCash ? null : String(body.account_number).trim(),
           bank_name: paymentMethod === 'bank' ? String(body.bank_name).trim() : null,
           bank_branch: paymentMethod === 'bank' ? String(body.bank_branch).trim() : null,
+          // Part B: optional routing number for bank transfers (new
+          // nullable column) — accepted when the employee supplies it.
+          routing_number: paymentMethod === 'bank' && body.routing_number ? String(body.routing_number).trim() || null : null,
           status: isCash ? 'paid' : 'pending',
           paid_at: isCash ? new Date() : null,
           trx_id: isCash ? 'Cash' : null,

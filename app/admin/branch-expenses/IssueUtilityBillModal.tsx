@@ -3,6 +3,24 @@
 import React, { useState, useEffect } from 'react'
 import { X, Zap, Check, Loader2, Droplets, Wifi } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import PaymentAccountCard, { type PaymentAccountField } from '@/components/PaymentAccountCard'
+
+// Part B: the selected meter's bill-pay details as PaymentAccountCard
+// fields — the exact references an admin must type into a banking /
+// bill-pay app. payable_to is a Part B nullable column: older meters
+// render "—" until filled in the registry settings.
+export function utilityMeterFields(meter: any, amount?: number): PaymentAccountField[] {
+  if (!meter) return []
+  const pick = (v: any): string | number | null =>
+    v === null || v === undefined || String(v).trim() === '' ? null : v
+  return [
+    { label: 'Payable To', value: pick(meter.payable_to) },
+    { label: 'Meter Type', value: pick(meter.meter_type) },
+    { label: 'Meter Number', value: pick(meter.meter_number) },
+    { label: 'Account / Bill Number', value: pick(meter.account_number) },
+    { label: 'Bill Amount (BDT)', value: amount && amount > 0 ? amount : null },
+  ]
+}
 
 // branches + utility meters come from
 // /api/branches and /api/admin/branch-settings (admin-gated,
@@ -199,6 +217,16 @@ export default function IssueUtilityBillModal({ isOpen, onClose, onSuccess, ledg
                           </option>
                         ))}
                       </select>
+                    </div>
+                  )}
+
+                  {/* Part B: post-selection bill-pay card, BEFORE confirm. */}
+                  {meterId && meters.find(m => m.id === meterId) && (
+                    <div className="col-span-2">
+                      <PaymentAccountCard
+                        title="Bill Payment Details (Pay to this meter / account)"
+                        fields={utilityMeterFields(meters.find(m => m.id === meterId), amount)}
+                      />
                     </div>
                   )}
 

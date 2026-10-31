@@ -13,6 +13,43 @@ import * as XLSX from 'xlsx'
 import { generatePdf } from '@/lib/pdf-generator'
 import { recordActivityLog } from '@/lib/audit-logger'
 import { uploadFile } from '@/lib/files-client'
+import PaymentAccountCard, { type PaymentAccountField } from '@/components/PaymentAccountCard'
+
+// Part B: the selected payout request's clearance target as
+// PaymentAccountCard fields. Sources: PaymentRequest.payment_details
+// Json (what the dashboard writes) merged with the request's
+// dedicated columns — both read in camelCase AND snake_case, as the
+// clearance grid always did. No schema change: every field below
+// already exists in the model.
+export function payoutAccountFields(req: any): PaymentAccountField[] {
+  if (!req) return []
+  const d = req.paymentDetails && typeof req.paymentDetails === 'object' ? req.paymentDetails : {}
+  const pick = (...keys: string[]): string | number | null => {
+    for (const k of keys) {
+      const v = d[k]
+      if (v !== null && v !== undefined && String(v).trim() !== '') return v
+    }
+    return null
+  }
+  if (req.paymentMethod === 'bank_transfer') {
+    return [
+      { label: 'Account Holder Name', value: pick('accountName', 'account_name') },
+      { label: 'Bank Name', value: pick('bankName', 'bank_name') },
+      { label: 'Account Number', value: pick('accountNumber', 'account_number') },
+      { label: 'Branch', value: pick('branchName', 'branch_name') },
+      { label: 'District', value: pick('district') },
+      { label: 'Routing Number', value: pick('routingNumber', 'routing_number') },
+      { label: 'SWIFT Code', value: pick('swiftCode', 'swift_code') },
+      { label: 'Mobile Number', value: pick('mobileNumber', 'mobile_number') },
+    ]
+  }
+  return [
+    { label: 'Payment Method', value: req.paymentMethod || null },
+    { label: 'Registered Name', value: pick('accountName', 'account_name') },
+    { label: 'Mobile Number', value: pick('mobileNumber', 'mobile_number') },
+    { label: 'Account Number', value: pick('accountNumber', 'account_number') },
+  ]
+}
 
 // Stored file values resolve through the file server: API
 // paths and absolute URLs pass through unchanged; bare stored paths
@@ -83,7 +120,19 @@ export default function PayoutManagement() {
           status: r.status,
           userName: r.profiles?.full_name || 'Client',
           userEmail: 'anchorfashionsupport@gmail.com', // Would need email from auth if needed
-          paymentDetails: r.payment_details || {},
+          // Part B: dedicated PaymentRequest columns are merged
+          // UNDER payment_details (the Json the dashboard writes
+          // wins) so the clearance card can read either store.
+          paymentDetails: {
+            account_name: r.account_name ?? null,
+            mobile_number: r.mobile_number ?? null,
+            bank_name: r.bank_name ?? null,
+            account_number: r.account_number ?? null,
+            routing_number: r.routing_number ?? null,
+            branch_name: r.branch_name ?? null,
+            swift_code: r.swift_code ?? null,
+            ...(r.payment_details || {}),
+          },
           invoiceFileUrl: r.invoice_file_url || '',
           submittedAt: r.created_at,
           completedAt: r.completed_at || null,
@@ -734,57 +783,14 @@ export default function PayoutManagement() {
                     <span className="text-lg font-extrabold text-slate-900">{selectedReq.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })} BDT</span>
                   </div>
 
-                  {/* Target Billing Specifics */}
-                  <div className="p-4 rounded-xl bg-white border border-slate-900/5 space-y-3.5 text-xs">
-                    <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                      <Landmark className="w-3.5 h-3.5 text-[#15803d]" />
-                      Clearance Target specifications
-                    </span>
-
-                    {selectedReq.paymentMethod === 'bank_transfer' ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 font-sans">
-                        <div>
-                          <span className="text-slate-500 block mb-0.5">Bank Legal Name:</span>
-                          <span className="text-slate-900 font-semibold">{selectedReq.paymentDetails.bankName || selectedReq.paymentDetails.bank_name || 'N/A'}</span>
-                        </div>
-                        <div>
-                          <span className="text-slate-500 block mb-0.5">Account Name:</span>
-                          <span className="text-slate-900 font-semibold">{selectedReq.paymentDetails.accountName || selectedReq.paymentDetails.account_name || 'N/A'}</span>
-                        </div>
-                        <div>
-                          <span className="text-slate-500 block mb-0.5">Account Number:</span>
-                          <span className="text-slate-900 font-mono font-semibold">{selectedReq.paymentDetails.accountNumber || selectedReq.paymentDetails.account_number || 'N/A'}</span>
-                        </div>
-                        <div>
-                          <span className="text-slate-500 block mb-0.5">District & Branch:</span>
-                          <span className="text-slate-900 font-semibold">
-                            {selectedReq.paymentDetails.district || selectedReq.paymentDetails.routingNumber || selectedReq.paymentDetails.routing_number || 'N/A'} ({selectedReq.paymentDetails.branchName || selectedReq.paymentDetails.branch_name || 'N/A'})
-                          </span>
-                        </div>
-                        {(selectedReq.paymentDetails.swiftCode || selectedReq.paymentDetails.swift_code) && (
-                          <div>
-                            <span className="text-slate-500 block mb-0.5">SWIFT Protocol:</span>
-                            <span className="text-slate-900 font-mono font-semibold">{selectedReq.paymentDetails.swiftCode || selectedReq.paymentDetails.swift_code}</span>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3 font-sans">
-                        <div>
-                          <span className="text-slate-500 block mb-0.5">Mobile Account:</span>
-                          <span className="text-slate-900 font-semibold uppercase">{selectedReq.paymentMethod} Mobile Wallet</span>
-                        </div>
-                        <div>
-                          <span className="text-slate-500 block mb-0.5">Registered Name:</span>
-                          <span className="text-slate-900 font-semibold">{selectedReq.paymentDetails.accountName || selectedReq.paymentDetails.account_name || 'N/A'}</span>
-                        </div>
-                        <div>
-                          <span className="text-slate-500 block mb-0.5">Mobile Number:</span>
-                          <span className="text-slate-900 font-mono font-semibold">{selectedReq.paymentDetails.mobileNumber || selectedReq.paymentDetails.mobile_number || 'N/A'}</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  {/* Target Billing Specifics — Part B: the clearance
+                      target is now the shared per-field copyable card
+                      (was a display-only grid), shown BEFORE any
+                      accept / confirm action below. */}
+                  <PaymentAccountCard
+                    title="Clearance Target — Payment Account (Send money here)"
+                    fields={payoutAccountFields(selectedReq)}
+                  />
 
                   {/* ACTIVE WORKFLOW STEP ACTIONS */}
                   <div className="space-y-4 pt-4 border-t border-slate-900/5">
@@ -916,6 +922,13 @@ export default function PayoutManagement() {
               </div>
 
               <div className="space-y-4">
+                {/* Part B: the payee card again at the final confirm
+                    step, so details are copyable at the exact moment
+                    of settlement. */}
+                <PaymentAccountCard
+                  title="Clearance Target — Payment Account (Send money here)"
+                  fields={payoutAccountFields(selectedReq)}
+                />
                 <div>
                   <label className="block text-[10px] font-semibold text-slate-500 tracking-wider uppercase mb-1.5">Gateway Transaction Hash ID (Required)</label>
                   <div className="relative">

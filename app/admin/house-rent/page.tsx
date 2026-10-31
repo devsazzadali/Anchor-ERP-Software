@@ -126,6 +126,14 @@ export default function HouseRentPage() {
                       <span className="text-[10px] text-slate-500 block">Account Number</span>
                       <code className="text-xs text-[#15803d] tracking-wider font-bold">{acc.account_number}</code>
                     </div>
+                    <div>
+                      <span className="text-[10px] text-slate-500 block">Routing / Branch</span>
+                      <span className="text-xs text-slate-900 font-medium">{acc.routing_number || '—'} / {acc.bank_branch || '—'}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-500 block">Mobile Banking</span>
+                      <span className="text-xs text-slate-900 font-medium">{acc.mobile_banking_provider ? `${acc.mobile_banking_provider} ${acc.mobile_banking_number || ''}` : '—'}</span>
+                    </div>
                   </div>
 
                   <div className="pt-3 border-t border-slate-900/5 flex justify-between items-center mb-2">
@@ -192,7 +200,11 @@ function AddAccountModal({ isOpen, onClose, onSuccess, branches }: { isOpen: boo
     bank_name: '',
     account_name: '',
     account_number: '',
-    rent_amount: ''
+    rent_amount: '',
+    // Part B: new nullable landlord payment-detail fields.
+    bank_branch: '',
+    mobile_banking_provider: '',
+    mobile_banking_number: ''
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -211,12 +223,15 @@ function AddAccountModal({ isOpen, onClose, onSuccess, branches }: { isOpen: boo
           account_name: form.account_name,
           account_number: form.account_number,
           rent_amount: Number(form.rent_amount),
+          bank_branch: form.bank_branch.trim() || undefined,
+          mobile_banking_provider: form.mobile_banking_provider.trim() || undefined,
+          mobile_banking_number: form.mobile_banking_number.trim() || undefined,
         }),
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Failed to save account')
 
-      setForm({ branch_id: '', bank_name: '', account_name: '', account_number: '', rent_amount: '' })
+      setForm({ branch_id: '', bank_name: '', account_name: '', account_number: '', rent_amount: '', bank_branch: '', mobile_banking_provider: '', mobile_banking_number: '' })
       onSuccess()
     } catch (err: any) {
       setError(err.message)
@@ -269,6 +284,24 @@ function AddAccountModal({ isOpen, onClose, onSuccess, branches }: { isOpen: boo
                 <div>
                   <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Account Number *</label>
                   <input required type="text" value={form.account_number} onChange={e => setForm({...form, account_number: e.target.value})}
+                    className="w-full bg-white border border-slate-900/10 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 font-mono focus:outline-none focus:border-[#1ca34c]/50" />
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Bank Branch (Optional)</label>
+                  <input type="text" value={form.bank_branch} onChange={e => setForm({...form, bank_branch: e.target.value})}
+                    className="w-full bg-white border border-slate-900/10 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" />
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Mobile Banking Provider (Optional)</label>
+                  <input type="text" value={form.mobile_banking_provider} onChange={e => setForm({...form, mobile_banking_provider: e.target.value})}
+                    className="w-full bg-white border border-slate-900/10 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" placeholder="e.g. bKash" />
+                </div>
+
+                <div>
+                  <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Mobile Banking Number (Optional)</label>
+                  <input type="text" value={form.mobile_banking_number} onChange={e => setForm({...form, mobile_banking_number: e.target.value})}
                     className="w-full bg-white border border-slate-900/10 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 font-mono focus:outline-none focus:border-[#1ca34c]/50" />
                 </div>
 

@@ -17,6 +17,38 @@ import { motion, AnimatePresence } from 'framer-motion'
 // books the C20/C11 branch-cash copy in one transaction). The
 // payment proof uploads through the app's storage (uploadFile).
 import { uploadFile } from '@/lib/files-client'
+import PaymentAccountCard, { type PaymentAccountField } from '@/components/PaymentAccountCard'
+
+// The selected employee's payment account, as PaymentAccountCard
+// fields. The account lives on Profile.bank_info (Json) — the keys
+// actually stored today are bankName / accountName / accountNumber /
+// district / mobileBankingProvider / mobileBankingNumber (written by
+// dashboard settings + KYC approval). Branch and routing are NOT
+// stored in bank_info today, so those rows resolve to null and the
+// card renders "—" with no copy button; the legacy key variants
+// (routingNumber, walletType / mobileNumber, snake_case) are read as
+// fallbacks so older shapes still surface. Pure + exported so the
+// mapping is harness-testable without rendering the modal.
+export function salaryAccountFields(employee: any): PaymentAccountField[] {
+  const b = employee?.bank_info && typeof employee.bank_info === 'object' ? employee.bank_info : {}
+  const pick = (...keys: string[]): string | number | null => {
+    for (const k of keys) {
+      const v = b[k]
+      if (v !== null && v !== undefined && String(v).trim() !== '') return v
+    }
+    return null
+  }
+  return [
+    { label: 'Account Holder Name', value: pick('accountName', 'account_name', 'account_holder_name') },
+    { label: 'Bank Name', value: pick('bankName', 'bank_name') },
+    { label: 'Branch', value: pick('branch', 'branchName', 'branch_name') },
+    { label: 'Account Number', value: pick('accountNumber', 'account_number', 'bank_account_number') },
+    { label: 'Routing Number', value: pick('routingNumber', 'routing_number', 'routingCode', 'routing_code') },
+    { label: 'District', value: pick('district') },
+    { label: 'Mobile Banking Provider', value: pick('mobileBankingProvider', 'walletType') },
+    { label: 'Mobile Banking Number', value: pick('mobileBankingNumber', 'mobileNumber', 'mobile_number') },
+  ]
+}
 
 interface IssueSalaryModalProps {
   isOpen: boolean;
@@ -247,16 +279,22 @@ export default function IssueSalaryModal({
             </div>
 
             {employeeId && (
-              bankDetailsText ? (
-                <div className="bg-[#1ca34c]/10 border border-[#1ca34c]/30 rounded-xl p-3 my-2">
-                  <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-1">Payment Account (Send money here)</p>
-                  <p className="text-xs text-slate-900 font-medium">{bankDetailsText}</p>
-                </div>
-              ) : (
-                <div className="bg-rose-500/10 border border-rose-500/30 rounded-xl p-3 my-2 text-rose-600 text-xs">
-                  No bank account setup for this employee yet. Please update their profile.
-                </div>
-              )
+              <>
+                {/* The ONE account display in this modal: the shared
+                    PaymentAccountCard, driven by the SELECTED employee
+                    (selection state — identical from every entry point:
+                    profile preselect, Master Salary Ledger dropdown,
+                    branches, branch-expenses — and it refreshes when
+                    the selection changes). Display + copy only; the
+                    submit payload below still sends the same
+                    bankDetailsText snapshot as before. */}
+                <PaymentAccountCard fields={salaryAccountFields(selectedEmployee)} />
+                {!bankDetailsText && (
+                  <div className="bg-rose-500/10 border border-rose-500/30 rounded-xl p-3 my-2 text-rose-600 text-xs">
+                    No bank account setup for this employee yet. Please update their profile.
+                  </div>
+                )}
+              </>
             )}
 
             <div className="space-y-4">

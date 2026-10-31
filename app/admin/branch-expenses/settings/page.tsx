@@ -29,8 +29,12 @@ export default function ExpenseSettingsPage() {
   const [showDevModal, setShowDevModal] = useState(false)
 
   // Forms
-  const [rentForm, setRentForm] = useState({ branch_id: '', bank_name: '', account_name: '', account_number: '', routing_number: '' })
-  const [meterForm, setMeterForm] = useState({ branch_id: '', meter_number: '', account_number: '', meter_type: 'Electricity' })
+  const [rentForm, setRentForm] = useState({ branch_id: '', bank_name: '', account_name: '', account_number: '', routing_number: '', bank_branch: '', mobile_banking_provider: '', mobile_banking_number: '' })
+  const [meterForm, setMeterForm] = useState({ branch_id: '', meter_number: '', account_number: '', meter_type: 'Electricity', payable_to: '' })
+  // Part B: edit mode for existing registry rows — writes ONLY the
+  // new nullable account-detail fields via PATCH (see API route).
+  const [editingRentId, setEditingRentId] = useState<string | null>(null)
+  const [editingMeterId, setEditingMeterId] = useState<string | null>(null)
   const [devForm, setDevForm] = useState({ method_type: 'Bank', details: '' })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -72,18 +76,37 @@ export default function ExpenseSettingsPage() {
     setIsSubmitting(true)
     setError(null)
     try {
-      const payload: Record<string, any> = {
-        branch_id: rentForm.branch_id,
-        bank_name: rentForm.bank_name.trim(),
-        account_name: rentForm.account_name.trim(),
-        account_number: rentForm.account_number.trim(),
+      if (editingRentId) {
+        // Part B edit path: PATCH writes only the new detail fields.
+        const res = await fetch(`/api/admin/branch-settings?kind=house_rent_accounts&id=${editingRentId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            bank_branch: rentForm.bank_branch.trim() || null,
+            mobile_banking_provider: rentForm.mobile_banking_provider.trim() || null,
+            mobile_banking_number: rentForm.mobile_banking_number.trim() || null,
+          }),
+        })
+        const json = await res.json().catch(() => ({}))
+        if (!res.ok) throw new Error(json.error || 'Failed to save')
+      } else {
+        const payload: Record<string, any> = {
+          branch_id: rentForm.branch_id,
+          bank_name: rentForm.bank_name.trim(),
+          account_name: rentForm.account_name.trim(),
+          account_number: rentForm.account_number.trim(),
+        }
+        if (rentForm.routing_number && rentForm.routing_number.trim()) {
+          payload.routing_number = rentForm.routing_number.trim()
+        }
+        for (const k of ['bank_branch', 'mobile_banking_provider', 'mobile_banking_number'] as const) {
+          if (rentForm[k] && rentForm[k].trim()) payload[k] = rentForm[k].trim()
+        }
+        await createRow('house_rent_accounts', payload)
       }
-      if (rentForm.routing_number && rentForm.routing_number.trim()) {
-        payload.routing_number = rentForm.routing_number.trim()
-      }
-      await createRow('house_rent_accounts', payload)
       setShowRentModal(false)
-      setRentForm({ branch_id: '', bank_name: '', account_name: '', account_number: '', routing_number: '' })
+      setEditingRentId(null)
+      setRentForm({ branch_id: '', bank_name: '', account_name: '', account_number: '', routing_number: '', bank_branch: '', mobile_banking_provider: '', mobile_banking_number: '' })
       fetchData()
     } catch (err: any) {
       setError(err.message)
@@ -92,29 +115,72 @@ export default function ExpenseSettingsPage() {
     }
   }
 
+  const openEditRent = (account: any) => {
+    setEditingRentId(account.id)
+    setRentForm({
+      branch_id: account.branch_id || '',
+      bank_name: account.bank_name || '',
+      account_name: account.account_name || '',
+      account_number: account.account_number || '',
+      routing_number: account.routing_number || '',
+      bank_branch: account.bank_branch || '',
+      mobile_banking_provider: account.mobile_banking_provider || '',
+      mobile_banking_number: account.mobile_banking_number || '',
+    })
+    setError(null)
+    setShowRentModal(true)
+  }
+
   const handleAddMeter = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
     setError(null)
     try {
-      const payload: Record<string, any> = {
-        branch_id: meterForm.branch_id,
-        meter_number: meterForm.meter_number.trim(),
-        meter_type: meterForm.meter_type,
+      if (editingMeterId) {
+        // Part B edit path: PATCH writes only the new payable_to field.
+        const res = await fetch(`/api/admin/branch-settings?kind=utility_meters&id=${editingMeterId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ payable_to: meterForm.payable_to.trim() || null }),
+        })
+        const json = await res.json().catch(() => ({}))
+        if (!res.ok) throw new Error(json.error || 'Failed to save')
+      } else {
+        const payload: Record<string, any> = {
+          branch_id: meterForm.branch_id,
+          meter_number: meterForm.meter_number.trim(),
+          meter_type: meterForm.meter_type,
+        }
+        if (meterForm.account_number && meterForm.account_number.trim()) {
+          payload.account_number = meterForm.account_number.trim()
+        }
+        if (meterForm.payable_to && meterForm.payable_to.trim()) {
+          payload.payable_to = meterForm.payable_to.trim()
+        }
+        await createRow('utility_meters', payload)
       }
-      if (meterForm.account_number && meterForm.account_number.trim()) {
-        payload.account_number = meterForm.account_number.trim()
-      }
-
-      await createRow('utility_meters', payload)
       setShowMeterModal(false)
-      setMeterForm({ branch_id: '', meter_number: '', account_number: '', meter_type: 'Electricity' })
+      setEditingMeterId(null)
+      setMeterForm({ branch_id: '', meter_number: '', account_number: '', meter_type: 'Electricity', payable_to: '' })
       fetchData()
     } catch (err: any) {
       setError(err.message)
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  const openEditMeter = (meter: any) => {
+    setEditingMeterId(meter.id)
+    setMeterForm({
+      branch_id: meter.branch_id || '',
+      meter_number: meter.meter_number || '',
+      account_number: meter.account_number || '',
+      meter_type: meter.meter_type || 'Electricity',
+      payable_to: meter.payable_to || '',
+    })
+    setError(null)
+    setShowMeterModal(true)
   }
 
   const handleAddDevMethod = async (e: React.FormEvent) => {
@@ -188,7 +254,7 @@ export default function ExpenseSettingsPage() {
             {activeTab === 'rent' && (
               <div className="space-y-4">
                 <div className="flex justify-end">
-                  <button onClick={() => setShowRentModal(true)} className="bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 hover:bg-[#1ca34c]/20 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors">
+                  <button onClick={() => { setEditingRentId(null); setRentForm({ branch_id: '', bank_name: '', account_name: '', account_number: '', routing_number: '', bank_branch: '', mobile_banking_provider: '', mobile_banking_number: '' }); setShowRentModal(true) }} className="bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 hover:bg-[#1ca34c]/20 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors">
                     <Plus className="w-4 h-4" /> Add Rent Account
                   </button>
                 </div>
@@ -215,7 +281,12 @@ export default function ExpenseSettingsPage() {
                         <p><span className="text-slate-500 mr-2">Name:</span> {account.account_name}</p>
                         <p><span className="text-slate-500 mr-2">A/C No:</span> <span className="text-slate-900 font-mono">{account.account_number}</span></p>
                         {account.routing_number && <p><span className="text-slate-500 mr-2">Routing:</span> {account.routing_number}</p>}
+                        <p><span className="text-slate-500 mr-2">Branch:</span> {account.bank_branch || '—'}</p>
+                        <p><span className="text-slate-500 mr-2">Mobile Banking:</span> {account.mobile_banking_provider ? `${account.mobile_banking_provider} ${account.mobile_banking_number || ''}` : '—'}</p>
                       </div>
+                      <button onClick={() => openEditRent(account)} className="mt-3 text-[10px] font-bold uppercase tracking-wider text-[#15803d] hover:underline">
+                        Edit Payment Details
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -226,7 +297,7 @@ export default function ExpenseSettingsPage() {
             {activeTab === 'utility' && (
               <div className="space-y-4">
                 <div className="flex justify-end">
-                  <button onClick={() => setShowMeterModal(true)} className="bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 hover:bg-[#1ca34c]/20 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors">
+                  <button onClick={() => { setEditingMeterId(null); setMeterForm({ branch_id: '', meter_number: '', account_number: '', meter_type: 'Electricity', payable_to: '' }); setShowMeterModal(true) }} className="bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 hover:bg-[#1ca34c]/20 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors">
                     <Plus className="w-4 h-4" /> Add Utility Meter
                   </button>
                 </div>
@@ -252,7 +323,11 @@ export default function ExpenseSettingsPage() {
                       <div className="space-y-1.5 text-xs text-slate-500">
                         <p><span className="text-slate-500 mr-2">Meter No:</span> <span className="text-slate-900 font-mono">{meter.meter_number}</span></p>
                         {meter.account_number && <p><span className="text-slate-500 mr-2">A/C Ref:</span> <span className="text-slate-900 font-mono">{meter.account_number}</span></p>}
+                        <p><span className="text-slate-500 mr-2">Payable To:</span> {meter.payable_to || '—'}</p>
                       </div>
+                      <button onClick={() => openEditMeter(meter)} className="mt-3 text-[10px] font-bold uppercase tracking-wider text-[#15803d] hover:underline">
+                        Edit Payment Details
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -299,9 +374,10 @@ export default function ExpenseSettingsPage() {
         {/* RENT MODAL */}
         {showRentModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm" onClick={() => setShowRentModal(false)} />
+            <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm" onClick={() => { setShowRentModal(false); setEditingRentId(null) }} />
             <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} className="bg-white border border-slate-900/10 rounded-3xl w-full max-w-md p-6 relative z-10 shadow-2xl max-h-[90vh] overflow-y-auto">
-              <h3 className="text-lg font-bold text-slate-900 mb-4">Add Rent Account</h3>
+              <h3 className="text-lg font-bold text-slate-900 mb-4">{editingRentId ? 'Edit Rent Payment Details' : 'Add Rent Account'}</h3>
+              {editingRentId && <p className="text-[11px] text-slate-500 mb-3">Only the payment-detail fields below (branch / mobile banking) are editable here — the account itself is unchanged.</p>}
               {error && <div className="text-red-600 text-xs mb-4 bg-red-500/10 p-3 rounded-xl border border-red-500/20">{error}</div>}
               <form onSubmit={handleAddRentAccount} className="space-y-4">
                 <div>
@@ -327,8 +403,20 @@ export default function ExpenseSettingsPage() {
                   <label className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 block">Routing Number (Optional)</label>
                   <input type="text" value={rentForm.routing_number} onChange={e => setRentForm({ ...rentForm, routing_number: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" placeholder="e.g. 0902938" />
                 </div>
+                <div>
+                  <label className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 block">Bank Branch (Optional)</label>
+                  <input type="text" value={rentForm.bank_branch} onChange={e => setRentForm({ ...rentForm, bank_branch: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" placeholder="e.g. Rangpur Branch" />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 block">Mobile Banking Provider (Optional)</label>
+                  <input type="text" value={rentForm.mobile_banking_provider} onChange={e => setRentForm({ ...rentForm, mobile_banking_provider: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" placeholder="e.g. bKash" />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 block">Mobile Banking Number (Optional)</label>
+                  <input type="text" value={rentForm.mobile_banking_number} onChange={e => setRentForm({ ...rentForm, mobile_banking_number: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" placeholder="e.g. 01700000000" />
+                </div>
                 <div className="flex gap-3 pt-4">
-                  <button type="button" onClick={() => setShowRentModal(false)} className="flex-1 py-2.5 text-xs font-bold uppercase text-slate-500 hover:text-slate-900 border border-slate-900/10 rounded-xl">Cancel</button>
+                  <button type="button" onClick={() => { setShowRentModal(false); setEditingRentId(null) }} className="flex-1 py-2.5 text-xs font-bold uppercase text-slate-500 hover:text-slate-900 border border-slate-900/10 rounded-xl">Cancel</button>
                   <button type="submit" disabled={isSubmitting} className="flex-1 py-2.5 text-xs font-bold uppercase bg-[#1ca34c] text-white hover:brightness-110 rounded-full flex items-center justify-center gap-2">
                     {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save'}
                   </button>
@@ -341,9 +429,10 @@ export default function ExpenseSettingsPage() {
         {/* METER MODAL */}
         {showMeterModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm" onClick={() => setShowMeterModal(false)} />
+            <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm" onClick={() => { setShowMeterModal(false); setEditingMeterId(null) }} />
             <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} className="bg-white border border-slate-900/10 rounded-3xl w-full max-w-md p-6 relative z-10 shadow-2xl max-h-[90vh] overflow-y-auto">
-              <h3 className="text-lg font-bold text-slate-900 mb-4">Add Utility Meter</h3>
+              <h3 className="text-lg font-bold text-slate-900 mb-4">{editingMeterId ? 'Edit Meter Payment Details' : 'Add Utility Meter'}</h3>
+              {editingMeterId && <p className="text-[11px] text-slate-500 mb-3">Only the Payable To field is editable here — the meter itself is unchanged.</p>}
               {error && <div className="text-red-600 text-xs mb-4 bg-red-500/10 p-3 rounded-xl border border-red-500/20">{error}</div>}
               <form onSubmit={handleAddMeter} className="space-y-4">
                 <div>
@@ -371,8 +460,12 @@ export default function ExpenseSettingsPage() {
                   <label className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 block">Account Number / Reference (Optional)</label>
                   <input type="text" value={meterForm.account_number} onChange={e => setMeterForm({ ...meterForm, account_number: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" placeholder="e.g. A/C 9901" />
                 </div>
+                <div>
+                  <label className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 block">Payable To / Utility Provider (Optional)</label>
+                  <input type="text" value={meterForm.payable_to} onChange={e => setMeterForm({ ...meterForm, payable_to: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" placeholder="e.g. DPDC / DESCO / WASA" />
+                </div>
                 <div className="flex gap-3 pt-4">
-                  <button type="button" onClick={() => setShowMeterModal(false)} className="flex-1 py-2.5 text-xs font-bold uppercase text-slate-500 hover:text-slate-900 border border-slate-900/10 rounded-xl">Cancel</button>
+                  <button type="button" onClick={() => { setShowMeterModal(false); setEditingMeterId(null) }} className="flex-1 py-2.5 text-xs font-bold uppercase text-slate-500 hover:text-slate-900 border border-slate-900/10 rounded-xl">Cancel</button>
                   <button type="submit" disabled={isSubmitting} className="flex-1 py-2.5 text-xs font-bold uppercase bg-[#1ca34c] text-white hover:brightness-110 rounded-full flex items-center justify-center gap-2">
                     {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save'}
                   </button>

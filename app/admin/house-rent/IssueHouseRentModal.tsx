@@ -1,10 +1,32 @@
 'use client'
 
 import React, { useState, useEffect, useMemo } from 'react'
-import { X, Building2, Check, Loader2, Copy, CheckCircle, AlertCircle, Info } from 'lucide-react'
+import { X, Building2, Check, Loader2, CheckCircle, AlertCircle, Info } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { dhakaToday } from '@/lib/dhaka-time'
 import { sumMoney } from '@/lib/money'
+import PaymentAccountCard, { type PaymentAccountField } from '@/components/PaymentAccountCard'
+
+// Part B: the selected rent account's payment details as
+// PaymentAccountCard fields — every stored field an admin needs to
+// actually send the rent (bank + mobile banking + holder), one
+// copyable row each. bank_branch / mobile_banking_* are Part B
+// nullable columns: older accounts render "—" until filled in the
+// registry settings.
+export function houseRentAccountFields(account: any): PaymentAccountField[] {
+  if (!account) return []
+  const pick = (v: any): string | number | null =>
+    v === null || v === undefined || String(v).trim() === '' ? null : v
+  return [
+    { label: 'Account Holder Name', value: pick(account.account_name) },
+    { label: 'Bank Name', value: pick(account.bank_name) },
+    { label: 'Bank Branch', value: pick(account.bank_branch) },
+    { label: 'Account Number', value: pick(account.account_number) },
+    { label: 'Routing Number', value: pick(account.routing_number) },
+    { label: 'Mobile Banking Provider', value: pick(account.mobile_banking_provider) },
+    { label: 'Mobile Banking Number', value: pick(account.mobile_banking_number) },
+  ]
+}
 
 // branches from /api/branches, ledger heads from
 // /api/ledger-heads (the House Rent heads are name-matched and
@@ -24,7 +46,6 @@ const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 
 export default function IssueHouseRentModal({ isOpen, onClose, onSuccess }: IssueHouseRentModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [copySuccess, setCopySuccess] = useState<string | null>(null)
 
   const [branches, setBranches] = useState<any[]>([])
   const [rentAccounts, setRentAccounts] = useState<any[]>([])
@@ -105,13 +126,6 @@ export default function IssueHouseRentModal({ isOpen, onClose, onSuccess }: Issu
       setRentAccounts([])
       setPastPayments([])
     }
-  }
-
-  const handleCopy = (e: React.MouseEvent, text: string) => {
-    e.stopPropagation()
-    navigator.clipboard.writeText(text)
-    setCopySuccess('Copied!')
-    setTimeout(() => setCopySuccess(null), 2000)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -284,13 +298,6 @@ export default function IssueHouseRentModal({ isOpen, onClose, onSuccess }: Issu
                     {error}
                   </div>
                 )}
-                {copySuccess && (
-                  <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 p-3 text-xs rounded-xl flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4" />
-                    {copySuccess}
-                  </div>
-                )}
-
                 <div className="grid grid-cols-2 gap-5">
                   {/* Ledger Head Selection */}
                   <div>
@@ -375,7 +382,6 @@ export default function IssueHouseRentModal({ isOpen, onClose, onSuccess }: Issu
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           {rentAccounts.map(a => {
                             const isSelected = rentAccountId === a.id;
-                            const accDetails = `Bank: ${a.bank_name}\nA/C Name: ${a.account_name}\nA/C No: ${a.account_number}`;
                             return (
                               <div key={a.id}
                                 onClick={() => {
@@ -408,10 +414,6 @@ export default function IssueHouseRentModal({ isOpen, onClose, onSuccess }: Issu
 
                                 <div className="flex items-center justify-between p-2 rounded-lg bg-white border border-slate-900/5">
                                   <code className="text-xs text-[#15803d] font-bold tracking-wide">{a.account_number}</code>
-                                  <button type="button" onClick={(e) => handleCopy(e, accDetails)}
-                                    className="text-slate-500 hover:text-slate-900 transition-colors p-2.5 rounded-md hover:bg-slate-900/[0.07]" title="Copy Details">
-                                    <Copy className="w-3.5 h-3.5" />
-                                  </button>
                                 </div>
 
                                 <div className="mt-4 pt-3 border-t border-slate-900/5 flex justify-between items-center">
@@ -428,6 +430,17 @@ export default function IssueHouseRentModal({ isOpen, onClose, onSuccess }: Issu
                           <p>No bank account is set up for this branch. Please go to House Rent Management page to add a bank account first.</p>
                         </div>
                       )}
+                    </div>
+                  )}
+
+                  {/* Part B: per-field payment account card for the
+                      selected rent account, shown BEFORE confirm. */}
+                  {rentAccountId && rentAccounts.find(a => a.id === rentAccountId) && (
+                    <div className="col-span-2">
+                      <PaymentAccountCard
+                        title="Landlord Payment Account (Send money here)"
+                        fields={houseRentAccountFields(rentAccounts.find(a => a.id === rentAccountId))}
+                      />
                     </div>
                   )}
 

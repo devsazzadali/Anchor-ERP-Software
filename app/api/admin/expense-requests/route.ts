@@ -91,6 +91,7 @@ export async function POST(req: NextRequest) {
         account_number: body.account_number || null,
         bank_name: body.bank_name || null,
         bank_branch: body.bank_branch || null,
+        routing_number: body.routing_number || null,
         status: body.status || 'pending',
         trx_id: body.trx_id || null,
         paid_amount: paid,
@@ -202,7 +203,9 @@ export async function PATCH(req: NextRequest) {
     if (!existing) return NextResponse.json({ error: 'Request not found' }, { status: 404 })
 
     const patch: Record<string, unknown> = {}
-    for (const key of ['title', 'description', 'status', 'trx_id', 'admin_notes'] as const) {
+    // Part B: routing_number (new nullable column) is writable here
+    // ONLY as an account-detail edit — pay/approve semantics unchanged.
+    for (const key of ['title', 'description', 'status', 'trx_id', 'admin_notes', 'routing_number'] as const) {
       if (key in body) patch[key] = body[key]
     }
     if ('paid_at' in body) patch.paid_at = body.paid_at ? new Date(body.paid_at) : null

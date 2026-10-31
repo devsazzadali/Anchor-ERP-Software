@@ -21,6 +21,26 @@ import * as XLSX from 'xlsx'
 import { generatePdf } from '@/lib/pdf-generator'
 import { getCachedData, setCachedData, invalidateBranchCache } from '@/lib/branch-cache'
 import { roundMoney } from '@/lib/money'
+import PaymentAccountCard, { type PaymentAccountField } from '@/components/PaymentAccountCard'
+
+// Part B: the requester's payment details (stored on the request
+// itself — the destination the employee entered for reimbursement)
+// as PaymentAccountCard fields, shown at the pay moment with
+// per-field copy. routing_number is a Part B nullable column:
+// older requests render "—" until an admin fills it via Edit.
+export function expenseRequestAccountFields(req: any): PaymentAccountField[] {
+  if (!req) return []
+  const pick = (v: any): string | number | null =>
+    v === null || v === undefined || String(v).trim() === '' ? null : v
+  return [
+    { label: 'Payment Method', value: req.payment_method === 'bkash' ? 'bKash / Mobile Banking' : req.payment_method === 'bank' ? 'Bank Transfer' : pick(req.payment_method) },
+    { label: 'Account Holder Name', value: pick(req.account_holder_name) },
+    { label: 'Account / Mobile Number', value: pick(req.account_number) },
+    { label: 'Bank Name', value: pick(req.bank_name) },
+    { label: 'Bank Branch', value: pick(req.bank_branch) },
+    { label: 'Routing Number', value: pick(req.routing_number) },
+  ]
+}
 
 // all data flows through the app's API layer —
 // identity via /api/auth/me, branches via /api/branches, and
@@ -61,6 +81,7 @@ type ExpenseRequest = {
   account_number: string | null
   bank_name: string | null
   bank_branch: string | null
+  routing_number: string | null
   status: 'pending' | 'approved' | 'rejected' | 'paid'
   admin_notes: string | null
   trx_id: string | null
@@ -197,6 +218,7 @@ export default function AdminBranchExpensesPage() {
   const [editStatus, setEditStatus] = useState<'pending' | 'approved' | 'rejected' | 'paid'>('pending')
   const [editTrxId, setEditTrxId] = useState('')
   const [editAdminNotes, setEditAdminNotes] = useState('')
+  const [editRoutingNumber, setEditRoutingNumber] = useState('')
 
   // Auto-calculate Due Amount = Total - Paid.
   // C34: NO Math.max(0, ...) clamp — clamping silently masked
@@ -242,6 +264,7 @@ export default function AdminBranchExpensesPage() {
     setEditStatus(req.status || 'pending')
     setEditTrxId(req.trx_id || '')
     setEditAdminNotes(req.admin_notes || '')
+    setEditRoutingNumber(req.routing_number || '')
     setEditFeedback(null)
     setShowEditModal(true)
   }
@@ -314,6 +337,9 @@ export default function AdminBranchExpensesPage() {
       due_amount: due,
       status: editStatus,
       trx_id: editTrxId.trim() || null,
+      // Part B: the ONLY account-detail field this edit writes —
+      // the new nullable routing_number column.
+      routing_number: editRoutingNumber.trim() || null,
       admin_notes: editAdminNotes.trim() || null,
       paid_at: editStatus === 'paid' ? (editingRequest.paid_at || new Date().toISOString()) : null,
     }
@@ -1579,13 +1605,12 @@ export default function AdminBranchExpensesPage() {
                   </div>
                 )}
 
-                {/* Payment info */}
+                {/* Payment info — Part B: per-field copyable card at
+                    the pay moment (was display-only rows). Cash keeps
+                    its branch-drawer notice: there is no account. */}
                 {(actionType === 'pay' || actionType === 'view') && actionRequest.account_holder_name !== 'Admin Direct' && (
-                  <div className="p-4 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 space-y-2">
-                    <p className="text-[10px] text-slate-500 uppercase tracking-wider font-bold mb-2 flex items-center gap-1">
-                      <CreditCard className="w-3 h-3" /> Payment Account
-                    </p>
-                    {actionRequest.payment_method === 'cash' ? (
+                  actionRequest.payment_method === 'cash' ? (
+                    <div className="p-4 rounded-xl bg-slate-900/[0.04] border border-slate-900/5">
                       <div className="flex items-center gap-2 p-2 rounded-lg bg-emerald-500/5 border border-emerald-500/20">
                         <Banknote className="w-4 h-4 text-emerald-600" />
                         <div>
@@ -1593,36 +1618,10 @@ export default function AdminBranchExpensesPage() {
                           <p className="text-[10px] text-emerald-600">Branch-এর daily cash closing থেকে deduct হবে।</p>
                         </div>
                       </div>
-                    ) : (
-                      [
-                        ['Method', actionRequest.payment_method === 'bkash' ? 'bKash / Mobile' : 'Bank Transfer'],
-                        ['Account Name', actionRequest.account_holder_name || '—'],
-                      ].map(([k, v]) => (
-                        <div key={k} className="flex justify-between">
-                          <span className="text-[10px] text-slate-500">{k}</span>
-                          <span className="text-[10px] text-slate-900 font-semibold">{v}</span>
-                        </div>
-                      ))
-                    )}
-                    {actionRequest.payment_method !== 'cash' && (
-                      <div className="flex justify-between items-center">
-                        <span className="text-[10px] text-slate-500">Number</span>
-                        <span className="text-sm text-[#15803d] font-mono font-bold">{actionRequest.account_number || '—'}</span>
-                      </div>
-                    )}
-                    {actionRequest.bank_name && (
-                      <div className="flex justify-between">
-                        <span className="text-[10px] text-slate-500">Bank</span>
-                        <span className="text-[10px] text-slate-900">{actionRequest.bank_name}</span>
-                      </div>
-                    )}
-                    {actionRequest.bank_branch && (
-                      <div className="flex justify-between">
-                        <span className="text-[10px] text-slate-500">Branch</span>
-                        <span className="text-[10px] text-slate-900">{actionRequest.bank_branch}</span>
-                      </div>
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    <PaymentAccountCard fields={expenseRequestAccountFields(actionRequest)} />
+                  )
                 )}
 
                 {/* Invoice */}
@@ -2037,6 +2036,16 @@ export default function AdminBranchExpensesPage() {
                       <input
                         type="text" placeholder="e.g. TRX123456"
                         value={editTrxId} onChange={e => setEditTrxId(e.target.value)}
+                        className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-mono placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] text-slate-500 uppercase tracking-wider font-bold mb-1.5">
+                        Bank Routing Number (Optional)
+                      </label>
+                      <input
+                        type="text" placeholder="e.g. 0902938"
+                        value={editRoutingNumber} onChange={e => setEditRoutingNumber(e.target.value)}
                         className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-mono placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                       />
                     </div>

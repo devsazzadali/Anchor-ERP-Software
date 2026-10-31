@@ -128,6 +128,10 @@ export async function POST(req: NextRequest) {
       if (fields.routing_number && String(fields.routing_number).trim()) {
         payload.routing_number = String(fields.routing_number).trim()
       }
+      // Part B: new nullable landlord payment-detail columns.
+      for (const k of ['bank_branch', 'mobile_banking_provider', 'mobile_banking_number'] as const) {
+        if (fields[k] && String(fields[k]).trim()) payload[k] = String(fields[k]).trim()
+      }
       if (fields.rent_amount !== undefined && fields.rent_amount !== null && fields.rent_amount !== '') {
         const rent = parseMoneyAmount(fields.rent_amount)
         if (rent === null) return NextResponse.json({ error: 'Invalid rent amount.' }, { status: 400 })
@@ -145,6 +149,10 @@ export async function POST(req: NextRequest) {
       }
       if (fields.account_number && String(fields.account_number).trim()) {
         payload.account_number = String(fields.account_number).trim()
+      }
+      // Part B: new nullable payable-to column.
+      if (fields.payable_to && String(fields.payable_to).trim()) {
+        payload.payable_to = String(fields.payable_to).trim()
       }
       data = await prisma.utilityMeter.create({ data: payload })
     } else {
@@ -164,6 +172,15 @@ export async function POST(req: NextRequest) {
 // PATCH /api/admin/branch-settings?kind=<kind>&id=<uuid>
 // The settings page's remove action: soft-deactivate only
 // (is_active = false), as before — rows are never hard-deleted.
+// Part B addition: when the JSON body carries any of the NEW
+// nullable account-detail fields for the kind, PATCH instead
+// updates ONLY those fields (the admin fill-in path for existing
+// registry rows) and leaves is_active untouched.
+const PART_B_EDIT_FIELDS: Record<string, string[]> = {
+  house_rent_accounts: ['bank_branch', 'mobile_banking_provider', 'mobile_banking_number'],
+  utility_meters: ['payable_to'],
+  developer_payment_methods: [],
+}
 export async function PATCH(req: NextRequest) {
   try {
     const caller = await getCallerProfile(req)
@@ -175,6 +192,22 @@ export async function PATCH(req: NextRequest) {
     const id = searchParams.get('id')
     if (!isKind(kind)) return NextResponse.json({ error: 'Unknown kind' }, { status: 400 })
     if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
+
+    const body = await req.json().catch(() => ({} as any))
+    const editKeys = (PART_B_EDIT_FIELDS[kind] || []).filter((k) => body && k in body)
+    if (editKeys.length > 0) {
+      const data: Record<string, unknown> = {}
+      for (const k of editKeys) {
+        const v = body[k]
+        data[k] = v === null || v === undefined || String(v).trim() === '' ? null : String(v).trim()
+      }
+      if (kind === 'house_rent_accounts') {
+        await prisma.houseRentAccount.update({ where: { id }, data: data as any })
+      } else if (kind === 'utility_meters') {
+        await prisma.utilityMeter.update({ where: { id }, data: data as any })
+      }
+      return NextResponse.json({ success: true, updated: editKeys })
+    }
 
     if (kind === 'house_rent_accounts') {
       await prisma.houseRentAccount.update({ where: { id }, data: { is_active: false } })

@@ -4,6 +4,34 @@ import React, { useState, useEffect } from 'react'
 import { X, Code, Check, Loader2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { dhakaToday } from '@/lib/dhaka-time'
+import PaymentAccountCard, { type PaymentAccountField } from '@/components/PaymentAccountCard'
+
+// Part B: the selected developer payment method's details as
+// PaymentAccountCard fields. The store is the `details` Json on
+// DeveloperPaymentMethod — it already holds every key below (no
+// schema change needed); both camelCase and snake_case keys are
+// read, matching how the rest of the app reads this Json.
+export function developerMethodFields(method: any): PaymentAccountField[] {
+  if (!method) return []
+  const d = method.details && typeof method.details === 'object' ? method.details : {}
+  const pick = (...keys: string[]): string | number | null => {
+    for (const k of keys) {
+      const v = d[k]
+      if (v !== null && v !== undefined && String(v).trim() !== '') return v
+    }
+    return null
+  }
+  return [
+    { label: 'Payment Method', value: method.method_type || null },
+    { label: 'Account Holder Name', value: pick('account_name', 'accountName', 'account_holder_name', 'holder_name', 'name') },
+    { label: 'Bank Name', value: pick('bank_name', 'bankName') },
+    { label: 'Bank Branch', value: pick('branch_name', 'branchName', 'branch', 'bank_branch') },
+    { label: 'Account Number', value: pick('account_number', 'accountNumber') },
+    { label: 'Routing Number', value: pick('routing_number', 'routingNumber', 'routing_code') },
+    { label: 'Mobile Banking Provider', value: pick('mobile_banking_provider', 'mobileBankingProvider', 'provider', 'wallet_type', 'walletType') },
+    { label: 'Mobile / Phone Number', value: pick('phone', 'mobile_number', 'mobileNumber', 'mobile_banking_number', 'mobileBankingNumber') },
+  ]
+}
 
 // branches + developer payment methods come from
 // /api/branches and /api/admin/branch-settings (admin-gated,
@@ -167,6 +195,16 @@ export default function IssueDeveloperBillModal({ isOpen, onClose, onSuccess, le
                            )
                         })}
                       </select>
+                    </div>
+                  )}
+
+                  {/* Part B: post-selection payee card, BEFORE confirm. */}
+                  {methodId && methods.find(m => m.id === methodId) && (
+                    <div className="col-span-2">
+                      <PaymentAccountCard
+                        title="Developer Payment Account (Send money here)"
+                        fields={developerMethodFields(methods.find(m => m.id === methodId))}
+                      />
                     </div>
                   )}
 
