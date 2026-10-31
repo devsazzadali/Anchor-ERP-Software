@@ -168,7 +168,7 @@ export default function AdminUserSettings() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen w-full flex items-center justify-center bg-white text-[#8a6d1f]">
+      <div className="min-h-screen w-full flex items-center justify-center bg-white text-[#15803d]">
         <Loader2 className="w-8 h-8 animate-spin" />
       </div>
     )
@@ -176,19 +176,20 @@ export default function AdminUserSettings() {
 
   return (
     <div className="min-h-screen w-full flex bg-white text-slate-900 font-sans overflow-x-hidden relative">
-      <div className="absolute top-[-10%] right-[-5%] w-[45%] h-[45%] bg-[#d4af37]/5 rounded-full filter blur-[150px] pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-5%] w-[45%] h-[45%] bg-[#1ca34c]/5 rounded-full filter blur-[150px] pointer-events-none" />
 
       <div className="flex-1 flex flex-col p-6 max-w-6xl mx-auto z-10 w-full relative">
         <div className="flex justify-between items-end mb-8 pb-4 border-b border-slate-900/5">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight text-slate-900 font-serif">
+            <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 font-serif flex items-center gap-3">
+              <span className="w-1.5 h-9 rounded-full bg-[#1ca34c] shrink-0" />
               User <span className="premium-text-gradient">Settings</span>
             </h2>
             <p className="text-xs text-slate-500 mt-1">Manage all user credentials, roles, and administrative permissions.</p>
           </div>
           <button
             onClick={() => setShowRegisterModal(true)}
-            className="bg-[#d4af37]/10 hover:bg-[#d4af37]/20 border border-[#d4af37]/30 text-[#8a6d1f] px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all"
+            className="bg-[#1ca34c]/10 hover:bg-[#1ca34c]/20 border border-[#1ca34c]/30 text-[#15803d] px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all"
           >
             <UserPlus className="w-4 h-4" /> Register New User
           </button>
@@ -220,7 +221,7 @@ export default function AdminUserSettings() {
                   onClick={() => handleSelectUser(user)}
                   className={`p-3 rounded-xl cursor-pointer transition-all border ${
                     selectedUser?.id === user.id
-                      ? 'bg-[#d4af37]/10 border-[#d4af37]/30'
+                      ? 'bg-[#1ca34c]/10 border-[#1ca34c]/30'
                       : 'bg-slate-900/[0.04] border-slate-900/5 hover:bg-slate-900/[0.04]'
                   }`}
                 >
@@ -243,7 +244,7 @@ export default function AdminUserSettings() {
             {selectedUser ? (
               <div className="glass-panel p-6 sm:p-8 rounded-2xl relative shadow-xl overflow-hidden">
                 <div className="flex items-center gap-3 mb-8">
-                  <div className="w-10 h-10 rounded-xl bg-[#d4af37]/10 border border-[#d4af37]/30 flex items-center justify-center text-[#8a6d1f]">
+                  <div className="w-10 h-10 rounded-xl bg-[#1ca34c]/10 border border-[#1ca34c]/30 flex items-center justify-center text-[#15803d]">
                     <Edit3 className="w-5 h-5" />
                   </div>
                   <div>
@@ -260,7 +261,7 @@ export default function AdminUserSettings() {
                         type="text"
                         value={phoneNumber}
                         onChange={e => setPhoneNumber(e.target.value)}
-                        className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50"
+                        className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50"
                       />
                     </div>
                     <div>
@@ -270,7 +271,7 @@ export default function AdminUserSettings() {
                         value={password}
                         onChange={e => setPassword(e.target.value)}
                         placeholder="Leave blank to keep current"
-                        className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50 placeholder-slate-600"
+                        className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 placeholder-slate-600"
                       />
                     </div>
                   </div>
@@ -281,7 +282,7 @@ export default function AdminUserSettings() {
                       <select
                         value={role}
                         onChange={e => setRole(e.target.value)}
-                        className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50"
+                        className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50"
                       >
                         <option value="user">User</option>
                         <option value="admin">Admin</option>
@@ -293,7 +294,7 @@ export default function AdminUserSettings() {
                       <select
                         value={profileType}
                         onChange={e => setProfileType(e.target.value)}
-                        className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50"
+                        className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50"
                       >
                         <option value="employee">Employee</option>
                         <option value="partner">Partner</option>
@@ -307,7 +308,7 @@ export default function AdminUserSettings() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="flex-1 bg-[#d4af37]/10 hover:bg-[#d4af37]/20 border border-[#d4af37]/30 text-[#8a6d1f] font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                      className="flex-1 bg-[#1ca34c]/10 hover:bg-[#1ca34c]/20 border border-[#1ca34c]/30 text-[#15803d] font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all disabled:opacity-50"
                     >
                       {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                       Save User Settings
@@ -357,24 +358,24 @@ export default function AdminUserSettings() {
               <form onSubmit={handleRegisterUser} className="space-y-4">
                 <div>
                   <label className="block text-[10px] font-bold text-slate-500 tracking-wider uppercase mb-1.5">Full Name</label>
-                  <input required type="text" value={regFullName} onChange={e => setRegFullName(e.target.value)} className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50" />
+                  <input required type="text" value={regFullName} onChange={e => setRegFullName(e.target.value)} className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" />
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold text-slate-500 tracking-wider uppercase mb-1.5">Email Address</label>
-                  <input required type="email" value={regEmail} onChange={e => setRegEmail(e.target.value)} className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50" />
+                  <input required type="email" value={regEmail} onChange={e => setRegEmail(e.target.value)} className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" />
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold text-slate-500 tracking-wider uppercase mb-1.5">Phone Number</label>
-                  <input type="text" value={regPhone} onChange={e => setRegPhone(e.target.value)} className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50" />
+                  <input type="text" value={regPhone} onChange={e => setRegPhone(e.target.value)} className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" />
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold text-slate-500 tracking-wider uppercase mb-1.5">Password</label>
-                  <input required type="password" value={regPassword} onChange={e => setRegPassword(e.target.value)} className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50" />
+                  <input required type="password" value={regPassword} onChange={e => setRegPassword(e.target.value)} className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[10px] font-bold text-slate-500 tracking-wider uppercase mb-1.5">System Role</label>
-                    <select value={regRole} onChange={e => setRegRole(e.target.value)} className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50">
+                    <select value={regRole} onChange={e => setRegRole(e.target.value)} className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50">
                       <option value="user">User</option>
                       <option value="admin">Admin</option>
                       <option value="super_admin">Super Admin</option>
@@ -382,7 +383,7 @@ export default function AdminUserSettings() {
                   </div>
                   <div>
                     <label className="block text-[10px] font-bold text-slate-500 tracking-wider uppercase mb-1.5">Profile Type</label>
-                    <select value={regProfileType} onChange={e => setRegProfileType(e.target.value)} className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50">
+                    <select value={regProfileType} onChange={e => setRegProfileType(e.target.value)} className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50">
                       <option value="employee">Employee</option>
                       <option value="partner">Partner</option>
                       <option value="head_office">Head Office</option>
@@ -394,7 +395,7 @@ export default function AdminUserSettings() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full mt-4 bg-[#d4af37]/10 hover:bg-[#d4af37]/20 border border-[#d4af37]/30 text-[#8a6d1f] font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                  className="w-full mt-4 bg-[#1ca34c]/10 hover:bg-[#1ca34c]/20 border border-[#1ca34c]/30 text-[#15803d] font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all disabled:opacity-50"
                 >
                   {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
                   Register User

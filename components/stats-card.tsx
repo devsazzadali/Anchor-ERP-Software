@@ -70,9 +70,9 @@ export default function StatsCard({
       glow: 'shadow-amber-500/5'
     },
     gold: {
-      stroke: '#d4af37',
-      fill: 'rgba(212, 175, 87, 0.05)',
-      glow: 'shadow-[#d4af37]/5'
+      stroke: '#1ca34c',
+      fill: 'rgba(28,163,76, 0.05)',
+      glow: 'shadow-[#1ca34c]/5'
     },
     blue: {
       stroke: '#3b82f6',
@@ -87,7 +87,7 @@ export default function StatsCard({
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-      className={`glass-panel glass-panel-hover p-5 rounded-2xl relative shadow-lg overflow-hidden flex flex-col justify-between h-[155px] ${colorClasses.glow}`}
+      className={`glass-panel glass-panel-hover p-5 rounded-3xl relative shadow-lg overflow-hidden flex flex-col justify-between h-[155px] ${colorClasses.glow}`}
     >
       {/* Decorative Corner Ambient Glow */}
       <div 
@@ -101,7 +101,7 @@ export default function StatsCard({
           <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">
             {title}
           </span>
-          <h3 className="text-2xl font-bold tracking-tight text-slate-900 font-serif">{value}</h3>
+          <h3 className="text-2xl font-extrabold tracking-tight text-slate-900 font-serif">{value}</h3>
         </div>
 
         {/* Floating Glass Icon */}

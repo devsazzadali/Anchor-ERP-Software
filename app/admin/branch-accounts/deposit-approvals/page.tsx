@@ -346,7 +346,7 @@ export default function DepositApprovalsPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -355,7 +355,7 @@ export default function DepositApprovalsPage() {
     <div className="min-h-screen bg-white text-slate-900">
       {/* Background glow */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/3 w-[600px] h-[350px] bg-[#d4af37]/3 rounded-full filter blur-[150px]" />
+        <div className="absolute top-0 left-1/3 w-[600px] h-[350px] bg-[#1ca34c]/3 rounded-full filter blur-[150px]" />
       </div>
 
       <div className="relative z-10 p-4 md:p-6 lg:p-8 max-w-5xl mx-auto">
@@ -363,7 +363,7 @@ export default function DepositApprovalsPage() {
         <div className="flex items-center gap-4 mb-6 pb-5 border-b border-slate-900/5">
           <Link
             href="/admin/branch-accounts"
-            className="p-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#d4af37]/30 text-slate-500 hover:text-slate-900 transition-all cursor-pointer"
+            className="p-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#1ca34c]/30 text-slate-500 hover:text-slate-900 transition-all cursor-pointer"
           >
             <ChevronLeft className="w-4 h-4" />
           </Link>
@@ -388,9 +388,9 @@ export default function DepositApprovalsPage() {
               <button
                 onClick={() => setShowExportMenu(!showExportMenu)}
                 disabled={isExporting || filteredDeposits.length === 0}
-                className="px-3.5 py-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#d4af37]/30 text-slate-600 hover:text-slate-900 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                className="px-3.5 py-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#1ca34c]/30 text-slate-600 hover:text-slate-900 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
               >
-                <Download className="w-3.5 h-3.5 text-[#8a6d1f]" />
+                <Download className="w-3.5 h-3.5 text-[#15803d]" />
                 <span>{isExporting ? 'Exporting...' : 'Export'}</span>
                 <ChevronDown className="w-3 h-3 text-slate-500" />
               </button>
@@ -407,7 +407,7 @@ export default function DepositApprovalsPage() {
                       onClick={handleExportPdf}
                       className="w-full px-4 py-2.5 text-left text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-900/[0.04] flex items-center gap-2.5 transition-colors cursor-pointer"
                     >
-                      <FileText className="w-4 h-4 text-[#8a6d1f]" /> Export PDF (Official)
+                      <FileText className="w-4 h-4 text-[#15803d]" /> Export PDF (Official)
                     </button>
                     <button
                       onClick={handleExportExcel}
@@ -428,8 +428,8 @@ export default function DepositApprovalsPage() {
 
             <button
               onClick={handleRefresh}
-              className={`p-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#d4af37]/30 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${
-                isRefreshing ? 'animate-spin text-[#8a6d1f]' : ''
+              className={`p-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#1ca34c]/30 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${
+                isRefreshing ? 'animate-spin text-[#15803d]' : ''
               }`}
               title="Refresh submissions"
             >
@@ -440,18 +440,18 @@ export default function DepositApprovalsPage() {
 
         {/* Metric Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-          <div className="p-4 rounded-2xl border border-amber-500/20 bg-amber-500/5">
+          <div className="p-4 rounded-3xl border border-amber-500/20 bg-amber-500/5">
             <p className="text-[9px] uppercase tracking-widest text-amber-600/80 font-bold mb-1">Awaiting Approval</p>
             <div className="flex items-baseline justify-between">
               <p className="text-xl sm:text-2xl font-bold font-serif text-amber-600">{pendingCount}</p>
               <p className="text-xs font-semibold text-amber-700 font-serif">{fmt(pendingAmount)}</p>
             </div>
           </div>
-          <div className="p-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/5">
+          <div className="p-4 rounded-3xl border border-emerald-500/20 bg-emerald-500/5">
             <p className="text-[9px] uppercase tracking-widest text-emerald-600/80 font-bold mb-1">Approved Deposits</p>
             <p className="text-xl sm:text-2xl font-bold font-serif text-emerald-600">{approvedCount}</p>
           </div>
-          <div className="p-4 rounded-2xl border border-slate-900/10 bg-slate-900/[0.04]">
+          <div className="p-4 rounded-3xl border border-slate-900/10 bg-slate-900/[0.04]">
             <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mb-1">Total Recorded Submissions</p>
             <p className="text-xl sm:text-2xl font-bold font-serif text-slate-900">{deposits.length}</p>
           </div>
@@ -466,7 +466,7 @@ export default function DepositApprovalsPage() {
                 onClick={() => setFilter(f)}
                 className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider border transition-all cursor-pointer ${
                   filter === f
-                    ? 'bg-[#d4af37]/15 border-[#d4af37]/40 text-[#8a6d1f] shadow-sm'
+                    ? 'bg-[#1ca34c]/15 border-[#1ca34c]/40 text-[#15803d] shadow-sm'
                     : 'bg-slate-900/[0.04] border-slate-900/10 text-slate-500 hover:text-slate-900'
                 }`}
               >
@@ -482,7 +482,7 @@ export default function DepositApprovalsPage() {
               placeholder="Search branch name, manager, slip no., or TXN ID..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl py-2 pl-10 pr-4 text-xs text-slate-900 placeholder-slate-500 focus:outline-none focus:border-[#d4af37]/40 transition-colors"
+              className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl py-2 pl-10 pr-4 text-xs text-slate-900 placeholder-slate-500 focus:outline-none focus:border-[#1ca34c]/40 transition-colors"
             />
           </div>
         </div>
@@ -513,7 +513,7 @@ export default function DepositApprovalsPage() {
 
         {/* Deposits List */}
         {filteredDeposits.length === 0 ? (
-          <div className="text-center py-16 rounded-2xl border border-slate-900/5 bg-slate-900/[0.04]">
+          <div className="text-center py-16 rounded-3xl border border-slate-900/5 bg-slate-900/[0.04]">
             <CheckCircle className="w-12 h-12 text-emerald-500/40 mx-auto mb-3" />
             <p className="text-slate-600 text-sm font-semibold">
               {filter === 'submitted' ? 'No pending deposits awaiting review' : 'No deposits found'}
@@ -531,14 +531,14 @@ export default function DepositApprovalsPage() {
               return (
                 <div
                   key={dep.id}
-                  className="rounded-2xl border border-slate-900/10 bg-slate-900/[0.05] shadow-xl overflow-hidden hover:border-slate-900/20 transition-all"
+                  className="rounded-3xl border border-slate-900/10 bg-slate-900/[0.05] shadow-xl overflow-hidden hover:border-slate-900/20 transition-all"
                 >
                   {/* Deposit Header */}
                   <div className="p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-slate-900/[0.08]">
                     <div>
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <span className="text-base font-bold text-slate-900 flex items-center gap-1.5 font-serif">
-                          <Building2 className="w-4 h-4 text-[#8a6d1f]" /> {branchTitle}
+                          <Building2 className="w-4 h-4 text-[#15803d]" /> {branchTitle}
                         </span>
                         <span
                           className={`text-[9px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
@@ -561,7 +561,7 @@ export default function DepositApprovalsPage() {
                     </div>
 
                     <div className="text-left sm:text-right shrink-0">
-                      <p className="text-2xl font-bold font-serif text-[#8a6d1f]">{fmt(dep.amount)}</p>
+                      <p className="text-2xl font-bold font-serif text-[#15803d]">{fmt(dep.amount)}</p>
                       <p className="text-[10px] text-slate-500">Bank Deposit Amount</p>
                       {parseKhuchraAmount(dep) > 0 && (
                         <p className="text-[11px] text-orange-600 font-semibold mt-0.5">
@@ -590,7 +590,7 @@ export default function DepositApprovalsPage() {
                         </div>
                         <div>
                           <p className="text-[9px] uppercase tracking-wider text-slate-500">Deposit Slip No.</p>
-                          <p className="text-xs text-[#8a6d1f] font-mono font-bold mt-0.5 truncate">
+                          <p className="text-xs text-[#15803d] font-mono font-bold mt-0.5 truncate">
                             {dep.deposit_slip_number || '—'}
                           </p>
                         </div>
@@ -623,9 +623,9 @@ export default function DepositApprovalsPage() {
                         if (list.length === 0) return null
 
                         return (
-                          <div className="p-4 rounded-xl bg-gradient-to-br from-[#d4af37]/10 via-[#d4af37]/5 to-transparent border border-[#d4af37]/25 space-y-2.5">
-                            <div className="flex items-center justify-between border-b border-[#d4af37]/20 pb-2">
-                              <span className="text-[11px] font-bold text-[#8a6d1f] uppercase tracking-wider flex items-center gap-1.5 font-serif">
+                          <div className="p-4 rounded-xl bg-gradient-to-br from-[#1ca34c]/10 via-[#1ca34c]/5 to-transparent border border-[#1ca34c]/25 space-y-2.5">
+                            <div className="flex items-center justify-between border-b border-[#1ca34c]/20 pb-2">
+                              <span className="text-[11px] font-bold text-[#15803d] uppercase tracking-wider flex items-center gap-1.5 font-serif">
                                 <Layers className="w-3.5 h-3.5" />
                                 প্রতিদিনের জমার বিবরণ · Daily Sales Breakdown ({list.length} Days Combined)
                               </span>
@@ -644,7 +644,7 @@ export default function DepositApprovalsPage() {
                                   >
                                     <div>
                                       <p className="text-[11px] font-mono text-slate-900 font-medium flex items-center gap-1.5">
-                                        <Calendar className="w-3 h-3 text-[#8a6d1f]" />
+                                        <Calendar className="w-3 h-3 text-[#15803d]" />
                                         {item.date}
                                       </p>
                                       <p className="text-[9px] text-slate-500">
@@ -652,7 +652,7 @@ export default function DepositApprovalsPage() {
                                       </p>
                                     </div>
                                     <div className="text-right">
-                                      <p className="text-xs font-bold font-serif text-[#8a6d1f]">
+                                      <p className="text-xs font-bold font-serif text-[#15803d]">
                                         {fmt(item.amount)}
                                       </p>
                                     </div>
@@ -699,10 +699,10 @@ export default function DepositApprovalsPage() {
                       <div className="flex-1 rounded-xl border border-slate-900/10 bg-white p-3 flex flex-col justify-between">
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1">
-                            <ImageIcon className="w-3 h-3 text-[#8a6d1f]" /> Slip Photo
+                            <ImageIcon className="w-3 h-3 text-[#15803d]" /> Slip Photo
                           </span>
                           {dep.slip_attachment_url && (
-                            <span className="text-[9px] bg-[#d4af37]/10 text-[#8a6d1f] px-1.5 py-0.5 rounded font-mono">
+                            <span className="text-[9px] bg-[#1ca34c]/10 text-[#15803d] px-1.5 py-0.5 rounded font-mono">
                               Attached
                             </span>
                           )}
@@ -720,7 +720,7 @@ export default function DepositApprovalsPage() {
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                               />
                               <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-slate-900 text-xs font-semibold">
-                                <ZoomIn className="w-4 h-4 text-[#8a6d1f]" />
+                                <ZoomIn className="w-4 h-4 text-[#15803d]" />
                                 <span>Inspect Full Slip</span>
                               </div>
                             </div>
@@ -730,7 +730,7 @@ export default function DepositApprovalsPage() {
                                 onClick={() => openSlipModal(dep, dep.slip_attachment_url, 'Deposit Slip / Bank Receipt')}
                                 className="flex-1 py-1.5 rounded-lg bg-slate-900/[0.04] hover:bg-slate-900/[0.04] border border-slate-900/10 text-[11px] font-semibold text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                               >
-                                <Eye className="w-3 h-3 text-[#8a6d1f]" /> View
+                                <Eye className="w-3 h-3 text-[#15803d]" /> View
                               </button>
                               <a
                                 href={dep.slip_attachment_url}
@@ -825,9 +825,9 @@ export default function DepositApprovalsPage() {
 
                   {/* Edit Deposit Inline Form (Admin can edit any deposit, including approved) */}
                   {editDepositId === dep.id && (
-                    <div className="px-5 pb-4 border-t border-slate-900/5 pt-4 bg-[#d4af37]/[0.03] space-y-3">
+                    <div className="px-5 pb-4 border-t border-slate-900/5 pt-4 bg-[#1ca34c]/[0.03] space-y-3">
                       <div className="flex items-center justify-between">
-                        <p className="text-xs font-bold text-[#8a6d1f] uppercase tracking-wider flex items-center gap-1.5">
+                        <p className="text-xs font-bold text-[#15803d] uppercase tracking-wider flex items-center gap-1.5">
                           <Edit3 className="w-3.5 h-3.5" /> Edit Deposit Details {dep.status === 'approved' && <span className="text-[10px] text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20 font-normal ml-1">Approved Deposit</span>}
                         </p>
                         <span className="text-[10px] text-slate-500">ID: {dep.id.slice(0, 8)}...</span>
@@ -842,7 +842,7 @@ export default function DepositApprovalsPage() {
                             step="0.01"
                             value={editAmount}
                             onChange={e => setEditAmount(e.target.value)}
-                            className="w-full bg-white border border-[#d4af37]/30 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-[#d4af37]/60 font-serif"
+                            className="w-full bg-white border border-[#1ca34c]/30 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/60 font-serif"
                           />
                         </div>
                         <div>
@@ -863,7 +863,7 @@ export default function DepositApprovalsPage() {
                             type="date"
                             value={editDepositDate}
                             onChange={e => setEditDepositDate(e.target.value)}
-                            className="w-full bg-white border border-slate-900/10 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-[#d4af37]/40"
+                            className="w-full bg-white border border-slate-900/10 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/40"
                           />
                         </div>
                       </div>
@@ -875,7 +875,7 @@ export default function DepositApprovalsPage() {
                             type="date"
                             value={editSalesFromDate}
                             onChange={e => setEditSalesFromDate(e.target.value)}
-                            className="w-full bg-white border border-slate-900/10 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-[#d4af37]/40"
+                            className="w-full bg-white border border-slate-900/10 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/40"
                           />
                         </div>
                         <div>
@@ -884,7 +884,7 @@ export default function DepositApprovalsPage() {
                             type="date"
                             value={editSalesToDate}
                             onChange={e => setEditSalesToDate(e.target.value)}
-                            className="w-full bg-white border border-slate-900/10 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-[#d4af37]/40"
+                            className="w-full bg-white border border-slate-900/10 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/40"
                           />
                         </div>
                       </div>
@@ -897,7 +897,7 @@ export default function DepositApprovalsPage() {
                             value={editBankName}
                             onChange={e => setEditBankName(e.target.value)}
                             placeholder="e.g. BRAC Bank PLC"
-                            className="w-full bg-white border border-slate-900/10 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-[#d4af37]/40"
+                            className="w-full bg-white border border-slate-900/10 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/40"
                           />
                         </div>
                         <div>
@@ -907,7 +907,7 @@ export default function DepositApprovalsPage() {
                             value={editBankAcctNumber}
                             onChange={e => setEditBankAcctNumber(e.target.value)}
                             placeholder="Account Number"
-                            className="w-full bg-white border border-slate-900/10 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-[#d4af37]/40 font-mono"
+                            className="w-full bg-white border border-slate-900/10 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 font-mono"
                           />
                         </div>
                       </div>
@@ -920,7 +920,7 @@ export default function DepositApprovalsPage() {
                             value={editSlipNumber}
                             onChange={e => setEditSlipNumber(e.target.value)}
                             placeholder="Slip # / Challan #"
-                            className="w-full bg-white border border-slate-900/10 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-[#d4af37]/40 font-mono"
+                            className="w-full bg-white border border-slate-900/10 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 font-mono"
                           />
                         </div>
                         <div>
@@ -930,7 +930,7 @@ export default function DepositApprovalsPage() {
                             value={editTxnId}
                             onChange={e => setEditTxnId(e.target.value)}
                             placeholder="Bank TXN ID"
-                            className="w-full bg-white border border-slate-900/10 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-[#d4af37]/40 font-mono"
+                            className="w-full bg-white border border-slate-900/10 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 font-mono"
                           />
                         </div>
                       </div>
@@ -942,7 +942,7 @@ export default function DepositApprovalsPage() {
                           value={editNotes}
                           onChange={e => setEditNotes(e.target.value)}
                           placeholder="Admin or manager notes"
-                          className="w-full bg-white border border-slate-900/10 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-[#d4af37]/40"
+                          className="w-full bg-white border border-slate-900/10 rounded-xl px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/40"
                         />
                       </div>
 
@@ -950,7 +950,7 @@ export default function DepositApprovalsPage() {
                         <button
                           onClick={() => handleSaveDepositEdit(dep.id)}
                           disabled={isSavingEdit}
-                          className="flex-1 py-2.5 rounded-xl bg-[#d4af37] hover:bg-[#b8952e] text-black font-bold text-xs uppercase tracking-wider transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#d4af37]/10"
+                          className="flex-1 py-2.5 rounded-full bg-[#1ca34c] hover:bg-[#15803d] text-white font-bold text-xs uppercase tracking-wider transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#1ca34c]/10"
                         >
                           {isSavingEdit ? <div className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" /> : <Save className="w-3.5 h-3.5" />}
                           Save Changes
@@ -972,16 +972,16 @@ export default function DepositApprovalsPage() {
                       <div className="flex gap-2 w-full sm:w-auto">
                         <button
                           onClick={() => openSlipModal(dep, dep.slip_attachment_url, 'Deposit Slip / Bank Receipt')}
-                          className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#d4af37]/30 text-slate-600 hover:text-slate-900 text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer"
+                          className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#1ca34c]/30 text-slate-600 hover:text-slate-900 text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer"
                         >
-                          <ZoomIn className="w-3.5 h-3.5 text-[#8a6d1f]" /> Inspect Slip
+                          <ZoomIn className="w-3.5 h-3.5 text-[#15803d]" /> Inspect Slip
                         </button>
                         <button
                           onClick={() => openEditDeposit(dep)}
                           className={`w-full sm:w-auto px-4 py-2.5 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
                             dep.status === 'approved'
                               ? 'bg-amber-500/10 border-amber-500/30 hover:bg-amber-500/20 text-amber-700'
-                              : 'bg-[#d4af37]/10 border-[#d4af37]/20 hover:bg-[#d4af37]/20 text-[#8a6d1f]'
+                              : 'bg-[#1ca34c]/10 border-[#1ca34c]/20 hover:bg-[#1ca34c]/20 text-[#15803d]'
                           }`}
                           title={dep.status === 'approved' ? 'Admin: Edit approved deposit details' : 'Edit deposit details'}
                         >

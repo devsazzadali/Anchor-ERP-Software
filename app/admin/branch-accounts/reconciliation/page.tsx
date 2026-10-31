@@ -189,7 +189,7 @@ export default function AdminReconciliationPage() {
   }
 
   if (isLoading) {
-    return <div className="min-h-screen bg-white flex items-center justify-center"><div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" /></div>
+    return <div className="min-h-screen bg-white flex items-center justify-center"><div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" /></div>
   }
 
   return (
@@ -201,12 +201,12 @@ export default function AdminReconciliationPage() {
       <div className="relative z-10 p-4 md:p-6 max-w-5xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
-          <Link href="/admin/branch-accounts" className="p-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 text-slate-500 hover:text-slate-900 transition-all">
+          <Link href="/admin/branch-accounts" className="p-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 text-slate-500 hover:text-slate-900 transition-all">
             <ChevronLeft className="w-4 h-4" />
           </Link>
           <div className="flex-1">
             <h1 className="text-xl font-bold font-serif flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-[#8a6d1f]" /> Bank & Cash Reconciliation
+              <BarChart3 className="w-5 h-5 text-[#15803d]" /> Bank & Cash Reconciliation
             </h1>
             <p className="text-[11px] text-slate-500">Auditing net cash collections against approved bank deposits</p>
           </div>
@@ -216,9 +216,9 @@ export default function AdminReconciliationPage() {
               <button
                 onClick={() => setShowExportMenu(!showExportMenu)}
                 disabled={isExporting || summary.length === 0}
-                className="px-3.5 py-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#d4af37]/30 text-slate-600 hover:text-slate-900 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                className="px-3.5 py-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#1ca34c]/30 text-slate-600 hover:text-slate-900 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
               >
-                <Download className="w-3.5 h-3.5 text-[#8a6d1f]" />
+                <Download className="w-3.5 h-3.5 text-[#15803d]" />
                 <span>{isExporting ? 'Exporting...' : 'Export'}</span>
                 <ChevronDown className="w-3 h-3 text-slate-500" />
               </button>
@@ -235,7 +235,7 @@ export default function AdminReconciliationPage() {
                       onClick={handleExportPdf}
                       className="w-full px-4 py-2.5 text-left text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-900/[0.04] flex items-center gap-2.5 transition-colors cursor-pointer"
                     >
-                      <FileText className="w-4 h-4 text-[#8a6d1f]" /> Export PDF (Official)
+                      <FileText className="w-4 h-4 text-[#15803d]" /> Export PDF (Official)
                     </button>
                     <button
                       onClick={handleExportExcel}
@@ -254,27 +254,27 @@ export default function AdminReconciliationPage() {
               </AnimatePresence>
             </div>
 
-            <button onClick={handleRefresh} className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'animate-spin text-[#8a6d1f]' : ''}`}>
+            <button onClick={handleRefresh} className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'animate-spin text-[#15803d]' : ''}`}>
               <RefreshCw className="w-4 h-4" />
             </button>
           </div>
         </div>
 
         {/* Date Filter Bar */}
-        <div className="flex flex-wrap items-center gap-3 p-4 rounded-2xl bg-slate-900/[0.04] border border-slate-900/5 mb-6">
-          <Calendar className="w-4 h-4 text-[#8a6d1f]" />
+        <div className="flex flex-wrap items-center gap-3 p-4 rounded-3xl bg-slate-900/[0.04] border border-slate-900/5 mb-6">
+          <Calendar className="w-4 h-4 text-[#15803d]" />
           <div className="flex items-center gap-2">
             <label className="text-[10px] uppercase tracking-widest text-slate-500">From</label>
             <input type="date" value={fromDate} onChange={e => setFromDate(e.target.value)}
-              className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2 text-slate-900 text-xs focus:outline-none focus:border-[#d4af37]/40 cursor-pointer [color-scheme:light]" />
+              className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2 text-slate-900 text-xs focus:outline-none focus:border-[#1ca34c]/40 cursor-pointer [color-scheme:light]" />
           </div>
           <div className="flex items-center gap-2">
             <label className="text-[10px] uppercase tracking-widest text-slate-500">To</label>
             <input type="date" value={toDate} onChange={e => setToDate(e.target.value)}
-              className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2 text-slate-900 text-xs focus:outline-none focus:border-[#d4af37]/40 cursor-pointer [color-scheme:light]" />
+              className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2 text-slate-900 text-xs focus:outline-none focus:border-[#1ca34c]/40 cursor-pointer [color-scheme:light]" />
           </div>
           <button onClick={fetchData}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#d4af37] to-white text-black font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-all"
+            className="px-4 py-2 rounded-full bg-[#1ca34c] text-white font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-all"
           >
             Apply
           </button>
@@ -289,17 +289,17 @@ export default function AdminReconciliationPage() {
 
         {/* Global totals */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="p-5 rounded-2xl bg-blue-500/10 border border-blue-500/20">
+          <div className="p-5 rounded-3xl bg-blue-500/10 border border-blue-500/20">
             <Banknote className="w-5 h-5 text-blue-600 mb-2" />
             <p className="text-[9px] uppercase tracking-widest text-blue-600/70 mb-1">Net Cash Collected</p>
             <p className="text-2xl font-bold font-serif text-slate-900">{fmt(totalCashCollected)}</p>
           </div>
-          <div className="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+          <div className="p-5 rounded-3xl bg-emerald-500/10 border border-emerald-500/20">
             <CheckCircle className="w-5 h-5 text-emerald-600 mb-2" />
             <p className="text-[9px] uppercase tracking-widest text-emerald-600/70 mb-1">Approved in Bank</p>
             <p className="text-2xl font-bold font-serif text-slate-900">{fmt(totalApproved)}</p>
           </div>
-          <div className={`p-5 rounded-2xl border ${totalUnbankedVariance > 500 ? 'bg-amber-500/10 border-amber-500/20' : 'bg-emerald-500/10 border-emerald-500/20'}`}>
+          <div className={`p-5 rounded-3xl border ${totalUnbankedVariance > 500 ? 'bg-amber-500/10 border-amber-500/20' : 'bg-emerald-500/10 border-emerald-500/20'}`}>
             <AlertTriangle className={`w-5 h-5 mb-2 ${totalUnbankedVariance > 500 ? 'text-amber-600' : 'text-emerald-600'}`} />
             <p className={`text-[9px] uppercase tracking-widest mb-1 ${totalUnbankedVariance > 500 ? 'text-amber-600/70' : 'text-emerald-600/70'}`}>
               {totalUnbankedVariance > 500 ? 'Unbanked Cash in Drawer' : 'Bank Reconciliation Status'}
@@ -308,7 +308,7 @@ export default function AdminReconciliationPage() {
               {totalUnbankedVariance > 500 ? fmt(totalUnbankedVariance) : '৳0 (Balanced)'}
             </p>
           </div>
-          <div className="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/20">
+          <div className="p-5 rounded-3xl bg-amber-500/10 border border-amber-500/20">
             <Clock className="w-5 h-5 text-amber-600 mb-2" />
             <p className="text-[9px] uppercase tracking-widest text-amber-600/70 mb-1">Pending Approvals</p>
             <p className="text-2xl font-bold font-serif text-slate-900">{fmt(totalPending)}</p>
@@ -316,7 +316,7 @@ export default function AdminReconciliationPage() {
         </div>
 
         {/* Branch-wise reconciliation table */}
-        <div className="rounded-2xl border border-slate-900/5 bg-slate-900/[0.04] overflow-hidden mb-6">
+        <div className="rounded-3xl border border-slate-900/5 bg-slate-900/[0.04] overflow-hidden mb-6">
           <div className="p-5 border-b border-slate-900/5 flex items-center justify-between">
             <p className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold">Branch Cash vs Bank Deposits</p>
             <span className="text-[10px] text-slate-500 font-medium">Reconciliation Period: {fromDate} to {toDate}</span>
@@ -404,7 +404,7 @@ export default function AdminReconciliationPage() {
         </div>
 
         {data?.deposits?.length > 0 ? (
-          <div className="rounded-2xl border border-slate-900/5 bg-slate-900/[0.04] overflow-hidden">
+          <div className="rounded-3xl border border-slate-900/5 bg-slate-900/[0.04] overflow-hidden">
             <div className="p-5 border-b border-slate-900/5">
               <p className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold">Individual Deposit Records — {data.from} to {data.to}</p>
             </div>
@@ -442,7 +442,7 @@ export default function AdminReconciliationPage() {
             </div>
           </div>
         ) : data !== null && (
-          <div className="rounded-2xl border border-slate-900/5 bg-slate-900/[0.04] p-10 text-center">
+          <div className="rounded-3xl border border-slate-900/5 bg-slate-900/[0.04] p-10 text-center">
             <p className="text-slate-500 text-sm">No deposit records found for {data?.from} → {data?.to}.</p>
           </div>
         )}

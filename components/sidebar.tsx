@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { useRouter, usePathname } from 'next/navigation';
 import {
   Shield, LayoutDashboard, CreditCard, Receipt,
@@ -200,22 +199,24 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
       }
     >
       {/* Decorative top accent */}
-      <div className="absolute top-0 left-5 right-5 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/30 to-transparent" />
+      <div className="absolute top-0 left-5 right-5 h-[1px] bg-gradient-to-r from-transparent via-[#1ca34c]/30 to-transparent" />
 
       {/* ── Top section ─────────────────────────────────────── */}
       <div>
         {/* Brand */}
         <div className="flex items-center gap-2 mb-8 mt-2 px-1">
-          <img src="/logos.png" alt="Anchor ERP Official Logo" className="w-12 h-12 object-contain drop-shadow-md" />
+          <div className="w-12 h-12 rounded-2xl bg-[#1ca34c] shadow flex items-center justify-center shrink-0">
+            <img src="/logos.png" alt="Anchor ERP Official Logo" className="w-7 h-7 object-contain brightness-0 invert" />
+          </div>
           <div>
-            <h1 className="text-sm font-bold tracking-wider premium-text-gradient font-serif">ANCHOR ERP</h1>
-            <p className="text-[7.5px] uppercase tracking-[0.25em] text-slate-500">Enterprise Resource Planning</p>
+            <h1 className="text-sm font-extrabold tracking-wider text-slate-900 font-serif">ANCHOR ERP</h1>
+            <p className="text-[7.5px] uppercase tracking-[0.25em] text-[#15803d] font-semibold">Enterprise Resource Planning</p>
           </div>
         </div>
 
         {/* Role badge */}
         <div className="mb-4 px-1">
-          <span className="text-[9px] uppercase tracking-widest text-[#8a6d1f]/70 font-semibold">
+          <span className="text-[9px] uppercase tracking-widest text-[#15803d]/70 font-semibold">
             {forcedRole === 'admin' || forcedRole === 'super_admin' ? 'Admin Panel' :
              forcedRole === 'partner'        ? 'Partner Portal' :
              forcedRole === 'branch_manager' ? 'Branch Manager' :
@@ -247,14 +248,16 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
                   {(node as any).divider && <div className="my-3 border-t border-slate-900/[0.08]" />}
                   <button
                     onClick={() => toggleMenu(node.name)}
-                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all group relative cursor-pointer ${
-                      isChildActive || isMenuExpanded
-                        ? 'text-slate-900 bg-slate-900/[0.04]'
-                        : 'text-slate-500 hover:text-slate-700 hover:bg-slate-900/[0.04]'
+                    className={`w-full flex items-center justify-between px-4 py-2.5 rounded-full text-xs font-medium transition-all group relative cursor-pointer ${
+                      isChildActive
+                        ? 'text-[#15803d] bg-[#e8f7ee]'
+                        : isMenuExpanded
+                          ? 'text-slate-900 bg-slate-900/[0.04]'
+                          : 'text-slate-500 hover:text-slate-700 hover:bg-slate-900/[0.04]'
                     }`}
                   >
                     <div className="flex items-center gap-3.5 min-w-0">
-                      <Icon className={`w-4 h-4 shrink-0 transition-transform ${isChildActive ? 'text-[#8a6d1f]' : 'text-slate-500 group-hover:text-slate-900'}`} />
+                      <Icon className={`w-4 h-4 shrink-0 transition-transform ${isChildActive ? 'text-[#1ca34c]' : 'text-slate-500 group-hover:text-slate-900'}`} />
                       <span className="min-w-0 break-words leading-snug">{node.name}</span>
                     </div>
                     <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isMenuExpanded ? 'rotate-180' : ''}`} />
@@ -269,9 +272,9 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
                             key={sub.name}
                             href={sub.href}
                             onClick={() => { closeMenu && closeMenu(); }}
-                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all relative ${
+                            className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs transition-all relative ${
                               isSubActive
-                                ? 'text-black font-semibold bg-[#d4af37]'
+                                ? 'bg-[#e8f7ee] text-[#15803d] font-semibold'
                                 : 'text-slate-500 hover:text-slate-600 hover:bg-slate-900/[0.04]'
                             }`}
                           >
@@ -294,22 +297,18 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
                 <Link
                   href={node.href}
                   onClick={() => { closeMenu && closeMenu(); }}
-                  className={`flex items-center gap-3.5 px-3 py-2.5 rounded-xl text-xs font-medium transition-all group relative cursor-pointer ${
+                  className={`flex items-center gap-3.5 px-4 py-2.5 rounded-full text-xs font-medium transition-all group relative cursor-pointer ${
                     isActive
-                      ? 'text-black font-semibold bg-[#d4af37]/20'
+                      ? 'bg-[#e8f7ee] text-[#15803d] font-semibold'
                       : 'text-slate-500 hover:text-slate-700 hover:bg-slate-900/[0.04]'
                   }`}
                 >
                   {isActive && (
-                    <motion.div
-                      layoutId="active-pill"
-                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                      className="absolute inset-0 bg-gradient-to-r from-[#d4af37] to-white rounded-xl -z-10 shadow"
-                    />
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-full bg-[#1ca34c]" />
                   )}
                   <Icon
                     className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${
-                      isActive ? 'text-black' : 'text-slate-500 group-hover:text-[#8a6d1f]'
+                      isActive ? 'text-[#1ca34c]' : 'text-slate-500 group-hover:text-[#15803d]'
                     }`}
                   />
                   <span className="min-w-0 break-words leading-snug">{node.name}</span>
@@ -324,27 +323,17 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
       <div className="space-y-4 mt-auto pt-6">
         {/* AI widget */}
         <div className="p-3.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 relative overflow-hidden group">
-          <div className="absolute -top-10 -right-10 w-20 h-20 bg-[#d4af37]/5 rounded-full filter blur-xl group-hover:bg-[#d4af37]/10 transition-all" />
+          <div className="absolute -top-10 -right-10 w-20 h-20 bg-[#1ca34c]/5 rounded-full filter blur-xl group-hover:bg-[#1ca34c]/10 transition-all" />
           <div className="flex items-center gap-2 mb-1">
-            <Sparkles className="w-3.5 h-3.5 text-[#8a6d1f]" />
+            <Sparkles className="w-3.5 h-3.5 text-[#15803d]" />
             <span className="text-[9px] font-bold text-slate-900 uppercase tracking-wider">Anchor ERP AI Fraud Risk</span>
           </div>
           <p className="text-[10px] text-slate-500 font-sans">Verification node secure. Zero structural anomalies detected.</p>
         </div>
 
-        {/* Logout */}
-        <div className="flex gap-2 justify-end px-1">
-          <button
-            onClick={handleLogout}
-            className="p-2 rounded-xl bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 text-rose-600 transition-all cursor-pointer"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
-        </div>
-
         {/* Profile capsule */}
         <div className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/5">
-          <div className="w-8 h-8 rounded-lg bg-white border border-slate-900/10 flex items-center justify-center text-xs font-semibold text-[#8a6d1f]">
+          <div className="w-8 h-8 rounded-lg bg-white border border-slate-900/10 flex items-center justify-center text-xs font-semibold text-[#15803d]">
             {userName ? userName.charAt(0).toUpperCase() : <User className="w-3 h-3" />}
           </div>
           <div className="overflow-hidden">
@@ -352,6 +341,15 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
             <p className="text-[9px] text-slate-500 truncate">{userEmail || ''}</p>
           </div>
         </div>
+
+        {/* Sign Out */}
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-full text-rose-600 hover:bg-rose-500/10 font-semibold text-xs transition-all cursor-pointer"
+        >
+          <LogOut className="w-4 h-4 shrink-0" />
+          <span>Sign Out</span>
+        </button>
       </div>
     </div>
   );

@@ -66,7 +66,7 @@ export default function PasswordRequestsAdmin() {
       <div className="flex justify-between items-end">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
-            <ShieldAlert className="w-8 h-8 text-[#8a6d1f]" />
+            <ShieldAlert className="w-8 h-8 text-[#15803d]" />
             Password Reset Requests
           </h1>
           <p className="text-sm text-slate-500 mt-2">
@@ -84,7 +84,7 @@ export default function PasswordRequestsAdmin() {
 
       {loading ? (
         <div className="flex justify-center py-20">
-          <div className="w-8 h-8 border-4 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-[#1ca34c] border-t-transparent rounded-full animate-spin" />
         </div>
       ) : requests.length === 0 ? (
         <div className="glass-panel p-12 rounded-2xl text-center border border-slate-900/5">
@@ -110,7 +110,7 @@ export default function PasswordRequestsAdmin() {
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-slate-900/[0.04] flex items-center justify-center">
-                    <User className="w-5 h-5 text-[#8a6d1f]" />
+                    <User className="w-5 h-5 text-[#15803d]" />
                   </div>
                   <div>
                     <h3 className="text-slate-900 font-bold text-sm">{req.profiles?.full_name || 'Unknown User'}</h3>
@@ -147,7 +147,7 @@ export default function PasswordRequestsAdmin() {
                   <button
                     onClick={() => handleUpdateStatus(req.id, 'approved')}
                     disabled={actionLoading === req.id}
-                    className="flex-1 px-4 py-2 bg-[#d4af37] hover:bg-[#c4a030] text-black rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="flex-1 px-4 py-2 bg-[#1ca34c] hover:bg-[#15803d] text-white rounded-full text-xs font-semibold uppercase tracking-wider transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     <Check className="w-4 h-4" />
                     Approve

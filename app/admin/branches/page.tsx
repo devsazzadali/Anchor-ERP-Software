@@ -501,7 +501,7 @@ const isHeadOffice = (name?: string | null) => {
   return (
     <div className="min-h-screen w-full flex bg-white text-slate-900 font-sans">
       {/* Glow background */}
-      <div className="absolute top-[-10%] right-[-5%] w-[50%] h-[50%] bg-[#d4af37]/3 rounded-full filter blur-[150px] pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-5%] w-[50%] h-[50%] bg-[#1ca34c]/3 rounded-full filter blur-[150px] pointer-events-none" />
 
       <div className="flex-1 flex flex-col p-6 lg:p-10 overflow-y-auto max-h-screen relative z-10">
         <AnimatePresence mode="wait">
@@ -522,9 +522,9 @@ const isHeadOffice = (name?: string | null) => {
                     setLedgerMonthFilter('')
                     setShowEmpExportDropdown(false)
                   }}
-                  className="flex items-center gap-2.5 bg-slate-900/[0.04] hover:bg-slate-900/[0.04] text-slate-900 border border-slate-900/15 px-5 py-2.5 rounded-xl transition-all font-semibold text-xs tracking-wider uppercase group shadow-lg hover:border-[#d4af37]/50 cursor-pointer"
+                  className="flex items-center gap-2.5 bg-slate-900/[0.04] hover:bg-slate-900/[0.04] text-slate-900 border border-slate-900/15 px-5 py-2.5 rounded-xl transition-all font-semibold text-xs tracking-wider uppercase group shadow-lg hover:border-[#1ca34c]/50 cursor-pointer"
                 >
-                  <ArrowLeft className="w-4 h-4 text-[#8a6d1f] group-hover:-translate-x-1 transition-transform" /> Back to Branch Workforce
+                  <ArrowLeft className="w-4 h-4 text-[#15803d] group-hover:-translate-x-1 transition-transform" /> Back to Branch Workforce
                 </button>
 
                 {/* Feedback Notification */}
@@ -539,10 +539,10 @@ const isHeadOffice = (name?: string | null) => {
               </div>
 
               {/* Employee Banner Header Card */}
-              <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-[#d4af37]/30 bg-gradient-to-r from-white via-white to-white shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative overflow-hidden">
-                <div className="absolute -top-24 -right-24 w-72 h-72 bg-[#d4af37]/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-[#1ca34c]/30 bg-gradient-to-r from-white via-white to-white shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative overflow-hidden">
+                <div className="absolute -top-24 -right-24 w-72 h-72 bg-[#1ca34c]/10 rounded-full blur-3xl pointer-events-none" />
                 <div className="flex items-center gap-5 z-10">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#d4af37] via-[#e5c158] to-white flex items-center justify-center text-black font-extrabold text-3xl shadow-[0_0_20px_rgba(212,175,55,0.3)] shrink-0">
+                  <div className="w-16 h-16 rounded-2xl bg-[#1ca34c] flex items-center justify-center text-white font-extrabold text-3xl shadow-lg shadow-[#1ca34c]/25 shrink-0">
                     {selectedEmployee.full_name?.charAt(0) || '?'}
                   </div>
                   <div>
@@ -569,14 +569,14 @@ const isHeadOffice = (name?: string | null) => {
                       {selectedEmployee.position && (
                         <span className="text-slate-900 font-semibold bg-slate-900/[0.04] px-2.5 py-0.5 rounded-md border border-slate-900/5">{selectedEmployee.position}</span>
                       )}
-                      <span>Assigned Branch: <strong className="text-[#8a6d1f] font-semibold">{selectedBranch?.name}</strong></span>
+                      <span>Assigned Branch: <strong className="text-[#15803d] font-semibold">{selectedBranch?.name}</strong></span>
                     </p>
                   </div>
                 </div>
 
                 <button
                   onClick={() => setShowSalaryModal(true)}
-                  className="bg-gradient-to-r from-[#d4af37] via-[#f3e5ab] to-white text-black font-extrabold px-6 py-3.5 rounded-2xl text-xs tracking-wider uppercase flex items-center gap-2.5 shadow-[0_0_25px_rgba(212,175,55,0.4)] hover:shadow-[0_0_35px_rgba(212,175,55,0.6)] transition-all hover:-translate-y-0.5 z-10 w-full md:w-auto justify-center cursor-pointer"
+                  className="bg-[#1ca34c] text-white font-extrabold px-6 py-3.5 rounded-full text-xs tracking-wider uppercase flex items-center gap-2.5 shadow-lg shadow-[#1ca34c]/25 transition-all hover:-translate-y-0.5 z-10 w-full md:w-auto justify-center cursor-pointer"
                 >
                   <CreditCard className="w-4 h-4 fill-black" /> Issue Salary Payment
                 </button>
@@ -584,7 +584,7 @@ const isHeadOffice = (name?: string | null) => {
 
               {employeeDetailsLoading ? (
                 <div className="glass-panel p-16 rounded-3xl border border-slate-900/5 flex flex-col items-center justify-center">
-                  <div className="w-10 h-10 border-3 border-[#d4af37] border-t-transparent rounded-full animate-spin mb-4 shadow-[0_0_15px_rgba(212,175,55,0.5)]" />
+                  <div className="w-10 h-10 border-3 border-[#1ca34c] border-t-transparent rounded-full animate-spin mb-4 shadow-[0_0_15px_rgba(28,163,76,0.5)]" />
                   <span className="text-xs font-semibold uppercase tracking-widest text-slate-500">Loading member ledger and KYC details...</span>
                 </div>
               ) : (
@@ -594,7 +594,7 @@ const isHeadOffice = (name?: string | null) => {
                     {/* Compensation Card */}
                     <div className="glass-panel p-6 rounded-3xl border border-slate-900/5 bg-slate-900/[0.04] space-y-4 relative overflow-hidden shadow-xl">
                       <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none" />
-                      <span className="text-[11px] font-bold text-[#8a6d1f] uppercase tracking-widest flex items-center gap-2">
+                      <span className="text-[11px] font-bold text-[#15803d] uppercase tracking-widest flex items-center gap-2">
                         <Landmark className="w-4 h-4" /> Compensation & Routing
                       </span>
 
@@ -628,13 +628,13 @@ const isHeadOffice = (name?: string | null) => {
 
                     {/* Contact Card */}
                     <div className="glass-panel p-6 rounded-3xl border border-slate-900/5 bg-slate-900/[0.04] space-y-4 shadow-xl">
-                      <span className="text-[11px] font-bold text-[#8a6d1f] uppercase tracking-widest flex items-center gap-2">
+                      <span className="text-[11px] font-bold text-[#15803d] uppercase tracking-widest flex items-center gap-2">
                         <UserCircle className="w-4 h-4" /> Contact & Profile Info
                       </span>
 
                       <div className="space-y-3.5 text-xs">
                         <div className="flex items-center gap-3.5 py-2 border-b border-slate-900/5">
-                          <div className="p-2 rounded-xl bg-slate-900/[0.04] text-[#8a6d1f]">
+                          <div className="p-2 rounded-xl bg-slate-900/[0.04] text-[#15803d]">
                             <Phone className="w-4 h-4" />
                           </div>
                           <div>
@@ -644,7 +644,7 @@ const isHeadOffice = (name?: string | null) => {
                         </div>
 
                         <div className="flex items-center gap-3.5 py-2 border-b border-slate-900/5">
-                          <div className="p-2 rounded-xl bg-slate-900/[0.04] text-[#8a6d1f]">
+                          <div className="p-2 rounded-xl bg-slate-900/[0.04] text-[#15803d]">
                             <Mail className="w-4 h-4" />
                           </div>
                           <div>
@@ -654,7 +654,7 @@ const isHeadOffice = (name?: string | null) => {
                         </div>
 
                         <div className="flex items-start gap-3.5 py-2">
-                          <div className="p-2 rounded-xl bg-slate-900/[0.04] text-[#8a6d1f] shrink-0 mt-0.5">
+                          <div className="p-2 rounded-xl bg-slate-900/[0.04] text-[#15803d] shrink-0 mt-0.5">
                             <MapPin className="w-4 h-4" />
                           </div>
                           <div>
@@ -671,7 +671,7 @@ const isHeadOffice = (name?: string | null) => {
                     {/* KYC Documents Card */}
                     {employeeKyc && (
                       <div className="glass-panel p-6 rounded-3xl border border-slate-900/5 bg-slate-900/[0.04] shadow-xl">
-                        <span className="text-[11px] font-bold text-[#8a6d1f] uppercase tracking-widest block mb-4 flex items-center gap-2">
+                        <span className="text-[11px] font-bold text-[#15803d] uppercase tracking-widest block mb-4 flex items-center gap-2">
                           <ShieldCheck className="w-4 h-4" /> Verified Identity Documents
                         </span>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -685,7 +685,7 @@ const isHeadOffice = (name?: string | null) => {
                               {doc.url ? (
                                 <button
                                   onClick={() => setFullscreenImage(getKycImageUrl(doc.url)!)}
-                                  className="w-full aspect-[4/3] rounded-2xl bg-white border border-slate-900/10 hover:border-[#d4af37] overflow-hidden relative group transition-all cursor-pointer shadow-lg"
+                                  className="w-full aspect-[4/3] rounded-3xl bg-white border border-slate-900/10 hover:border-[#1ca34c] overflow-hidden relative group transition-all cursor-pointer shadow-lg"
                                 >
                                   <img
                                     src={getKycImageUrl(doc.url)!}
@@ -695,12 +695,12 @@ const isHeadOffice = (name?: string | null) => {
                                   />
                                   <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity backdrop-blur-xs">
                                     <div className="bg-white p-2.5 rounded-full border border-slate-900/20 text-slate-900 flex items-center gap-1.5 text-xs font-semibold">
-                                      <Eye className="w-4 h-4 text-[#8a6d1f]" /> View Full
+                                      <Eye className="w-4 h-4 text-[#15803d]" /> View Full
                                     </div>
                                   </div>
                                 </button>
                               ) : (
-                                <div className="w-full aspect-[4/3] rounded-2xl bg-slate-900/[0.04] border border-slate-900/5 border-dashed flex items-center justify-center text-xs text-slate-600 font-medium">
+                                <div className="w-full aspect-[4/3] rounded-3xl bg-slate-900/[0.04] border border-slate-900/5 border-dashed flex items-center justify-center text-xs text-slate-600 font-medium">
                                   Not Uploaded
                                 </div>
                               )}
@@ -714,7 +714,7 @@ const isHeadOffice = (name?: string | null) => {
                     <div className="glass-panel p-6 rounded-3xl border border-slate-900/5 bg-slate-900/[0.04] shadow-xl">
                       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-slate-900/10">
                         <div>
-                          <span className="text-xs font-bold text-[#8a6d1f] uppercase tracking-widest flex items-center gap-2">
+                          <span className="text-xs font-bold text-[#15803d] uppercase tracking-widest flex items-center gap-2">
                             <DollarSign className="w-4 h-4" /> Disbursement Ledger ({filteredEmployeePayments.length})
                           </span>
                           {filteredEmployeePayments.length > 0 && (
@@ -735,7 +735,7 @@ const isHeadOffice = (name?: string | null) => {
                                   placeholder="Search Trx, Notes..."
                                   value={ledgerSearch}
                                   onChange={(e) => setLedgerSearch(e.target.value)}
-                                  className="w-full bg-white border border-slate-900/15 rounded-xl pl-8 pr-7 py-1.5 text-xs text-slate-900 placeholder-slate-500 focus:outline-none focus:border-[#d4af37] transition-colors"
+                                  className="w-full bg-white border border-slate-900/15 rounded-xl pl-8 pr-7 py-1.5 text-xs text-slate-900 placeholder-slate-500 focus:outline-none focus:border-[#1ca34c] transition-colors"
                                 />
                                 {ledgerSearch && (
                                   <button onClick={() => setLedgerSearch('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-900">
@@ -747,7 +747,7 @@ const isHeadOffice = (name?: string | null) => {
                                 type="month"
                                 value={ledgerMonthFilter}
                                 onChange={(e) => setLedgerMonthFilter(e.target.value)}
-                                className="bg-white border border-slate-900/15 rounded-xl px-2.5 py-1.5 text-xs text-slate-600 focus:outline-none focus:border-[#d4af37] transition-colors font-mono"
+                                className="bg-white border border-slate-900/15 rounded-xl px-2.5 py-1.5 text-xs text-slate-600 focus:outline-none focus:border-[#1ca34c] transition-colors font-mono"
                               />
                               {ledgerMonthFilter && (
                                 <button onClick={() => setLedgerMonthFilter('')} className="text-slate-500 hover:text-slate-900 p-2.5">
@@ -760,7 +760,7 @@ const isHeadOffice = (name?: string | null) => {
                             <div className="relative">
                               <button
                                 onClick={() => setShowEmpExportDropdown(!showEmpExportDropdown)}
-                                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#d4af37]/10 hover:bg-[#d4af37]/20 text-[#8a6d1f] border border-[#d4af37]/30 text-xs font-semibold transition-all shrink-0 cursor-pointer shadow-md"
+                                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#1ca34c]/10 hover:bg-[#1ca34c]/20 text-[#15803d] border border-[#1ca34c]/30 text-xs font-semibold transition-all shrink-0 cursor-pointer shadow-md"
                               >
                                 <Download className="w-3.5 h-3.5" /> Export
                               </button>
@@ -771,7 +771,7 @@ const isHeadOffice = (name?: string | null) => {
                                     initial={{ opacity: 0, y: 5 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: 5 }}
-                                    className="absolute right-0 mt-2 w-44 bg-white border border-slate-900/15 rounded-2xl shadow-2xl overflow-hidden z-50 py-1 backdrop-blur-xl"
+                                    className="absolute right-0 mt-2 w-44 bg-white border border-slate-900/15 rounded-3xl shadow-2xl overflow-hidden z-50 py-1 backdrop-blur-xl"
                                   >
                                     <button onClick={() => handleExportEmployeeSalaries('excel')} className="w-full text-left px-3.5 py-2 text-xs text-slate-600 hover:bg-slate-900/[0.07] hover:text-slate-900 flex items-center gap-2 transition-colors">
                                       <FileText className="w-3.5 h-3.5 text-emerald-600" /> Excel (.xlsx)
@@ -791,7 +791,7 @@ const isHeadOffice = (name?: string | null) => {
                       </div>
 
                       {filteredEmployeePayments.length === 0 ? (
-                        <div className="text-center py-12 text-slate-500 text-sm italic bg-white rounded-2xl border border-slate-900/5">
+                        <div className="text-center py-12 text-slate-500 text-sm italic bg-white rounded-3xl border border-slate-900/5">
                           {employeePayments.length === 0
                             ? 'No salary payments recorded for this member yet. Click "Issue Salary Payment" above to disburse.'
                             : 'No salary payments match your filter criteria.'}
@@ -799,7 +799,7 @@ const isHeadOffice = (name?: string | null) => {
                       ) : (
                         <div className="space-y-3 max-h-[380px] overflow-y-auto pr-2 custom-scrollbar">
                           {filteredEmployeePayments.map((pay) => (
-                            <div key={pay.id} className="p-4 rounded-2xl bg-white border border-slate-900/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-slate-900/15 transition-all shadow-md">
+                            <div key={pay.id} className="p-4 rounded-3xl bg-white border border-slate-900/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-slate-900/15 transition-all shadow-md">
                               <div className="space-y-1">
                                 <div className="flex items-center gap-3 flex-wrap">
                                   <span className="text-base font-extrabold text-emerald-600 font-mono">+{Number(pay.amount).toLocaleString()} BDT</span>
@@ -810,7 +810,7 @@ const isHeadOffice = (name?: string | null) => {
                               </div>
                               <div className="flex items-center gap-4 sm:text-right shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-900/5">
                                 <div className="text-xs text-slate-500 font-medium">
-                                  <Calendar className="w-3.5 h-3.5 inline mr-1.5 text-[#8a6d1f]" />
+                                  <Calendar className="w-3.5 h-3.5 inline mr-1.5 text-[#15803d]" />
                                   {new Date(pay.payment_date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                                 </div>
                               </div>
@@ -833,12 +833,13 @@ const isHeadOffice = (name?: string | null) => {
             >
               <div className="pb-4 border-b border-slate-900/5 flex justify-between items-center">
                 <div>
-                  <h2 className="text-2xl font-bold tracking-tight text-slate-900 font-serif">
+                  <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 font-serif flex items-center gap-3">
+                    <span className="w-1.5 h-9 rounded-full bg-[#1ca34c] shrink-0" />
                     Branch <span className="premium-text-gradient">Management</span>
                   </h2>
                   <p className="text-xs text-slate-500 mt-1">Manage branch locations and view who is working in each branch.</p>
                 </div>
-                <Link href="/admin/branches/create" className="flex items-center gap-2 bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20 px-4 py-2.5 rounded-xl hover:bg-[#d4af37]/20 transition-all font-semibold text-xs tracking-wider uppercase">
+                <Link href="/admin/branches/create" className="flex items-center gap-2 bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 px-4 py-2.5 rounded-xl hover:bg-[#1ca34c]/20 transition-all font-semibold text-xs tracking-wider uppercase">
                   <Plus className="w-4 h-4" /> Add Branch
                 </Link>
               </div>
@@ -848,7 +849,7 @@ const isHeadOffice = (name?: string | null) => {
                 <div className="lg:col-span-5 glass-panel p-6 rounded-2xl relative shadow-xl">
                   <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-900/5">
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-[#8a6d1f]/75" /> All Branches ({branches.length})
+                      <MapPin className="w-4 h-4 text-[#15803d]/75" /> All Branches ({branches.length})
                     </span>
                   </div>
 
@@ -869,35 +870,35 @@ const isHeadOffice = (name?: string | null) => {
                             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') fetchEmployeesForBranch(b) }}
                             className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all cursor-pointer group ${
                               selectedBranch?.id === b.id
-                                ? 'bg-[#d4af37]/15 border-[#d4af37]/50 shadow-lg shadow-[#d4af37]/10'
+                                ? 'bg-[#1ca34c]/15 border-[#1ca34c]/50 shadow-lg shadow-[#1ca34c]/10'
                                 : isHq
-                                ? 'bg-gradient-to-r from-[#d4af37]/12 via-[#d4af37]/5 to-transparent border-[#d4af37]/35 hover:border-[#d4af37]/50'
+                                ? 'bg-gradient-to-r from-[#1ca34c]/12 via-[#1ca34c]/5 to-transparent border-[#1ca34c]/35 hover:border-[#1ca34c]/50'
                                 : 'bg-slate-900/[0.04] border-slate-900/5 hover:border-slate-900/10 hover:bg-slate-900/[0.04]'
                             }`}
                           >
                             <div className="flex items-center gap-3">
                               {isHq ? (
-                                <div className="w-7 h-7 rounded-lg bg-[#d4af37]/20 border border-[#d4af37]/40 flex items-center justify-center shrink-0">
-                                  <Landmark className="w-3.5 h-3.5 text-[#8a6d1f]" />
+                                <div className="w-7 h-7 rounded-lg bg-[#1ca34c]/20 border border-[#1ca34c]/40 flex items-center justify-center shrink-0">
+                                  <Landmark className="w-3.5 h-3.5 text-[#15803d]" />
                                 </div>
                               ) : (
-                                <MapPin className={`w-4 h-4 shrink-0 ${selectedBranch?.id === b.id ? 'text-[#8a6d1f]' : 'text-slate-500'}`} />
+                                <MapPin className={`w-4 h-4 shrink-0 ${selectedBranch?.id === b.id ? 'text-[#15803d]' : 'text-slate-500'}`} />
                               )}
                               <div className="flex items-center gap-2">
                                 <span className={`text-sm font-semibold ${
-                                  selectedBranch?.id === b.id ? 'text-[#8a6d1f]' : isHq ? 'text-slate-500' : 'text-slate-900'
+                                  selectedBranch?.id === b.id ? 'text-[#15803d]' : isHq ? 'text-slate-500' : 'text-slate-900'
                                 }`}>
                                   {b.name}
                                 </span>
                                 {isHq && (
-                                  <span className="px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider rounded-full bg-[#d4af37]/20 text-[#8a6d1f] border border-[#d4af37]/40">
+                                  <span className="px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider rounded-full bg-[#1ca34c]/20 text-[#15803d] border border-[#1ca34c]/40">
                                     HQ / Main
                                   </span>
                                 )}
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
-                              <ChevronRight className={`w-4 h-4 ${selectedBranch?.id === b.id ? 'text-[#8a6d1f]' : 'text-slate-600 group-hover:text-slate-500'} transition-colors`} />
+                              <ChevronRight className={`w-4 h-4 ${selectedBranch?.id === b.id ? 'text-[#15803d]' : 'text-slate-600 group-hover:text-slate-500'} transition-colors`} />
                               {!isHq && (
                                 <button
                                   onClick={(e) => { e.stopPropagation(); handleDelete(b.id) }}
@@ -929,7 +930,7 @@ const isHeadOffice = (name?: string | null) => {
                       >
                         <div className="flex justify-between items-start mb-6 pb-4 border-b border-slate-900/5">
                           <div>
-                            <span className="text-[10px] font-bold text-[#8a6d1f] uppercase tracking-widest block mb-1 flex items-center gap-2">
+                            <span className="text-[10px] font-bold text-[#15803d] uppercase tracking-widest block mb-1 flex items-center gap-2">
                               <MapPin className="w-3.5 h-3.5" /> Branch Workforce
                             </span>
                             <h3 className="text-lg font-bold text-slate-900 font-serif">{selectedBranch.name}</h3>
@@ -944,7 +945,7 @@ const isHeadOffice = (name?: string | null) => {
                                 onClick={() => setShowExportDropdown(!showExportDropdown)}
                                 className="flex items-center gap-2 bg-slate-900/[0.04] hover:bg-slate-900/[0.07] text-slate-900 border border-slate-900/10 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all"
                               >
-                                <Download className="w-3.5 h-3.5 text-[#8a6d1f]" /> Export
+                                <Download className="w-3.5 h-3.5 text-[#15803d]" /> Export
                               </button>
                               {showExportDropdown && (
                                 <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-900/10 rounded-xl shadow-2xl py-2 z-30">
@@ -972,7 +973,7 @@ const isHeadOffice = (name?: string | null) => {
 
                         {employeesLoading ? (
                           <div className="flex flex-col items-center justify-center py-12">
-                            <div className="w-6 h-6 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin mb-2" />
+                            <div className="w-6 h-6 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin mb-2" />
                             <span className="text-xs text-slate-500">Loading workforce...</span>
                           </div>
                         ) : employees.length === 0 ? (
@@ -985,14 +986,14 @@ const isHeadOffice = (name?: string | null) => {
                               <div
                                 key={emp.id}
                                 onClick={() => handleSelectEmployee(emp)}
-                                className="p-4 rounded-xl bg-white border border-slate-900/5 hover:border-[#d4af37]/40 hover:bg-slate-900/[0.04] transition-all cursor-pointer flex items-center justify-between gap-4 group shadow-sm"
+                                className="p-4 rounded-xl bg-white border border-slate-900/5 hover:border-[#1ca34c]/40 hover:bg-slate-900/[0.04] transition-all cursor-pointer flex items-center justify-between gap-4 group shadow-sm"
                               >
                                 <div className="flex items-center gap-3.5">
-                                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#d4af37]/20 to-[#d4af37]/5 border border-[#d4af37]/30 flex items-center justify-center text-[#8a6d1f] font-bold text-sm shrink-0 group-hover:scale-105 transition-transform">
+                                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1ca34c]/20 to-[#1ca34c]/5 border border-[#1ca34c]/30 flex items-center justify-center text-[#15803d] font-bold text-sm shrink-0 group-hover:scale-105 transition-transform">
                                     {emp.full_name?.charAt(0) || '?'}
                                   </div>
                                   <div>
-                                    <h4 className="text-sm font-bold text-slate-900 group-hover:text-[#8a6d1f] transition-colors">{emp.full_name}</h4>
+                                    <h4 className="text-sm font-bold text-slate-900 group-hover:text-[#15803d] transition-colors">{emp.full_name}</h4>
                                     <div className="flex items-center gap-2 mt-0.5">
                                       <span className="text-[10px] text-slate-500 font-mono">{emp.phone_number || 'No Phone'}</span>
                                       {emp.position && (
@@ -1017,9 +1018,9 @@ const isHeadOffice = (name?: string | null) => {
                                       ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]'
                                       : 'bg-amber-400'
                                   }`} title={emp.verification_status === 'approved' ? 'Verified' : 'Pending KYC'} />
-                                  <div className="flex items-center gap-1 text-xs font-semibold text-slate-500 group-hover:text-[#8a6d1f] transition-colors pl-2 border-l border-slate-900/5">
+                                  <div className="flex items-center gap-1 text-xs font-semibold text-slate-500 group-hover:text-[#15803d] transition-colors pl-2 border-l border-slate-900/5">
                                     <span className="hidden sm:inline">Details</span>
-                                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform text-[#8a6d1f]" />
+                                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform text-[#15803d]" />
                                   </div>
                                 </div>
                               </div>
@@ -1060,7 +1061,7 @@ const isHeadOffice = (name?: string | null) => {
                 initial={{ scale: 0.95, y: 20 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.95, y: 20 }}
-                className="glass-panel p-6 sm:p-8 rounded-3xl max-w-lg w-full relative shadow-2xl border border-[#d4af37]/40 bg-white"
+                className="glass-panel p-6 sm:p-8 rounded-3xl max-w-lg w-full relative shadow-2xl border border-[#1ca34c]/40 bg-white"
               >
                 <div className="flex justify-between items-start mb-6 border-b border-slate-900/10 pb-4">
                   <div>
@@ -1072,13 +1073,13 @@ const isHeadOffice = (name?: string | null) => {
                   </button>
                 </div>
 
-                <div className="mb-6 p-4 rounded-xl bg-gradient-to-br from-[#d4af37]/15 to-transparent border border-[#d4af37]/30 flex items-center justify-between">
+                <div className="mb-6 p-4 rounded-xl bg-gradient-to-br from-[#1ca34c]/15 to-transparent border border-[#1ca34c]/30 flex items-center justify-between">
                   <div>
-                    <p className="text-[10px] font-bold text-[#8a6d1f] uppercase tracking-wider mb-0.5">Recipient Member</p>
+                    <p className="text-[10px] font-bold text-[#15803d] uppercase tracking-wider mb-0.5">Recipient Member</p>
                     <p className="text-sm font-semibold text-slate-900">{selectedEmployee.full_name}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[10px] font-bold text-[#8a6d1f] uppercase tracking-wider mb-0.5">Base Salary</p>
+                    <p className="text-[10px] font-bold text-[#15803d] uppercase tracking-wider mb-0.5">Base Salary</p>
                     <p className="text-sm font-bold text-emerald-600 font-mono">{selectedEmployee.salary ? `${Number(selectedEmployee.salary).toLocaleString()} BDT` : 'Not Set'}</p>
                   </div>
                 </div>
@@ -1093,7 +1094,7 @@ const isHeadOffice = (name?: string | null) => {
                         value={salaryAmount}
                         onChange={(e) => setSalaryAmount(e.target.value)}
                         placeholder="e.g. 25000"
-                        className="w-full bg-white border border-slate-900/15 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 font-mono focus:outline-none focus:border-[#d4af37] transition-colors"
+                        className="w-full bg-white border border-slate-900/15 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 font-mono focus:outline-none focus:border-[#1ca34c] transition-colors"
                       />
                     </div>
                     <div>
@@ -1103,7 +1104,7 @@ const isHeadOffice = (name?: string | null) => {
                         required
                         value={salaryDate}
                         onChange={(e) => setSalaryDate(e.target.value)}
-                        className="w-full bg-white border border-slate-900/15 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 font-mono focus:outline-none focus:border-[#d4af37] transition-colors"
+                        className="w-full bg-white border border-slate-900/15 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 font-mono focus:outline-none focus:border-[#1ca34c] transition-colors"
                       />
                     </div>
                   </div>
@@ -1114,7 +1115,7 @@ const isHeadOffice = (name?: string | null) => {
                       <select
                         value={salaryAccount}
                         onChange={(e) => setSalaryAccount(e.target.value)}
-                        className="w-full bg-white border border-slate-900/15 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#d4af37] transition-colors"
+                        className="w-full bg-white border border-slate-900/15 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c] transition-colors"
                       >
                         {selectedEmployee.bank_info && Object.keys(selectedEmployee.bank_info).length > 0 && (
                           Object.entries(selectedEmployee.bank_info).map(([k, v]) => {
@@ -1136,7 +1137,7 @@ const isHeadOffice = (name?: string | null) => {
                         value={salaryTrxId}
                         onChange={(e) => setSalaryTrxId(e.target.value)}
                         placeholder="e.g. TR6839201"
-                        className="w-full bg-white border border-slate-900/15 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 font-mono focus:outline-none focus:border-[#d4af37] transition-colors"
+                        className="w-full bg-white border border-slate-900/15 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 font-mono focus:outline-none focus:border-[#1ca34c] transition-colors"
                       />
                     </div>
                   </div>
@@ -1149,14 +1150,14 @@ const isHeadOffice = (name?: string | null) => {
                         value={customAccount}
                         onChange={(e) => setCustomAccount(e.target.value)}
                         placeholder="Enter Account Name / Number"
-                        className="w-full bg-white border border-slate-900/15 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#d4af37] transition-colors"
+                        className="w-full bg-white border border-slate-900/15 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c] transition-colors"
                       />
                     </div>
                   )}
 
                   <div>
                     <label className="text-[11px] font-semibold text-slate-600 block mb-1">Upload Voucher / Receipt Proof</label>
-                    <div className="relative border border-dashed border-slate-900/15 hover:border-[#d4af37]/50 rounded-xl p-3 text-center bg-white transition-colors cursor-pointer">
+                    <div className="relative border border-dashed border-slate-900/15 hover:border-[#1ca34c]/50 rounded-xl p-3 text-center bg-white transition-colors cursor-pointer">
                       <input
                         type="file"
                         accept="image/*,.pdf"
@@ -1164,7 +1165,7 @@ const isHeadOffice = (name?: string | null) => {
                         className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                       />
                       <div className="flex items-center justify-center gap-2 text-xs text-slate-500">
-                        <Upload className="w-4 h-4 text-[#8a6d1f]" />
+                        <Upload className="w-4 h-4 text-[#15803d]" />
                         <span>{proofFile ? proofFile.name : 'Click or drag receipt file to upload'}</span>
                       </div>
                     </div>
@@ -1177,7 +1178,7 @@ const isHeadOffice = (name?: string | null) => {
                       onChange={(e) => setSalaryNote(e.target.value)}
                       rows={2}
                       placeholder="Optional notes for this payment..."
-                      className="w-full bg-white border border-slate-900/15 rounded-xl p-3 text-sm text-slate-900 focus:outline-none focus:border-[#d4af37] transition-colors"
+                      className="w-full bg-white border border-slate-900/15 rounded-xl p-3 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c] transition-colors"
                     />
                   </div>
 
@@ -1192,7 +1193,7 @@ const isHeadOffice = (name?: string | null) => {
                     <button
                       type="submit"
                       disabled={isSubmittingSalary}
-                      className="bg-gradient-to-r from-[#d4af37] to-white text-black font-bold px-6 py-2.5 rounded-xl text-xs tracking-wider uppercase shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:shadow-[0_0_25px_rgba(212,175,55,0.5)] transition-all cursor-pointer disabled:opacity-50"
+                      className="bg-[#1ca34c] text-white font-bold px-6 py-2.5 rounded-full text-xs tracking-wider uppercase shadow-lg shadow-[#1ca34c]/25 transition-all cursor-pointer disabled:opacity-50"
                     >
                       {isSubmittingSalary ? 'Disbursing...' : 'Confirm Disbursement'}
                     </button>

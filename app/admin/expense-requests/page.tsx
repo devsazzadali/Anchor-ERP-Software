@@ -962,7 +962,7 @@ export default function AdminBranchExpensesPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -970,7 +970,7 @@ export default function AdminBranchExpensesPage() {
   // ════════════════════════════════════════════════════════════════════════════
   return (
     <div className="min-h-screen w-full bg-white text-slate-900 font-sans relative">
-      <div className="absolute top-[-5%] right-[-5%] w-[40%] h-[40%] bg-[#d4af37]/3 rounded-full filter blur-[120px] pointer-events-none" />
+      <div className="absolute top-[-5%] right-[-5%] w-[40%] h-[40%] bg-[#1ca34c]/3 rounded-full filter blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-5%] left-[10%] w-[50%] h-[50%] bg-emerald-500/3 rounded-full filter blur-[150px] pointer-events-none" />
 
       <div className="relative z-10 flex flex-col p-4 md:p-6 max-h-screen overflow-y-auto custom-scrollbar">
@@ -978,10 +978,10 @@ export default function AdminBranchExpensesPage() {
         {/* ── Header ── */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 pb-4 border-b border-slate-900/5">
           <div>
-            <span className="text-[10px] bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider inline-flex items-center gap-1 mb-1">
+            <span className="text-[10px] bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider inline-flex items-center gap-1 mb-1">
               <Building2 className="w-3 h-3" /> Branch Expense Requests
             </span>
-            <h1 className="text-xl font-bold tracking-tight text-slate-900 font-serif">Employee Expense Requests</h1>
+            <h1 className="text-xl font-extrabold tracking-tight text-slate-900 font-serif flex items-center gap-3"><span className="w-1.5 h-8 rounded-full bg-[#1ca34c] shrink-0" />Employee Expense Requests</h1>
             <p className="text-[11px] text-slate-500 mt-0.5">Review, approve, and process expense requests across all branches.</p>
           </div>
 
@@ -989,7 +989,7 @@ export default function AdminBranchExpensesPage() {
 
 
             {/* Refresh */}
-            <button onClick={handleRefresh} className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 text-slate-500 hover:text-slate-900 transition-all ${isRefreshing ? 'animate-spin text-[#8a6d1f]' : ''}`}>
+            <button onClick={handleRefresh} className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 text-slate-500 hover:text-slate-900 transition-all ${isRefreshing ? 'animate-spin text-[#15803d]' : ''}`}>
               <RefreshCw className="w-4 h-4" />
             </button>
           </div>
@@ -1020,9 +1020,9 @@ export default function AdminBranchExpensesPage() {
                 { label: 'Pending',        value: summaryStats.pending,                                     cls: 'text-amber-600',  icon: Clock,      bg: 'bg-amber-500/5 border-amber-500/10' },
                 { label: 'Total Paid',     value: `${summaryStats.totalPaid.toLocaleString()} BDT`,         cls: 'text-emerald-600',icon: BadgeCheck, bg: 'bg-emerald-500/5 border-emerald-500/10' },
                 { label: 'Total Due',      value: `${summaryStats.totalDue.toLocaleString()} BDT`,          cls: 'text-rose-600',   icon: AlertTriangle, bg: 'bg-rose-500/5 border-rose-500/10' },
-                { label: 'Total Amount',   value: `${summaryStats.amount.toLocaleString()} BDT`,            cls: 'text-[#8a6d1f]',  icon: Banknote,   bg: 'bg-[#d4af37]/5 border-[#d4af37]/10' },
+                { label: 'Total Amount',   value: `${summaryStats.amount.toLocaleString()} BDT`,            cls: 'text-[#15803d]',  icon: Banknote,   bg: 'bg-[#1ca34c]/5 border-[#1ca34c]/10' },
               ].map(item => (
-                <div key={item.label} className={`p-4 rounded-2xl border flex items-center gap-3 ${item.bg}`}>
+                <div key={item.label} className={`p-4 rounded-3xl border flex items-center gap-3 ${item.bg}`}>
                   <div className="w-9 h-9 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 flex items-center justify-center flex-shrink-0">
                     <item.icon className={`w-4 h-4 ${item.cls}`} />
                   </div>
@@ -1035,7 +1035,7 @@ export default function AdminBranchExpensesPage() {
             </div>
 
             {/* ── Branch Cards List ── */}
-            <div className="rounded-2xl border border-slate-900/[0.08] overflow-hidden bg-slate-900/[0.05]">
+            <div className="rounded-3xl border border-slate-900/[0.08] overflow-hidden bg-slate-900/[0.05]">
               {/* List Header */}
               <div className="hidden md:flex items-center px-5 py-3 border-b border-slate-900/[0.08] bg-slate-900/[0.04]">
                 <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-600 flex-1">Branch</span>
@@ -1057,14 +1057,14 @@ export default function AdminBranchExpensesPage() {
                   return (
                     <motion.button
                       key={b.id}
-                      whileHover={{ backgroundColor: isHq ? 'rgba(212,175,55,0.08)' : b.id === 'general' ? 'rgba(212,175,55,0.06)' : 'rgba(212,175,55,0.03)' }}
+                      whileHover={{ backgroundColor: isHq ? 'rgba(28,163,76,0.08)' : b.id === 'general' ? 'rgba(28,163,76,0.06)' : 'rgba(28,163,76,0.03)' }}
                       whileTap={{ scale: 0.995 }}
                       onClick={() => { goToBranch(b); setSearch(''); }}
                       className={`w-full flex items-center px-5 py-4 cursor-pointer group transition-all text-left ${
                         isHq
-                          ? 'bg-gradient-to-r from-[#d4af37]/15 via-[#d4af37]/5 to-transparent border-b-2 border-[#d4af37]/40 shadow-sm shadow-[#d4af37]/5'
+                          ? 'bg-gradient-to-r from-[#1ca34c]/15 via-[#1ca34c]/5 to-transparent border-b-2 border-[#1ca34c]/40 shadow-sm shadow-[#1ca34c]/5'
                           : b.id === 'general'
-                          ? 'bg-[#d4af37]/5 border border-[#d4af37]/20 rounded-xl my-2'
+                          ? 'bg-[#1ca34c]/5 border border-[#1ca34c]/20 rounded-xl my-2'
                           : idx < displayBranches.length - 1 && b.id !== 'general'
                           ? 'border-b border-slate-900/[0.08]'
                           : ''
@@ -1073,28 +1073,28 @@ export default function AdminBranchExpensesPage() {
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
                           isHq
-                            ? 'bg-gradient-to-br from-[#d4af37]/30 to-[#d4af37]/10 border border-[#d4af37]/50 shadow-sm shadow-[#d4af37]/20'
+                            ? 'bg-gradient-to-br from-[#1ca34c]/30 to-[#1ca34c]/10 border border-[#1ca34c]/50 shadow-sm shadow-[#1ca34c]/20'
                             : b.id === 'general'
-                            ? 'bg-[#d4af37]/20 border border-[#d4af37]/30'
-                            : 'bg-[#d4af37]/8 border border-slate-900/5'
+                            ? 'bg-[#1ca34c]/20 border border-[#1ca34c]/30'
+                            : 'bg-[#1ca34c]/8 border border-slate-900/5'
                         }`}>
                           {isHq ? (
-                            <Landmark className="w-4 h-4 text-[#8a6d1f]" />
+                            <Landmark className="w-4 h-4 text-[#15803d]" />
                           ) : b.id === 'general' ? (
-                            <Building2 className="w-4 h-4 text-[#8a6d1f]" />
+                            <Building2 className="w-4 h-4 text-[#15803d]" />
                           ) : (
-                            <MapPin className="w-3.5 h-3.5 text-[#8a6d1f]" />
+                            <MapPin className="w-3.5 h-3.5 text-[#15803d]" />
                           )}
                         </div>
                         <div className="min-w-0">
                           <div className="flex items-center gap-2">
                             <span className={`text-sm font-bold transition-colors truncate ${
-                              isHq ? 'text-slate-500 group-hover:text-slate-900' : 'text-slate-900 group-hover:text-[#8a6d1f]'
+                              isHq ? 'text-slate-500 group-hover:text-slate-900' : 'text-slate-900 group-hover:text-[#15803d]'
                             }`}>
                               {b.name}
                             </span>
                             {isHq && (
-                              <span className="px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider rounded-full bg-[#d4af37]/20 text-[#8a6d1f] border border-[#d4af37]/40 flex items-center gap-1 shadow-xs">
+                              <span className="px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider rounded-full bg-[#1ca34c]/20 text-[#15803d] border border-[#1ca34c]/40 flex items-center gap-1 shadow-xs">
                                 <ShieldCheck className="w-2.5 h-2.5" /> HQ / Main
                               </span>
                             )}
@@ -1112,7 +1112,7 @@ export default function AdminBranchExpensesPage() {
                       <div className="hidden md:block w-28 text-right text-sm font-semibold">{st.pendingCount > 0 ? <span className="text-amber-600">{st.pendingCount} pending</span> : <span className="text-slate-600 text-xs">0 pending</span>}</div>
                       <div className="hidden md:block w-24 text-right text-[11px] text-slate-500">{st.count} records</div>
                       <div className="w-8 flex justify-end">
-                        <ChevronRight className="w-4 h-4 text-slate-700 group-hover:text-[#8a6d1f] transition-colors" />
+                        <ChevronRight className="w-4 h-4 text-slate-700 group-hover:text-[#15803d] transition-colors" />
                       </div>
                     </motion.button>
                   )
@@ -1132,17 +1132,17 @@ export default function AdminBranchExpensesPage() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => { goToBranch(null); setSearch(''); }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 text-slate-600 hover:text-slate-900 hover:border-[#d4af37]/30 transition-all text-xs font-semibold cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 text-slate-600 hover:text-slate-900 hover:border-[#1ca34c]/30 transition-all text-xs font-semibold cursor-pointer"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" /> Back to Branches
                 </button>
                 <div>
                   <div className="flex items-center gap-2">
                     {selectedBranch.id === 'all'
-                      ? <Globe className="w-4 h-4 text-[#8a6d1f]" />
+                      ? <Globe className="w-4 h-4 text-[#15803d]" />
                       : selectedBranch.id === 'general'
                         ? <Building2 className="w-4 h-4 text-slate-500" />
-                        : <MapPin className="w-4 h-4 text-[#8a6d1f]" />
+                        : <MapPin className="w-4 h-4 text-[#15803d]" />
                     }
                     <h2 className="text-lg font-bold font-serif text-slate-900">{selectedBranch.name}</h2>
                   </div>
@@ -1160,7 +1160,7 @@ export default function AdminBranchExpensesPage() {
                       key={tab}
                       onClick={() => updateActiveTab(tab)}
                       className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1.5 ${
-                        activeTab === tab ? 'bg-[#d4af37] text-black shadow-lg shadow-[#d4af37]/20' : 'text-slate-500 hover:text-slate-900'
+                        activeTab === tab ? 'bg-[#1ca34c] text-white shadow-lg shadow-[#1ca34c]/20' : 'text-slate-500 hover:text-slate-900'
                       }`}
                     >
                       {tab === 'list' ? <FileText className="w-3 h-3" /> : <BarChart3 className="w-3 h-3" />}
@@ -1180,7 +1180,7 @@ export default function AdminBranchExpensesPage() {
                       setModalFeedback(null);
                       setShowNewModal(true);
                     }}
-                    className="bg-gradient-to-r from-[#d4af37] to-white text-black font-semibold px-3 py-2 rounded-xl text-xs tracking-wider uppercase flex items-center gap-1.5 shadow-lg shadow-[#d4af37]/10 active:scale-95 transition-transform"
+                    className="bg-[#1ca34c] text-white font-semibold px-3 py-2 rounded-full text-xs tracking-wider uppercase flex items-center gap-1.5 shadow-lg shadow-[#1ca34c]/10 active:scale-95 transition-transform"
                   >
                     <Plus className="w-3.5 h-3.5" /> New Request
                   </button>
@@ -1190,7 +1190,7 @@ export default function AdminBranchExpensesPage() {
                   {!isSelectMode ? (
                     <button
                       onClick={() => setIsSelectMode(true)}
-                      className="flex items-center gap-1.5 px-3 py-2 bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#d4af37]/40 text-slate-600 hover:text-slate-900 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer"
+                      className="flex items-center gap-1.5 px-3 py-2 bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#1ca34c]/40 text-slate-600 hover:text-slate-900 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer"
                     >
                       Select Mode
                     </button>
@@ -1208,7 +1208,7 @@ export default function AdminBranchExpensesPage() {
                       <label className="flex items-center gap-1.5 cursor-pointer select-none px-3 py-2">
                         <div className="relative flex items-center justify-center shrink-0 w-4 h-4">
                           <input type="checkbox" checked={filteredRequests.length > 0 && selectedIds.length === filteredRequests.length} onChange={(e) => { if (e.target.checked) setSelectedIds(filteredRequests.map(r => r.id)); else setSelectedIds([]); }} className="peer absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-                          <div className="w-full h-full rounded-[4px] border border-slate-900/20 bg-white peer-checked:bg-[#d4af37] peer-checked:border-[#d4af37] flex items-center justify-center transition-all duration-200">
+                          <div className="w-full h-full rounded-[4px] border border-slate-900/20 bg-white peer-checked:bg-[#1ca34c] peer-checked:border-[#1ca34c] flex items-center justify-center transition-all duration-200">
                             <Check className="w-3 h-3 text-black opacity-0 peer-checked:opacity-100 transition-opacity" strokeWidth={3} />
                           </div>
                         </div>
@@ -1221,7 +1221,7 @@ export default function AdminBranchExpensesPage() {
                     <div className="relative" onMouseDown={e => e.stopPropagation()}>
                       <button
                         onClick={() => setShowExportDropdown(!showExportDropdown)}
-                        className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-[#d4af37] to-white text-black font-bold text-xs uppercase tracking-wider hover:brightness-110 transition-all shadow-md shadow-[#d4af37]/10 cursor-pointer"
+                        className="flex items-center gap-2 px-3 py-2 rounded-full bg-[#1ca34c] text-white font-bold text-xs uppercase tracking-wider hover:brightness-110 transition-all shadow-md shadow-[#1ca34c]/10 cursor-pointer"
                       >
                         <Download className="w-3.5 h-3.5" /> Export ({selectedIds.length}) ▼
                       </button>
@@ -1244,11 +1244,11 @@ export default function AdminBranchExpensesPage() {
                 {/* Filter toggle */}
                 <button
                   onClick={() => setShowFilters(!showFilters)}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-semibold transition-all ${showFilters ? 'border-[#d4af37]/40 bg-[#d4af37]/10 text-[#8a6d1f]' : 'border-slate-900/5 bg-slate-900/[0.04] text-slate-500 hover:border-slate-900/10'}`}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-semibold transition-all ${showFilters ? 'border-[#1ca34c]/40 bg-[#1ca34c]/10 text-[#15803d]' : 'border-slate-900/5 bg-slate-900/[0.04] text-slate-500 hover:border-slate-900/10'}`}
                 >
                   <Filter className="w-3.5 h-3.5" /> Filters
                   {(search || statusFilter !== 'all' || dateFrom || dateTo) && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#d4af37]" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#1ca34c]" />
                   )}
                 </button>
               </div>
@@ -1261,9 +1261,9 @@ export default function AdminBranchExpensesPage() {
                 { label: 'Pending',        value: summaryStats.pending,                                     cls: 'text-amber-600',  icon: Clock,      bg: 'bg-amber-500/5 border-amber-500/10' },
                 { label: 'Total Paid',     value: `${summaryStats.totalPaid.toLocaleString()} BDT`,         cls: 'text-emerald-600',icon: BadgeCheck, bg: 'bg-emerald-500/5 border-emerald-500/10' },
                 { label: 'Total Due',      value: `${summaryStats.totalDue.toLocaleString()} BDT`,          cls: 'text-rose-600',   icon: AlertTriangle, bg: 'bg-rose-500/5 border-rose-500/10' },
-                { label: 'Total Amount',   value: `${summaryStats.amount.toLocaleString()} BDT`,            cls: 'text-[#8a6d1f]',  icon: Banknote,   bg: 'bg-[#d4af37]/5 border-[#d4af37]/10' },
+                { label: 'Total Amount',   value: `${summaryStats.amount.toLocaleString()} BDT`,            cls: 'text-[#15803d]',  icon: Banknote,   bg: 'bg-[#1ca34c]/5 border-[#1ca34c]/10' },
               ].map(item => (
-                <div key={item.label} className={`p-4 rounded-2xl border flex items-center gap-3 ${item.bg}`}>
+                <div key={item.label} className={`p-4 rounded-3xl border flex items-center gap-3 ${item.bg}`}>
                   <div className="w-9 h-9 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 flex items-center justify-center flex-shrink-0">
                     <item.icon className={`w-4 h-4 ${item.cls}`} />
                   </div>
@@ -1290,7 +1290,7 @@ export default function AdminBranchExpensesPage() {
                         <input
                           type="text" placeholder="Search employee, title..."
                           value={search} onChange={e => setSearch(e.target.value)}
-                          className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-2 pl-9 pr-3 text-[11px] placeholder-slate-600 text-slate-900 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                          className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-2 pl-9 pr-3 text-[11px] placeholder-slate-600 text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                         />
                       </div>
 
@@ -1298,7 +1298,7 @@ export default function AdminBranchExpensesPage() {
                       <div className="relative min-w-[130px]">
                         <select
                           value={statusFilter} onChange={e => updateStatusFilter(e.target.value)}
-                          className="w-full bg-white border border-slate-900/5 rounded-xl py-2 pl-3 pr-8 text-[11px] text-slate-500 focus:outline-none focus:border-[#d4af37]/40 cursor-pointer appearance-none"
+                          className="w-full bg-white border border-slate-900/5 rounded-xl py-2 pl-3 pr-8 text-[11px] text-slate-500 focus:outline-none focus:border-[#1ca34c]/40 cursor-pointer appearance-none"
                         >
                           <option value="all">All Status</option>
                           <option value="pending">Pending</option>
@@ -1312,20 +1312,20 @@ export default function AdminBranchExpensesPage() {
                       {/* Date range */}
                       <div>
                         <label className="block text-[9px] text-slate-600 uppercase tracking-wider mb-1">From</label>
-                        <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="bg-white border border-slate-900/5 rounded-xl py-2 px-3 text-[11px] text-slate-500 focus:outline-none focus:border-[#d4af37]/40 cursor-pointer" />
+                        <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="bg-white border border-slate-900/5 rounded-xl py-2 px-3 text-[11px] text-slate-500 focus:outline-none focus:border-[#1ca34c]/40 cursor-pointer" />
                       </div>
                       <div>
                         <label className="block text-[9px] text-slate-600 uppercase tracking-wider mb-1">To</label>
-                        <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="bg-white border border-slate-900/5 rounded-xl py-2 px-3 text-[11px] text-slate-500 focus:outline-none focus:border-[#d4af37]/40 cursor-pointer" />
+                        <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="bg-white border border-slate-900/5 rounded-xl py-2 px-3 text-[11px] text-slate-500 focus:outline-none focus:border-[#1ca34c]/40 cursor-pointer" />
                       </div>
                       <div className="flex gap-2 items-end pb-1">
-                        <button onClick={setLast30Days} className="px-3 py-2 rounded-xl border border-slate-900/5 bg-slate-900/[0.04] text-[10px] text-slate-500 hover:border-[#d4af37]/20 hover:text-slate-900 transition-all font-semibold flex items-center gap-1">
+                        <button onClick={setLast30Days} className="px-3 py-2 rounded-xl border border-slate-900/5 bg-slate-900/[0.04] text-[10px] text-slate-500 hover:border-[#1ca34c]/20 hover:text-slate-900 transition-all font-semibold flex items-center gap-1">
                           <CalendarRange className="w-3 h-3" /> 30D
                         </button>
-                        <button onClick={setCurrentMonth} className="px-3 py-2 rounded-xl border border-slate-900/5 bg-slate-900/[0.04] text-[10px] text-slate-500 hover:border-[#d4af37]/20 hover:text-slate-900 transition-all font-semibold flex items-center gap-1">
+                        <button onClick={setCurrentMonth} className="px-3 py-2 rounded-xl border border-slate-900/5 bg-slate-900/[0.04] text-[10px] text-slate-500 hover:border-[#1ca34c]/20 hover:text-slate-900 transition-all font-semibold flex items-center gap-1">
                           <CalendarRange className="w-3 h-3" /> This Month
                         </button>
-                        <button onClick={setPreviousMonth} className="px-3 py-2 rounded-xl border border-slate-900/5 bg-slate-900/[0.04] text-[10px] text-slate-500 hover:border-[#d4af37]/20 hover:text-slate-900 transition-all font-semibold flex items-center gap-1">
+                        <button onClick={setPreviousMonth} className="px-3 py-2 rounded-xl border border-slate-900/5 bg-slate-900/[0.04] text-[10px] text-slate-500 hover:border-[#1ca34c]/20 hover:text-slate-900 transition-all font-semibold flex items-center gap-1">
                           <CalendarRange className="w-3 h-3" /> Last Month
                         </button>
                       </div>
@@ -1351,7 +1351,7 @@ export default function AdminBranchExpensesPage() {
             {activeTab === 'analytics' && (
               <div className="glass-panel rounded-2xl p-5 mb-6">
                 <h3 className="text-sm font-bold text-slate-900 font-serif mb-5 flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4 text-[#8a6d1f]" /> Monthly Expense Trend
+                  <BarChart3 className="w-4 h-4 text-[#15803d]" /> Monthly Expense Trend
                   <span className="text-[10px] text-slate-500 font-sans font-normal">— {branchLabel}</span>
                 </h3>
                 {analyticsData.length === 0 ? (
@@ -1365,7 +1365,7 @@ export default function AdminBranchExpensesPage() {
                           <motion.div
                             initial={{ width: 0 }} animate={{ width: `${(d.amount / maxAnalytics) * 100}%` }}
                             transition={{ duration: 0.6, ease: 'easeOut' }}
-                            className="h-full bg-gradient-to-r from-[#d4af37] to-white rounded-full"
+                            className="h-full bg-[#1ca34c] rounded-full"
                           />
                         </div>
                         <span className="text-[10px] text-slate-600 w-28 text-right flex-shrink-0 font-mono">{d.amount.toLocaleString()} BDT</span>
@@ -1407,7 +1407,7 @@ export default function AdminBranchExpensesPage() {
                             key={req.id}
                             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                             transition={{ delay: Math.min(idx * 0.02, 0.3) }}
-                            className={`px-5 py-4 transition-colors group flex flex-col md:flex-row md:items-center gap-4 ${isSelectMode && isChecked ? 'bg-[#d4af37]/10' : 'hover:bg-slate-900/[0.04]'} ${isSelectMode ? 'cursor-pointer' : ''}`}
+                            className={`px-5 py-4 transition-colors group flex flex-col md:flex-row md:items-center gap-4 ${isSelectMode && isChecked ? 'bg-[#1ca34c]/10' : 'hover:bg-slate-900/[0.04]'} ${isSelectMode ? 'cursor-pointer' : ''}`}
                             onClick={() => {
                               if (isSelectMode) {
                                 if (isChecked) setSelectedIds(selectedIds.filter(id => id !== req.id))
@@ -1419,7 +1419,7 @@ export default function AdminBranchExpensesPage() {
                             {isSelectMode && (
                               <div className="relative flex items-center justify-center shrink-0 w-4 h-4 transition-all hover:scale-110 mr-1 md:mr-3">
                                 <input type="checkbox" checked={isChecked} onChange={(e) => {}} className="peer absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-                                <div className="w-full h-full rounded-[4px] border border-slate-900/20 bg-white peer-checked:bg-[#d4af37] peer-checked:border-[#d4af37] flex items-center justify-center transition-all duration-200 shadow-inner">
+                                <div className="w-full h-full rounded-[4px] border border-slate-900/20 bg-white peer-checked:bg-[#1ca34c] peer-checked:border-[#1ca34c] flex items-center justify-center transition-all duration-200 shadow-inner">
                                   <Check className="w-3 h-3 text-black opacity-0 peer-checked:opacity-100 transition-opacity" strokeWidth={3} />
                                 </div>
                               </div>
@@ -1435,7 +1435,7 @@ export default function AdminBranchExpensesPage() {
                                     {req.branch_name && (
                                       <>
                                         <span className="text-slate-700">·</span>
-                                        <span className="text-[10px] text-[#8a6d1f] flex items-center gap-0.5">
+                                        <span className="text-[10px] text-[#15803d] flex items-center gap-0.5">
                                           <Building2 className="w-2.5 h-2.5" />{req.branch_name}
                                         </span>
                                       </>
@@ -1474,7 +1474,7 @@ export default function AdminBranchExpensesPage() {
                               <div className="min-w-0 pr-2">
                                 <p className="text-xs text-slate-600 truncate">{req.employee_name || '—'}</p>
                                 <p className="text-[10px] text-slate-500 flex items-center gap-1 mt-0.5 truncate">
-                                  <Building2 className="w-2.5 h-2.5 flex-shrink-0 text-[#8a6d1f]" />{req.branch_name || 'Head Office'}
+                                  <Building2 className="w-2.5 h-2.5 flex-shrink-0 text-[#15803d]" />{req.branch_name || 'Head Office'}
                                 </p>
                               </div>
 
@@ -1541,7 +1541,7 @@ export default function AdminBranchExpensesPage() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="w-full max-w-md bg-white border border-slate-900/10 rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
+              className="w-full max-w-md bg-white border border-slate-900/10 rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
             >
               {/* Header */}
               <div className={`p-5 border-b border-slate-900/5 flex items-center justify-between ${
@@ -1568,7 +1568,7 @@ export default function AdminBranchExpensesPage() {
                   <p className="text-[10px] text-slate-500 uppercase tracking-wider mb-1">Amount</p>
                   <p className="text-2xl font-bold text-slate-900">{Number(actionRequest.amount).toLocaleString()} BDT</p>
                   <p className="text-[10px] text-slate-600 mt-1">
-                    By {actionRequest.employee_name} · <span className="text-[#8a6d1f]">{actionRequest.branch_name}</span>
+                    By {actionRequest.employee_name} · <span className="text-[#15803d]">{actionRequest.branch_name}</span>
                   </p>
                 </div>
 
@@ -1607,7 +1607,7 @@ export default function AdminBranchExpensesPage() {
                     {actionRequest.payment_method !== 'cash' && (
                       <div className="flex justify-between items-center">
                         <span className="text-[10px] text-slate-500">Number</span>
-                        <span className="text-sm text-[#8a6d1f] font-mono font-bold">{actionRequest.account_number || '—'}</span>
+                        <span className="text-sm text-[#15803d] font-mono font-bold">{actionRequest.account_number || '—'}</span>
                       </div>
                     )}
                     {actionRequest.bank_name && (
@@ -1635,11 +1635,11 @@ export default function AdminBranchExpensesPage() {
                       // URL in the app's storage — no signed-URL step.
                       window.open(actionRequest.invoice_url, '_blank');
                     }}
-                    className="flex items-center gap-2 p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 transition-colors group w-full text-left"
+                    className="flex items-center gap-2 p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 transition-colors group w-full text-left"
                   >
-                    <Eye className="w-4 h-4 text-slate-500 group-hover:text-[#8a6d1f]" />
+                    <Eye className="w-4 h-4 text-slate-500 group-hover:text-[#15803d]" />
                     <span className="text-xs text-slate-500 group-hover:text-slate-900">View Invoice</span>
-                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/20 text-[#8a6d1f] ml-auto">
+                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#1ca34c]/10 border border-[#1ca34c]/20 text-[#15803d] ml-auto">
                       {actionRequest.is_purchased ? 'Purchased' : 'Pre-approval'}
                     </span>
                   </button>
@@ -1676,7 +1676,7 @@ export default function AdminBranchExpensesPage() {
                     <select
                       value={selectedLedgerHeadId}
                       onChange={e => setSelectedLedgerHeadId(e.target.value)}
-                      className="w-full bg-white border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                      className="w-full bg-white border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                     >
                       <option value="" disabled>Select Ledger Head</option>
                       {ledgerHeads.map(lh => (
@@ -1695,7 +1695,7 @@ export default function AdminBranchExpensesPage() {
                     <textarea
                       placeholder={actionType === 'reject' ? 'Reason for rejection (required)...' : 'Optional notes...'}
                       value={adminNote} onChange={e => setAdminNote(e.target.value)} rows={2}
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all resize-none"
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all resize-none"
                     />
                   </div>
                 )}
@@ -1727,7 +1727,7 @@ export default function AdminBranchExpensesPage() {
                         setActionType(null);
                         openEditModal(r);
                       }}
-                      className="px-4 py-2.5 bg-[#d4af37]/10 border border-[#d4af37]/30 text-[#8a6d1f] hover:bg-[#d4af37]/20 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shrink-0 cursor-pointer"
+                      className="px-4 py-2.5 bg-[#1ca34c]/10 border border-[#1ca34c]/30 text-[#15803d] hover:bg-[#1ca34c]/20 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shrink-0 cursor-pointer"
                     >
                       <Edit3 className="w-3.5 h-3.5" /> Edit
                     </button>
@@ -1785,13 +1785,13 @@ export default function AdminBranchExpensesPage() {
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="w-full max-w-lg bg-white border border-slate-900/10 rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+              className="w-full max-w-lg bg-white border border-slate-900/10 rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
             >
               {/* Modal Header */}
               <div className="p-5 border-b border-slate-900/5 flex items-center justify-between">
                 <div>
                   <h2 className="text-base font-bold text-slate-900 font-serif flex items-center gap-2">
-                    <Plus className="w-4 h-4 text-[#8a6d1f]" /> New Expense Request
+                    <Plus className="w-4 h-4 text-[#15803d]" /> New Expense Request
                   </h2>
                   <p className="text-[10px] text-slate-500 mt-0.5 flex items-center gap-1">
                     <Building2 className="w-3 h-3" /> Branch: {selectedBranch.name}
@@ -1821,7 +1821,7 @@ export default function AdminBranchExpensesPage() {
                     <input
                       type="text" placeholder="e.g., Office Fan, Light Bulbs"
                       value={formTitle} onChange={e => setFormTitle(e.target.value)}
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                     />
                   </div>
 
@@ -1833,7 +1833,7 @@ export default function AdminBranchExpensesPage() {
                     <textarea
                       placeholder="Describe why this expense is needed..."
                       value={formDesc} onChange={e => setFormDesc(e.target.value)} rows={2}
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all resize-none"
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all resize-none"
                     />
                   </div>
 
@@ -1848,7 +1848,7 @@ export default function AdminBranchExpensesPage() {
                         <input
                           type="number" placeholder="0.00" value={formAmount} min="1" step="0.01"
                           onChange={e => handleFormTotalChange(e.target.value)}
-                          className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl pl-8 pr-4 py-2.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all font-mono"
+                          className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl pl-8 pr-4 py-2.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all font-mono"
                         />
                       </div>
                     </div>
@@ -1891,7 +1891,7 @@ export default function AdminBranchExpensesPage() {
                 </button>
                 <button
                   type="submit" form="new-expense-form" disabled={isSubmittingNew}
-                  className="flex-1 bg-gradient-to-r from-[#d4af37] to-white text-black font-bold px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-[#d4af37]/10 active:scale-95 transition-transform disabled:opacity-60"
+                  className="flex-1 bg-[#1ca34c] text-white font-bold px-4 py-2.5 rounded-full text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-[#1ca34c]/10 active:scale-95 transition-transform disabled:opacity-60"
                 >
                   {isSubmittingNew ? (
                     <><Loader2 className="w-3.5 h-3.5 animate-spin" />Submitting...</>
@@ -1916,13 +1916,13 @@ export default function AdminBranchExpensesPage() {
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="w-full max-w-lg bg-white border border-slate-900/10 rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+              className="w-full max-w-lg bg-white border border-slate-900/10 rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
             >
               {/* Modal Header */}
               <div className="p-5 border-b border-slate-900/5 flex items-center justify-between">
                 <div>
                   <h2 className="text-base font-bold text-slate-900 font-serif flex items-center gap-2">
-                    <Edit3 className="w-4 h-4 text-[#8a6d1f]" /> Edit Expense Request
+                    <Edit3 className="w-4 h-4 text-[#15803d]" /> Edit Expense Request
                   </h2>
                   <p className="text-[10px] text-slate-500 mt-0.5 flex items-center gap-1">
                     <Building2 className="w-3 h-3" /> Branch: {editingRequest.branch_name || 'Head Office'}
@@ -1952,7 +1952,7 @@ export default function AdminBranchExpensesPage() {
                     <input
                       type="text" placeholder="e.g., Office Fan, Light Bulbs"
                       value={editTitle} onChange={e => setEditTitle(e.target.value)}
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                       required
                     />
                   </div>
@@ -1965,7 +1965,7 @@ export default function AdminBranchExpensesPage() {
                     <textarea
                       placeholder="Details of the expense..."
                       value={editDesc} onChange={e => setEditDesc(e.target.value)} rows={2}
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all resize-none"
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all resize-none"
                     />
                   </div>
 
@@ -1980,7 +1980,7 @@ export default function AdminBranchExpensesPage() {
                         <input
                           type="number" placeholder="0.00" value={editAmount} min="1" step="0.01"
                           onChange={e => handleEditTotalChange(e.target.value)}
-                          className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl pl-7 pr-3 py-2.5 text-xs text-slate-900 font-mono placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                          className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl pl-7 pr-3 py-2.5 text-xs text-slate-900 font-mono placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                           required
                         />
                       </div>
@@ -2022,7 +2022,7 @@ export default function AdminBranchExpensesPage() {
                       <select
                         value={editStatus}
                         onChange={e => setEditStatus(e.target.value as any)}
-                        className="w-full bg-white border border-slate-900/10 rounded-xl px-3 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                        className="w-full bg-white border border-slate-900/10 rounded-xl px-3 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                       >
                         <option value="pending">Pending</option>
                         <option value="approved">Approved</option>
@@ -2037,7 +2037,7 @@ export default function AdminBranchExpensesPage() {
                       <input
                         type="text" placeholder="e.g. TRX123456"
                         value={editTrxId} onChange={e => setEditTrxId(e.target.value)}
-                        className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-mono placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                        className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-mono placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                       />
                     </div>
                   </div>
@@ -2050,7 +2050,7 @@ export default function AdminBranchExpensesPage() {
                     <textarea
                       placeholder="Remarks or notes..."
                       value={editAdminNotes} onChange={e => setEditAdminNotes(e.target.value)} rows={2}
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all resize-none"
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all resize-none"
                     />
                   </div>
                 </form>
@@ -2063,7 +2063,7 @@ export default function AdminBranchExpensesPage() {
                 </button>
                 <button
                   type="submit" form="edit-expense-form" disabled={isSubmittingEdit}
-                  className="flex-1 bg-gradient-to-r from-[#d4af37] to-white text-black font-bold px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-[#d4af37]/10 active:scale-95 transition-transform disabled:opacity-60"
+                  className="flex-1 bg-[#1ca34c] text-white font-bold px-4 py-2.5 rounded-full text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-[#1ca34c]/10 active:scale-95 transition-transform disabled:opacity-60"
                 >
                   {isSubmittingEdit ? (
                     <><Loader2 className="w-3.5 h-3.5 animate-spin" />Saving...</>
@@ -2097,7 +2097,7 @@ function ActionButtons({
       </button>
       {onEdit && (
         <button onClick={() => onEdit(req)} title="Edit Request"
-          className="p-2.5 rounded-lg bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/30 text-slate-500 hover:text-[#8a6d1f] transition-all cursor-pointer">
+          className="p-2.5 rounded-lg bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/30 text-slate-500 hover:text-[#15803d] transition-all cursor-pointer">
           <Edit3 className="w-3.5 h-3.5" />
         </button>
       )}

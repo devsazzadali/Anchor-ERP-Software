@@ -63,9 +63,9 @@ function EmployeeSalariesContent() {
           const el = document.getElementById(`item-${sal.id}`)
           if (el) {
             el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-            el.classList.add('ring-2', 'ring-[#d4af37]', 'ring-offset-2', 'ring-offset-white')
+            el.classList.add('ring-2', 'ring-[#1ca34c]', 'ring-offset-2', 'ring-offset-white')
             setTimeout(() => {
-              el.classList.remove('ring-2', 'ring-[#d4af37]', 'ring-offset-2', 'ring-offset-white')
+              el.classList.remove('ring-2', 'ring-[#1ca34c]', 'ring-offset-2', 'ring-offset-white')
             }, 3000)
           }
         }
@@ -192,15 +192,18 @@ function EmployeeSalariesContent() {
 
   return (
     <div className="min-h-screen w-full flex bg-white text-slate-900 font-sans">
-      <div className="absolute top-[-10%] right-[-5%] w-[50%] h-[50%] bg-[#d4af37]/5 rounded-full filter blur-[150px] pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-5%] w-[50%] h-[50%] bg-[#1ca34c]/5 rounded-full filter blur-[150px] pointer-events-none" />
 
       <div className="flex-1 p-6 lg:p-10 overflow-y-auto max-h-screen relative z-10">
         <div className="mb-8 pb-4 border-b border-slate-900/5 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
-          <div>
-            <h2 className="text-2xl font-bold tracking-tight text-slate-900 font-serif">
+          <div className="flex items-start gap-3">
+            <span className="w-1.5 h-9 rounded-full bg-[#1ca34c] shrink-0" />
+            <div>
+            <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 font-serif">
               Salary <span className="premium-text-gradient">Ledger</span>
             </h2>
             <p className="text-xs text-slate-500 mt-1">Track your disbursed salary payments and receipts.</p>
+            </div>
           </div>
 
           {salaries.length > 0 && (
@@ -208,7 +211,7 @@ function EmployeeSalariesContent() {
               {!isSelectMode ? (
                 <button
                   onClick={() => setIsSelectMode(true)}
-                  className="px-3 py-1.5 bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#d4af37]/40 text-slate-600 hover:text-slate-900 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer"
+                  className="px-3 py-1.5 bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#1ca34c]/40 text-slate-600 hover:text-slate-900 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer"
                 >
                   Select Vouchers
                 </button>
@@ -234,7 +237,7 @@ function EmployeeSalariesContent() {
                           setSelectedIds([])
                         }
                       }}
-                      className="w-3.5 h-3.5 rounded border-slate-900/10 bg-white text-[#8a6d1f] focus:ring-0 accent-[#d4af37] cursor-pointer transition-all hover:scale-110"
+                      className="w-3.5 h-3.5 rounded border-slate-900/10 bg-white text-[#15803d] focus:ring-0 accent-[#1ca34c] cursor-pointer transition-all hover:scale-110"
                     />
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Select All</span>
                   </label>
@@ -243,7 +246,7 @@ function EmployeeSalariesContent() {
               <div className="relative">
                 <button
                   onClick={() => setShowExportDropdown(prev => !prev)}
-                  className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-[#d4af37] to-white text-black hover:brightness-110 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-md shadow-[#d4af37]/10 cursor-pointer"
+                  className="flex items-center gap-1 px-3 py-1.5 bg-[#1ca34c] hover:bg-[#15803d] text-white hover:brightness-110 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-md shadow-[#1ca34c]/10 cursor-pointer"
                 >
                   <FileText className="w-3.5 h-3.5" />
                   <span>{selectedIds.length > 0 ? `Export (${selectedIds.length}) ▼` : 'Export All ▼'}</span>
@@ -258,7 +261,7 @@ function EmployeeSalariesContent() {
                           handleExportSelectedExcel();
                           setShowExportDropdown(false);
                         }}
-                        className="px-3 py-1.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#8a6d1f] text-slate-900 transition-colors cursor-pointer"
+                        className="px-3 py-1.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#15803d] text-slate-900 transition-colors cursor-pointer"
                       >
                         Export to Excel (.xlsx)
                       </button>
@@ -267,7 +270,7 @@ function EmployeeSalariesContent() {
                           handleExportSelectedCSV();
                           setShowExportDropdown(false);
                         }}
-                        className="px-3 py-1.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#8a6d1f] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer"
+                        className="px-3 py-1.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#15803d] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer"
                       >
                         Export to CSV (.csv)
                       </button>
@@ -276,7 +279,7 @@ function EmployeeSalariesContent() {
                           handleExportSelectedPDF();
                           setShowExportDropdown(false);
                         }}
-                        className="px-3 py-1.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#8a6d1f] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer"
+                        className="px-3 py-1.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#15803d] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer"
                       >
                         Export to PDF (.pdf)
                       </button>
@@ -290,7 +293,7 @@ function EmployeeSalariesContent() {
 
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20 text-slate-500">
-            <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin mb-4" />
+            <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin mb-4" />
             <span className="text-xs tracking-wider uppercase">Loading Ledger...</span>
           </div>
         ) : salaries.length === 0 ? (
@@ -315,8 +318,8 @@ function EmployeeSalariesContent() {
                       else setSelectedIds(prev => [...prev, salary.id])
                     }
                   }}
-                  className={`glass-panel p-6 rounded-2xl relative shadow-xl hover:border-[#d4af37]/30 transition-all border group ${
-                    isSelectMode ? 'cursor-pointer ' + (isChecked ? 'border-[#d4af37]/50 bg-[#d4af37]/5' : 'border-slate-900/5') : 'border-slate-900/5'
+                  className={`glass-panel p-6 rounded-2xl relative shadow-xl hover:border-[#1ca34c]/30 transition-all border group ${
+                    isSelectMode ? 'cursor-pointer ' + (isChecked ? 'border-[#1ca34c]/50 bg-[#1ca34c]/5' : 'border-slate-900/5') : 'border-slate-900/5'
                   }`}
                 >
                   <div className="flex justify-between items-start mb-4">
@@ -326,10 +329,10 @@ function EmployeeSalariesContent() {
                           type="checkbox"
                           checked={isChecked}
                           onChange={() => {}} // handled by onClick
-                          className="w-4 h-4 rounded border-slate-900/10 bg-white text-[#8a6d1f] focus:ring-0 accent-[#d4af37] cursor-pointer transition-all hover:scale-110 shrink-0"
+                          className="w-4 h-4 rounded border-slate-900/10 bg-white text-[#15803d] focus:ring-0 accent-[#1ca34c] cursor-pointer transition-all hover:scale-110 shrink-0"
                         />
                       )}
-                      <div className="w-10 h-10 rounded-xl bg-[#d4af37]/10 border border-[#d4af37]/20 flex items-center justify-center text-[#8a6d1f]">
+                      <div className="w-10 h-10 rounded-xl bg-[#1ca34c]/10 border border-[#1ca34c]/20 flex items-center justify-center text-[#15803d]">
                         <Landmark className="w-5 h-5" />
                       </div>
                     </div>
@@ -339,7 +342,7 @@ function EmployeeSalariesContent() {
                         Salary Received
                       </div>
                       {matchedBranch && (
-                        <span className="text-[8px] bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
+                        <span className="text-[8px] bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
                           {matchedBranch.name}
                         </span>
                       )}
@@ -383,7 +386,7 @@ function EmployeeSalariesContent() {
                     <button 
                       type="button"
                       onClick={() => handleExportIndividualPdf(salary)}
-                      className="w-full mt-3 py-2.5 rounded-xl bg-[#d4af37]/10 hover:bg-[#d4af37]/20 border border-[#d4af37]/30 text-[#8a6d1f] text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm hover:shadow-[#d4af37]/10"
+                      className="w-full mt-3 py-2.5 rounded-xl bg-[#1ca34c]/10 hover:bg-[#1ca34c]/20 border border-[#1ca34c]/30 text-[#15803d] text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-sm hover:shadow-[#1ca34c]/10"
                     >
                       <Download className="w-3.5 h-3.5" />
                       Export Voucher (PDF)

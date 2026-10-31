@@ -73,21 +73,21 @@ export default function ManagerReconciliationPage() {
   const unbankedVariance = reconciliation ? Number(reconciliation.unbanked_cash_variance || 0) : 0
 
   if (isLoading) {
-    return <div className="min-h-screen bg-white flex items-center justify-center"><div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" /></div>
+    return <div className="min-h-screen bg-white flex items-center justify-center"><div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" /></div>
   }
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
       <div className="relative z-10 p-4 md:p-6 max-w-4xl mx-auto">
         <div className="flex items-center gap-4 mb-8">
-          <Link href="/dashboard/branch-accounts" className="p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 text-slate-500 hover:text-slate-900 transition-all">
+          <Link href="/dashboard/branch-accounts" className="p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 text-slate-500 hover:text-slate-900 transition-all">
             <ChevronLeft className="w-4 h-4" />
           </Link>
           <div className="flex-1">
             <h1 className="text-xl font-bold tracking-tight">Bank & Cash Reconciliation</h1>
             <p className="text-[11px] text-slate-500">Reconcile net physical cash collections against verified bank deposits</p>
           </div>
-          <button onClick={handleRefresh} className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'animate-spin text-[#8a6d1f]' : ''}`}>
+          <button onClick={handleRefresh} className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'animate-spin text-[#15803d]' : ''}`}>
             <RefreshCw className="w-4 h-4" />
           </button>
         </div>
@@ -131,7 +131,7 @@ export default function ManagerReconciliationPage() {
         <div className="rounded-2xl border border-slate-900/5 bg-slate-900/[0.04] overflow-hidden shadow-xl">
           <div className="p-4 border-b border-slate-900/5 flex items-center justify-between">
             <p className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold">All Bank Deposits ({deposits.length})</p>
-            <Link href="/dashboard/branch-accounts/bank-deposit" className="text-[10px] text-[#8a6d1f] hover:underline font-semibold">
+            <Link href="/dashboard/branch-accounts/bank-deposit" className="text-[10px] text-[#15803d] hover:underline font-semibold">
               + New Deposit
             </Link>
           </div>
@@ -151,7 +151,7 @@ export default function ManagerReconciliationPage() {
                 {deposits.map((dep: any) => (
                   <tr key={dep.id} className={`border-b border-slate-900/[0.08] hover:bg-slate-900/[0.04] transition-colors ${dep.is_reversed ? 'opacity-40' : ''}`}>
                     <td className="p-3.5 text-slate-600 font-mono whitespace-nowrap">{dep.deposit_date}</td>
-                    <td className="p-3.5 text-[#8a6d1f] font-bold whitespace-nowrap">{fmt(dep.amount)}</td>
+                    <td className="p-3.5 text-[#15803d] font-bold whitespace-nowrap">{fmt(dep.amount)}</td>
                     <td className="p-3.5 text-slate-600 truncate max-w-[160px]" title={dep.bank_account_name}>{dep.bank_account_name || '—'}</td>
                     <td className="p-3.5 text-slate-500 font-mono text-[11px] whitespace-nowrap">{dep.deposit_slip_number || '—'}</td>
                     <td className="p-3.5 text-center whitespace-nowrap">

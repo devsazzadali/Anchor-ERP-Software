@@ -241,7 +241,7 @@ export default function BranchBundleRequestsPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -249,7 +249,7 @@ export default function BranchBundleRequestsPage() {
   return (
     <div className="min-h-screen w-full bg-white text-slate-900 font-sans relative">
       {/* Glow effects */}
-      <div className="absolute top-[-5%] right-[-5%] w-[40%] h-[40%] bg-[#d4af37]/5 rounded-full filter blur-[120px] pointer-events-none" />
+      <div className="absolute top-[-5%] right-[-5%] w-[40%] h-[40%] bg-[#1ca34c]/5 rounded-full filter blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-5%] left-[10%] w-[45%] h-[45%] bg-blue-500/5 rounded-full filter blur-[150px] pointer-events-none" />
 
       <div className="relative z-10 flex flex-col p-4 md:p-6 max-w-7xl mx-auto custom-scrollbar">
@@ -258,12 +258,12 @@ export default function BranchBundleRequestsPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-5 border-b border-slate-900/10">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
-              <span className="text-[10px] bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider flex items-center gap-1.5">
+              <span className="text-[10px] bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider flex items-center gap-1.5">
                 <Coins className="w-3 h-3" /> Branch Accounts
               </span>
               {profile?.branch && (
                 <span className="text-[10px] bg-slate-900/[0.04] text-slate-600 border border-slate-900/10 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider flex items-center gap-1">
-                  <Building2 className="w-3 h-3 text-[#8a6d1f]" /> {profile.branch}
+                  <Building2 className="w-3 h-3 text-[#15803d]" /> {profile.branch}
                 </span>
               )}
             </div>
@@ -278,7 +278,7 @@ export default function BranchBundleRequestsPage() {
           <div className="flex flex-wrap items-center gap-3">
             <button
               onClick={handleRefresh}
-              className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#d4af37]/30 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'animate-spin text-[#8a6d1f]' : ''}`}
+              className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#1ca34c]/30 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'animate-spin text-[#15803d]' : ''}`}
               title="Refresh requisitions"
             >
               <RefreshCw className="w-4 h-4" />
@@ -288,13 +288,13 @@ export default function BranchBundleRequestsPage() {
               onClick={handleExportPdf}
               className="px-3.5 py-2.5 rounded-xl bg-slate-900/[0.04] hover:bg-slate-900/[0.04] border border-slate-900/10 text-slate-600 hover:text-slate-900 text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer"
             >
-              <Download className="w-4 h-4 text-[#8a6d1f]" />
+              <Download className="w-4 h-4 text-[#15803d]" />
               Export PDF
             </button>
 
             <button
               onClick={() => { resetForm(); setShowModal(true) }}
-              className="bg-gradient-to-r from-[#d4af37] to-white text-black font-semibold px-4 py-2.5 rounded-xl text-xs tracking-wider uppercase flex items-center gap-2 shadow-lg shadow-[#d4af37]/15 hover:opacity-95 active:scale-95 transition-all cursor-pointer"
+              className="bg-[#1ca34c] hover:bg-[#15803d] text-white font-semibold px-4 py-2.5 rounded-full text-xs tracking-wider uppercase flex items-center gap-2 shadow-lg shadow-[#1ca34c]/15 hover:opacity-95 active:scale-95 transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4" />
               New Bundle Request
@@ -321,40 +321,40 @@ export default function BranchBundleRequestsPage() {
 
         {/* ── Metrics Cards ── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="p-5 rounded-2xl border border-slate-900/10 bg-slate-900/[0.04]">
+          <div className="p-5 rounded-3xl border border-slate-900/10 bg-slate-900/[0.04]">
             <div className="flex items-center justify-between mb-2">
-              <FileText className="w-5 h-5 text-slate-500" />
+              <span className="w-10 h-10 rounded-xl bg-slate-500/10 flex items-center justify-center"><FileText className="w-5 h-5 text-slate-500" /></span>
               <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Requisitions</span>
             </div>
             <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Total Submissions</p>
-            <p className="text-2xl font-bold font-serif text-slate-900">{totalRequisitions}</p>
+            <p className="text-2xl font-extrabold text-slate-900">{totalRequisitions}</p>
           </div>
 
-          <div className="p-5 rounded-2xl border border-amber-500/20 bg-amber-500/5">
+          <div className="p-5 rounded-3xl border border-amber-500/20 bg-amber-500/5">
             <div className="flex items-center justify-between mb-2">
-              <Clock className="w-5 h-5 text-amber-600" />
+              <span className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center"><Clock className="w-5 h-5 text-amber-600" /></span>
               <span className="text-[9px] font-bold text-amber-600/80 uppercase tracking-widest">Active / In-Transit</span>
             </div>
             <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Pending Head Office</p>
-            <p className="text-2xl font-bold font-serif text-amber-600">{activeInTransit}</p>
+            <p className="text-2xl font-extrabold text-amber-600">{activeInTransit}</p>
           </div>
 
-          <div className="p-5 rounded-2xl border border-emerald-500/20 bg-emerald-500/5">
+          <div className="p-5 rounded-3xl border border-emerald-500/20 bg-emerald-500/5">
             <div className="flex items-center justify-between mb-2">
-              <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+              <span className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center"><CheckCircle2 className="w-5 h-5 text-emerald-600" /></span>
               <span className="text-[9px] font-bold text-emerald-600/80 uppercase tracking-widest">Fulfilled</span>
             </div>
             <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Received at Branch</p>
-            <p className="text-2xl font-bold font-serif text-emerald-600">{completedRequisitions}</p>
+            <p className="text-2xl font-extrabold text-emerald-600">{completedRequisitions}</p>
           </div>
 
-          <div className="p-5 rounded-2xl border border-[#d4af37]/20 bg-[#d4af37]/5">
+          <div className="p-5 rounded-3xl border border-[#1ca34c]/20 bg-[#1ca34c]/5">
             <div className="flex items-center justify-between mb-2">
-              <Coins className="w-5 h-5 text-[#8a6d1f]" />
-              <span className="text-[9px] font-bold text-[#8a6d1f]/80 uppercase tracking-widest">Total Cash Value</span>
+              <span className="w-10 h-10 rounded-xl bg-[#e8f7ee] flex items-center justify-center"><Coins className="w-5 h-5 text-[#15803d]" /></span>
+              <span className="text-[9px] font-bold text-[#15803d]/80 uppercase tracking-widest">Total Cash Value</span>
             </div>
             <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Total Requisitioned</p>
-            <p className="text-2xl font-bold font-serif text-[#8a6d1f]">{fmt(totalAmountRequested)}</p>
+            <p className="text-2xl font-extrabold text-[#15803d]">{fmt(totalAmountRequested)}</p>
           </div>
         </div>
 
@@ -362,7 +362,7 @@ export default function BranchBundleRequestsPage() {
         <div className="rounded-2xl border border-slate-900/10 bg-slate-900/[0.04] overflow-hidden shadow-xl">
           <div className="p-4 sm:p-5 border-b border-slate-900/10 bg-slate-900/[0.04] flex items-center justify-between">
             <p className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-2">
-              <Coins className="w-4 h-4 text-[#8a6d1f]" />
+              <Coins className="w-4 h-4 text-[#15803d]" />
               Requisition History ({requests.length})
             </p>
             <span className="text-[10px] text-slate-500">1 Bundle = 100 Notes</span>
@@ -392,7 +392,7 @@ export default function BranchBundleRequestsPage() {
                       <p>No change bundle requisitions recorded yet.</p>
                       <button
                         onClick={() => { resetForm(); setShowModal(true) }}
-                        className="mt-3 text-xs text-[#8a6d1f] hover:underline"
+                        className="mt-3 text-xs text-[#15803d] hover:underline"
                       >
                         Create your first bundle request
                       </button>
@@ -429,7 +429,7 @@ export default function BranchBundleRequestsPage() {
                         <td className="p-3.5">
                           <div className="flex flex-wrap gap-1.5 max-w-sm">
                             {req.bundle_10_count > 0 && (
-                              <span className="text-[10px] px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-300 border border-amber-500/20 font-mono">
+                              <span className="text-[10px] px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-700 border border-amber-500/20 font-mono">
                                 ৳10 × {req.bundle_10_count} bndl ({fmt(req.bundle_10_count * 1000)})
                               </span>
                             )}
@@ -452,7 +452,7 @@ export default function BranchBundleRequestsPage() {
                         </td>
 
                         {/* Total Amount */}
-                        <td className="p-3.5 whitespace-nowrap text-right font-serif font-bold text-[#8a6d1f] text-sm">
+                        <td className="p-3.5 whitespace-nowrap text-right font-serif font-bold text-[#15803d] text-sm">
                           {fmt(req.total_amount)}
                         </td>
 
@@ -467,7 +467,7 @@ export default function BranchBundleRequestsPage() {
                         {/* Admin Notes / Remarks */}
                         <td className="p-3.5 max-w-xs truncate text-slate-500">
                           {req.admin_notes ? (
-                            <span className="text-amber-300/90 italic font-sans text-[11px]">
+                            <span className="text-amber-700/90 italic font-sans text-[11px]">
                               {req.admin_notes}
                             </span>
                           ) : req.reason ? (
@@ -511,7 +511,7 @@ export default function BranchBundleRequestsPage() {
               <div className="p-5 sm:p-6 border-b border-slate-900/10 bg-slate-900/[0.04] flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] bg-[#d4af37]/15 text-[#8a6d1f] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                    <span className="text-[10px] bg-[#1ca34c]/15 text-[#15803d] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
                       Requisition Slip
                     </span>
                     <span className="text-[10px] text-slate-500 font-mono">1 Bundle = 100 Notes</span>
@@ -574,7 +574,7 @@ export default function BranchBundleRequestsPage() {
                           +
                         </button>
                       </div>
-                      <span className="w-20 text-right font-serif font-bold text-amber-300 text-xs">
+                      <span className="w-20 text-right font-serif font-bold text-amber-700 text-xs">
                         {fmt(b10 * 1000)}
                       </span>
                     </div>
@@ -690,14 +690,14 @@ export default function BranchBundleRequestsPage() {
                 </div>
 
                 {/* Grand Total Bar */}
-                <div className="p-4 rounded-2xl border border-[#d4af37]/30 bg-gradient-to-r from-[#d4af37]/10 to-transparent flex items-center justify-between">
+                <div className="p-4 rounded-2xl border border-[#1ca34c]/30 bg-gradient-to-r from-[#1ca34c]/10 to-transparent flex items-center justify-between">
                   <div>
-                    <span className="text-[10px] uppercase tracking-widest text-[#8a6d1f] font-bold">Grand Requisition Total</span>
+                    <span className="text-[10px] uppercase tracking-widest text-[#15803d] font-bold">Grand Requisition Total</span>
                     <p className="text-xs text-slate-500">
                       {(b10 + b20 + b50 + b100)} bundle(s) | {(b10 + b20 + b50 + b100) * 100} total currency notes
                     </p>
                   </div>
-                  <p className="text-2xl font-bold font-serif text-[#8a6d1f]">
+                  <p className="text-2xl font-bold font-serif text-[#15803d]">
                     {fmt(grandTotal)}
                   </p>
                 </div>
@@ -713,7 +713,7 @@ export default function BranchBundleRequestsPage() {
                       onClick={() => setUrgency('normal')}
                       className={`p-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer transition-all ${
                         urgency === 'normal'
-                          ? 'bg-[#d4af37]/10 border-[#d4af37]/40 text-[#8a6d1f]'
+                          ? 'bg-[#1ca34c]/10 border-[#1ca34c]/40 text-[#15803d]'
                           : 'bg-slate-900/[0.04] border-slate-900/10 text-slate-500 hover:text-slate-900'
                       }`}
                     >
@@ -743,7 +743,7 @@ export default function BranchBundleRequestsPage() {
                     value={reason}
                     onChange={e => setReason(e.target.value)}
                     placeholder="e.g. Weekend retail rush expected; change drawer running low..."
-                    className="w-full bg-white border border-slate-900/10 rounded-xl p-3 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/40"
+                    className="w-full bg-white border border-slate-900/10 rounded-xl p-3 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40"
                   />
                 </div>
 
@@ -759,7 +759,7 @@ export default function BranchBundleRequestsPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting || grandTotal <= 0}
-                    className="flex-1 py-3 rounded-xl bg-gradient-to-r from-[#d4af37] to-white text-black text-xs font-bold uppercase tracking-wider disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-[#d4af37]/20 hover:opacity-95 cursor-pointer"
+                    className="flex-1 py-3 rounded-full bg-[#1ca34c] hover:bg-[#15803d] text-white text-xs font-bold uppercase tracking-wider disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-[#1ca34c]/20 hover:opacity-95 cursor-pointer"
                   >
                     {isSubmitting ? (
                       <RefreshCw className="w-4 h-4 animate-spin" />
@@ -789,7 +789,7 @@ export default function BranchBundleRequestsPage() {
             >
               <div className="flex items-center justify-between pb-4 border-b border-slate-900/10 mb-4">
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-[#8a6d1f] tracking-wider">Requisition Details</span>
+                  <span className="text-[10px] uppercase font-bold text-[#15803d] tracking-wider">Requisition Details</span>
                   <h3 className="text-base font-bold text-slate-900 font-serif mt-0.5">
                     Ref #{selectedRequest.id.slice(0, 8)}
                   </h3>
@@ -817,7 +817,7 @@ export default function BranchBundleRequestsPage() {
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-900/5">
                   <span className="text-slate-500">Grand Total</span>
-                  <span className="text-[#8a6d1f] font-bold font-serif text-sm">{fmt(selectedRequest.total_amount)}</span>
+                  <span className="text-[#15803d] font-bold font-serif text-sm">{fmt(selectedRequest.total_amount)}</span>
                 </div>
 
                 <div className="pt-2">
@@ -862,7 +862,7 @@ export default function BranchBundleRequestsPage() {
                 {selectedRequest.admin_notes && (
                   <div>
                     <span className="text-[10px] uppercase text-amber-600 font-bold tracking-wider block mb-1">Head Office Notes:</span>
-                    <p className="bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-amber-300 text-[11px]">
+                    <p className="bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/20 text-amber-700 text-[11px]">
                       {selectedRequest.admin_notes}
                     </p>
                   </div>

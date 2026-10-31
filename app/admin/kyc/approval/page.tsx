@@ -144,13 +144,13 @@ export default function KycApprovalPage() {
                 <td className="p-2">{req.phone_number}</td>
                 <td className="p-2 capitalize">{req.profile_type}</td>
                 <td className="p-2 space-x-2">
-                  <a href={req.nid_front_url} target="_blank" rel="noopener" className="text-[#8a6d1f] underline">
+                  <a href={req.nid_front_url} target="_blank" rel="noopener" className="text-[#15803d] underline">
                     NID Front
                   </a>
-                  <a href={req.nid_back_url} target="_blank" rel="noopener" className="text-[#8a6d1f] underline">
+                  <a href={req.nid_back_url} target="_blank" rel="noopener" className="text-[#15803d] underline">
                     NID Back
                   </a>
-                  <a href={req.selfie_url} target="_blank" rel="noopener" className="text-[#8a6d1f] underline">
+                  <a href={req.selfie_url} target="_blank" rel="noopener" className="text-[#15803d] underline">
                     Selfie
                   </a>
                 </td>

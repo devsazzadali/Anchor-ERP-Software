@@ -22,7 +22,7 @@ export default function Error({
           We've encountered an unexpected error. Our team has been notified.
         </p>
         <button
-          className="bg-slate-900/[0.07] hover:bg-slate-900/[0.09] text-slate-900 font-bold py-3 px-6 rounded-xl text-sm transition-colors"
+          className="bg-[#1ca34c] hover:bg-[#15803d] text-white font-bold py-3 px-6 rounded-full text-sm transition-colors"
           onClick={
             // Attempt to recover by trying to re-render the segment
             () => reset()

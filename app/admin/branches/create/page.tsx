@@ -36,7 +36,7 @@ export default function CreateBranch() {
   return (
     <div className="min-h-screen w-full flex bg-white text-slate-900 font-sans">
       {/* Glow background */}
-      <div className="absolute top-[-10%] right-[-5%] w-[50%] h-[50%] bg-[#d4af37]/3 rounded-full filter blur-[150px] pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-5%] w-[50%] h-[50%] bg-[#1ca34c]/3 rounded-full filter blur-[150px] pointer-events-none" />
 
       <div className="flex-1 flex flex-col p-6 lg:p-10 overflow-y-auto max-h-screen relative z-10">
         <div className="mb-8 pb-4 border-b border-slate-900/5 flex justify-between items-center">
@@ -46,7 +46,7 @@ export default function CreateBranch() {
             </h2>
             <p className="text-xs text-slate-500 mt-1">Add a new institutional branch location to the database.</p>
           </div>
-          <Link href="/admin/branches" className="flex items-center gap-2 text-[#8a6d1f] hover:underline text-xs tracking-wider uppercase font-semibold">
+          <Link href="/admin/branches" className="flex items-center gap-2 text-[#15803d] hover:underline text-xs tracking-wider uppercase font-semibold">
             <MapPin className="w-4 h-4" /> Back to List
           </Link>
         </div>
@@ -60,7 +60,7 @@ export default function CreateBranch() {
                 value={branchName}
                 onChange={(e) => setBranchName(e.target.value)}
                 maxLength={30}
-                className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50"
+                className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50"
                 placeholder="e.g., Dhaka, Rangpur"
                 required
               />
@@ -69,7 +69,7 @@ export default function CreateBranch() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20 px-4 py-3 rounded-xl hover:bg-[#d4af37]/20 transition-all font-semibold text-xs tracking-wider uppercase"
+              className="w-full flex items-center justify-center gap-2 bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 px-4 py-3 rounded-xl hover:bg-[#1ca34c]/20 transition-all font-semibold text-xs tracking-wider uppercase"
             >
               <Plus className="w-4 h-4" /> {loading ? 'Creating…' : 'Create Branch'}
             </button>

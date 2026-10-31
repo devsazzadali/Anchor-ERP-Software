@@ -1265,11 +1265,12 @@ export default function AdminUsersDirectory() {
 
   return (
     <div className="min-h-screen w-full flex bg-white text-slate-900 font-sans">
-      <div className="absolute top-[-10%] right-[-5%] w-[50%] h-[50%] bg-[#d4af37]/3 rounded-full filter blur-[150px] pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-5%] w-[50%] h-[50%] bg-[#1ca34c]/3 rounded-full filter blur-[150px] pointer-events-none" />
 
       <div className="flex-1 flex flex-col p-4 md:p-6 lg:p-10 overflow-y-auto max-h-screen relative z-10 custom-scrollbar">
         <div className="mb-8 pb-4 border-b border-slate-900/5">
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900 font-serif">
+          <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 font-serif flex items-center gap-3">
+            <span className="w-1.5 h-9 rounded-full bg-[#1ca34c] shrink-0" />
             User <span className="premium-text-gradient">Directory</span>
           </h2>
           <p className="text-xs text-slate-500 mt-1">Manage all registered Employees and Partners across the ecosystem.</p>
@@ -1292,7 +1293,7 @@ export default function AdminUsersDirectory() {
             onClick={() => updateTab('employees')}
             className={`px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border w-full sm:w-auto active:scale-95 ${
               activeTab === 'employees'
-                ? 'bg-[#d4af37]/10 text-[#8a6d1f] border-[#d4af37]/30 shadow-lg'
+                ? 'bg-[#1ca34c]/10 text-[#15803d] border-[#1ca34c]/30 shadow-lg'
                 : 'bg-slate-900/[0.04] text-slate-500 border-slate-900/5 hover:border-slate-900/10'
             }`}
           >
@@ -1302,7 +1303,7 @@ export default function AdminUsersDirectory() {
             onClick={() => updateTab('partners')}
             className={`px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border w-full sm:w-auto active:scale-95 ${
               activeTab === 'partners'
-                ? 'bg-[#d4af37]/10 text-[#8a6d1f] border-[#d4af37]/30 shadow-lg'
+                ? 'bg-[#1ca34c]/10 text-[#15803d] border-[#1ca34c]/30 shadow-lg'
                 : 'bg-slate-900/[0.04] text-slate-500 border-slate-900/5 hover:border-slate-900/10'
             }`}
           >
@@ -1323,7 +1324,7 @@ export default function AdminUsersDirectory() {
                   {!isSelectMode ? (
                     <button
                       onClick={() => setIsSelectMode(true)}
-                      className="px-2 py-0.5 bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#d4af37]/40 text-slate-600 hover:text-slate-900 rounded text-[8px] font-bold uppercase tracking-wider transition-all cursor-pointer"
+                      className="px-2 py-0.5 bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#1ca34c]/40 text-slate-600 hover:text-slate-900 rounded text-[8px] font-bold uppercase tracking-wider transition-all cursor-pointer"
                     >
                       Select Mode
                     </button>
@@ -1349,7 +1350,7 @@ export default function AdminUsersDirectory() {
                               setSelectedIds([])
                             }
                           }}
-                          className="w-3 h-3 rounded border-slate-900/10 bg-white text-[#8a6d1f] focus:ring-0 accent-[#d4af37] cursor-pointer"
+                          className="w-3 h-3 rounded border-slate-900/10 bg-white text-[#15803d] focus:ring-0 accent-[#1ca34c] cursor-pointer"
                         />
                         <span className="text-[8px] font-bold text-slate-500 uppercase tracking-wider">All</span>
                       </label>
@@ -1359,7 +1360,7 @@ export default function AdminUsersDirectory() {
                     <div className="relative">
                       <button
                         onClick={() => setShowExportDropdown(prev => !prev)}
-                        className="flex items-center gap-1 px-2.5 py-1 bg-gradient-to-r from-[#d4af37] to-white text-black hover:brightness-110 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-md shadow-[#d4af37]/10 cursor-pointer"
+                        className="flex items-center gap-1 px-2.5 py-1 bg-[#1ca34c] text-white hover:brightness-110 rounded-full text-[9px] font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-md shadow-[#1ca34c]/10 cursor-pointer"
                       >
                         <FileText className="w-3 h-3" />
                         <span>{selectedIds.length > 0 ? `Export Selected (${selectedIds.length}) ▼` : `Export All (${filteredUsers.length}) ▼`}</span>
@@ -1374,7 +1375,7 @@ export default function AdminUsersDirectory() {
                                 handleExportExcel();
                                 setShowExportDropdown(false);
                               }}
-                              className="px-3 py-1.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#8a6d1f] text-slate-900 transition-colors cursor-pointer"
+                              className="px-3 py-1.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#15803d] text-slate-900 transition-colors cursor-pointer"
                             >
                               Export to Excel (.xlsx)
                             </button>
@@ -1383,7 +1384,7 @@ export default function AdminUsersDirectory() {
                                 handleExportCSV();
                                 setShowExportDropdown(false);
                               }}
-                              className="px-3 py-1.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#8a6d1f] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer"
+                              className="px-3 py-1.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#15803d] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer"
                             >
                               Export to CSV (.csv)
                             </button>
@@ -1392,7 +1393,7 @@ export default function AdminUsersDirectory() {
                                 handleExportPDF();
                                 setShowExportDropdown(false);
                               }}
-                              className="px-3 py-1.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#8a6d1f] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer"
+                              className="px-3 py-1.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#15803d] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer"
                             >
                               Export to PDF (.pdf)
                             </button>
@@ -1410,7 +1411,7 @@ export default function AdminUsersDirectory() {
                     {[0, 1, 2, 3].map(i => (
                       <div key={i} className="p-4 rounded-xl border border-slate-900/5 bg-slate-900/[0.03] animate-pulse">
                         <div className="h-3.5 w-32 rounded bg-slate-900/10 mb-2" />
-                        <div className="h-2.5 w-44 rounded bg-[#d4af37]/20" />
+                        <div className="h-2.5 w-44 rounded bg-[#1ca34c]/20" />
                       </div>
                     ))}
                   </div>
@@ -1433,20 +1434,20 @@ export default function AdminUsersDirectory() {
                               setSelectedIds(prev => prev.filter(id => id !== u.id))
                             }
                           }}
-                          className="w-4 h-4 rounded border-slate-900/10 bg-white text-[#8a6d1f] focus:ring-0 accent-[#d4af37] cursor-pointer transition-all hover:scale-110 shrink-0"
+                          className="w-4 h-4 rounded border-slate-900/10 bg-white text-[#15803d] focus:ring-0 accent-[#1ca34c] cursor-pointer transition-all hover:scale-110 shrink-0"
                         />
                       )}
                       <button
                         onClick={() => handleSelect(u)}
                         className={`flex-1 text-left p-4 rounded-xl border transition-all cursor-pointer flex flex-col gap-2 ${
                           isSelected
-                            ? 'bg-[#d4af37]/10 border-[#d4af37]/40 shadow-lg'
+                            ? 'bg-[#1ca34c]/10 border-[#1ca34c]/40 shadow-lg'
                             : 'bg-slate-900/[0.04] border-slate-900/5 hover:border-slate-900/10'
                         }`}
                       >
                         <div className="flex justify-between items-start w-full">
                           <div className="min-w-0 flex-1 pr-2">
-                            <h4 className={`text-sm font-bold truncate ${isSelected ? 'text-[#8a6d1f]' : 'text-slate-900'} flex items-center gap-1.5`}>
+                            <h4 className={`text-sm font-bold truncate ${isSelected ? 'text-[#15803d]' : 'text-slate-900'} flex items-center gap-1.5`}>
                               <span>{u.full_name}</span>
                               {u.branch && (
                                 <span className="text-[10px] text-slate-500 font-normal">
@@ -1454,7 +1455,7 @@ export default function AdminUsersDirectory() {
                                 </span>
                               )}
                               {u.is_banned && <span className="ml-2 text-[9px] bg-rose-500/20 text-rose-600 px-1.5 py-0.5 rounded font-bold uppercase">Banned</span>}
-                              {u.profile_type === 'branch_manager' && <span className="ml-1 text-[9px] bg-[#d4af37]/15 text-[#8a6d1f] px-1.5 py-0.5 rounded font-bold uppercase border border-[#d4af37]/20">Mgr</span>}
+                              {u.profile_type === 'branch_manager' && <span className="ml-1 text-[9px] bg-[#1ca34c]/15 text-[#15803d] px-1.5 py-0.5 rounded font-bold uppercase border border-[#1ca34c]/20">Mgr</span>}
                             </h4>
                             <div className="flex items-center gap-2 mt-1">
                               <span className="text-[10px] text-slate-500 truncate">
@@ -1477,8 +1478,8 @@ export default function AdminUsersDirectory() {
 
             {/* Position Directory Panel */}
             <div className="glass-panel p-4 rounded-2xl relative shadow-xl border border-slate-900/5 space-y-4 mt-4 bg-gradient-to-br from-slate-900/[0.01] to-slate-900/[0.03]">
-              <span className="text-[10px] font-bold text-[#8a6d1f] uppercase tracking-widest block flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-[#8a6d1f]" /> Position Directory
+              <span className="text-[10px] font-bold text-[#15803d] uppercase tracking-widest block flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-[#15803d]" /> Position Directory
               </span>
 
               <div className="space-y-2 max-h-[150px] overflow-y-auto pr-1 custom-scrollbar">
@@ -1508,12 +1509,12 @@ export default function AdminUsersDirectory() {
                   placeholder="e.g. Manager, HR"
                   required
                   maxLength={30}
-                  className="flex-1 bg-white border border-slate-900/10 rounded-xl py-2 px-3 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50"
+                  className="flex-1 bg-white border border-slate-900/10 rounded-xl py-2 px-3 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50"
                 />
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-[#d4af37]/10 hover:bg-[#d4af37]/20 border border-[#d4af37]/30 text-[#8a6d1f] px-3.5 rounded-xl text-xs font-bold uppercase transition-all cursor-pointer"
+                  className="bg-[#1ca34c]/10 hover:bg-[#1ca34c]/20 border border-[#1ca34c]/30 text-[#15803d] px-3.5 rounded-xl text-xs font-bold uppercase transition-all cursor-pointer"
                 >
                   Create
                 </button>
@@ -1537,12 +1538,12 @@ export default function AdminUsersDirectory() {
                     {/* Identity Overview */}
                     <div className="xl:col-span-2 glass-panel p-6 rounded-2xl relative shadow-xl border border-slate-900/5 flex flex-col justify-center overflow-hidden">
                       {/* Premium Background Accent */}
-                      <div className="absolute top-0 right-0 w-64 h-64 bg-[#d4af37]/5 rounded-full filter blur-[100px] pointer-events-none" />
+                      <div className="absolute top-0 right-0 w-64 h-64 bg-[#1ca34c]/5 rounded-full filter blur-[100px] pointer-events-none" />
 
                       <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4 relative z-10">
                         <div className="flex items-center gap-4 sm:gap-5 min-w-0">
                           {/* Dynamic Avatar */}
-                          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-tr from-[#d4af37] to-white flex items-center justify-center text-lg sm:text-xl font-black text-black shadow-[0_0_20px_rgba(212,175,55,0.3)] shrink-0">
+                          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#1ca34c] flex items-center justify-center text-lg sm:text-xl font-black text-white shadow-lg shadow-[#1ca34c]/25 shrink-0">
                             {selectedUser.full_name?.substring(0, 2).toUpperCase() || 'US'}
                           </div>
                           <div className="min-w-0">
@@ -1553,9 +1554,9 @@ export default function AdminUsersDirectory() {
                               )}
                             </h2>
                             <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs text-slate-500 font-medium">
-                              <span className="flex items-center gap-1.5"><UserCircle className="w-3.5 h-3.5 text-[#8a6d1f]" /> {selectedUser.phone_number || 'No Phone Number'}</span>
-                              <span className="w-1 h-1 rounded-full bg-[#d4af37]/50" />
-                              <span className="uppercase tracking-widest text-[#8a6d1f]/80">{activeTab}</span>
+                              <span className="flex items-center gap-1.5"><UserCircle className="w-3.5 h-3.5 text-[#15803d]" /> {selectedUser.phone_number || 'No Phone Number'}</span>
+                              <span className="w-1 h-1 rounded-full bg-[#1ca34c]/50" />
+                              <span className="uppercase tracking-widest text-[#15803d]/80">{activeTab}</span>
                             </div>
                           </div>
                         </div>
@@ -1574,7 +1575,7 @@ export default function AdminUsersDirectory() {
                       </div>
 
                       <div className="p-3.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 text-[11px] text-slate-600 relative z-10 flex items-start gap-2.5 hover:border-slate-900/10 transition-all">
-                        <MapPin className="w-4 h-4 shrink-0 text-[#8a6d1f]" />
+                        <MapPin className="w-4 h-4 shrink-0 text-[#15803d]" />
                         <span className="leading-relaxed">
                           {selectedUser.address || kycDetails?.address || 'Address information has not been provided yet.'}
                         </span>
@@ -1582,19 +1583,19 @@ export default function AdminUsersDirectory() {
                     </div>
 
                     {/* Financial Summary */}
-                    <div className="glass-panel p-6 rounded-2xl relative shadow-[0_0_30px_rgba(212,175,55,0.05)] border border-[#d4af37]/20 bg-[#d4af37]/[0.03] flex flex-col justify-center overflow-hidden group">
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#d4af37]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                      <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-[#d4af37]/20 rounded-full filter blur-[40px] animate-pulse" />
+                    <div className="glass-panel p-6 rounded-2xl relative shadow-[0_0_30px_rgba(28,163,76,0.05)] border border-[#1ca34c]/20 bg-[#1ca34c]/[0.03] flex flex-col justify-center overflow-hidden group">
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#1ca34c]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-[#1ca34c]/20 rounded-full filter blur-[40px] animate-pulse" />
 
-                      <span className="text-[9px] font-bold text-[#8a6d1f] uppercase tracking-widest block mb-3 relative z-10 flex items-center gap-2">
+                      <span className="text-[9px] font-bold text-[#15803d] uppercase tracking-widest block mb-3 relative z-10 flex items-center gap-2">
                         <CreditCard className="w-3.5 h-3.5" />
                         {activeTab === 'employees' ? 'Total Salary Disbursed' : 'Total Value Transfer'}
                       </span>
                       <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2 font-serif relative z-10 tracking-tight break-all sm:break-normal">
                         {isDetailsLoading ? '…' : <>৳{totalPaid.toLocaleString()}</>}
                       </h3>
-                      <p className="text-[10px] text-slate-500 uppercase tracking-widest relative z-10 border-t border-[#d4af37]/10 pt-3 mt-1">
-                        Across <span className="text-[#8a6d1f] font-bold">{isDetailsLoading ? '…' : transactionCount}</span> successful records
+                      <p className="text-[10px] text-slate-500 uppercase tracking-widest relative z-10 border-t border-[#1ca34c]/10 pt-3 mt-1">
+                        Across <span className="text-[#15803d] font-bold">{isDetailsLoading ? '…' : transactionCount}</span> successful records
                       </p>
                     </div>
                   </div>
@@ -1616,7 +1617,7 @@ export default function AdminUsersDirectory() {
                             {doc.url ? (
                               <button
                                 onClick={() => setFullscreenImage(getKycImageUrl(doc.url)!)}
-                                className="w-full aspect-[4/3] rounded-xl bg-white border border-slate-900/10 hover:border-[#d4af37]/50 overflow-hidden relative group transition-all"
+                                className="w-full aspect-[4/3] rounded-xl bg-white border border-slate-900/10 hover:border-[#1ca34c]/50 overflow-hidden relative group transition-all"
                               >
                                 <img
                                   src={getKycImageUrl(doc.url)!}
@@ -1645,13 +1646,13 @@ export default function AdminUsersDirectory() {
                     <div className="glass-panel p-6 rounded-2xl relative shadow-xl border border-slate-900/5 space-y-6 flex flex-col">
                       <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-3 border-b border-slate-900/5 pb-4">
                         <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2 shrink-0">
-                          <UserCircle className="w-4 h-4 text-[#8a6d1f]" /> Configuration
+                          <UserCircle className="w-4 h-4 text-[#15803d]" /> Configuration
                         </span>
                         <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                           {!isEditing ? (
                             <button
                               onClick={() => setIsEditing(true)}
-                              className="text-[10px] font-bold text-[#8a6d1f] border border-[#d4af37]/20 bg-[#d4af37]/5 px-3 py-1.5 rounded-lg hover:bg-[#d4af37]/15 transition-all uppercase cursor-pointer"
+                              className="text-[10px] font-bold text-[#15803d] border border-[#1ca34c]/20 bg-[#1ca34c]/5 px-3 py-1.5 rounded-lg hover:bg-[#1ca34c]/15 transition-all uppercase cursor-pointer"
                             >
                               Edit Data
                             </button>
@@ -1666,7 +1667,7 @@ export default function AdminUsersDirectory() {
                           {activeTab === 'employees' && (
                             <button
                               onClick={() => setShowBranchModal(true)}
-                              className="text-[10px] font-bold text-[#8a6d1f] border border-[#d4af37]/20 bg-[#d4af37]/5 px-3 py-1.5 rounded-lg hover:bg-[#d4af37]/15 transition-all uppercase cursor-pointer"
+                              className="text-[10px] font-bold text-[#15803d] border border-[#1ca34c]/20 bg-[#1ca34c]/5 px-3 py-1.5 rounded-lg hover:bg-[#1ca34c]/15 transition-all uppercase cursor-pointer"
                             >
                               Transfer
                             </button>
@@ -1686,20 +1687,20 @@ export default function AdminUsersDirectory() {
                       <div className="flex-1 space-y-1 mt-2">
                         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-3 border-b border-slate-900/5 group">
                           <span className="text-[11px] font-medium text-slate-500 group-hover:text-slate-900 transition-colors flex items-center gap-1.5">
-                            <Calendar className="w-3.5 h-3.5 text-[#8a6d1f]" /> Joining Date
+                            <Calendar className="w-3.5 h-3.5 text-[#15803d]" /> Joining Date
                           </span>
                           {isEditing ? (
                             <input
                               type="date"
                               value={joiningDateInput}
                               onChange={(e) => setJoiningDateInput(e.target.value)}
-                              className="w-full sm:w-48 bg-white border border-[#d4af37]/30 rounded-lg py-1.5 px-3 text-sm text-slate-900 focus:outline-none mt-2 sm:mt-0"
+                              className="w-full sm:w-48 bg-white border border-[#1ca34c]/30 rounded-lg py-1.5 px-3 text-sm text-slate-900 focus:outline-none mt-2 sm:mt-0"
                             />
                           ) : (
                             <span className="text-sm font-semibold text-slate-900 mt-1 sm:mt-0 font-mono bg-slate-900/[0.04] px-3 py-1 rounded-lg border border-slate-900/5 shadow-inner flex items-center gap-3">
                               <span>{selectedUser.joining_date ? new Date(selectedUser.joining_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : (selectedUser.created_at ? new Date(selectedUser.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : 'N/A')}</span>
                               {(selectedUser.joining_date || selectedUser.created_at) && (
-                                <span className="text-[9px] bg-[#d4af37]/10 text-[#8a6d1f] px-2 py-0.5 rounded uppercase tracking-wider font-bold">
+                                <span className="text-[9px] bg-[#1ca34c]/10 text-[#15803d] px-2 py-0.5 rounded uppercase tracking-wider font-bold">
                                   {getDuration(selectedUser.joining_date || selectedUser.created_at)}
                                 </span>
                               )}
@@ -1727,7 +1728,7 @@ export default function AdminUsersDirectory() {
                                       setTransferPositionNote('')
                                       setShowPositionModal(true)
                                     }}
-                                    className="text-[9px] font-bold text-[#8a6d1f] uppercase hover:underline"
+                                    className="text-[9px] font-bold text-[#15803d] uppercase hover:underline"
                                   >
                                     Update
                                   </button>
@@ -1742,7 +1743,7 @@ export default function AdminUsersDirectory() {
                                   type="number"
                                   value={salaryInput}
                                   onChange={(e) => setSalaryInput(e.target.value)}
-                                  className="w-full sm:w-48 bg-white border border-[#d4af37]/30 rounded-lg py-1.5 px-3 text-sm font-mono text-slate-900 focus:outline-none mt-2 sm:mt-0"
+                                  className="w-full sm:w-48 bg-white border border-[#1ca34c]/30 rounded-lg py-1.5 px-3 text-sm font-mono text-slate-900 focus:outline-none mt-2 sm:mt-0"
                                 />
                               ) : (
                                 <span className="text-lg font-bold text-slate-900 font-serif mt-1 sm:mt-0">{selectedUser.salary ? `${Number(selectedUser.salary).toLocaleString()} BDT` : 'Not Set'}</span>
@@ -1755,10 +1756,10 @@ export default function AdminUsersDirectory() {
                                 <span className="text-[9px] uppercase tracking-wider text-slate-500 font-semibold block">Branch Timeline</span>
                                 <div className="space-y-2 max-h-[120px] overflow-y-auto pr-1 custom-scrollbar">
                                   {branchTransfers.map((bt) => (
-                                    <div key={bt.id} className="text-[11px] bg-white border-l-[2px] border-l-[#d4af37] border-y border-y-slate-900/10 border-r border-r-slate-900/10 p-2.5 rounded-r-lg space-y-1 hover:bg-slate-900/[0.04] transition-colors">
+                                    <div key={bt.id} className="text-[11px] bg-white border-l-[2px] border-l-[#1ca34c] border-y border-y-slate-900/10 border-r border-r-slate-900/10 p-2.5 rounded-r-lg space-y-1 hover:bg-slate-900/[0.04] transition-colors">
                                       <div className="flex justify-between items-center">
                                         <span className="text-slate-600 font-medium">
-                                          {bt.old_branch_name || 'N/A'} <span className="text-slate-500 mx-1">&rarr;</span> <span className="text-[#8a6d1f] font-bold">{bt.new_branch_name}</span>
+                                          {bt.old_branch_name || 'N/A'} <span className="text-slate-500 mx-1">&rarr;</span> <span className="text-[#15803d] font-bold">{bt.new_branch_name}</span>
                                         </span>
                                         <span className="text-slate-500 text-[9px] font-mono">{new Date(bt.join_date).toLocaleDateString()}</span>
                                       </div>
@@ -1775,10 +1776,10 @@ export default function AdminUsersDirectory() {
                                 <span className="text-[9px] uppercase tracking-wider text-slate-500 font-semibold block">Position Timeline</span>
                                 <div className="space-y-2 max-h-[120px] overflow-y-auto pr-1 custom-scrollbar">
                                   {positionTransfers.map((pt) => (
-                                    <div key={pt.id} className="text-[11px] bg-white border-l-[2px] border-l-[#d4af37] border-y border-y-slate-900/10 border-r border-r-slate-900/10 p-2.5 rounded-r-lg space-y-1 hover:bg-slate-900/[0.04] transition-colors">
+                                    <div key={pt.id} className="text-[11px] bg-white border-l-[2px] border-l-[#1ca34c] border-y border-y-slate-900/10 border-r border-r-slate-900/10 p-2.5 rounded-r-lg space-y-1 hover:bg-slate-900/[0.04] transition-colors">
                                       <div className="flex justify-between items-center">
                                         <span className="text-slate-600 font-medium">
-                                          {pt.old_position_name || 'N/A'} <span className="text-slate-500 mx-1">&rarr;</span> <span className="text-[#8a6d1f] font-bold">{pt.new_position_name}</span>
+                                          {pt.old_position_name || 'N/A'} <span className="text-slate-500 mx-1">&rarr;</span> <span className="text-[#15803d] font-bold">{pt.new_position_name}</span>
                                         </span>
                                         <span className="text-slate-500 text-[9px] font-mono">{new Date(pt.join_date).toLocaleDateString()}</span>
                                       </div>
@@ -1796,7 +1797,7 @@ export default function AdminUsersDirectory() {
                               <select
                                 value={profileTypeInput}
                                 onChange={(e) => setProfileTypeInput(e.target.value)}
-                                className="w-full sm:w-48 bg-white border border-[#d4af37]/30 rounded-lg py-1.5 px-3 text-sm font-semibold text-[#8a6d1f] focus:outline-none mt-2 sm:mt-0"
+                                className="w-full sm:w-48 bg-white border border-[#1ca34c]/30 rounded-lg py-1.5 px-3 text-sm font-semibold text-[#15803d] focus:outline-none mt-2 sm:mt-0"
                               >
                                 <option value="employee">Corporate Employee</option>
                                 <option value="partner">Corporate Partner</option>
@@ -1804,7 +1805,7 @@ export default function AdminUsersDirectory() {
                                 <option value="branch_manager">Branch Manager</option>
                               </select>
                             ) : (
-                              <span className="text-sm font-semibold text-[#8a6d1f]">
+                              <span className="text-sm font-semibold text-[#15803d]">
                                 {selectedUser.profile_type === 'head_office' ? 'Head Office'
                                   : selectedUser.profile_type === 'employee' ? 'Corporate Employee'
                                   : selectedUser.profile_type === 'branch_manager' ? 'Branch Manager'
@@ -1818,7 +1819,7 @@ export default function AdminUsersDirectory() {
                           <button
                             onClick={handleUpdateProfile}
                             disabled={isSubmitting}
-                            className="mt-4 w-full py-2.5 bg-[#d4af37]/10 hover:bg-[#d4af37]/20 border border-[#d4af37]/30 text-[#8a6d1f] text-[10px] font-bold uppercase tracking-wider rounded-xl transition-all"
+                            className="mt-4 w-full py-2.5 bg-[#1ca34c]/10 hover:bg-[#1ca34c]/20 border border-[#1ca34c]/30 text-[#15803d] text-[10px] font-bold uppercase tracking-wider rounded-xl transition-all"
                           >
                             {isSubmitting ? 'Saving...' : 'Save Configuration'}
                           </button>
@@ -1833,7 +1834,7 @@ export default function AdminUsersDirectory() {
                               <select
                                 value={managerAssignBranch}
                                 onChange={(e) => setManagerAssignBranch(e.target.value)}
-                                className="w-full bg-white border border-[#d4af37]/30 rounded-xl py-2.5 px-3 text-xs text-slate-900 focus:outline-none"
+                                className="w-full bg-white border border-[#1ca34c]/30 rounded-xl py-2.5 px-3 text-xs text-slate-900 focus:outline-none"
                                 required
                               >
                                 <option value="">— Select Branch —</option>
@@ -1853,12 +1854,12 @@ export default function AdminUsersDirectory() {
                         )}
                         {selectedUser.profile_type === 'branch_manager' && !isEditing && (
                            <div className="mt-4 pt-4 border-t border-slate-900/5 space-y-2">
-                              <div className="p-3 rounded-xl bg-[#d4af37]/10 border border-[#d4af37]/20 flex items-center justify-between">
+                              <div className="p-3 rounded-xl bg-[#1ca34c]/10 border border-[#1ca34c]/20 flex items-center justify-between">
                                  <div>
-                                   <span className="text-[10px] font-bold text-[#8a6d1f] uppercase tracking-widest block">Branch Manager</span>
+                                   <span className="text-[10px] font-bold text-[#15803d] uppercase tracking-widest block">Branch Manager</span>
                                    <span className="text-xs text-slate-600">{selectedUser.branch || 'Assigned to Branch'}</span>
                                  </div>
-                                 <Building2 className="w-5 h-5 text-[#8a6d1f]" />
+                                 <Building2 className="w-5 h-5 text-[#15803d]" />
                               </div>
                               <button
                                 onClick={handleRemoveManager}
@@ -1887,7 +1888,7 @@ export default function AdminUsersDirectory() {
                               setCustomAccountInput('')
                               setShowSalaryModal(true)
                             }}
-                            className="mt-6 w-full bg-gradient-to-r from-[#d4af37] to-white text-black font-bold py-3 rounded-xl text-xs tracking-wider uppercase flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_15px_rgba(212,175,55,0.2)] hover:shadow-[0_0_25px_rgba(212,175,55,0.4)] transition-all hover:-translate-y-0.5"
+                            className="mt-6 w-full bg-[#1ca34c] text-white font-bold py-3 rounded-full text-xs tracking-wider uppercase flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#1ca34c]/25 transition-all hover:-translate-y-0.5"
                           >
                             <CreditCard className="w-4 h-4" /> {activeTab === 'employees' ? 'Issue Salary Payment' : 'Issue Value Transfer'}
                           </button>
@@ -1900,7 +1901,7 @@ export default function AdminUsersDirectory() {
                     <div className={`glass-panel p-6 rounded-2xl relative shadow-xl border border-slate-900/5 flex flex-col ${activeTab === 'partners' ? 'lg:col-span-2' : ''}`}>
                       <div className="flex justify-between items-center border-b border-slate-900/5 pb-4 mb-4">
                         <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                          <Landmark className="w-4 h-4 text-[#8a6d1f]" /> Banking & Routing
+                          <Landmark className="w-4 h-4 text-[#15803d]" /> Banking & Routing
                         </span>
                       </div>
 
@@ -1916,7 +1917,7 @@ export default function AdminUsersDirectory() {
                                   <span className="text-sm font-semibold text-slate-900 font-mono">{String(val)}</span>
                                   <button
                                     onClick={() => copyToClipboard(String(val))}
-                                    className="text-slate-500 hover:text-[#8a6d1f] transition-colors opacity-0 group-hover:opacity-100"
+                                    className="text-slate-500 hover:text-[#15803d] transition-colors opacity-0 group-hover:opacity-100"
                                   >
                                     <Copy className="w-3.5 h-3.5" />
                                   </button>
@@ -1958,7 +1959,7 @@ export default function AdminUsersDirectory() {
                                    <span className="text-xs font-bold text-slate-900 font-mono">{kycDetails.bank_account_number}</span>
                                    <button
                                      onClick={() => copyToClipboard(kycDetails.bank_account_number)}
-                                     className="text-slate-500 hover:text-[#8a6d1f] transition-colors opacity-0 group-hover:opacity-100"
+                                     className="text-slate-500 hover:text-[#15803d] transition-colors opacity-0 group-hover:opacity-100"
                                    >
                                      <Copy className="w-3 h-3"/>
                                    </button>
@@ -1981,7 +1982,7 @@ export default function AdminUsersDirectory() {
                   <div className="glass-panel p-6 rounded-2xl relative shadow-xl border border-slate-900/5 space-y-6">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-4 border-b border-slate-900/5 flex-wrap">
                       <div className="shrink-0">
-                        <span className="text-[10px] font-bold text-[#8a6d1f] uppercase tracking-widest block mb-1">Disbursement History</span>
+                        <span className="text-[10px] font-bold text-[#15803d] uppercase tracking-widest block mb-1">Disbursement History</span>
                         <h3 className="text-sm font-bold text-slate-900 font-serif">{activeTab === 'employees' ? 'Salary Payment Ledger' : 'Value Transfer Ledger'}</h3>
                       </div>
 
@@ -1991,7 +1992,7 @@ export default function AdminUsersDirectory() {
                             <button
                               type="button"
                               onClick={() => setShowDossierDropdown(!showDossierDropdown)}
-                              className="flex items-center gap-1.5 bg-[#d4af37]/10 hover:bg-[#d4af37]/20 border border-[#d4af37]/30 text-[#8a6d1f] px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer"
+                              className="flex items-center gap-1.5 bg-[#1ca34c]/10 hover:bg-[#1ca34c]/20 border border-[#1ca34c]/30 text-[#15803d] px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer"
                             >
                               <Download className="w-3 h-3" />
                               {selectedProfileVouchers.length > 0 ? `Export Selected (${selectedProfileVouchers.length})` : 'Export All Vouchers'}
@@ -2000,13 +2001,13 @@ export default function AdminUsersDirectory() {
                               <>
                                 <div className="fixed inset-0 z-40" onClick={() => setShowDossierDropdown(false)} />
                                 <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-900/10 rounded-xl shadow-2xl py-2 z-50 flex flex-col">
-                                  <button onClick={() => { handleExportIndividualDossierExcel(); setShowDossierDropdown(false) }} className="px-4 py-2.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#8a6d1f] text-slate-900 transition-colors cursor-pointer">
+                                  <button onClick={() => { handleExportIndividualDossierExcel(); setShowDossierDropdown(false) }} className="px-4 py-2.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#15803d] text-slate-900 transition-colors cursor-pointer">
                                     Export Vouchers (.xlsx)
                                   </button>
-                                  <button onClick={() => { handleExportIndividualDossierCSV(); setShowDossierDropdown(false) }} className="px-4 py-2.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#8a6d1f] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer">
+                                  <button onClick={() => { handleExportIndividualDossierCSV(); setShowDossierDropdown(false) }} className="px-4 py-2.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#15803d] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer">
                                     Export Vouchers (.csv)
                                   </button>
-                                  <button onClick={() => { handleExportIndividualDossierPDF(); setShowDossierDropdown(false) }} className="px-4 py-2.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#8a6d1f] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer">
+                                  <button onClick={() => { handleExportIndividualDossierPDF(); setShowDossierDropdown(false) }} className="px-4 py-2.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#15803d] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer">
                                     Export Vouchers (.pdf)
                                   </button>
                                 </div>
@@ -2020,7 +2021,7 @@ export default function AdminUsersDirectory() {
                           <select
                             value={selectedHistoryBranch}
                             onChange={(e) => setSelectedHistoryBranch(e.target.value)}
-                            className="bg-white border border-slate-900/10 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50 animate-fade-in"
+                            className="bg-white border border-slate-900/10 rounded-lg px-2.5 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 animate-fade-in"
                           >
                             <option value="all" className="bg-white text-slate-900">All Branches</option>
                             {branches.map(b => (
@@ -2049,10 +2050,10 @@ export default function AdminUsersDirectory() {
                           <button
                             type="button"
                             onClick={() => toggleAllProfileVouchers(filteredHistory)}
-                            className="flex items-center gap-2 text-xs text-slate-500 hover:text-[#8a6d1f] transition-colors focus:outline-none"
+                            className="flex items-center gap-2 text-xs text-slate-500 hover:text-[#15803d] transition-colors focus:outline-none"
                           >
                             {selectedProfileVouchers.length === filteredHistory.length && filteredHistory.length > 0 ? (
-                              <CheckSquare className="w-4 h-4 text-[#8a6d1f]" />
+                              <CheckSquare className="w-4 h-4 text-[#15803d]" />
                             ) : (
                               <Square className="w-4 h-4" />
                             )}
@@ -2068,7 +2069,7 @@ export default function AdminUsersDirectory() {
                             {[0, 1].map(i => (
                               <div key={i} className="p-4 rounded-xl border border-slate-900/5 bg-white animate-pulse">
                                 <div className="h-3.5 w-36 rounded bg-slate-900/10 mb-2" />
-                                <div className="h-2.5 w-24 rounded bg-[#d4af37]/20" />
+                                <div className="h-2.5 w-24 rounded bg-[#1ca34c]/20" />
                               </div>
                             ))}
                           </div>
@@ -2081,21 +2082,21 @@ export default function AdminUsersDirectory() {
                             const itemBranch = branches.find(b => b.id === item.branch_id);
                             const isChecked = selectedProfileVouchers.includes(item.id);
                             return (
-                              <div key={item.id} className={`p-4 rounded-xl bg-white border flex flex-col sm:flex-row justify-between sm:items-center gap-3 relative overflow-hidden group transition-all ${isChecked ? 'border-[#d4af37]/50 bg-[#d4af37]/5' : 'border-slate-900/5'}`}>
-                                <div className="absolute top-0 left-0 bottom-0 w-[3px] bg-[#d4af37]" />
+                              <div key={item.id} className={`p-4 rounded-xl bg-white border flex flex-col sm:flex-row justify-between sm:items-center gap-3 relative overflow-hidden group transition-all ${isChecked ? 'border-[#1ca34c]/50 bg-[#1ca34c]/5' : 'border-slate-900/5'}`}>
+                                <div className="absolute top-0 left-0 bottom-0 w-[3px] bg-[#1ca34c]" />
                                 <div className="flex items-start gap-3 pl-2">
                                   <button
                                     type="button"
                                     onClick={() => toggleProfileVoucherSelection(item.id)}
-                                    className="mt-0.5 p-2 text-slate-500 hover:text-[#8a6d1f] transition-colors focus:outline-none shrink-0"
+                                    className="mt-0.5 p-2 text-slate-500 hover:text-[#15803d] transition-colors focus:outline-none shrink-0"
                                   >
-                                    {isChecked ? <CheckSquare className="w-4 h-4 text-[#8a6d1f]" /> : <Square className="w-4 h-4" />}
+                                    {isChecked ? <CheckSquare className="w-4 h-4 text-[#15803d]" /> : <Square className="w-4 h-4" />}
                                   </button>
                                   <div className="space-y-1">
                                     <div className="flex items-center gap-2">
                                     <span className="text-xs font-bold text-slate-900">{activeTab === 'employees' ? 'Salary Disbursed' : 'Value Transfer'}</span>
                                     {itemBranch && (
-                                      <span className="text-[9px] bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                                      <span className="text-[9px] bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
                                         {itemBranch.name}
                                       </span>
                                     )}
@@ -2121,7 +2122,7 @@ export default function AdminUsersDirectory() {
                                   <button
                                     type="button"
                                     onClick={() => handleExportSingleLedgerVoucherPdf(item)}
-                                    className="px-2.5 py-1 rounded-lg bg-[#d4af37]/10 hover:bg-[#d4af37]/20 border border-[#d4af37]/30 text-[#8a6d1f] text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer shadow-sm hover:shadow-[#d4af37]/10"
+                                    className="px-2.5 py-1 rounded-lg bg-[#1ca34c]/10 hover:bg-[#1ca34c]/20 border border-[#1ca34c]/30 text-[#15803d] text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer shadow-sm hover:shadow-[#1ca34c]/10"
                                     title="Export Voucher (PDF)"
                                   >
                                     <Download className="w-3 h-3" />
@@ -2137,12 +2138,12 @@ export default function AdminUsersDirectory() {
                   </motion.div>
               ) : (
                 <div className="glass-panel p-6 lg:p-10 rounded-2xl shadow-xl flex flex-col gap-6 animate-fade-in border border-slate-900/5 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-[#d4af37]/5 rounded-full filter blur-[100px] pointer-events-none" />
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-[#1ca34c]/5 rounded-full filter blur-[100px] pointer-events-none" />
 
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-slate-900/5 z-10">
                     <div>
                       <h3 className="text-2xl font-bold text-slate-900 font-serif flex items-center gap-3">
-                        <CreditCard className="w-6 h-6 text-[#8a6d1f]" /> {activeTab === 'employees' ? 'Global Employee Salary Ledger' : 'Global Partner Value Transfer Ledger'}
+                        <CreditCard className="w-6 h-6 text-[#15803d]" /> {activeTab === 'employees' ? 'Global Employee Salary Ledger' : 'Global Partner Value Transfer Ledger'}
                       </h3>
                       <p className="text-xs text-slate-500 mt-2">{activeTab === 'employees' ? 'History of all recent salary disbursements across the workforce.' : 'History of all value transfers and completed payouts across network partners.'}</p>
                     </div>
@@ -2151,7 +2152,7 @@ export default function AdminUsersDirectory() {
                         <button
                           type="button"
                           onClick={() => setShowGlobalExportDropdown(!showGlobalExportDropdown)}
-                          className="flex items-center gap-1.5 bg-gradient-to-r from-[#d4af37] to-white text-black px-3 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer shadow-md hover:scale-105"
+                          className="flex items-center gap-1.5 bg-[#1ca34c] text-white px-3 py-2 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer shadow-md hover:scale-105"
                         >
                           <Download className="w-3.5 h-3.5" />
                           {selectedGlobalVouchers.length > 0 ? `Export Selected (${selectedGlobalVouchers.length}) ▼` : 'Export Vouchers (Bulk) ▼'}
@@ -2160,13 +2161,13 @@ export default function AdminUsersDirectory() {
                           <>
                             <div className="fixed inset-0 z-40" onClick={() => setShowGlobalExportDropdown(false)} />
                             <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-900/10 rounded-xl shadow-2xl py-2 z-50 flex flex-col">
-                              <button onClick={() => { handleExportGlobalExcel(); setShowGlobalExportDropdown(false) }} className="px-4 py-2.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#8a6d1f] text-slate-900 transition-colors cursor-pointer">
+                              <button onClick={() => { handleExportGlobalExcel(); setShowGlobalExportDropdown(false) }} className="px-4 py-2.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#15803d] text-slate-900 transition-colors cursor-pointer">
                                 {selectedGlobalVouchers.length > 0 ? 'Export Selected (.xlsx)' : 'Export All (.xlsx)'}
                               </button>
-                              <button onClick={() => { handleExportGlobalCSV(); setShowGlobalExportDropdown(false) }} className="px-4 py-2.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#8a6d1f] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer">
+                              <button onClick={() => { handleExportGlobalCSV(); setShowGlobalExportDropdown(false) }} className="px-4 py-2.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#15803d] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer">
                                 {selectedGlobalVouchers.length > 0 ? 'Export Selected (.csv)' : 'Export All (.csv)'}
                               </button>
-                              <button onClick={() => { handleExportGlobalPDF(); setShowGlobalExportDropdown(false) }} className="px-4 py-2.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#8a6d1f] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer">
+                              <button onClick={() => { handleExportGlobalPDF(); setShowGlobalExportDropdown(false) }} className="px-4 py-2.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#15803d] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer">
                                 {selectedGlobalVouchers.length > 0 ? 'Export Selected (.pdf)' : 'Export All (.pdf)'}
                               </button>
                             </div>
@@ -2186,10 +2187,10 @@ export default function AdminUsersDirectory() {
                       <button
                         type="button"
                         onClick={() => toggleAllGlobalVouchers(filteredMasterLedger)}
-                        className="flex items-center gap-2 text-xs text-slate-500 hover:text-[#8a6d1f] transition-colors focus:outline-none"
+                        className="flex items-center gap-2 text-xs text-slate-500 hover:text-[#15803d] transition-colors focus:outline-none"
                       >
                         {selectedGlobalVouchers.length === filteredMasterLedger.length && filteredMasterLedger.length > 0 ? (
-                          <CheckSquare className="w-4 h-4 text-[#8a6d1f]" />
+                          <CheckSquare className="w-4 h-4 text-[#15803d]" />
                         ) : (
                           <Square className="w-4 h-4" />
                         )}
@@ -2207,14 +2208,14 @@ export default function AdminUsersDirectory() {
                       filteredMasterLedger.map((item) => {
                         const isChecked = selectedGlobalVouchers.includes(item.id);
                         return (
-                        <div key={item.id} className={`flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 rounded-xl border transition-all gap-4 ${isChecked ? 'border-[#d4af37]/50 bg-[#d4af37]/5' : 'bg-slate-900/[0.04] border-slate-900/5 hover:border-slate-900/10'}`}>
+                        <div key={item.id} className={`flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 rounded-xl border transition-all gap-4 ${isChecked ? 'border-[#1ca34c]/50 bg-[#1ca34c]/5' : 'bg-slate-900/[0.04] border-slate-900/5 hover:border-slate-900/10'}`}>
                           <div className="flex items-start gap-3 flex-1">
                             <button
                               type="button"
                               onClick={() => toggleGlobalVoucherSelection(item.id)}
-                              className="mt-0.5 p-2 text-slate-500 hover:text-[#8a6d1f] transition-colors focus:outline-none shrink-0"
+                              className="mt-0.5 p-2 text-slate-500 hover:text-[#15803d] transition-colors focus:outline-none shrink-0"
                             >
-                              {isChecked ? <CheckSquare className="w-4 h-4 text-[#8a6d1f]" /> : <Square className="w-4 h-4" />}
+                              {isChecked ? <CheckSquare className="w-4 h-4 text-[#15803d]" /> : <Square className="w-4 h-4" />}
                             </button>
                             <div>
                               <div className="flex items-center gap-2 mb-1">
@@ -2228,7 +2229,7 @@ export default function AdminUsersDirectory() {
                               {item.account && <span>Acc: <span className="text-slate-600">{item.account}</span></span>}
                             </div>
                             {item.notes && (
-                              <div className="mt-2 text-[10px] text-[#8a6d1f]/80 bg-[#d4af37]/10 px-3 py-1.5 rounded-lg border border-[#d4af37]/20 inline-block">
+                              <div className="mt-2 text-[10px] text-[#15803d]/80 bg-[#1ca34c]/10 px-3 py-1.5 rounded-lg border border-[#1ca34c]/20 inline-block">
                                 Note: {item.notes}
                               </div>
                             )}
@@ -2239,7 +2240,7 @@ export default function AdminUsersDirectory() {
                             <button
                               type="button"
                               onClick={() => handleExportSingleLedgerVoucherPdf(item, item.profiles?.full_name)}
-                              className="px-2.5 py-1 rounded-lg bg-[#d4af37]/10 hover:bg-[#d4af37]/20 border border-[#d4af37]/30 text-[#8a6d1f] text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer shadow-sm hover:shadow-[#d4af37]/10"
+                              className="px-2.5 py-1 rounded-lg bg-[#1ca34c]/10 hover:bg-[#1ca34c]/20 border border-[#1ca34c]/30 text-[#15803d] text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 transition-all cursor-pointer shadow-sm hover:shadow-[#1ca34c]/10"
                               title="Export Voucher (PDF)"
                             >
                               <Download className="w-3 h-3" />
@@ -2292,7 +2293,7 @@ export default function AdminUsersDirectory() {
               initial={{ scale: 0.95 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.95 }}
-              className="glass-panel p-4 sm:p-6 rounded-2xl max-w-lg w-full relative shadow-2xl overflow-y-auto max-h-[90vh] border border-[#d4af37]/30"
+              className="glass-panel p-4 sm:p-6 rounded-2xl max-w-lg w-full relative shadow-2xl overflow-y-auto max-h-[90vh] border border-[#1ca34c]/30"
             >
               <div className="flex justify-between items-start mb-6">
                 <div>
@@ -2305,13 +2306,13 @@ export default function AdminUsersDirectory() {
               </div>
 
               {/* Reference Card */}
-              <div className="mb-6 p-4 rounded-xl bg-gradient-to-br from-[#d4af37]/10 to-transparent border border-[#d4af37]/20 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+              <div className="mb-6 p-4 rounded-xl bg-gradient-to-br from-[#1ca34c]/10 to-transparent border border-[#1ca34c]/20 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                 <div>
-                  <p className="text-[10px] font-bold text-[#8a6d1f] uppercase tracking-wider mb-0.5">{activeTab === 'employees' ? 'Employee' : 'Partner'}</p>
+                  <p className="text-[10px] font-bold text-[#15803d] uppercase tracking-wider mb-0.5">{activeTab === 'employees' ? 'Employee' : 'Partner'}</p>
                   <p className="text-sm font-semibold text-slate-900 break-all sm:break-normal">{selectedUser.full_name}</p>
                 </div>
                 <div className="sm:text-right">
-                  <p className="text-[10px] font-bold text-[#8a6d1f] uppercase tracking-wider mb-0.5">{activeTab === 'employees' ? 'Fixed Base Salary' : 'Base Allocation'}</p>
+                  <p className="text-[10px] font-bold text-[#15803d] uppercase tracking-wider mb-0.5">{activeTab === 'employees' ? 'Fixed Base Salary' : 'Base Allocation'}</p>
                   <p className="text-sm font-bold text-emerald-600">{selectedUser.salary ? `${Number(selectedUser.salary).toLocaleString()} BDT` : 'Not Set'}</p>
                 </div>
               </div>
@@ -2320,7 +2321,7 @@ export default function AdminUsersDirectory() {
                 {activeTab === 'employees' && ledgerHeads.length > 0 && (
                   <div>
                     <label className="block text-[10px] font-semibold text-slate-500 tracking-wider uppercase mb-1.5">Ledger Head (Expense Category) <span className="text-emerald-500">*</span></label>
-                    <select value={ledgerHeadId} onChange={(e)=>setLedgerHeadId(e.target.value)} required className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-sm font-bold text-slate-900 focus:outline-none focus:border-[#d4af37]/50 transition-colors">
+                    <select value={ledgerHeadId} onChange={(e)=>setLedgerHeadId(e.target.value)} required className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-sm font-bold text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 transition-colors">
                       <option value="" disabled className="bg-white">Select Ledger Head</option>
                       {ledgerHeads.map(l => <option key={l.id} value={l.id} className="bg-white">{l.name} {l.code_number ? `(Code ${l.code_number})` : ''}</option>)}
                     </select>
@@ -2333,42 +2334,42 @@ export default function AdminUsersDirectory() {
                       <span>Basic (BDT)</span>
                       <span className="text-emerald-500">*</span>
                     </label>
-                    <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} required className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-sm font-bold text-slate-900 focus:outline-none focus:border-[#d4af37]/50 transition-colors" />
+                    <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} required className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-sm font-bold text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 transition-colors" />
                   </div>
                   <div>
                     <label className="block text-[10px] font-semibold text-slate-500 tracking-wider uppercase mb-1.5 flex justify-between">
                       <span>Overtime</span>
                     </label>
-                    <input type="number" value={overtimeAmount} onChange={(e) => setOvertimeAmount(e.target.value)} className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-sm font-bold text-slate-900 focus:outline-none focus:border-[#d4af37]/50 transition-colors" />
+                    <input type="number" value={overtimeAmount} onChange={(e) => setOvertimeAmount(e.target.value)} className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-sm font-bold text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 transition-colors" />
                   </div>
                   <div>
                     <label className="block text-[10px] font-semibold text-slate-500 tracking-wider uppercase mb-1.5 flex justify-between">
                       <span>Bonus</span>
                     </label>
-                    <input type="number" value={bonusAmount} onChange={(e) => setBonusAmount(e.target.value)} className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-sm font-bold text-slate-900 focus:outline-none focus:border-[#d4af37]/50 transition-colors" />
+                    <input type="number" value={bonusAmount} onChange={(e) => setBonusAmount(e.target.value)} className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-sm font-bold text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 transition-colors" />
                   </div>
                   <div>
                     <label className="block text-[10px] font-semibold text-slate-500 tracking-wider uppercase mb-1.5 flex justify-between">
                       <span>Sales Comm</span>
                     </label>
-                    <input type="number" value={salesCommission} onChange={(e) => setSalesCommission(e.target.value)} className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-sm font-bold text-slate-900 focus:outline-none focus:border-[#d4af37]/50 transition-colors" />
+                    <input type="number" value={salesCommission} onChange={(e) => setSalesCommission(e.target.value)} className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-sm font-bold text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 transition-colors" />
                   </div>
                   <div>
                     <label className="block text-[10px] font-semibold text-slate-500 tracking-wider uppercase mb-1.5 flex justify-between">
                       <span>Tiffin Bill</span>
                     </label>
-                    <input type="number" value={tiffinBill} onChange={(e) => setTiffinBill(e.target.value)} className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-sm font-bold text-slate-900 focus:outline-none focus:border-[#d4af37]/50 transition-colors" />
+                    <input type="number" value={tiffinBill} onChange={(e) => setTiffinBill(e.target.value)} className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-sm font-bold text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 transition-colors" />
                   </div>
                 </div>
 
-                <div className="p-4 bg-[#d4af37]/5 border border-[#d4af37]/20 rounded-xl flex justify-between items-center">
-                  <div className="flex items-center gap-2 text-[#8a6d1f]"><span className="text-xs font-bold uppercase tracking-wider">Total Amount</span></div>
+                <div className="p-4 bg-[#1ca34c]/5 border border-[#1ca34c]/20 rounded-xl flex justify-between items-center">
+                  <div className="flex items-center gap-2 text-[#15803d]"><span className="text-xs font-bold uppercase tracking-wider">Total Amount</span></div>
                   <span className="text-lg font-bold text-slate-900">{(Number(amount || 0) + Number(overtimeAmount || 0) + Number(bonusAmount || 0) + Number(salesCommission || 0) + Number(tiffinBill || 0)).toLocaleString()} BDT</span>
                 </div>
 
                 <div>
                   <label className="block text-[10px] font-semibold text-slate-500 tracking-wider uppercase mb-1.5">Remarks / Notes (Optional)</label>
-                  <textarea rows={2} value={salaryNote} onChange={(e) => setSalaryNote(e.target.value)} placeholder="e.g. Added 5k Eid Bonus" className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-sm text-slate-900 focus:outline-none focus:border-[#d4af37]/50 transition-colors resize-none" />
+                  <textarea rows={2} value={salaryNote} onChange={(e) => setSalaryNote(e.target.value)} placeholder="e.g. Added 5k Eid Bonus" className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 transition-colors resize-none" />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -2378,7 +2379,7 @@ export default function AdminUsersDirectory() {
                       value={selectedSalaryBranch}
                       onChange={(e) => setSelectedSalaryBranch(e.target.value)}
                       required
-                      className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50"
+                      className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50"
                     >
                       <option value="" className="bg-white text-slate-900">Select Branch</option>
                       {branches.map((b) => (
@@ -2392,7 +2393,7 @@ export default function AdminUsersDirectory() {
                     <select
                       value={selectedSalaryAccount}
                       onChange={(e) => setSelectedSalaryAccount(e.target.value)}
-                      className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50"
+                      className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50"
                     >
                       {selectedUser.bank_info && Object.entries(selectedUser.bank_info).map(([key, val]) => {
                         if (!val) return null
@@ -2417,7 +2418,7 @@ export default function AdminUsersDirectory() {
                       onChange={(e) => setCustomAccountInput(e.target.value)}
                       required
                       placeholder="e.g. bKash: 01712345678 or Hand Cash"
-                      className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50"
+                      className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50"
                     />
                   </div>
                 )}
@@ -2425,16 +2426,16 @@ export default function AdminUsersDirectory() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div>
                     <label className="block text-[10px] font-semibold text-slate-500 tracking-wider uppercase mb-1.5">Transaction ID</label>
-                    <input type="text" value={trxId} onChange={(e) => setTrxId(e.target.value)} required placeholder="e.g. TRX-1290381" className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs font-mono text-slate-900 focus:outline-none focus:border-[#d4af37]/50" />
+                    <input type="text" value={trxId} onChange={(e) => setTrxId(e.target.value)} required placeholder="e.g. TRX-1290381" className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs font-mono text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" />
                   </div>
                   <div>
                     <label className="block text-[10px] font-semibold text-slate-500 tracking-wider uppercase mb-1.5">Payment Date</label>
-                    <input type="date" value={paymentDate} onChange={(e) => setPaymentDate(e.target.value)} required className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50" />
+                    <input type="date" value={paymentDate} onChange={(e) => setPaymentDate(e.target.value)} required className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" />
                   </div>
                 </div>
 
                 <div>
-                  <label className="flex flex-col items-center justify-center w-full py-6 border-2 border-dashed border-slate-900/10 hover:border-[#d4af37]/30 rounded-xl cursor-pointer bg-slate-900/[0.04] transition-all">
+                  <label className="flex flex-col items-center justify-center w-full py-6 border-2 border-dashed border-slate-900/10 hover:border-[#1ca34c]/30 rounded-xl cursor-pointer bg-slate-900/[0.04] transition-all">
                     <Camera className="w-6 h-6 text-slate-500 mb-2" />
                     <span className="text-xs text-slate-500 font-semibold">{proofFile ? proofFile.name : 'Upload Screenshot (PNG, JPG)'}</span>
                     <input type="file" className="hidden" accept="image/*" onChange={(e) => { if (e.target.files && e.target.files[0]) setProofFile(e.target.files[0]) }} />
@@ -2462,12 +2463,12 @@ export default function AdminUsersDirectory() {
               initial={{ scale: 0.95 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.95 }}
-              className="glass-panel p-4 sm:p-6 rounded-2xl max-w-md w-full relative shadow-2xl overflow-y-auto max-h-[90vh] border border-[#d4af37]/30"
+              className="glass-panel p-4 sm:p-6 rounded-2xl max-w-md w-full relative shadow-2xl overflow-y-auto max-h-[90vh] border border-[#1ca34c]/30"
             >
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <h3 className="text-lg font-bold text-slate-900 font-serif">Transfer Employee Branch</h3>
-                  <p className="text-[10px] text-slate-500 mt-1">Employee: <span className="text-[#8a6d1f]">{selectedUser.full_name}</span></p>
+                  <p className="text-[10px] text-slate-500 mt-1">Employee: <span className="text-[#15803d]">{selectedUser.full_name}</span></p>
                 </div>
                 <button type="button" onClick={() => setShowBranchModal(false)} className="text-slate-500 hover:text-slate-900 cursor-pointer p-2.5 rounded-lg">
                   <X className="w-5 h-5" />
@@ -2488,7 +2489,7 @@ export default function AdminUsersDirectory() {
                     value={transferBranchId}
                     onChange={(e) => setTransferBranchId(e.target.value)}
                     required
-                    className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50"
+                    className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50"
                   >
                     <option value="" className="bg-white text-slate-900">Select New Branch</option>
                     {branches
@@ -2520,14 +2521,14 @@ export default function AdminUsersDirectory() {
                     placeholder="e.g. Relocated to Dhaka Head Office for project support"
                     maxLength={200}
                     rows={3}
-                    className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50 resize-none"
+                    className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 resize-none"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-[#d4af37] to-white text-black font-semibold py-3.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 mt-4 cursor-pointer hover:shadow-lg hover:shadow-[#d4af37]/10 transition-all"
+                  className="w-full bg-[#1ca34c] text-white font-semibold py-3.5 rounded-full text-xs uppercase tracking-wider flex items-center justify-center gap-2 mt-4 cursor-pointer hover:shadow-lg hover:shadow-[#1ca34c]/10 transition-all"
                 >
                   {isSubmitting ? 'Processing Transfer...' : 'Confirm Branch Transfer'}
                 </button>
@@ -2550,12 +2551,12 @@ export default function AdminUsersDirectory() {
               initial={{ scale: 0.95 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.95 }}
-              className="glass-panel p-4 sm:p-6 rounded-2xl max-w-md w-full relative shadow-2xl overflow-y-auto max-h-[90vh] border border-[#d4af37]/30"
+              className="glass-panel p-4 sm:p-6 rounded-2xl max-w-md w-full relative shadow-2xl overflow-y-auto max-h-[90vh] border border-[#1ca34c]/30"
             >
               <div className="flex justify-between items-start mb-6">
                 <div>
                   <h3 className="text-lg font-bold text-slate-900 font-serif">Change Employee Position</h3>
-                  <p className="text-[10px] text-slate-500 mt-1">Employee: <span className="text-[#8a6d1f]">{selectedUser.full_name}</span></p>
+                  <p className="text-[10px] text-slate-500 mt-1">Employee: <span className="text-[#15803d]">{selectedUser.full_name}</span></p>
                 </div>
                 <button type="button" onClick={() => setShowPositionModal(false)} className="text-slate-500 hover:text-slate-900 cursor-pointer p-2.5 rounded-lg">
                   <X className="w-5 h-5" />
@@ -2576,7 +2577,7 @@ export default function AdminUsersDirectory() {
                     value={transferPositionId}
                     onChange={(e) => setTransferPositionId(e.target.value)}
                     required
-                    className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50"
+                    className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50"
                   >
                     <option value="" className="bg-white text-slate-900">Select New Position</option>
                     {positions
@@ -2608,14 +2609,14 @@ export default function AdminUsersDirectory() {
                     placeholder="e.g. Promoted to Senior Role after annual evaluation"
                     maxLength={200}
                     rows={3}
-                    className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50 resize-none"
+                    className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 resize-none"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full bg-gradient-to-r from-[#d4af37] to-white text-black font-semibold py-3.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 mt-4 cursor-pointer hover:shadow-lg hover:shadow-[#d4af37]/10 transition-all"
+                  className="w-full bg-[#1ca34c] text-white font-semibold py-3.5 rounded-full text-xs uppercase tracking-wider flex items-center justify-center gap-2 mt-4 cursor-pointer hover:shadow-lg hover:shadow-[#1ca34c]/10 transition-all"
                 >
                   {isSubmitting ? 'Processing Position Change...' : 'Confirm Position Change'}
                 </button>

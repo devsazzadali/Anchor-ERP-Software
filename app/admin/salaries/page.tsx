@@ -283,12 +283,13 @@ export default function AdminSalariesLedger() {
 
   return (
     <div className="min-h-screen w-full flex bg-white text-slate-900 font-sans">
-      <div className="absolute top-[-10%] right-[-5%] w-[50%] h-[50%] bg-[#d4af37]/3 rounded-full filter blur-[150px] pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-5%] w-[50%] h-[50%] bg-[#1ca34c]/3 rounded-full filter blur-[150px] pointer-events-none" />
 
       <div className="flex-1 flex flex-col p-6 lg:p-10 overflow-y-auto max-h-screen relative z-10">
         <div className="mb-8 pb-4 border-b border-slate-900/5 flex justify-between items-end">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight text-slate-900 font-serif">
+            <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 font-serif flex items-center gap-3">
+              <span className="w-1.5 h-9 rounded-full bg-[#1ca34c] shrink-0" />
               Master Salary <span className="premium-text-gradient">Ledger</span>
             </h2>
             <p className="text-xs text-slate-500 mt-1">Audit log of disbursed and pending workforce compensations for {currentMonthStr}.</p>
@@ -297,13 +298,13 @@ export default function AdminSalariesLedger() {
           <div className="flex items-center gap-4 flex-wrap justify-end">
             <button
               onClick={() => setShowIssueModal(true)}
-              className="px-4 py-2 bg-gradient-to-r from-[#d4af37] to-white text-black hover:brightness-110 rounded-xl text-xs font-bold uppercase tracking-wider shadow-md hover:scale-105 transition-all flex items-center gap-2"
+              className="px-4 py-2 bg-[#1ca34c] text-white hover:brightness-110 rounded-full text-xs font-bold uppercase tracking-wider shadow-md hover:scale-105 transition-all flex items-center gap-2"
             >
               <Landmark className="w-4 h-4" />
               Issue Salary
             </button>
             {/* Filters */}
-            <div className="flex items-center gap-3 bg-white p-2 rounded-2xl border border-slate-900/5 shadow-inner flex-wrap">
+            <div className="flex items-center gap-3 bg-white p-2 rounded-3xl border border-slate-900/5 shadow-inner flex-wrap">
               <div className="relative">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
                 <input
@@ -311,7 +312,7 @@ export default function AdminSalariesLedger() {
                   placeholder="Search Employee..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="bg-white border border-slate-900/10 rounded-xl py-2 pl-9 pr-3 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/70 focus:ring-1 focus:ring-[#d4af37]/50 transition-all w-48 placeholder:text-slate-600"
+                  className="bg-white border border-slate-900/10 rounded-xl py-2 pl-9 pr-3 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/70 focus:ring-1 focus:ring-[#1ca34c]/50 transition-all w-48 placeholder:text-slate-600"
                 />
               </div>
 
@@ -319,7 +320,7 @@ export default function AdminSalariesLedger() {
                 <select
                   value={branchFilter}
                   onChange={(e) => setBranchFilter(e.target.value)}
-                  className="bg-white border border-slate-900/10 rounded-xl py-2 pl-3 pr-8 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/70 focus:ring-1 focus:ring-[#d4af37]/50 transition-all cursor-pointer appearance-none min-w-[140px]"
+                  className="bg-white border border-slate-900/10 rounded-xl py-2 pl-3 pr-8 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/70 focus:ring-1 focus:ring-[#1ca34c]/50 transition-all cursor-pointer appearance-none min-w-[140px]"
                 >
                   <option value="All" className="bg-white">🏢 All Branches</option>
                   {uniqueBranches.map(branch => (
@@ -335,15 +336,15 @@ export default function AdminSalariesLedger() {
                 <select
                   value={selectedMonth}
                   onChange={(e) => setSelectedMonth(e.target.value)}
-                  className="bg-[#d4af37]/10 border border-[#d4af37]/30 text-[#8a6d1f] rounded-xl py-2 pl-9 pr-8 text-xs font-bold focus:outline-none focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37]/50 transition-all cursor-pointer appearance-none min-w-[150px]"
+                  className="bg-[#1ca34c]/10 border border-[#1ca34c]/30 text-[#15803d] rounded-xl py-2 pl-9 pr-8 text-xs font-bold focus:outline-none focus:border-[#1ca34c] focus:ring-1 focus:ring-[#1ca34c]/50 transition-all cursor-pointer appearance-none min-w-[150px]"
                 >
                   <option value="all" className="bg-white text-slate-900 font-bold">📅 All Time (Total)</option>
                   {last12Months.map(m => (
                     <option key={m.value} value={m.value} className="bg-white text-slate-900">{m.label}</option>
                   ))}
                 </select>
-                <Calendar className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#8a6d1f]" />
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#8a6d1f]">
+                <Calendar className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#15803d]" />
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-[#15803d]">
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                 </div>
               </div>
@@ -354,7 +355,7 @@ export default function AdminSalariesLedger() {
               {!isSelectMode ? (
                 <button
                   onClick={() => setIsSelectMode(true)}
-                  className="px-3 py-1.5 bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#d4af37]/40 text-slate-600 hover:text-slate-900 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer"
+                  className="px-3 py-1.5 bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#1ca34c]/40 text-slate-600 hover:text-slate-900 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer"
                 >
                   Select Mode
                 </button>
@@ -377,7 +378,7 @@ export default function AdminSalariesLedger() {
                         if (e.target.checked) setSelectedIds(filteredSalaries.map(s => s.id))
                         else setSelectedIds([])
                       }}
-                      className="w-3.5 h-3.5 rounded border-slate-900/10 bg-white text-[#8a6d1f] focus:ring-0 accent-[#d4af37] cursor-pointer transition-all hover:scale-110"
+                      className="w-3.5 h-3.5 rounded border-slate-900/10 bg-white text-[#15803d] focus:ring-0 accent-[#1ca34c] cursor-pointer transition-all hover:scale-110"
                     />
                     <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Select All</span>
                   </label>
@@ -388,7 +389,7 @@ export default function AdminSalariesLedger() {
                 <div className="relative">
                   <button
                     onClick={() => setShowExportDropdown(prev => !prev)}
-                    className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-[#d4af37] to-white text-black hover:brightness-110 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-md shadow-[#d4af37]/10 cursor-pointer"
+                    className="flex items-center gap-1 px-3 py-1.5 bg-[#1ca34c] text-white hover:brightness-110 rounded-full text-[10px] font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-md shadow-[#1ca34c]/10 cursor-pointer"
                   >
                     <FileText className="w-3.5 h-3.5" />
                     <span>Export ({selectedIds.length}) ▼</span>
@@ -400,19 +401,19 @@ export default function AdminSalariesLedger() {
                       <div className="absolute right-0 mt-1.5 w-36 bg-white border border-slate-900/10 rounded-lg shadow-xl py-1 z-20 flex flex-col">
                         <button
                           onClick={() => { handleExportExcel(); setShowExportDropdown(false); }}
-                          className="px-3 py-1.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#8a6d1f] text-slate-900 transition-colors cursor-pointer"
+                          className="px-3 py-1.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#15803d] text-slate-900 transition-colors cursor-pointer"
                         >
                           Export to Excel (.xlsx)
                         </button>
                         <button
                           onClick={() => { handleExportCSV(); setShowExportDropdown(false); }}
-                          className="px-3 py-1.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#8a6d1f] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer"
+                          className="px-3 py-1.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#15803d] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer"
                         >
                           Export to CSV (.csv)
                         </button>
                         <button
                           onClick={() => { handleExportPDF(); setShowExportDropdown(false); }}
-                          className="px-3 py-1.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#8a6d1f] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer"
+                          className="px-3 py-1.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#15803d] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer"
                         >
                           Export to PDF (.pdf)
                         </button>
@@ -464,7 +465,7 @@ export default function AdminSalariesLedger() {
         <div className="flex gap-4 mb-6 border-b border-slate-900/5">
           <button
             onClick={() => setActiveTab('paid')}
-            className={`pb-3 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 ${activeTab === 'paid' ? 'text-[#8a6d1f] border-[#d4af37]' : 'text-slate-500 border-transparent hover:text-slate-900'}`}
+            className={`pb-3 text-xs font-bold uppercase tracking-wider transition-colors border-b-2 ${activeTab === 'paid' ? 'text-[#15803d] border-[#1ca34c]' : 'text-slate-500 border-transparent hover:text-slate-900'}`}
           >
             Paid ({summaryStats.countPaid})
           </button>
@@ -479,7 +480,7 @@ export default function AdminSalariesLedger() {
         {/* --- Content Area --- */}
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20 text-slate-500">
-            <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin mb-4" />
+            <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin mb-4" />
             <span className="text-xs tracking-wider uppercase">Loading Ledger...</span>
           </div>
         ) : (
@@ -499,8 +500,8 @@ export default function AdminSalariesLedger() {
                   animate={{ opacity: 1, scale: 1 }}
                   key={salary.id}
                   onClick={() => setSelectedSalary(salary)}
-                  className={`glass-panel p-6 rounded-2xl relative shadow-xl hover:border-[#d4af37]/30 transition-all border cursor-pointer group ${
-                    isChecked && isSelectMode ? 'border-[#d4af37]/40 bg-[#d4af37]/5' : 'border-slate-900/5'
+                  className={`glass-panel p-6 rounded-2xl relative shadow-xl hover:border-[#1ca34c]/30 transition-all border cursor-pointer group ${
+                    isChecked && isSelectMode ? 'border-[#1ca34c]/40 bg-[#1ca34c]/5' : 'border-slate-900/5'
                   }`}
                 >
                   <div className="flex justify-between items-start mb-4">
@@ -514,18 +515,18 @@ export default function AdminSalariesLedger() {
                             if (e.target.checked) setSelectedIds(prev => [...prev, salary.id])
                             else setSelectedIds(prev => prev.filter(id => id !== salary.id))
                           }}
-                          className="w-4 h-4 rounded border-slate-900/10 bg-white text-[#8a6d1f] focus:ring-0 accent-[#d4af37] cursor-pointer transition-all hover:scale-110 shrink-0"
+                          className="w-4 h-4 rounded border-slate-900/10 bg-white text-[#15803d] focus:ring-0 accent-[#1ca34c] cursor-pointer transition-all hover:scale-110 shrink-0"
                         />
                       )}
                       <div className="w-10 h-10 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 flex items-center justify-center text-slate-900 font-bold text-sm">
                         {(salary.profiles?.branch?.toLowerCase().includes('head office') || salary.profiles?.branch?.toLowerCase() === 'hq' || salary.profiles?.profile_type === 'head_office') ? (
-                          <Building2 className="w-5 h-5 text-[#8a6d1f]" />
+                          <Building2 className="w-5 h-5 text-[#15803d]" />
                         ) : (
                           salary.profiles?.full_name?.charAt(0) || '?'
                         )}
                       </div>
                       <div>
-                        <h4 className="text-sm font-bold text-slate-900 group-hover:text-[#8a6d1f] transition-colors">{salary.profiles?.full_name || 'Unknown Employee'}</h4>
+                        <h4 className="text-sm font-bold text-slate-900 group-hover:text-[#15803d] transition-colors">{salary.profiles?.full_name || 'Unknown Employee'}</h4>
                         <span className="text-[10px] text-slate-500 uppercase tracking-wider block">{salary.profiles?.branch || 'HQ'}</span>
                       </div>
                     </div>
@@ -542,7 +543,7 @@ export default function AdminSalariesLedger() {
 
                   {/* Joining Date info in Paid view */}
                   <div className="text-[10px] text-slate-500 mb-3 flex items-center gap-1.5">
-                    <Calendar className="w-3 h-3 text-[#8a6d1f]" />
+                    <Calendar className="w-3 h-3 text-[#15803d]" />
                     Joined: {salary.profiles?.joining_date ? new Date(salary.profiles.joining_date).toLocaleDateString() : (salary.profiles?.created_at ? new Date(salary.profiles.created_at).toLocaleDateString() : 'N/A')}
                   </div>
 
@@ -576,7 +577,7 @@ export default function AdminSalariesLedger() {
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 flex items-center justify-center text-slate-900 font-bold text-sm">
                       {(user.branch?.toLowerCase().includes('head office') || user.branch?.toLowerCase() === 'hq' || user.profile_type === 'head_office') ? (
-                        <Building2 className="w-5 h-5 text-[#8a6d1f]" />
+                        <Building2 className="w-5 h-5 text-[#15803d]" />
                       ) : (
                         user.full_name?.charAt(0) || '?'
                       )}
@@ -600,7 +601,7 @@ export default function AdminSalariesLedger() {
 
                 {/* Joining Date info in Unpaid view */}
                 <div className="text-[10px] text-slate-500 mb-4 flex items-center gap-1.5 bg-white p-2 rounded-lg border border-slate-900/5">
-                  <Calendar className="w-3.5 h-3.5 text-[#8a6d1f]" />
+                  <Calendar className="w-3.5 h-3.5 text-[#15803d]" />
                   Joined: <span className="text-slate-900 font-medium">{user.joining_date ? new Date(user.joining_date).toLocaleDateString() : (user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A')}</span>
                 </div>
 
@@ -629,7 +630,7 @@ export default function AdminSalariesLedger() {
               initial={{ scale: 0.95 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.95 }}
-              className="glass-panel p-6 rounded-2xl max-w-md w-full relative shadow-2xl overflow-y-auto max-h-[90vh] border border-[#d4af37]/30"
+              className="glass-panel p-6 rounded-2xl max-w-md w-full relative shadow-2xl overflow-y-auto max-h-[90vh] border border-[#1ca34c]/30"
             >
               <div className="flex justify-between items-start border-b border-slate-900/5 pb-4 mb-4">
                 <div>
@@ -692,7 +693,7 @@ export default function AdminSalariesLedger() {
                 <button
                   type="button"
                   onClick={() => handleExportSingleSalaryPdf(selectedSalary)}
-                  className="w-full py-3 rounded-xl bg-[#d4af37]/10 hover:bg-[#d4af37]/20 border border-[#d4af37]/30 text-[#8a6d1f] text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow-[#d4af37]/10"
+                  className="w-full py-3 rounded-xl bg-[#1ca34c]/10 hover:bg-[#1ca34c]/20 border border-[#1ca34c]/30 text-[#15803d] text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow-[#1ca34c]/10"
                 >
                   <Download className="w-4 h-4" />
                   Export Voucher (PDF)

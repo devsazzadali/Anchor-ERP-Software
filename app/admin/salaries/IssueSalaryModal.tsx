@@ -181,7 +181,7 @@ export default function IssueSalaryModal({
   return (
     <AnimatePresence>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-slate-950/50 z-50 flex justify-center items-center p-4">
-        <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} className="glass-panel p-6 rounded-2xl max-w-md w-full relative border border-[#d4af37]/30 max-h-[90vh] overflow-y-auto custom-scrollbar">
+        <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} className="glass-panel p-6 rounded-2xl max-w-md w-full relative border border-[#1ca34c]/30 max-h-[90vh] overflow-y-auto custom-scrollbar">
           <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-900/5">
             <h3 className="text-xl font-bold text-slate-900">Issue Salary</h3>
             <button onClick={onClose} className="text-slate-500 hover:text-slate-900 p-2.5 rounded-lg"><X className="w-5 h-5" /></button>
@@ -209,7 +209,7 @@ export default function IssueSalaryModal({
 
             {employeeId && (
               bankDetailsText ? (
-                <div className="bg-[#d4af37]/10 border border-[#d4af37]/30 rounded-xl p-3 my-2">
+                <div className="bg-[#1ca34c]/10 border border-[#1ca34c]/30 rounded-xl p-3 my-2">
                   <p className="text-[10px] text-slate-500 uppercase font-bold tracking-widest mb-1">Payment Account (Send money here)</p>
                   <p className="text-xs text-slate-900 font-medium">{bankDetailsText}</p>
                 </div>
@@ -223,46 +223,46 @@ export default function IssueSalaryModal({
             <div className="space-y-4">
               <div>
                 <label className="text-xs text-slate-500 mb-1 block">Basic Salary (BDT)</label>
-                <input type="number" min="0" value={basicSalary} onChange={(e) => setBasicSalary(Number(e.target.value))} required className="w-full bg-white border border-slate-900/10 rounded-xl py-2 px-3 text-slate-900 focus:border-[#d4af37]/50 focus:outline-none" />
+                <input type="number" min="0" value={basicSalary} onChange={(e) => setBasicSalary(Number(e.target.value))} required className="w-full bg-white border border-slate-900/10 rounded-xl py-2 px-3 text-slate-900 focus:border-[#1ca34c]/50 focus:outline-none" />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs text-slate-500 mb-1 block">Overtime (BDT)</label>
-                  <input type="number" min="0" value={overtimeAmount} onChange={(e) => setOvertimeAmount(Number(e.target.value))} className="w-full bg-white border border-slate-900/10 rounded-xl py-2 px-3 text-slate-900 focus:border-[#d4af37]/50 focus:outline-none" />
+                  <input type="number" min="0" value={overtimeAmount} onChange={(e) => setOvertimeAmount(Number(e.target.value))} className="w-full bg-white border border-slate-900/10 rounded-xl py-2 px-3 text-slate-900 focus:border-[#1ca34c]/50 focus:outline-none" />
                 </div>
                 <div>
                   <label className="text-xs text-slate-500 mb-1 block">Bonus (BDT)</label>
-                  <input type="number" min="0" value={bonusAmount} onChange={(e) => setBonusAmount(Number(e.target.value))} className="w-full bg-white border border-slate-900/10 rounded-xl py-2 px-3 text-slate-900 focus:border-[#d4af37]/50 focus:outline-none" />
+                  <input type="number" min="0" value={bonusAmount} onChange={(e) => setBonusAmount(Number(e.target.value))} className="w-full bg-white border border-slate-900/10 rounded-xl py-2 px-3 text-slate-900 focus:border-[#1ca34c]/50 focus:outline-none" />
                 </div>
                 <div>
                   <label className="text-xs text-slate-500 mb-1 block">Sales Comm (BDT)</label>
-                  <input type="number" min="0" value={salesCommission} onChange={(e) => setSalesCommission(Number(e.target.value))} className="w-full bg-white border border-slate-900/10 rounded-xl py-2 px-3 text-slate-900 focus:border-[#d4af37]/50 focus:outline-none" />
+                  <input type="number" min="0" value={salesCommission} onChange={(e) => setSalesCommission(Number(e.target.value))} className="w-full bg-white border border-slate-900/10 rounded-xl py-2 px-3 text-slate-900 focus:border-[#1ca34c]/50 focus:outline-none" />
                 </div>
                 <div>
                   <label className="text-xs text-slate-500 mb-1 block">Tiffin Bill (BDT)</label>
-                  <input type="number" min="0" value={tiffinBill} onChange={(e) => setTiffinBill(Number(e.target.value))} className="w-full bg-white border border-slate-900/10 rounded-xl py-2 px-3 text-slate-900 focus:border-[#d4af37]/50 focus:outline-none" />
+                  <input type="number" min="0" value={tiffinBill} onChange={(e) => setTiffinBill(Number(e.target.value))} className="w-full bg-white border border-slate-900/10 rounded-xl py-2 px-3 text-slate-900 focus:border-[#1ca34c]/50 focus:outline-none" />
                 </div>
               </div>
             </div>
 
             <div className="bg-white p-4 rounded-xl border border-slate-900/5 flex justify-between items-center mt-2">
               <span className="text-xs text-slate-500 uppercase tracking-widest font-bold">Total Payout</span>
-              <span className="text-lg font-bold text-[#8a6d1f]">{totalSalary.toLocaleString()} BDT</span>
+              <span className="text-lg font-bold text-[#15803d]">{totalSalary.toLocaleString()} BDT</span>
             </div>
 
             <div>
               <label className="text-xs text-slate-500 mb-1 block uppercase tracking-wider font-bold">Payment Proof (Screenshot)</label>
-              <div className="border border-dashed border-slate-900/10 rounded-xl p-4 text-center hover:border-[#d4af37]/50 transition-colors bg-white">
+              <div className="border border-dashed border-slate-900/10 rounded-xl p-4 text-center hover:border-[#1ca34c]/50 transition-colors bg-white">
                 <input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} className="hidden" id="proof-upload" accept="image/*" />
                 <label htmlFor="proof-upload" className="cursor-pointer flex flex-col items-center justify-center gap-2">
-                  <UploadCloud className="w-6 h-6 text-[#8a6d1f]" />
+                  <UploadCloud className="w-6 h-6 text-[#15803d]" />
                   <span className="text-xs text-slate-500">{file ? file.name : 'Click to upload proof (TrxID / Screenshot)'}</span>
                 </label>
               </div>
             </div>
 
-            <button type="submit" disabled={isSubmitting || totalSalary <= 0} className="w-full py-3 bg-gradient-to-r from-[#d4af37] to-white text-black font-bold uppercase tracking-widest text-xs rounded-xl hover:brightness-110 disabled:opacity-50 transition-all flex items-center justify-center gap-2 mt-4">
+            <button type="submit" disabled={isSubmitting || totalSalary <= 0} className="w-full py-3 bg-[#1ca34c] text-white font-bold uppercase tracking-widest text-xs rounded-full hover:brightness-110 disabled:opacity-50 transition-all flex items-center justify-center gap-2 mt-4">
               {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Calculator className="w-4 h-4" />}
               {isSubmitting ? 'Processing...' : 'Confirm Salary Payment'}
             </button>

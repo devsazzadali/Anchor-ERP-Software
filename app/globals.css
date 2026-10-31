@@ -2,33 +2,36 @@
 
 /*
   Light theme — the whole app uses these tokens.
-  Surfaces are white / soft grey, text is near-black, and the gold
-  primary (#d4af37) is kept from the previous identity. Where gold is
-  used as text on white it is too light to read, so components use the
-  darker --gold-text shade for text and keep #d4af37 for fills.
+  Surfaces are white / soft grey, text is near-black ink (#0b1220),
+  and the vivid green primary (#1ca34c) is the Anchor Fashion
+  identity. Where green is used as text on white the primary is too
+  light to read, so components use the darker brand shade for text
+  and keep #1ca34c for fills. --gold-text is a legacy variable name
+  kept for compatibility — it now holds that brand green text shade
+  (#15803d), not a gold colour.
 */
 :root {
-  --background: #f4f5f7;
-  --foreground: #17181c;
+  --background: #f4f6f5;
+  --foreground: #0b1220;
   --card: #ffffff;
-  --card-foreground: #17181c;
+  --card-foreground: #0b1220;
   --popover: #ffffff;
-  --popover-foreground: #17181c;
-  --primary: #d4af37;
-  --primary-foreground: #17181c;
-  --gold-text: #8a6d1f;
+  --popover-foreground: #0b1220;
+  --primary: #1ca34c;
+  --primary-foreground: #ffffff;
+  --gold-text: #15803d;
   --secondary: #eceef1;
-  --secondary-foreground: #17181c;
+  --secondary-foreground: #0b1220;
   --muted: #eceef1;
   --muted-foreground: #59616e;
-  --accent: #f7ecd2;
-  --accent-foreground: #7a5c14;
+  --accent: #e8f7ee;
+  --accent-foreground: #15803d;
   --destructive: #dc2626;
   --destructive-foreground: #ffffff;
   --border: rgba(15, 18, 25, 0.1);
   --input: rgba(15, 18, 25, 0.04);
-  --ring: #b8912a;
-  --radius: 0.75rem;
+  --ring: #16a34a;
+  --radius: 1.5rem;
 
   --emerald: #059669;
   --rose: #e11d48;
@@ -92,7 +95,8 @@ body {
 .glass-panel {
   background: var(--card);
   border: 1px solid var(--border);
-  box-shadow: 0 1px 2px rgba(15, 18, 25, 0.05);
+  border-radius: 1.5rem;
+  box-shadow: 0 1px 3px rgba(11,18,32,0.04), 0 8px 24px -12px rgba(11,18,32,0.08);
 }
 
 .glass-panel-hover {
@@ -100,7 +104,7 @@ body {
 }
 .glass-panel-hover:hover {
   transform: translateY(-2px);
-  border-color: rgba(184, 145, 42, 0.4);
+  border-color: rgba(22,163,74, 0.4);
   box-shadow: 0 12px 30px rgba(15, 18, 25, 0.1);
 }
 
@@ -113,11 +117,11 @@ body {
 }
 
 .gold-glow {
-  box-shadow: 0 0 40px -10px rgba(212, 175, 55, 0.35);
+  box-shadow: 0 0 40px -10px rgba(28,163,76,0.35);
 }
 
 .gold-glow-hover:hover {
-  box-shadow: 0 0 50px -5px rgba(212, 175, 55, 0.4);
+  box-shadow: 0 0 50px -5px rgba(28,163,76,0.4);
 }
 
 .premium-export-btn {
@@ -141,12 +145,13 @@ body {
 }
 
 .premium-gradient {
-  background: linear-gradient(135deg, #d4af37 0%, #aa7c11 50%, #f3e5ab 100%);
+  background: linear-gradient(135deg,#1ca34c 0%,#16a34a 55%,#15803d 100%);
 }
 
-/* Gold gradient text — darker stops so it stays readable on white. */
+/* Brand gradient text — near-black stops (like the reference
+   wordmark) easing into brand green so it stays readable on white. */
 .premium-text-gradient {
-  background: linear-gradient(135deg, #aa7c11 0%, #8a6d1f 50%, #c39a2b 100%);
+  background: linear-gradient(135deg,#0b1220 0%,#0b1220 55%,#15803d 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -154,7 +159,7 @@ body {
 /* Was a dark hero gradient; now a soft light one. Kept under the same
    class name because several pages still reference it. */
 .dark-gradient {
-  background: linear-gradient(180deg, #ffffff 0%, #eef0f3 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #edf3ef 100%);
 }
 
 /* Keep any stray wide child from pushing the whole page sideways.
@@ -282,15 +287,15 @@ html, body {
 }
 
 .pdf-editor-zone:focus-within {
-  box-shadow: inset 0 0 0 2px rgba(184, 145, 42, 0.45);
+  box-shadow: inset 0 0 0 2px rgba(22,163,74, 0.45);
 }
 
 .pdf-toolbar-btn {
   transition: all 0.15s ease;
 }
 .pdf-toolbar-btn.active {
-  background: rgba(212, 175, 55, 0.25);
-  color: #7a5c14;
+  background: rgba(28,163,76, 0.25);
+  color: #15803d;
 }
 .pdf-toolbar-btn:hover {
   background: rgba(15, 18, 25, 0.06);

@@ -368,7 +368,7 @@ export default function KycReviews() {
     <div className="min-h-screen w-full flex bg-white text-slate-900 font-sans">
 
       {/* Background neon filters */}
-      <div className="absolute top-[-10%] left-[20%] w-[50%] h-[50%] bg-[#d4af37]/3 rounded-full filter blur-[150px] pointer-events-none" />
+      <div className="absolute top-[-10%] left-[20%] w-[50%] h-[50%] bg-[#1ca34c]/3 rounded-full filter blur-[150px] pointer-events-none" />
 
       {/* Floating Sidebar */}
 
@@ -378,7 +378,8 @@ export default function KycReviews() {
         {/* Upper title */}
         <div className="mb-6 pb-4 border-b border-slate-900/5 flex justify-between items-center">
           <div>
-            <h2 className="text-xl font-bold tracking-tight text-slate-900 font-serif">
+            <h2 className="text-xl font-extrabold tracking-tight text-slate-900 font-serif flex items-center gap-3">
+              <span className="w-1.5 h-8 rounded-full bg-[#1ca34c] shrink-0" />
               KYC Document <span className="premium-text-gradient">Review Bench</span>
             </h2>
             <p className="text-[11px] text-slate-500">Validate identity credentials, verify NID documents, and clear accounts.</p>
@@ -387,9 +388,9 @@ export default function KycReviews() {
           <button
             onClick={fetchQueue}
             disabled={isLoading}
-            className="p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 text-slate-500 hover:text-slate-900 transition-all cursor-pointer disabled:opacity-50"
+            className="p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 text-slate-500 hover:text-slate-900 transition-all cursor-pointer disabled:opacity-50"
           >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-[#8a6d1f]' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-[#15803d]' : ''}`} />
           </button>
         </div>
 
@@ -444,7 +445,7 @@ export default function KycReviews() {
                       onClick={() => updateStatusFilter(tab)}
                       className={`px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
                         statusFilter === tab
-                          ? 'bg-[#d4af37] text-black shadow-md font-extrabold'
+                          ? 'bg-[#1ca34c] text-white shadow-md font-extrabold'
                           : 'bg-slate-900/[0.04] text-slate-500 hover:text-slate-900 hover:bg-slate-900/[0.07]'
                       }`}
                     >
@@ -463,12 +464,12 @@ export default function KycReviews() {
                         onClick={() => handleSelectRequest(req)}
                         className={`w-full text-left p-3.5 rounded-xl border transition-all cursor-pointer relative overflow-hidden flex items-center justify-between group ${
                           isSelected
-                            ? 'bg-[#d4af37]/10 border-[#d4af37]/40 shadow'
+                            ? 'bg-[#1ca34c]/10 border-[#1ca34c]/40 shadow'
                             : 'bg-slate-900/[0.04] border-slate-900/5 hover:border-slate-900/10'
                         }`}
                       >
                         <div>
-                          <h4 className="text-xs font-bold text-slate-900 group-hover:text-[#8a6d1f] transition-colors">{req.full_name}</h4>
+                          <h4 className="text-xs font-bold text-slate-900 group-hover:text-[#15803d] transition-colors">{req.full_name}</h4>
                           <p className="text-[10px] text-slate-500 mt-1">{req.phone_number}</p>
                           <span className="text-[8px] text-slate-600 font-mono block mt-1">{new Date(req.created_at).toLocaleDateString()}</span>
                         </div>
@@ -501,12 +502,12 @@ export default function KycReviews() {
                     exit={{ opacity: 0, x: -15 }}
                     className="glass-panel p-6 rounded-2xl relative shadow-2xl"
                   >
-                    <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/30 to-transparent" />
+                    <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#1ca34c]/30 to-transparent" />
 
                     {/* Workbench Title */}
                     <div className="flex justify-between items-start mb-6 border-b border-slate-900/5 pb-4">
                       <div>
-                        <span className="text-[10px] font-bold text-[#8a6d1f] uppercase tracking-wider">Evaluation Console</span>
+                        <span className="text-[10px] font-bold text-[#15803d] uppercase tracking-wider">Evaluation Console</span>
                         <h3 className="text-base font-bold text-slate-900 font-serif">{selectedRequest.full_name}</h3>
                         <p className="text-[10px] text-slate-500 font-mono">Ref: {selectedRequest.id}</p>
                       </div>
@@ -514,7 +515,7 @@ export default function KycReviews() {
                         <button
                           type="button"
                           onClick={handleOpenEditModal}
-                          className="px-3 py-1.5 rounded-lg bg-[#d4af37]/10 hover:bg-[#d4af37]/20 border border-[#d4af37]/30 text-[#8a6d1f] text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow hover:scale-[1.02] active:scale-[0.98]"
+                          className="px-3 py-1.5 rounded-lg bg-[#1ca34c]/10 hover:bg-[#1ca34c]/20 border border-[#1ca34c]/30 text-[#15803d] text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow hover:scale-[1.02] active:scale-[0.98]"
                         >
                           <Pencil className="w-3.5 h-3.5" />
                           <span>Edit All Info</span>
@@ -538,7 +539,7 @@ export default function KycReviews() {
                             className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-900/[0.04] hover:bg-slate-900/[0.07] border border-slate-900/10 hover:border-slate-900/20 text-slate-600 text-[10px] font-semibold transition-all cursor-pointer group"
                             title="Edit applicant information"
                           >
-                            <Pencil className="w-3 h-3 text-[#8a6d1f] group-hover:scale-110 transition-transform" />
+                            <Pencil className="w-3 h-3 text-[#15803d] group-hover:scale-110 transition-transform" />
                             <span>Edit Info</span>
                           </button>
                         </div>
@@ -561,7 +562,7 @@ export default function KycReviews() {
                           </div>
                           <div className="flex items-center justify-between">
                             <span className="text-[10px] text-slate-500">Profile Type:</span>
-                            <span className="text-[#8a6d1f] font-semibold text-right capitalize">{selectedRequest.profile_type || 'employee'}</span>
+                            <span className="text-[#15803d] font-semibold text-right capitalize">{selectedRequest.profile_type || 'employee'}</span>
                           </div>
                         </div>
                       </div>
@@ -572,7 +573,7 @@ export default function KycReviews() {
                           <button
                             type="button"
                             onClick={handleOpenEditModal}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-[#d4af37]/10 hover:bg-[#d4af37]/20 border border-[#d4af37]/30 text-[#8a6d1f] text-[10px] font-semibold transition-all cursor-pointer group"
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-[#1ca34c]/10 hover:bg-[#1ca34c]/20 border border-[#1ca34c]/30 text-[#15803d] text-[10px] font-semibold transition-all cursor-pointer group"
                             title="Edit submitted bank details"
                           >
                             <Pencil className="w-3 h-3 group-hover:scale-110 transition-transform" />
@@ -637,14 +638,14 @@ export default function KycReviews() {
                             value={adminNotes}
                             onChange={(e) => setAdminNotes(e.target.value)}
                             placeholder="e.g. Identity and address verify matching against Bangladesh NID server registry..."
-                            className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3.5 px-4 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all resize-none"
+                            className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3.5 px-4 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all resize-none"
                           />
                         </div>
 
                         <div className="flex gap-4">
                           <button
                             onClick={() => approveKyc(selectedRequest.id)}
-                            className="flex-1 bg-gradient-to-r from-[#d4af37] to-white text-black font-semibold py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+                            className="flex-1 bg-[#1ca34c] text-white font-semibold py-3 rounded-full text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-lg"
                           >
                             <UserCheck className="w-4 h-4" />
                             <span>Approve Applicant</span>
@@ -691,7 +692,7 @@ export default function KycReviews() {
           >
             <div className="absolute top-6 left-6 right-6 flex justify-between items-center z-50 bg-white backdrop-blur-md px-5 py-3 rounded-xl border border-slate-900/5">
               <span className="text-xs font-semibold text-slate-900 tracking-widest uppercase flex items-center gap-2">
-                <Terminal className="w-4 h-4 text-[#8a6d1f]" />
+                <Terminal className="w-4 h-4 text-[#15803d]" />
                 Interactive Zoom Magnifier
               </span>
               <div className="flex gap-3">
@@ -708,7 +709,7 @@ export default function KycReviews() {
             </div>
 
             <motion.div
-              className="relative rounded-2xl overflow-hidden border border-slate-900/15 max-w-4xl max-h-[75vh]"
+              className="relative rounded-3xl overflow-hidden border border-slate-900/15 max-w-4xl max-h-[75vh]"
               style={{ scale: zoomScale }}
               transition={{ type: 'spring', stiffness: 300, damping: 25 }}
             >
@@ -787,13 +788,13 @@ export default function KycReviews() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="glass-panel p-6 rounded-2xl max-w-2xl w-full relative shadow-2xl overflow-hidden border border-[#d4af37]/30 bg-white max-h-[90vh] flex flex-col"
+              className="glass-panel p-6 rounded-2xl max-w-2xl w-full relative shadow-2xl overflow-hidden border border-[#1ca34c]/30 bg-white max-h-[90vh] flex flex-col"
             >
-              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/40 to-transparent" />
+              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#1ca34c]/40 to-transparent" />
 
               <div className="flex justify-between items-start mb-4 pb-3 border-b border-slate-900/5 flex-shrink-0">
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20">
+                  <div className="p-2.5 rounded-xl bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20">
                     <Pencil className="w-5 h-5" />
                   </div>
                   <div>
@@ -817,7 +818,7 @@ export default function KycReviews() {
                   {/* Column 1: Identity & Profile Details */}
                   <div className="space-y-3 bg-slate-900/[0.04] p-3.5 rounded-xl border border-slate-900/5">
                     <div className="flex items-center gap-2 pb-2 border-b border-slate-900/5">
-                      <UserCircle className="w-4 h-4 text-[#8a6d1f]" />
+                      <UserCircle className="w-4 h-4 text-[#15803d]" />
                       <span className="text-[11px] font-bold text-slate-900 uppercase tracking-wider">Identity & Profile</span>
                     </div>
 
@@ -830,7 +831,7 @@ export default function KycReviews() {
                         value={editFullName}
                         onChange={(e) => setEditFullName(e.target.value)}
                         placeholder="Applicant Full Name"
-                        className="w-full bg-slate-900/[0.04] border border-slate-900/10 focus:border-[#d4af37]/50 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none transition-colors"
+                        className="w-full bg-slate-900/[0.04] border border-slate-900/10 focus:border-[#1ca34c]/50 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none transition-colors"
                         required
                       />
                     </div>
@@ -844,7 +845,7 @@ export default function KycReviews() {
                         value={editPhoneNumber}
                         onChange={(e) => setEditPhoneNumber(e.target.value)}
                         placeholder="+880 1XXXXXXXXX"
-                        className="w-full bg-slate-900/[0.04] border border-slate-900/10 focus:border-[#d4af37]/50 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none transition-colors"
+                        className="w-full bg-slate-900/[0.04] border border-slate-900/10 focus:border-[#1ca34c]/50 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none transition-colors"
                       />
                     </div>
 
@@ -857,7 +858,7 @@ export default function KycReviews() {
                         value={editAddress}
                         onChange={(e) => setEditAddress(e.target.value)}
                         placeholder="Full street address / House / City"
-                        className="w-full bg-slate-900/[0.04] border border-slate-900/10 focus:border-[#d4af37]/50 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none transition-colors resize-none"
+                        className="w-full bg-slate-900/[0.04] border border-slate-900/10 focus:border-[#1ca34c]/50 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none transition-colors resize-none"
                       />
                     </div>
 
@@ -870,7 +871,7 @@ export default function KycReviews() {
                         value={editCountry}
                         onChange={(e) => setEditCountry(e.target.value)}
                         placeholder="Bangladesh"
-                        className="w-full bg-slate-900/[0.04] border border-slate-900/10 focus:border-[#d4af37]/50 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none transition-colors"
+                        className="w-full bg-slate-900/[0.04] border border-slate-900/10 focus:border-[#1ca34c]/50 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none transition-colors"
                       />
                     </div>
 
@@ -881,7 +882,7 @@ export default function KycReviews() {
                       <select
                         value={editProfileType}
                         onChange={(e) => setEditProfileType(e.target.value)}
-                        className="w-full bg-white border border-slate-900/10 focus:border-[#d4af37]/50 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none transition-colors cursor-pointer"
+                        className="w-full bg-white border border-slate-900/10 focus:border-[#1ca34c]/50 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none transition-colors cursor-pointer"
                       >
                         <option value="employee">Employee</option>
                         <option value="partner">Partner</option>
@@ -894,7 +895,7 @@ export default function KycReviews() {
                   {/* Column 2: Bank & Payout Details */}
                   <div className="space-y-3 bg-slate-900/[0.04] p-3.5 rounded-xl border border-slate-900/5">
                     <div className="flex items-center gap-2 pb-2 border-b border-slate-900/5">
-                      <Landmark className="w-4 h-4 text-[#8a6d1f]" />
+                      <Landmark className="w-4 h-4 text-[#15803d]" />
                       <span className="text-[11px] font-bold text-slate-900 uppercase tracking-wider">Bank & Financial Details</span>
                     </div>
 
@@ -907,7 +908,7 @@ export default function KycReviews() {
                         value={editBankName}
                         onChange={(e) => setEditBankName(e.target.value)}
                         placeholder="e.g. Dutch-Bangla Bank PLC, Islami Bank"
-                        className="w-full bg-slate-900/[0.04] border border-slate-900/10 focus:border-[#d4af37]/50 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none transition-colors"
+                        className="w-full bg-slate-900/[0.04] border border-slate-900/10 focus:border-[#1ca34c]/50 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none transition-colors"
                       />
                     </div>
 
@@ -920,7 +921,7 @@ export default function KycReviews() {
                         value={editAccountHolder}
                         onChange={(e) => setEditAccountHolder(e.target.value)}
                         placeholder="e.g. Md. Rahim Ahmed"
-                        className="w-full bg-slate-900/[0.04] border border-slate-900/10 focus:border-[#d4af37]/50 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none transition-colors"
+                        className="w-full bg-slate-900/[0.04] border border-slate-900/10 focus:border-[#1ca34c]/50 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none transition-colors"
                       />
                     </div>
 
@@ -933,7 +934,7 @@ export default function KycReviews() {
                         value={editAccountNumber}
                         onChange={(e) => setEditAccountNumber(e.target.value)}
                         placeholder="e.g. 1041200000000"
-                        className="w-full bg-slate-900/[0.04] border border-slate-900/10 focus:border-[#d4af37]/50 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 placeholder-slate-600 focus:outline-none transition-colors"
+                        className="w-full bg-slate-900/[0.04] border border-slate-900/10 focus:border-[#1ca34c]/50 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 placeholder-slate-600 focus:outline-none transition-colors"
                       />
                     </div>
 
@@ -946,7 +947,7 @@ export default function KycReviews() {
                         value={editDistrict}
                         onChange={(e) => setEditDistrict(e.target.value)}
                         placeholder="e.g. Dhaka, Motijheel Branch"
-                        className="w-full bg-slate-900/[0.04] border border-slate-900/10 focus:border-[#d4af37]/50 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none transition-colors"
+                        className="w-full bg-slate-900/[0.04] border border-slate-900/10 focus:border-[#1ca34c]/50 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none transition-colors"
                       />
                     </div>
 
@@ -969,7 +970,7 @@ export default function KycReviews() {
                   <button
                     type="submit"
                     disabled={isSavingDetails}
-                    className="flex-1 bg-gradient-to-r from-[#d4af37] to-white text-black font-semibold py-2.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-lg hover:brightness-110 transition-all disabled:opacity-50"
+                    className="flex-1 bg-[#1ca34c] text-white font-semibold py-2.5 rounded-full text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-lg hover:brightness-110 transition-all disabled:opacity-50"
                   >
                     {isSavingDetails ? (
                       <>
@@ -1016,9 +1017,9 @@ function NidImageBox({
       {url ? (
         isPdf ? (
           <div className="flex flex-col items-center justify-center gap-2 text-slate-500">
-            <FileCheck className="w-8 h-8 text-[#8a6d1f]" />
+            <FileCheck className="w-8 h-8 text-[#15803d]" />
             <span className="text-[9px] uppercase tracking-wider">PDF Document</span>
-            <a href={url} target="_blank" rel="noreferrer" className="text-[9px] text-[#8a6d1f] underline">Open PDF</a>
+            <a href={url} target="_blank" rel="noreferrer" className="text-[9px] text-[#15803d] underline">Open PDF</a>
           </div>
         ) : (
           <>

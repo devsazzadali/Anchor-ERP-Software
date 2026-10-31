@@ -281,7 +281,7 @@ export default function AdminBranchExpensesPage() {
   if (isLoading && !selectedHead && ledgerHeads.length === 0) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -291,7 +291,7 @@ export default function AdminBranchExpensesPage() {
       <div className="max-w-5xl mx-auto relative z-10">
 
         {/* Glow */}
-        <div className="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] bg-[#d4af37]/5 rounded-full filter blur-[150px] pointer-events-none" />
+        <div className="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] bg-[#1ca34c]/5 rounded-full filter blur-[150px] pointer-events-none" />
 
         {error && (
           <div className="mb-4 p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 text-sm flex items-center gap-2">
@@ -311,7 +311,7 @@ export default function AdminBranchExpensesPage() {
           <div>
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
               <div>
-                <span className="text-[10px] bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider inline-flex items-center gap-1 mb-1">
+                <span className="text-[10px] bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider inline-flex items-center gap-1 mb-1">
                   <Building2 className="w-3 h-3" /> Ledger Categories
                 </span>
                 <h1 className="text-xl font-bold tracking-tight text-slate-900 flex items-center gap-2 font-serif">
@@ -328,17 +328,17 @@ export default function AdminBranchExpensesPage() {
                     placeholder="Search by code or name..."
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
-                    className="w-full bg-white border border-slate-900/10 rounded-xl pl-9 pr-3 py-2.5 text-slate-900 text-xs focus:outline-none focus:border-[#d4af37]/40"
+                    className="w-full bg-white border border-slate-900/10 rounded-xl pl-9 pr-3 py-2.5 text-slate-900 text-xs focus:outline-none focus:border-[#1ca34c]/40"
                   />
                 </div>
                 {canDelete && (
                   <div className="flex items-center gap-2">
                     <Link href="/admin/branch-expenses/settings"
-                      className="flex-shrink-0 flex items-center gap-1.5 px-4 py-2.5 bg-slate-900/[0.04] border border-slate-900/8 hover:border-[#d4af37]/30 text-slate-600 hover:text-slate-900 rounded-xl text-xs font-semibold transition-all cursor-pointer">
+                      className="flex-shrink-0 flex items-center gap-1.5 px-4 py-2.5 bg-slate-900/[0.04] border border-slate-900/8 hover:border-[#1ca34c]/30 text-slate-600 hover:text-slate-900 rounded-xl text-xs font-semibold transition-all cursor-pointer">
                       <Settings className="w-3.5 h-3.5" /> Account Settings
                     </Link>
                     <button onClick={() => setShowAddHeadModal(true)}
-                      className="flex-shrink-0 flex items-center gap-1.5 px-4 py-2.5 bg-slate-900/[0.04] border border-slate-900/8 hover:border-[#d4af37]/30 text-slate-600 hover:text-slate-900 rounded-xl text-xs font-semibold transition-all cursor-pointer">
+                      className="flex-shrink-0 flex items-center gap-1.5 px-4 py-2.5 bg-slate-900/[0.04] border border-slate-900/8 hover:border-[#1ca34c]/30 text-slate-600 hover:text-slate-900 rounded-xl text-xs font-semibold transition-all cursor-pointer">
                       <Plus className="w-3.5 h-3.5" /> Add Category
                     </button>
                   </div>
@@ -356,19 +356,19 @@ export default function AdminBranchExpensesPage() {
                     setFilterMonth('')
                     setFilterBranch('')
                   }}
-                  className="text-left p-5 rounded-2xl bg-white border border-slate-900/5 hover:border-[#d4af37]/30 hover:bg-[#d4af37]/5 transition-all group relative overflow-hidden"
+                  className="text-left p-5 rounded-3xl bg-white border border-slate-900/5 hover:border-[#1ca34c]/30 hover:bg-[#1ca34c]/5 transition-all group relative overflow-hidden"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#d4af37]/0 to-[#d4af37]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <span className="text-[10px] font-mono font-bold text-[#8a6d1f] bg-[#d4af37]/10 px-2 py-1 rounded-lg mb-3 inline-block">
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#1ca34c]/0 to-[#1ca34c]/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <span className="text-[10px] font-mono font-bold text-[#15803d] bg-[#1ca34c]/10 px-2 py-1 rounded-lg mb-3 inline-block">
                     Code: {lh.code_number}
                   </span>
-                  <h3 className="text-sm font-bold text-slate-900 mb-1 group-hover:text-[#8a6d1f] transition-colors line-clamp-2">
+                  <h3 className="text-sm font-bold text-slate-900 mb-1 group-hover:text-[#15803d] transition-colors line-clamp-2">
                     {lh.name}
                   </h3>
                 </button>
               ))}
               {filteredHeads.length === 0 && (
-                <div className="col-span-full py-16 text-center border border-slate-900/5 bg-slate-900/[0.04] rounded-2xl">
+                <div className="col-span-full py-16 text-center border border-slate-900/5 bg-slate-900/[0.04] rounded-3xl">
                   <p className="text-slate-500 text-sm">No ledger heads found matching "{searchQuery}"</p>
                 </div>
               )}
@@ -383,13 +383,13 @@ export default function AdminBranchExpensesPage() {
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setSelectedHead(null)}
-                  className="p-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 text-slate-500 hover:text-slate-900 transition-all"
+                  className="p-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 text-slate-500 hover:text-slate-900 transition-all"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                    <span className="text-[10px] bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
                       Code {selectedHead.code_number}
                     </span>
                   </div>
@@ -407,13 +407,13 @@ export default function AdminBranchExpensesPage() {
                   <Download className="w-4 h-4" /> <span className="text-xs font-medium hidden sm:inline">Export PDF</span>
                 </button>
                 <button onClick={handleRefresh}
-                  className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'animate-spin text-[#8a6d1f]' : ''}`}
+                  className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'animate-spin text-[#15803d]' : ''}`}
                 >
                   <RefreshCw className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setShowForm(!showForm)}
-                  className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#d4af37] to-white text-black font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-all"
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#1ca34c] text-white font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-all"
                 >
                   <Plus className="w-4 h-4" /> {showForm ? 'Cancel' : 'Add Expense'}
                 </button>
@@ -423,7 +423,7 @@ export default function AdminBranchExpensesPage() {
             {/* Table or Empty State */}
             {isLoading ? (
               <div className="py-16 flex justify-center">
-                 <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+                 <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" />
               </div>
             ) : expenses.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 gap-4">
@@ -437,7 +437,7 @@ export default function AdminBranchExpensesPage() {
                     </p>
                   </div>
                   <button onClick={() => setShowForm(true)}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-slate-900/[0.04] border border-slate-900/8 hover:border-[#d4af37]/30 text-slate-600 hover:text-slate-900 rounded-lg text-xs font-semibold transition-all cursor-pointer">
+                    className="flex items-center gap-1.5 px-4 py-2 bg-slate-900/[0.04] border border-slate-900/8 hover:border-[#1ca34c]/30 text-slate-600 hover:text-slate-900 rounded-lg text-xs font-semibold transition-all cursor-pointer">
                     <Plus className="w-3.5 h-3.5" /> Add First Expense
                   </button>
                 </div>
@@ -469,7 +469,7 @@ export default function AdminBranchExpensesPage() {
                           )}
                         </td>
                         <td className="py-3.5">
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#d4af37]/8 text-[#8a6d1f] border border-[#d4af37]/15 text-[9px] font-bold uppercase">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#1ca34c]/8 text-[#15803d] border border-[#1ca34c]/15 text-[9px] font-bold uppercase">
                             <MapPin className="w-2.5 h-2.5" /> {(() => {
                               const bName = exp.branch_name || branches.find((b: any) => b.id === exp.branch_id)?.name || 'Branch';
                               return bName.length > 14 ? bName.slice(0, 14) + '…' : bName;
@@ -576,13 +576,13 @@ export default function AdminBranchExpensesPage() {
               transition={{ type: 'spring', stiffness: 320, damping: 28 }}
               className="fixed inset-0 flex items-center justify-center z-50 p-4"
             >
-              <div className="bg-white border border-slate-900/8 rounded-2xl w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+              <div className="bg-white border border-slate-900/8 rounded-3xl w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-slate-900/[0.08]">
                   <div>
                     <h3 className="text-sm font-bold text-slate-900 font-serif">Log New Expense</h3>
                     <div className="flex items-center gap-1.5 mt-0.5">
-                      <span className="text-[10px] bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20 px-1.5 py-0.5 rounded uppercase font-bold">
+                      <span className="text-[10px] bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 px-1.5 py-0.5 rounded uppercase font-bold">
                         {selectedHead.code_number}
                       </span>
                       <span className="text-[10px] text-slate-500">{selectedHead.name}</span>
@@ -598,7 +598,7 @@ export default function AdminBranchExpensesPage() {
                   <div>
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Branch *</label>
                     <select required value={form.branch_id} onChange={e => setForm(f => ({ ...f, branch_id: e.target.value }))}
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/8 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/40 transition-all cursor-pointer">
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/8 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 transition-all cursor-pointer">
                       <option value="" disabled>Select target branch</option>
                       {branches.map(b => (
                         <option key={b.id} value={b.id}>{b.name}</option>
@@ -610,7 +610,7 @@ export default function AdminBranchExpensesPage() {
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Description *</label>
                     <textarea required rows={2} value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                       placeholder="What was this expense for?"
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/8 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all resize-none" />
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/8 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all resize-none" />
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
@@ -618,12 +618,12 @@ export default function AdminBranchExpensesPage() {
                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Amount (BDT) *</label>
                       <input required type="number" step="0.01" min="0.01" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))}
                         placeholder="0.00"
-                        className="w-full bg-slate-900/[0.04] border border-slate-900/8 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all" />
+                        className="w-full bg-slate-900/[0.04] border border-slate-900/8 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all" />
                     </div>
                     <div>
                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Date *</label>
                       <input required type="date" value={form.expense_date} onChange={e => setForm(f => ({ ...f, expense_date: e.target.value }))}
-                        className="w-full bg-slate-900/[0.04] border border-slate-900/8 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all [color-scheme:light] cursor-pointer" />
+                        className="w-full bg-slate-900/[0.04] border border-slate-900/8 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all [color-scheme:light] cursor-pointer" />
                     </div>
                   </div>
 
@@ -631,7 +631,7 @@ export default function AdminBranchExpensesPage() {
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Notes (Optional)</label>
                     <input type="text" value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
                       placeholder="Additional remarks"
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/8 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all" />
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/8 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all" />
                   </div>
 
                   <div className="flex gap-3 pt-2">
@@ -640,7 +640,7 @@ export default function AdminBranchExpensesPage() {
                       Cancel
                     </button>
                     <button type="submit" disabled={isSubmitting}
-                      className="flex-1 bg-gradient-to-r from-[#d4af37] to-white text-black font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 hover:brightness-110 disabled:opacity-60 cursor-pointer shadow-lg shadow-[#d4af37]/15">
+                      className="flex-1 bg-[#1ca34c] text-white font-bold py-2.5 rounded-full text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 hover:brightness-110 disabled:opacity-60 cursor-pointer shadow-lg shadow-[#1ca34c]/15">
                       {isSubmitting ? <div className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" /> : <Check className="w-3.5 h-3.5" />}
                       Confirm & Save
                     </button>
@@ -667,7 +667,7 @@ export default function AdminBranchExpensesPage() {
               transition={{ type: 'spring', stiffness: 320, damping: 28 }}
               className="fixed inset-0 flex items-center justify-center z-50 p-4"
             >
-              <div className="bg-white border border-slate-900/8 rounded-2xl w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+              <div className="bg-white border border-slate-900/8 rounded-3xl w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-slate-900/[0.08]">
                   <div>
@@ -685,14 +685,14 @@ export default function AdminBranchExpensesPage() {
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Category Name *</label>
                     <input required type="text" value={addHeadForm.name} onChange={e => setAddHeadForm(f => ({ ...f, name: e.target.value }))}
                       placeholder="e.g. Utility Bills, Office Supplies"
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/8 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all" />
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/8 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all" />
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Ledger Type</label>
                       <select value={addHeadForm.ledger_type} onChange={e => setAddHeadForm(f => ({ ...f, ledger_type: e.target.value }))}
-                        className="w-full bg-slate-900/[0.04] border border-slate-900/8 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/40 transition-all cursor-pointer">
+                        className="w-full bg-slate-900/[0.04] border border-slate-900/8 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 transition-all cursor-pointer">
                         <option value="All">All</option>
                         <option value="Expenses">Expenses</option>
                         <option value="Income">Income</option>
@@ -704,7 +704,7 @@ export default function AdminBranchExpensesPage() {
                     <div>
                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Ref. Date</label>
                       <input type="date" value={addHeadForm.reference_creation_date} onChange={e => setAddHeadForm(f => ({ ...f, reference_creation_date: e.target.value }))}
-                        className="w-full bg-slate-900/[0.04] border border-slate-900/8 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all [color-scheme:light] cursor-pointer" />
+                        className="w-full bg-slate-900/[0.04] border border-slate-900/8 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all [color-scheme:light] cursor-pointer" />
                     </div>
                   </div>
 
@@ -714,7 +714,7 @@ export default function AdminBranchExpensesPage() {
                       Cancel
                     </button>
                     <button type="submit" disabled={isSubmittingHead}
-                      className="flex-1 bg-gradient-to-r from-[#d4af37] to-white text-black font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 hover:brightness-110 disabled:opacity-60 cursor-pointer shadow-lg shadow-[#d4af37]/15">
+                      className="flex-1 bg-[#1ca34c] text-white font-bold py-2.5 rounded-full text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 hover:brightness-110 disabled:opacity-60 cursor-pointer shadow-lg shadow-[#1ca34c]/15">
                       {isSubmittingHead ? <div className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
                       Create Category
                     </button>

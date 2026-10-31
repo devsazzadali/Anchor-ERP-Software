@@ -50,9 +50,9 @@ function UserTasks() {
         const el = document.getElementById(`item-${highlightId}`);
         if (el) {
           el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          el.classList.add('ring-2', 'ring-[#d4af37]', 'ring-offset-2', 'ring-offset-white');
+          el.classList.add('ring-2', 'ring-[#1ca34c]', 'ring-offset-2', 'ring-offset-white');
           setTimeout(() => {
-            el.classList.remove('ring-2', 'ring-[#d4af37]', 'ring-offset-2', 'ring-offset-white');
+            el.classList.remove('ring-2', 'ring-[#1ca34c]', 'ring-offset-2', 'ring-offset-white');
           }, 3000);
         }
       }, 100);
@@ -217,7 +217,7 @@ function UserTasks() {
     <div className="min-h-screen flex bg-white text-slate-900 font-sans md:ml-64">
       
       {/* Background glow effects */}
-      <div className="absolute top-[-10%] right-[-5%] w-[45%] h-[45%] bg-[#d4af37]/3 rounded-full filter blur-[120px] pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-5%] w-[45%] h-[45%] bg-[#1ca34c]/3 rounded-full filter blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] left-[20%] w-[50%] h-[50%] bg-[#10b981]/3 rounded-full filter blur-[150px] pointer-events-none" />
 
 {/* Sidebar removed – global layout provides it */}
@@ -227,22 +227,25 @@ function UserTasks() {
         
         {/* UPPER STATUS BAR */}
         <div className="flex justify-between items-center mb-8 pb-4 border-b border-slate-900/5">
-          <div>
+          <div className="flex items-start gap-3">
+            <span className="w-1.5 h-9 rounded-full bg-[#1ca34c] shrink-0" />
+            <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider flex items-center gap-1">
+              <span className="text-[10px] bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider flex items-center gap-1">
                 <ListTodo className="w-3.5 h-3.5" />
                 Dossier Verified
               </span>
             </div>
-            <h2 className="text-xl font-bold tracking-tight text-slate-900 font-serif">
+            <h2 className="text-xl font-extrabold tracking-tight text-slate-900 font-serif">
               Assigned Tasks & <span className="premium-text-gradient">To-Dos</span>
             </h2>
             <p className="text-[11px] text-slate-500">Task center panel. Update operations completion and log operational notes.</p>
+            </div>
           </div>
 
           <button 
             onClick={fetchTasks}
-            className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isLoading ? 'animate-spin text-[#8a6d1f]' : ''}`}
+            className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isLoading ? 'animate-spin text-[#15803d]' : ''}`}
           >
             <RefreshCw className="w-4 h-4" />
           </button>
@@ -292,7 +295,7 @@ function UserTasks() {
           <button
             onClick={() => setCurrentTab('my')}
             className={`flex-1 text-center py-2.5 rounded-lg text-xs font-semibold tracking-wide transition-all z-10 ${
-              currentTab === 'my' ? 'text-black font-bold' : 'text-slate-500'
+              currentTab === 'my' ? 'text-white font-bold' : 'text-slate-500'
             }`}
           >
             Assigned to Me ({myTasksCount})
@@ -300,7 +303,7 @@ function UserTasks() {
           <button
             onClick={() => setCurrentTab('all')}
             className={`flex-1 text-center py-2.5 rounded-lg text-xs font-semibold tracking-wide transition-all z-10 ${
-              currentTab === 'all' ? 'text-black font-bold' : 'text-slate-500'
+              currentTab === 'all' ? 'text-white font-bold' : 'text-slate-500'
             }`}
           >
             All Team Tasks ({tasks.length})
@@ -309,7 +312,7 @@ function UserTasks() {
           <motion.div
             layout
             transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-            className="absolute top-1.5 bottom-1.5 left-1.5 rounded-lg bg-gradient-to-r from-[#d4af37] to-white shadow"
+            className="absolute top-1.5 bottom-1.5 left-1.5 rounded-lg bg-[#1ca34c] shadow"
             style={{
               width: 'calc(50% - 12px)',
               x: currentTab === 'my' ? 0 : '100%',
@@ -326,7 +329,7 @@ function UserTasks() {
               placeholder="Search by title or operator..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-slate-900/[0.04] border border-slate-900/5 hover:border-slate-900/10 rounded-xl py-2.5 pl-10 pr-3.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/45 transition-all"
+              className="w-full bg-slate-900/[0.04] border border-slate-900/5 hover:border-slate-900/10 rounded-xl py-2.5 pl-10 pr-3.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/45 transition-all"
             />
           </div>
 
@@ -334,7 +337,7 @@ function UserTasks() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="bg-white border border-slate-900/5 rounded-xl py-2.5 pl-3 pr-8 text-xs text-slate-500 focus:outline-none focus:border-[#d4af37]/40 cursor-pointer w-full sm:w-36 appearance-none"
+              className="bg-white border border-slate-900/5 rounded-xl py-2.5 pl-3 pr-8 text-xs text-slate-500 focus:outline-none focus:border-[#1ca34c]/40 cursor-pointer w-full sm:w-36 appearance-none"
             >
               <option value="all">All Statuses</option>
               <option value="pending">Pending</option>
@@ -357,7 +360,7 @@ function UserTasks() {
 
               const statusColors = {
                 pending: 'bg-slate-100 text-slate-500 border border-slate-300',
-                processing: 'bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20',
+                processing: 'bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20',
                 completed: 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
               }[task.status as 'pending' | 'processing' | 'completed'] || 'bg-slate-100 text-slate-500'
 
@@ -374,7 +377,7 @@ function UserTasks() {
                 >
                   {/* Status Indicator Bar */}
                   <div className={`absolute top-0 left-0 bottom-0 w-[3.5px] rounded-l-2xl ${
-                    isOverdue ? 'bg-rose-500' : task.status === 'completed' ? 'bg-emerald-500' : task.status === 'processing' ? 'bg-[#d4af37]' : 'bg-slate-400'
+                    isOverdue ? 'bg-rose-500' : task.status === 'completed' ? 'bg-emerald-500' : task.status === 'processing' ? 'bg-[#1ca34c]' : 'bg-slate-400'
                   }`} />
 
                   {/* Title and control row */}
@@ -412,7 +415,7 @@ function UserTasks() {
                         {task.status === 'pending' && (
                           <button
                             onClick={() => handleUpdateStatus(task.id, 'processing')}
-                            className="bg-[#d4af37]/10 border border-[#d4af37]/20 text-[#8a6d1f] px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase hover:bg-[#d4af37]/25 transition-all flex items-center gap-1 cursor-pointer"
+                            className="bg-[#1ca34c]/10 border border-[#1ca34c]/20 text-[#15803d] px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase hover:bg-[#1ca34c]/25 transition-all flex items-center gap-1 cursor-pointer"
                           >
                             <Play className="w-3.5 h-3.5" /> Start Work
                           </button>
@@ -476,8 +479,8 @@ function UserTasks() {
                   {/* Notes / Remarks section */}
                   <div className="mt-4 pt-3 border-t border-slate-900/5 pl-2.5">
                     <div className="flex justify-between items-center mb-1">
-                      <span className="text-[9.5px] uppercase tracking-widest text-[#8a6d1f] font-semibold flex items-center gap-1.5">
-                        <MessageSquare className="w-3.5 h-3.5 text-[#8a6d1f]" />
+                      <span className="text-[9.5px] uppercase tracking-widest text-[#15803d] font-semibold flex items-center gap-1.5">
+                        <MessageSquare className="w-3.5 h-3.5 text-[#15803d]" />
                         Notes & Remarks
                       </span>
 
@@ -487,7 +490,7 @@ function UserTasks() {
                             setEditingTaskId(task.id)
                             setEditingNoteValue(task.note || '')
                           }}
-                          className="text-[10px] text-slate-500 hover:text-[#8a6d1f] underline transition-colors"
+                          className="text-[10px] text-slate-500 hover:text-[#15803d] underline transition-colors"
                         >
                           Modify note
                         </button>
@@ -501,12 +504,12 @@ function UserTasks() {
                           value={editingNoteValue}
                           onChange={(e) => setEditingNoteValue(e.target.value)}
                           placeholder="Explain what steps you did or update status remarks..."
-                          className="w-full bg-white border border-[#d4af37]/30 rounded-xl py-2 px-3 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37] resize-none"
+                          className="w-full bg-white border border-[#1ca34c]/30 rounded-xl py-2 px-3 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c] resize-none"
                         />
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleUpdateNote(task.id)}
-                            className="px-3 py-1 bg-gradient-to-r from-[#d4af37] to-white text-black font-semibold rounded-lg text-[10px] uppercase cursor-pointer"
+                            className="px-3 py-1 bg-[#1ca34c] hover:bg-[#15803d] text-white font-semibold rounded-full text-[10px] uppercase cursor-pointer"
                           >
                             Save Note
                           </button>

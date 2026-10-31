@@ -196,7 +196,7 @@ export default function AdminSettings() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen w-full flex items-center justify-center bg-white text-[#8a6d1f]">
+      <div className="min-h-screen w-full flex items-center justify-center bg-white text-[#15803d]">
         <Loader2 className="w-8 h-8 animate-spin" />
       </div>
     )
@@ -204,11 +204,12 @@ export default function AdminSettings() {
 
   return (
     <div className="min-h-screen w-full flex bg-white text-slate-900 font-sans overflow-x-hidden relative">
-      <div className="absolute top-[-10%] right-[-5%] w-[45%] h-[45%] bg-[#d4af37]/5 rounded-full filter blur-[150px] pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-5%] w-[45%] h-[45%] bg-[#1ca34c]/5 rounded-full filter blur-[150px] pointer-events-none" />
 
       <div className="flex-1 flex flex-col p-6 max-w-5xl mx-auto z-10 w-full relative">
         <div className="mb-8 pb-4 border-b border-slate-900/5">
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900 font-serif">
+          <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 font-serif flex items-center gap-3">
+            <span className="w-1.5 h-9 rounded-full bg-[#1ca34c] shrink-0" />
             Security & <span className="premium-text-gradient">Settings</span>
           </h2>
           <p className="text-xs text-slate-500 mt-1">Manage your administrative footprint and authentication credentials.</p>
@@ -236,10 +237,10 @@ export default function AdminSettings() {
 
           {/* PROFILE CARD */}
           <div className="glass-panel p-6 sm:p-8 rounded-2xl relative shadow-xl overflow-hidden group">
-            <div className="absolute top-0 right-0 w-40 h-40 bg-[#d4af37]/5 rounded-full filter blur-[80px] pointer-events-none group-hover:bg-[#d4af37]/10 transition-all duration-700" />
+            <div className="absolute top-0 right-0 w-40 h-40 bg-[#1ca34c]/5 rounded-full filter blur-[80px] pointer-events-none group-hover:bg-[#1ca34c]/10 transition-all duration-700" />
 
             <div className="flex items-center gap-3 mb-8 relative z-10">
-              <div className="w-10 h-10 rounded-xl bg-[#d4af37]/10 border border-[#d4af37]/30 flex items-center justify-center text-[#8a6d1f]">
+              <div className="w-10 h-10 rounded-xl bg-[#1ca34c]/10 border border-[#1ca34c]/30 flex items-center justify-center text-[#15803d]">
                 <User className="w-5 h-5" />
               </div>
               <div>
@@ -252,7 +253,7 @@ export default function AdminSettings() {
 
               {/* Profile Photo (Optional UI) */}
               <div className="flex items-center gap-4 p-4 rounded-xl bg-white border border-slate-900/5">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-[#d4af37] to-white flex items-center justify-center text-xl font-black text-black shrink-0 shadow-[0_0_15px_rgba(212,175,55,0.2)]">
+                <div className="w-16 h-16 rounded-full bg-[#1ca34c] flex items-center justify-center text-xl font-black text-white shrink-0 shadow-lg shadow-[#1ca34c]/25">
                   {profile.full_name?.substring(0, 2).toUpperCase() || 'AD'}
                 </div>
                 <div className="flex-1">
@@ -262,7 +263,7 @@ export default function AdminSettings() {
                     value={profile.profile_photo_url}
                     onChange={e => setProfile({...profile, profile_photo_url: e.target.value})}
                     placeholder="https://example.com/photo.png"
-                    className="w-full bg-transparent border-b border-slate-900/10 py-1 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50"
+                    className="w-full bg-transparent border-b border-slate-900/10 py-1 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50"
                   />
                 </div>
               </div>
@@ -275,7 +276,7 @@ export default function AdminSettings() {
                     type="text"
                     value={profile.full_name}
                     onChange={e => setProfile({...profile, full_name: e.target.value})}
-                    className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50 focus:bg-slate-900/[0.04] transition-all"
+                    className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 focus:bg-slate-900/[0.04] transition-all"
                   />
                 </div>
 
@@ -286,7 +287,7 @@ export default function AdminSettings() {
                       type="text"
                       value={profile.phone_number}
                       onChange={e => setProfile({...profile, phone_number: e.target.value})}
-                      className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50 focus:bg-slate-900/[0.04] transition-all"
+                      className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 focus:bg-slate-900/[0.04] transition-all"
                     />
                   </div>
                   <div>
@@ -295,7 +296,7 @@ export default function AdminSettings() {
                       type="text"
                       value={profile.country}
                       onChange={e => setProfile({...profile, country: e.target.value})}
-                      className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50 focus:bg-slate-900/[0.04] transition-all"
+                      className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 focus:bg-slate-900/[0.04] transition-all"
                     />
                   </div>
                 </div>
@@ -306,7 +307,7 @@ export default function AdminSettings() {
                     rows={2}
                     value={profile.address}
                     onChange={e => setProfile({...profile, address: e.target.value})}
-                    className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50 focus:bg-slate-900/[0.04] transition-all"
+                    className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 focus:bg-slate-900/[0.04] transition-all"
                   />
                 </div>
               </div>
@@ -315,7 +316,7 @@ export default function AdminSettings() {
                 <button
                   type="submit"
                   disabled={isSavingProfile}
-                  className="w-full bg-[#d4af37]/10 hover:bg-[#d4af37]/20 border border-[#d4af37]/30 text-[#8a6d1f] font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+                  className="w-full bg-[#1ca34c]/10 hover:bg-[#1ca34c]/20 border border-[#1ca34c]/30 text-[#15803d] font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
                 >
                   {isSavingProfile ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                   Save Identity Configuration
@@ -325,8 +326,8 @@ export default function AdminSettings() {
           </div>
 
           {/* SECURITY CARD */}
-          <div className="glass-panel p-6 sm:p-8 rounded-2xl relative shadow-[0_0_30px_rgba(212,175,55,0.03)] border border-[#d4af37]/20 bg-gradient-to-br from-[#d4af37]/[0.02] to-transparent overflow-hidden">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-[#d4af37]/5 rounded-full filter blur-[100px] pointer-events-none" />
+          <div className="glass-panel p-6 sm:p-8 rounded-2xl relative shadow-[0_0_30px_rgba(28,163,76,0.03)] border border-[#1ca34c]/20 bg-gradient-to-br from-[#1ca34c]/[0.02] to-transparent overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[#1ca34c]/5 rounded-full filter blur-[100px] pointer-events-none" />
 
             <div className="flex items-center gap-3 mb-6 relative z-10">
               <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-600">
@@ -388,7 +389,7 @@ export default function AdminSettings() {
           </div>
 
           {/* TWO-FACTOR AUTHENTICATION (2FA) */}
-          <div className="glass-panel p-6 sm:p-8 rounded-2xl relative shadow-[0_0_30px_rgba(212,175,55,0.03)] border border-[#d4af37]/20 bg-gradient-to-br from-[#d4af37]/[0.02] to-transparent overflow-hidden mt-8">
+          <div className="glass-panel p-6 sm:p-8 rounded-2xl relative shadow-[0_0_30px_rgba(28,163,76,0.03)] border border-[#1ca34c]/20 bg-gradient-to-br from-[#1ca34c]/[0.02] to-transparent overflow-hidden mt-8">
             <div className="flex items-center justify-between mb-2 relative z-10">
               <span className="text-sm font-bold text-slate-900 uppercase tracking-widest flex items-center gap-2">
                 <ShieldCheck className={`w-5 h-5 ${profile.is_2fa_enabled ? 'text-emerald-600' : 'text-slate-500'}`} />
@@ -426,12 +427,12 @@ export default function AdminSettings() {
           </div>
 
           {/* System Configuration Card */}
-          <div className="bg-slate-900/[0.05] backdrop-blur-md border border-slate-900/10 rounded-2xl p-6 lg:p-8 mt-8 shadow-2xl relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#d4af37]/5 rounded-bl-full pointer-events-none transition-transform duration-700 group-hover:scale-110" />
+          <div className="bg-slate-900/[0.05] backdrop-blur-md border border-slate-900/10 rounded-3xl p-6 lg:p-8 mt-8 shadow-2xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#1ca34c]/5 rounded-bl-full pointer-events-none transition-transform duration-700 group-hover:scale-110" />
 
             <div className="flex items-center gap-4 mb-8">
-              <div className="w-12 h-12 rounded-full bg-[#d4af37]/10 flex items-center justify-center border border-[#d4af37]/20">
-                <Globe className="w-6 h-6 text-[#8a6d1f]" />
+              <div className="w-12 h-12 rounded-full bg-[#1ca34c]/10 flex items-center justify-center border border-[#1ca34c]/20">
+                <Globe className="w-6 h-6 text-[#15803d]" />
               </div>
               <div>
                 <h3 className="text-xl font-bold text-slate-900 font-serif tracking-wide">System Configuration</h3>
@@ -456,13 +457,13 @@ export default function AdminSettings() {
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider ml-1">Sender Email</label>
                 <div className="relative group">
-                  <AlertTriangle className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[#8a6d1f] transition-colors" />
+                  <AlertTriangle className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[#15803d] transition-colors" />
                   <input
                     type="email"
                     value={systemSettings.sender_email}
                     onChange={e => setSystemSettings({...systemSettings, sender_email: e.target.value})}
                     placeholder="anchorfashionsupport@gmail.com"
-                    className="w-full bg-white border border-slate-900/5 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-[#d4af37]/50 focus:ring-1 focus:ring-[#d4af37]/50 transition-all text-slate-900 placeholder-slate-600"
+                    className="w-full bg-white border border-slate-900/5 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-[#1ca34c]/50 focus:ring-1 focus:ring-[#1ca34c]/50 transition-all text-slate-900 placeholder-slate-600"
                   />
                 </div>
               </div>
@@ -470,11 +471,11 @@ export default function AdminSettings() {
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-slate-600 uppercase tracking-wider ml-1">Password Reset Workflow</label>
                 <div className="relative group">
-                  <ShieldCheck className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[#8a6d1f] transition-colors" />
+                  <ShieldCheck className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-[#15803d] transition-colors" />
                   <select
                     value={systemSettings.password_reset_mode}
                     onChange={e => setSystemSettings({...systemSettings, password_reset_mode: e.target.value})}
-                    className="w-full bg-white border border-slate-900/5 rounded-xl pl-10 pr-8 py-3 text-sm focus:outline-none focus:border-[#d4af37]/50 focus:ring-1 focus:ring-[#d4af37]/50 transition-all text-slate-900 appearance-none"
+                    className="w-full bg-white border border-slate-900/5 rounded-xl pl-10 pr-8 py-3 text-sm focus:outline-none focus:border-[#1ca34c]/50 focus:ring-1 focus:ring-[#1ca34c]/50 transition-all text-slate-900 appearance-none"
                   >
                     <option value="manual">Manual Admin Approval (Legacy)</option>
                     <option value="otp">Email OTP (Automated)</option>
@@ -487,7 +488,7 @@ export default function AdminSettings() {
                 <button
                   type="submit"
                   disabled={isSavingSystem}
-                  className="w-full py-3.5 bg-gradient-to-r from-[#d4af37] to-[#e7c996] text-black font-bold rounded-xl hover:opacity-90 transition-all focus:outline-none focus:ring-2 focus:ring-[#d4af37]/50 disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full py-3.5 bg-[#1ca34c] text-white font-bold rounded-full hover:opacity-90 transition-all focus:outline-none focus:ring-2 focus:ring-[#1ca34c]/50 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {isSavingSystem ? (
                     <><Loader2 className="w-4 h-4 animate-spin" /> Saving Configuration...</>

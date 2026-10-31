@@ -417,31 +417,31 @@ export default function PartnerBranchChalansPage() {
                   type="text" placeholder="e.g. A-101"
                   value={item.code}
                   onChange={e => updateItem(idx, 'code', e.target.value, setter)}
-                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2 text-xs text-[#8a6d1f] placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/40 transition-all w-full font-mono"
+                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2 text-xs text-[#15803d] placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all w-full font-mono"
                 />
                 <input
                   type="text" placeholder="e.g. Shirt"
                   value={item.name}
                   onChange={e => updateItem(idx, 'name', e.target.value, setter)}
-                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/40 transition-all w-full"
+                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all w-full"
                 />
                 <input
                   type="number" min="1" step="1" placeholder="0"
                   value={item.quantity}
                   onChange={e => updateItem(idx, 'quantity', e.target.value, setter)}
-                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/40 transition-all text-center w-full"
+                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-center w-full"
                 />
                 <input
                   type="number" min="0" step="0.01" placeholder="0"
                   value={item.cost_price}
                   onChange={e => updateItem(idx, 'cost_price', e.target.value, setter)}
-                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/40 transition-all text-right w-full"
+                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-right w-full"
                 />
                 <input
                   type="number" min="0" step="0.01" placeholder="0"
                   value={item.sale_price}
                   onChange={e => updateItem(idx, 'sale_price', e.target.value, setter)}
-                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/40 transition-all text-right w-full"
+                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-right w-full"
                 />
                 <button
                   type="button"
@@ -455,7 +455,7 @@ export default function PartnerBranchChalansPage() {
               {(rowCostTotal > 0 || rowSaleTotal > 0) && (
                 <div className="flex justify-end gap-3 text-[10px] text-slate-500 pr-9 mt-0.5">
                   {rowCostTotal > 0 && <span>Cost: <span className="text-slate-900 font-semibold">৳{rowCostTotal.toLocaleString('en-BD')}</span></span>}
-                  {rowSaleTotal > 0 && <span>Retail: <span className="text-[#8a6d1f] font-semibold">৳{rowSaleTotal.toLocaleString('en-BD')}</span></span>}
+                  {rowSaleTotal > 0 && <span>Retail: <span className="text-[#15803d] font-semibold">৳{rowSaleTotal.toLocaleString('en-BD')}</span></span>}
                 </div>
               )}
             </div>
@@ -465,7 +465,7 @@ export default function PartnerBranchChalansPage() {
       <button
         type="button"
         onClick={() => addItemRow(setter)}
-        className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-xl border border-dashed border-slate-900/10 hover:border-[#d4af37]/30 text-slate-500 hover:text-[#8a6d1f] text-[10px] font-semibold uppercase tracking-wider transition-all"
+        className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-xl border border-dashed border-slate-900/10 hover:border-[#1ca34c]/30 text-slate-500 hover:text-[#15803d] text-[10px] font-semibold uppercase tracking-wider transition-all"
       >
         <Plus className="w-3 h-3" /> Add Product Row
       </button>
@@ -476,7 +476,7 @@ export default function PartnerBranchChalansPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -485,32 +485,35 @@ export default function PartnerBranchChalansPage() {
   return (
     <div className="min-h-screen w-full bg-white text-slate-900 font-sans relative">
       {/* Ambient glows */}
-      <div className="absolute top-[-5%] right-[-5%] w-[40%] h-[40%] bg-[#d4af37]/3 rounded-full filter blur-[120px] pointer-events-none" />
+      <div className="absolute top-[-5%] right-[-5%] w-[40%] h-[40%] bg-[#1ca34c]/3 rounded-full filter blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-5%] left-[10%] w-[50%] h-[50%] bg-indigo-500/3 rounded-full filter blur-[150px] pointer-events-none" />
 
       <div className="relative z-10 flex flex-col p-4 md:p-6 max-h-screen overflow-y-auto custom-scrollbar">
 
         {/* ── Page Header ── */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 pb-4 border-b border-slate-900/5">
-          <div>
-            <span className="text-[10px] bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider inline-flex items-center gap-1 mb-1">
+          <div className="flex items-start gap-3">
+            <span className="w-1.5 h-9 rounded-full bg-[#1ca34c] shrink-0" />
+            <div>
+            <span className="text-[10px] bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider inline-flex items-center gap-1 mb-1">
               <Package className="w-3 h-3" /> Branch Dispatch
             </span>
-            <h1 className="text-xl font-bold tracking-tight text-slate-900 font-serif">Branch Product Chalans</h1>
+            <h1 className="text-xl font-extrabold tracking-tight text-slate-900 font-serif">Branch Product Chalans</h1>
             <p className="text-[11px] text-slate-500 mt-0.5">
               {isHeadOffice ? 'Create, edit, and export product dispatch chalans for all branches.' : 'View product dispatch chalans for all branches.'}
             </p>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             {!isHeadOffice && (
               <span className="text-[9px] px-2 py-1 rounded-full bg-slate-100 border border-slate-900/5 text-slate-500 font-bold uppercase tracking-wider">View Only</span>
             )}
             {isHeadOffice && (
-              <span className="text-[9px] px-2 py-1 rounded-full bg-[#d4af37]/10 border border-[#d4af37]/20 text-[#8a6d1f] font-bold uppercase tracking-wider">Head Office</span>
+              <span className="text-[9px] px-2 py-1 rounded-full bg-[#1ca34c]/10 border border-[#1ca34c]/20 text-[#15803d] font-bold uppercase tracking-wider">Head Office</span>
             )}
             <button
               onClick={handleRefresh}
-              className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 text-slate-500 hover:text-slate-900 transition-all ${isRefreshing ? 'animate-spin text-[#8a6d1f]' : ''}`}
+              className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 text-slate-500 hover:text-slate-900 transition-all ${isRefreshing ? 'animate-spin text-[#15803d]' : ''}`}
             >
               <RefreshCw className="w-4 h-4" />
             </button>
@@ -541,7 +544,7 @@ export default function PartnerBranchChalansPage() {
               {[
                 { label: 'Total Chalans',     value: overallStats.totalChalans,                               cls: 'text-slate-900',      icon: ClipboardList, bg: 'bg-slate-900/[0.04] border-slate-900/5' },
                 { label: 'Total Line Items',  value: overallStats.totalItems,                                 cls: 'text-indigo-600', icon: Package,       bg: 'bg-indigo-500/5 border-indigo-500/10' },
-                { label: 'Total Dispatched',  value: `${overallStats.totalAmount.toLocaleString('en-BD')} BDT`, cls: 'text-[#8a6d1f]',  icon: Banknote,      bg: 'bg-[#d4af37]/5 border-[#d4af37]/10' },
+                { label: 'Total Dispatched',  value: `${overallStats.totalAmount.toLocaleString('en-BD')} BDT`, cls: 'text-[#15803d]',  icon: Banknote,      bg: 'bg-[#1ca34c]/5 border-[#1ca34c]/10' },
               ].map(item => (
                 <div key={item.label} className={`p-4 rounded-2xl border flex items-center gap-3 ${item.bg}`}>
                   <div className="w-9 h-9 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 flex items-center justify-center flex-shrink-0">
@@ -572,24 +575,24 @@ export default function PartnerBranchChalansPage() {
                   return (
                     <motion.button
                       key={b.id}
-                      whileHover={{ backgroundColor: 'rgba(212,175,55,0.03)' }}
+                      whileHover={{ backgroundColor: 'rgba(28,163,76,0.03)' }}
                       whileTap={{ scale: 0.995 }}
                       onClick={() => goToBranch(b)}
                       className={`w-full flex items-center px-5 py-4 cursor-pointer group transition-colors text-left ${idx < branches.length - 1 ? 'border-b border-slate-900/[0.08]' : ''}`}
                     >
                       <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <div className="w-8 h-8 rounded-xl bg-[#d4af37]/8 flex items-center justify-center flex-shrink-0">
-                          <MapPin className="w-3.5 h-3.5 text-[#8a6d1f]" />
+                        <div className="w-8 h-8 rounded-xl bg-[#1ca34c]/8 flex items-center justify-center flex-shrink-0">
+                          <MapPin className="w-3.5 h-3.5 text-[#15803d]" />
                         </div>
                         <div className="min-w-0">
-                          <div className="text-sm font-semibold text-slate-900 group-hover:text-[#8a6d1f] transition-colors truncate">{b.name}</div>
+                          <div className="text-sm font-semibold text-slate-900 group-hover:text-[#15803d] transition-colors truncate">{b.name}</div>
                           <div className="text-[10px] text-slate-600 mt-0.5">{st.count === 0 ? 'No chalans yet' : `${st.count} chalan${st.count !== 1 ? 's' : ''}`}</div>
                         </div>
                       </div>
                       <div className="hidden md:block w-28 text-right text-sm font-semibold text-slate-900">{st.count > 0 ? st.count : <span className="text-slate-600 font-normal text-xs">—</span>}</div>
-                      <div className="hidden md:block w-36 text-right text-sm font-bold text-[#8a6d1f]">{st.totalAmount > 0 ? `${st.totalAmount.toLocaleString('en-BD')} BDT` : <span className="text-slate-600 font-normal text-xs">—</span>}</div>
+                      <div className="hidden md:block w-36 text-right text-sm font-bold text-[#15803d]">{st.totalAmount > 0 ? `${st.totalAmount.toLocaleString('en-BD')} BDT` : <span className="text-slate-600 font-normal text-xs">—</span>}</div>
                       <div className="w-8 flex justify-end">
-                        <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-[#8a6d1f] transition-colors" />
+                        <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-[#15803d] transition-colors" />
                       </div>
                     </motion.button>
                   )
@@ -609,13 +612,13 @@ export default function PartnerBranchChalansPage() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => goToBranch(null)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 text-slate-600 hover:text-slate-900 hover:border-[#d4af37]/30 transition-all text-xs font-semibold cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 text-slate-600 hover:text-slate-900 hover:border-[#1ca34c]/30 transition-all text-xs font-semibold cursor-pointer"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" /> Back to Branches
                 </button>
                 <div>
                   <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-[#8a6d1f]" />
+                    <MapPin className="w-4 h-4 text-[#15803d]" />
                     <h2 className="text-lg font-bold font-serif text-slate-900">{selectedBranch.name}</h2>
                   </div>
                   <p className="text-[10px] text-slate-500 mt-0.5">
@@ -631,7 +634,7 @@ export default function PartnerBranchChalansPage() {
                   <input
                     type="text" placeholder="Search chalans..."
                     value={search} onChange={e => setSearch(e.target.value)}
-                    className="bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-2 pl-9 pr-3 text-[11px] placeholder-slate-400 text-slate-900 focus:outline-none focus:border-[#d4af37]/40 transition-all w-44"
+                    className="bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-2 pl-9 pr-3 text-[11px] placeholder-slate-400 text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 transition-all w-44"
                   />
                 </div>
 
@@ -643,7 +646,7 @@ export default function PartnerBranchChalansPage() {
                       setFormNotes('')
                       setShowNewModal(true)
                     }}
-                    className="bg-gradient-to-r from-[#d4af37] to-white text-black font-semibold px-3 py-2 rounded-xl text-xs tracking-wider uppercase flex items-center gap-1.5 shadow-lg shadow-[#d4af37]/10 active:scale-95 transition-transform"
+                    className="bg-[#1ca34c] hover:bg-[#15803d] text-white font-semibold px-3 py-2 rounded-full text-xs tracking-wider uppercase flex items-center gap-1.5 shadow-lg shadow-[#1ca34c]/10 active:scale-95 transition-transform"
                   >
                     <Plus className="w-3.5 h-3.5" /> New Chalan
                   </button>
@@ -679,8 +682,8 @@ export default function PartnerBranchChalansPage() {
                     {/* Top row (mobile) / Col 1 (desktop): Ref & Notes */}
                     <div className="flex justify-between items-start w-full md:w-auto min-w-0">
                       <div className="flex items-start gap-3 w-full">
-                        <div className="w-8 h-8 mt-0.5 rounded-lg bg-[#d4af37]/10 border border-[#d4af37]/20 flex items-center justify-center flex-shrink-0">
-                          <Hash className="w-3.5 h-3.5 text-[#8a6d1f]" />
+                        <div className="w-8 h-8 mt-0.5 rounded-lg bg-[#1ca34c]/10 border border-[#1ca34c]/20 flex items-center justify-center flex-shrink-0">
+                          <Hash className="w-3.5 h-3.5 text-[#15803d]" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-bold text-slate-900 font-mono truncate">{chalan.chalan_ref || chalan.id.slice(0, 8).toUpperCase()}</p>
@@ -689,7 +692,7 @@ export default function PartnerBranchChalansPage() {
                           <div className="md:hidden flex flex-wrap gap-1.5 mt-2">
                             {(chalan.items ?? []).slice(0, 3).map((it, i) => (
                               <span key={i} className="text-[9px] bg-slate-900/[0.04] border border-slate-900/5 text-slate-500 px-1.5 py-0.5 rounded-md">
-                                {it.code ? <span className="text-[#8a6d1f] font-mono">{it.code} </span> : null}{it.name} ×{it.quantity}
+                                {it.code ? <span className="text-[#15803d] font-mono">{it.code} </span> : null}{it.name} ×{it.quantity}
                               </span>
                             ))}
                             {(chalan.items ?? []).length > 3 && <span className="text-[9px] text-slate-600">+{chalan.items.length - 3} more</span>}
@@ -721,7 +724,7 @@ export default function PartnerBranchChalansPage() {
                       {/* Total */}
                       <div className="text-left md:text-right">
                         <span className="text-xs text-slate-500 block md:hidden mb-0.5 uppercase tracking-wider font-bold">Total</span>
-                        <span className="text-sm font-bold text-[#8a6d1f]">৳ {Number(chalan.total_amount).toLocaleString('en-BD')}</span>
+                        <span className="text-sm font-bold text-[#15803d]">৳ {Number(chalan.total_amount).toLocaleString('en-BD')}</span>
                       </div>
 
                       {/* Actions */}
@@ -738,7 +741,7 @@ export default function PartnerBranchChalansPage() {
                         <button
                           onClick={() => exportPdf(chalan)}
                           title="Export PDF"
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#d4af37]/10 border border-[#d4af37]/20 text-[#8a6d1f] hover:bg-[#d4af37]/20 transition-all text-[10px] font-bold uppercase tracking-wider"
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1ca34c]/10 border border-[#1ca34c]/20 text-[#15803d] hover:bg-[#1ca34c]/20 transition-all text-[10px] font-bold uppercase tracking-wider"
                         >
                           <Download className="w-3.5 h-3.5" /> <span className="hidden sm:inline">PDF</span>
                         </button>
@@ -770,7 +773,7 @@ export default function PartnerBranchChalansPage() {
               <div className="p-5 border-b border-slate-900/5 flex items-center justify-between shrink-0">
                 <div>
                   <h2 className="text-base font-bold text-slate-900 font-serif flex items-center gap-2">
-                    <Package className="w-4 h-4 text-[#8a6d1f]" /> New Product Chalan
+                    <Package className="w-4 h-4 text-[#15803d]" /> New Product Chalan
                   </h2>
                   <p className="text-[10px] text-slate-500 mt-0.5">Branch: {selectedBranch.name}</p>
                 </div>
@@ -785,14 +788,14 @@ export default function PartnerBranchChalansPage() {
                   {renderItemRows(formItems, setFormItems)}
 
                   {/* Grand total */}
-                  <div className="p-4 rounded-xl bg-[#d4af37]/5 border border-[#d4af37]/15 flex flex-col gap-2">
+                  <div className="p-4 rounded-xl bg-[#1ca34c]/5 border border-[#1ca34c]/15 flex flex-col gap-2">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Total Cost</span>
                       <span className="text-sm font-bold text-slate-900">৳ {grandTotalCostNew.toLocaleString('en-BD')}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] text-[#8a6d1f] uppercase tracking-wider font-bold">Expected Revenue</span>
-                      <span className="text-xl font-bold text-[#8a6d1f]">৳ {grandTotalSaleNew.toLocaleString('en-BD')}</span>
+                      <span className="text-[10px] text-[#15803d] uppercase tracking-wider font-bold">Expected Revenue</span>
+                      <span className="text-xl font-bold text-[#15803d]">৳ {grandTotalSaleNew.toLocaleString('en-BD')}</span>
                     </div>
                   </div>
 
@@ -804,7 +807,7 @@ export default function PartnerBranchChalansPage() {
                     <textarea
                       placeholder="e.g. Dispatched for Eid season..."
                       value={formNotes} onChange={e => setFormNotes(e.target.value)} rows={2}
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/40 transition-all resize-none"
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all resize-none"
                     />
                   </div>
                 </form>
@@ -820,7 +823,7 @@ export default function PartnerBranchChalansPage() {
                 </button>
                 <button
                   type="submit" form="new-chalan-form" disabled={isSubmitting || computedNewItems.length === 0}
-                  className="flex-1 bg-gradient-to-r from-[#d4af37] to-white text-black font-bold px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-[#d4af37]/10 active:scale-95 transition-transform disabled:opacity-50"
+                  className="flex-1 bg-[#1ca34c] hover:bg-[#15803d] text-white font-bold px-4 py-2.5 rounded-full text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-[#1ca34c]/10 active:scale-95 transition-transform disabled:opacity-50"
                 >
                   {isSubmitting ? <><Loader2 className="w-3.5 h-3.5 animate-spin" />Saving...</> : <><Check className="w-3.5 h-3.5" />Save Chalan</>}
                 </button>

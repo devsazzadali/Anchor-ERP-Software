@@ -242,7 +242,7 @@ export default function AdminDashboard() {
 
       {/* Dynamic Red and Amber Glows for Admin Risks */}
       <div className="absolute top-[-10%] right-[-5%] w-[45%] h-[45%] bg-rose-500/3 rounded-full filter blur-[130px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[20%] w-[50%] h-[50%] bg-[#d4af37]/3 rounded-full filter blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[20%] w-[50%] h-[50%] bg-[#1ca34c]/3 rounded-full filter blur-[150px] pointer-events-none" />
 
       {/* Admin Floating Sidebar */}
 
@@ -258,7 +258,8 @@ export default function AdminDashboard() {
                 Security Core Active
               </span>
             </div>
-            <h2 className="text-xl font-bold tracking-tight text-slate-900 font-serif">
+            <h2 className="text-xl font-extrabold tracking-tight text-slate-900 font-serif flex items-center gap-3">
+              <span className="w-1.5 h-8 rounded-full bg-[#1ca34c] shrink-0" />
               Operations Control: <span className="premium-text-gradient">{adminName}</span>
             </h2>
             <p className="text-[11px] text-slate-500">Enterprise security status cleared. Realtime telemetry logs streaming.</p>
@@ -272,14 +273,14 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-6">
               {[0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => (
                 <div key={i} className="glass-panel p-5 rounded-2xl h-[155px] animate-pulse">
-                  <div className="h-2.5 w-28 rounded bg-[#d4af37]/25 mb-3" />
+                  <div className="h-2.5 w-28 rounded bg-[#1ca34c]/25 mb-3" />
                   <div className="h-7 w-40 rounded bg-slate-900/10 mb-4" />
                   <div className="h-2.5 w-32 rounded bg-slate-900/[0.07]" />
                 </div>
               ))}
             </div>
             <div className="glass-panel p-6 rounded-2xl h-[320px] animate-pulse">
-              <div className="h-2.5 w-36 rounded bg-[#d4af37]/25 mb-3" />
+              <div className="h-2.5 w-36 rounded bg-[#1ca34c]/25 mb-3" />
               <div className="h-4 w-48 rounded bg-slate-900/10 mb-6" />
               <div className="h-[220px] rounded-xl bg-slate-900/[0.04]" />
             </div>
@@ -350,7 +351,7 @@ export default function AdminDashboard() {
               value={`৳ ${activePayoutLoad.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
               subtext="Clearing through gateways"
               icon={Wallet}
-              sparklineColor="amber"
+              sparklineColor="gold"
               sparklineData={telemetryData.map(d => d.payouts)}
             />
           </Link>
@@ -387,9 +388,9 @@ export default function AdminDashboard() {
         </div>
 
         {/* EXECUTIVE BRANCH ACCOUNTS & FINANCIAL SHORTCUT STRIP */}
-        <div className="mb-8 p-4 rounded-2xl border border-slate-900/10 bg-slate-900/[0.04] flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+        <div className="mb-8 p-4 rounded-3xl border border-slate-900/10 bg-slate-900/[0.04] flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#d4af37]/10 border border-[#d4af37]/20 flex items-center justify-center text-[#8a6d1f] flex-shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-[#1ca34c]/10 border border-[#1ca34c]/20 flex items-center justify-center text-[#15803d] flex-shrink-0">
               <Store className="w-4 h-4" />
             </div>
             <div>
@@ -401,13 +402,13 @@ export default function AdminDashboard() {
           <div className="flex items-center gap-2 flex-wrap">
             <Link
               href="/admin/branch-accounts"
-              className="px-3.5 py-1.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#d4af37]/30 text-slate-600 hover:text-slate-900 text-xs font-semibold flex items-center gap-1.5 transition-all"
+              className="px-3.5 py-1.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#1ca34c]/30 text-slate-600 hover:text-slate-900 text-xs font-semibold flex items-center gap-1.5 transition-all"
             >
               Daily Closings
             </Link>
             <Link
               href="/admin/branch-financial-reports"
-              className="px-3.5 py-1.5 rounded-xl bg-[#d4af37]/10 border border-[#d4af37]/30 text-[#8a6d1f] hover:bg-[#d4af37]/20 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all"
+              className="px-3.5 py-1.5 rounded-xl bg-[#1ca34c]/10 border border-[#1ca34c]/30 text-[#15803d] hover:bg-[#1ca34c]/20 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all"
             >
               Financial Reports
             </Link>
@@ -462,7 +463,7 @@ export default function AdminDashboard() {
 
           {/* FRAUD GEOLOCATION TELEMETRY & ALERTS */}
           <div className="lg:col-span-4 glass-panel p-6 rounded-2xl relative shadow-xl space-y-6">
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/20 to-transparent" />
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#1ca34c]/20 to-transparent" />
 
             <div>
               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">Biometric Core Alerts</span>
@@ -498,7 +499,7 @@ export default function AdminDashboard() {
             </div>
 
             <div className="p-3.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 flex gap-3.5 items-center">
-              <Compass className="w-6 h-6 text-[#8a6d1f]" />
+              <Compass className="w-6 h-6 text-[#15803d]" />
               <div>
                 <h4 className="text-[10px] font-bold uppercase text-slate-900 tracking-wider">Gateway Proxy Patrol</h4>
                 <p className="text-[9px] text-slate-500 font-sans">Active SSL certificates & JWT keys matching with 100% security assurance.</p>
@@ -534,7 +535,7 @@ export default function AdminDashboard() {
                   <tr key={log.id} className="hover:bg-slate-900/[0.04] transition-colors">
                     <td className="py-3.5 pl-2 font-semibold text-slate-900">{log.admin}</td>
                     <td className="py-3.5 text-slate-600 font-medium">{log.action}</td>
-                    <td className="py-3.5 font-bold text-[#8a6d1f]">{log.target}</td>
+                    <td className="py-3.5 font-bold text-[#15803d]">{log.target}</td>
                     <td className="py-3.5 font-mono text-slate-500 text-[10px]">{log.ip}</td>
                     <td className="py-3.5 text-right text-slate-500 text-[10px] pr-2">
                       {new Date(log.time).toLocaleTimeString()}

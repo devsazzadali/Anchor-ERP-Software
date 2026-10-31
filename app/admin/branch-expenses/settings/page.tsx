@@ -153,7 +153,7 @@ export default function ExpenseSettingsPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <div className="flex items-center gap-3 text-[#8a6d1f] mb-2">
+            <div className="flex items-center gap-3 text-[#15803d] mb-2">
               <Link href="/admin/branch-expenses" className="hover:text-slate-900 transition-colors">
                 <ChevronLeft className="w-5 h-5" />
               </Link>
@@ -165,13 +165,13 @@ export default function ExpenseSettingsPage() {
 
         {/* Tabs */}
         <div className="flex border-b border-slate-900/10 gap-6">
-          <button onClick={() => setActiveTab('rent')} className={`pb-3 text-sm font-bold uppercase tracking-wider transition-colors border-b-2 ${activeTab === 'rent' ? 'text-[#8a6d1f] border-[#d4af37]' : 'text-slate-500 border-transparent hover:text-slate-900'}`}>
+          <button onClick={() => setActiveTab('rent')} className={`pb-3 text-sm font-bold uppercase tracking-wider transition-colors border-b-2 ${activeTab === 'rent' ? 'text-[#15803d] border-[#1ca34c]' : 'text-slate-500 border-transparent hover:text-slate-900'}`}>
             House Rent Accounts
           </button>
-          <button onClick={() => setActiveTab('utility')} className={`pb-3 text-sm font-bold uppercase tracking-wider transition-colors border-b-2 ${activeTab === 'utility' ? 'text-[#8a6d1f] border-[#d4af37]' : 'text-slate-500 border-transparent hover:text-slate-900'}`}>
+          <button onClick={() => setActiveTab('utility')} className={`pb-3 text-sm font-bold uppercase tracking-wider transition-colors border-b-2 ${activeTab === 'utility' ? 'text-[#15803d] border-[#1ca34c]' : 'text-slate-500 border-transparent hover:text-slate-900'}`}>
             Utility Meters
           </button>
-          <button onClick={() => setActiveTab('developer')} className={`pb-3 text-sm font-bold uppercase tracking-wider transition-colors border-b-2 ${activeTab === 'developer' ? 'text-[#8a6d1f] border-[#d4af37]' : 'text-slate-500 border-transparent hover:text-slate-900'}`}>
+          <button onClick={() => setActiveTab('developer')} className={`pb-3 text-sm font-bold uppercase tracking-wider transition-colors border-b-2 ${activeTab === 'developer' ? 'text-[#15803d] border-[#1ca34c]' : 'text-slate-500 border-transparent hover:text-slate-900'}`}>
             Developer Payment Methods
           </button>
         </div>
@@ -179,7 +179,7 @@ export default function ExpenseSettingsPage() {
         {/* Content */}
         {isLoading ? (
           <div className="flex justify-center p-12">
-            <Loader2 className="w-8 h-8 text-[#8a6d1f] animate-spin" />
+            <Loader2 className="w-8 h-8 text-[#15803d] animate-spin" />
           </div>
         ) : (
           <div className="space-y-6">
@@ -188,17 +188,17 @@ export default function ExpenseSettingsPage() {
             {activeTab === 'rent' && (
               <div className="space-y-4">
                 <div className="flex justify-end">
-                  <button onClick={() => setShowRentModal(true)} className="bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20 hover:bg-[#d4af37]/20 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors">
+                  <button onClick={() => setShowRentModal(true)} className="bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 hover:bg-[#1ca34c]/20 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors">
                     <Plus className="w-4 h-4" /> Add Rent Account
                   </button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {rentAccounts.length === 0 ? (
-                    <div className="col-span-full p-8 text-center bg-slate-900/[0.04] border border-slate-900/5 rounded-2xl border-dashed text-slate-500 text-sm">
+                    <div className="col-span-full p-8 text-center bg-slate-900/[0.04] border border-slate-900/5 rounded-3xl border-dashed text-slate-500 text-sm">
                       No rent accounts configured yet.
                     </div>
                   ) : rentAccounts.map(account => (
-                    <div key={account.id} className="bg-slate-900/[0.04] border border-slate-900/5 rounded-2xl p-5 relative group">
+                    <div key={account.id} className="bg-slate-900/[0.04] border border-slate-900/5 rounded-3xl p-5 relative group">
                       <button onClick={() => deactivateItem('house_rent_accounts', account.id)} className="absolute top-4 right-4 text-slate-500 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all">
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -226,17 +226,17 @@ export default function ExpenseSettingsPage() {
             {activeTab === 'utility' && (
               <div className="space-y-4">
                 <div className="flex justify-end">
-                  <button onClick={() => setShowMeterModal(true)} className="bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20 hover:bg-[#d4af37]/20 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors">
+                  <button onClick={() => setShowMeterModal(true)} className="bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 hover:bg-[#1ca34c]/20 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors">
                     <Plus className="w-4 h-4" /> Add Utility Meter
                   </button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {utilityMeters.length === 0 ? (
-                    <div className="col-span-full p-8 text-center bg-slate-900/[0.04] border border-slate-900/5 rounded-2xl border-dashed text-slate-500 text-sm">
+                    <div className="col-span-full p-8 text-center bg-slate-900/[0.04] border border-slate-900/5 rounded-3xl border-dashed text-slate-500 text-sm">
                       No utility meters configured yet.
                     </div>
                   ) : utilityMeters.map(meter => (
-                    <div key={meter.id} className="bg-slate-900/[0.04] border border-slate-900/5 rounded-2xl p-5 relative group">
+                    <div key={meter.id} className="bg-slate-900/[0.04] border border-slate-900/5 rounded-3xl p-5 relative group">
                       <button onClick={() => deactivateItem('utility_meters', meter.id)} className="absolute top-4 right-4 text-slate-500 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all">
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -263,17 +263,17 @@ export default function ExpenseSettingsPage() {
             {activeTab === 'developer' && (
               <div className="space-y-4">
                 <div className="flex justify-end">
-                  <button onClick={() => setShowDevModal(true)} className="bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20 hover:bg-[#d4af37]/20 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors">
+                  <button onClick={() => setShowDevModal(true)} className="bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 hover:bg-[#1ca34c]/20 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors">
                     <Plus className="w-4 h-4" /> Add Payment Method
                   </button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {developerMethods.length === 0 ? (
-                    <div className="col-span-full p-8 text-center bg-slate-900/[0.04] border border-slate-900/5 rounded-2xl border-dashed text-slate-500 text-sm">
+                    <div className="col-span-full p-8 text-center bg-slate-900/[0.04] border border-slate-900/5 rounded-3xl border-dashed text-slate-500 text-sm">
                       No developer payment methods configured yet.
                     </div>
                   ) : developerMethods.map(method => (
-                    <div key={method.id} className="bg-slate-900/[0.04] border border-slate-900/5 rounded-2xl p-5 relative group">
+                    <div key={method.id} className="bg-slate-900/[0.04] border border-slate-900/5 rounded-3xl p-5 relative group">
                       <button onClick={() => deactivateItem('developer_payment_methods', method.id)} className="absolute top-4 right-4 text-slate-500 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all">
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -300,36 +300,36 @@ export default function ExpenseSettingsPage() {
         {showRentModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm" onClick={() => setShowRentModal(false)} />
-            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} className="bg-white border border-slate-900/10 rounded-2xl w-full max-w-md p-6 relative z-10 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} className="bg-white border border-slate-900/10 rounded-3xl w-full max-w-md p-6 relative z-10 shadow-2xl max-h-[90vh] overflow-y-auto">
               <h3 className="text-lg font-bold text-slate-900 mb-4">Add Rent Account</h3>
               {error && <div className="text-red-600 text-xs mb-4 bg-red-500/10 p-3 rounded-xl border border-red-500/20">{error}</div>}
               <form onSubmit={handleAddRentAccount} className="space-y-4">
                 <div>
                   <label className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 block">Branch *</label>
-                  <select required value={rentForm.branch_id} onChange={e => setRentForm({ ...rentForm, branch_id: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#d4af37]/50">
+                  <select required value={rentForm.branch_id} onChange={e => setRentForm({ ...rentForm, branch_id: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50">
                     <option value="" disabled className="bg-white">Select branch</option>
                     {branches.map(b => <option key={b.id} value={b.id} className="bg-white">{b.name}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 block">Bank Name *</label>
-                  <input required type="text" value={rentForm.bank_name} onChange={e => setRentForm({ ...rentForm, bank_name: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#d4af37]/50" placeholder="e.g. Dutch Bangla Bank" />
+                  <input required type="text" value={rentForm.bank_name} onChange={e => setRentForm({ ...rentForm, bank_name: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" placeholder="e.g. Dutch Bangla Bank" />
                 </div>
                 <div>
                   <label className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 block">Account Name *</label>
-                  <input required type="text" value={rentForm.account_name} onChange={e => setRentForm({ ...rentForm, account_name: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#d4af37]/50" placeholder="e.g. Mr. Landlord" />
+                  <input required type="text" value={rentForm.account_name} onChange={e => setRentForm({ ...rentForm, account_name: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" placeholder="e.g. Mr. Landlord" />
                 </div>
                 <div>
                   <label className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 block">Account Number *</label>
-                  <input required type="text" value={rentForm.account_number} onChange={e => setRentForm({ ...rentForm, account_number: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#d4af37]/50" placeholder="e.g. 101.101.0000" />
+                  <input required type="text" value={rentForm.account_number} onChange={e => setRentForm({ ...rentForm, account_number: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" placeholder="e.g. 101.101.0000" />
                 </div>
                 <div>
                   <label className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 block">Routing Number (Optional)</label>
-                  <input type="text" value={rentForm.routing_number} onChange={e => setRentForm({ ...rentForm, routing_number: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#d4af37]/50" placeholder="e.g. 0902938" />
+                  <input type="text" value={rentForm.routing_number} onChange={e => setRentForm({ ...rentForm, routing_number: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" placeholder="e.g. 0902938" />
                 </div>
                 <div className="flex gap-3 pt-4">
                   <button type="button" onClick={() => setShowRentModal(false)} className="flex-1 py-2.5 text-xs font-bold uppercase text-slate-500 hover:text-slate-900 border border-slate-900/10 rounded-xl">Cancel</button>
-                  <button type="submit" disabled={isSubmitting} className="flex-1 py-2.5 text-xs font-bold uppercase bg-[#d4af37] text-black hover:brightness-110 rounded-xl flex items-center justify-center gap-2">
+                  <button type="submit" disabled={isSubmitting} className="flex-1 py-2.5 text-xs font-bold uppercase bg-[#1ca34c] text-white hover:brightness-110 rounded-full flex items-center justify-center gap-2">
                     {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save'}
                   </button>
                 </div>
@@ -342,20 +342,20 @@ export default function ExpenseSettingsPage() {
         {showMeterModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm" onClick={() => setShowMeterModal(false)} />
-            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} className="bg-white border border-slate-900/10 rounded-2xl w-full max-w-md p-6 relative z-10 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} className="bg-white border border-slate-900/10 rounded-3xl w-full max-w-md p-6 relative z-10 shadow-2xl max-h-[90vh] overflow-y-auto">
               <h3 className="text-lg font-bold text-slate-900 mb-4">Add Utility Meter</h3>
               {error && <div className="text-red-600 text-xs mb-4 bg-red-500/10 p-3 rounded-xl border border-red-500/20">{error}</div>}
               <form onSubmit={handleAddMeter} className="space-y-4">
                 <div>
                   <label className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 block">Branch *</label>
-                  <select required value={meterForm.branch_id} onChange={e => setMeterForm({ ...meterForm, branch_id: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#d4af37]/50">
+                  <select required value={meterForm.branch_id} onChange={e => setMeterForm({ ...meterForm, branch_id: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50">
                     <option value="" disabled className="bg-white">Select branch</option>
                     {branches.map(b => <option key={b.id} value={b.id} className="bg-white">{b.name}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 block">Meter Type *</label>
-                  <select required value={meterForm.meter_type} onChange={e => setMeterForm({ ...meterForm, meter_type: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#d4af37]/50">
+                  <select required value={meterForm.meter_type} onChange={e => setMeterForm({ ...meterForm, meter_type: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50">
                     <option value="Electricity" className="bg-white">Electricity</option>
                     <option value="Water" className="bg-white">Water</option>
                     <option value="Gas" className="bg-white">Gas</option>
@@ -365,15 +365,15 @@ export default function ExpenseSettingsPage() {
                 </div>
                 <div>
                   <label className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 block">Meter Number *</label>
-                  <input required type="text" value={meterForm.meter_number} onChange={e => setMeterForm({ ...meterForm, meter_number: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#d4af37]/50" placeholder="e.g. 10293019" />
+                  <input required type="text" value={meterForm.meter_number} onChange={e => setMeterForm({ ...meterForm, meter_number: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" placeholder="e.g. 10293019" />
                 </div>
                 <div>
                   <label className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 block">Account Number / Reference (Optional)</label>
-                  <input type="text" value={meterForm.account_number} onChange={e => setMeterForm({ ...meterForm, account_number: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#d4af37]/50" placeholder="e.g. A/C 9901" />
+                  <input type="text" value={meterForm.account_number} onChange={e => setMeterForm({ ...meterForm, account_number: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" placeholder="e.g. A/C 9901" />
                 </div>
                 <div className="flex gap-3 pt-4">
                   <button type="button" onClick={() => setShowMeterModal(false)} className="flex-1 py-2.5 text-xs font-bold uppercase text-slate-500 hover:text-slate-900 border border-slate-900/10 rounded-xl">Cancel</button>
-                  <button type="submit" disabled={isSubmitting} className="flex-1 py-2.5 text-xs font-bold uppercase bg-[#d4af37] text-black hover:brightness-110 rounded-xl flex items-center justify-center gap-2">
+                  <button type="submit" disabled={isSubmitting} className="flex-1 py-2.5 text-xs font-bold uppercase bg-[#1ca34c] text-white hover:brightness-110 rounded-full flex items-center justify-center gap-2">
                     {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save'}
                   </button>
                 </div>
@@ -386,13 +386,13 @@ export default function ExpenseSettingsPage() {
         {showDevModal && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-slate-950/50 backdrop-blur-sm" onClick={() => setShowDevModal(false)} />
-            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} className="bg-white border border-slate-900/10 rounded-2xl w-full max-w-md p-6 relative z-10 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} className="bg-white border border-slate-900/10 rounded-3xl w-full max-w-md p-6 relative z-10 shadow-2xl max-h-[90vh] overflow-y-auto">
               <h3 className="text-lg font-bold text-slate-900 mb-4">Add Developer Payment Method</h3>
               {error && <div className="text-red-600 text-xs mb-4 bg-red-500/10 p-3 rounded-xl border border-red-500/20">{error}</div>}
               <form onSubmit={handleAddDevMethod} className="space-y-4">
                 <div>
                   <label className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 block">Method Type *</label>
-                  <select required value={devForm.method_type} onChange={e => setDevForm({ ...devForm, method_type: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#d4af37]/50">
+                  <select required value={devForm.method_type} onChange={e => setDevForm({ ...devForm, method_type: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50">
                     <option value="Bank" className="bg-white">Bank Transfer</option>
                     <option value="bKash" className="bg-white">bKash</option>
                     <option value="Rocket" className="bg-white">Rocket</option>
@@ -401,11 +401,11 @@ export default function ExpenseSettingsPage() {
                 </div>
                 <div>
                   <label className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 block">Details (JSON format or plain text) *</label>
-                  <textarea required rows={4} value={devForm.details} onChange={e => setDevForm({ ...devForm, details: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 font-mono focus:outline-none focus:border-[#d4af37]/50" placeholder={'{\n  "bank_name": "DBBL",\n  "account_number": "..."\n}'} />
+                  <textarea required rows={4} value={devForm.details} onChange={e => setDevForm({ ...devForm, details: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 font-mono focus:outline-none focus:border-[#1ca34c]/50" placeholder={'{\n  "bank_name": "DBBL",\n  "account_number": "..."\n}'} />
                 </div>
                 <div className="flex gap-3 pt-4">
                   <button type="button" onClick={() => setShowDevModal(false)} className="flex-1 py-2.5 text-xs font-bold uppercase text-slate-500 hover:text-slate-900 border border-slate-900/10 rounded-xl">Cancel</button>
-                  <button type="submit" disabled={isSubmitting} className="flex-1 py-2.5 text-xs font-bold uppercase bg-[#d4af37] text-black hover:brightness-110 rounded-xl flex items-center justify-center gap-2">
+                  <button type="submit" disabled={isSubmitting} className="flex-1 py-2.5 text-xs font-bold uppercase bg-[#1ca34c] text-white hover:brightness-110 rounded-full flex items-center justify-center gap-2">
                     {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save'}
                   </button>
                 </div>

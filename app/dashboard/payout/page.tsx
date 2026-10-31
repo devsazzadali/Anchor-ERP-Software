@@ -189,18 +189,21 @@ export default function PayoutRequest() {
   return <div className="flex-1 min-h-screen flex flex-col bg-white text-slate-900 font-sans">
       
       {/* Background neon gold filter */}
-      <div className="absolute top-[-10%] left-[20%] w-[50%] h-[50%] bg-[#d4af37]/3 rounded-full filter blur-[150px] pointer-events-none" />
+      <div className="absolute top-[-10%] left-[20%] w-[50%] h-[50%] bg-[#1ca34c]/3 rounded-full filter blur-[150px] pointer-events-none" />
 
       {/* Main Form container */}
       <div className="flex-1 flex flex-col p-6 overflow-y-auto max-h-screen relative z-10">
         
         {/* Upper title */}
         <div className="mb-8 pb-4 border-b border-slate-900/5 flex justify-between items-center">
-          <div>
-            <h2 className="text-xl font-bold tracking-tight text-slate-900 font-serif">
+          <div className="flex items-start gap-3">
+            <span className="w-1.5 h-9 rounded-full bg-[#1ca34c] shrink-0" />
+            <div>
+            <h2 className="text-xl font-extrabold tracking-tight text-slate-900 font-serif">
               Submit <span className="premium-text-gradient">Payout Invoice</span>
             </h2>
             <p className="text-[11px] text-slate-500">Request account settlement liquidity. High-integrity compliance verified.</p>
+            </div>
           </div>
         </div>
 
@@ -214,11 +217,11 @@ export default function PayoutRequest() {
             
             {/* Invoice File Drag Container */}
             <div className="glass-panel p-6 rounded-2xl relative shadow-xl">
-              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/20 to-transparent" />
+              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#1ca34c]/20 to-transparent" />
               
               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-4">Invoice Attachment</span>
               
-              <label className="flex flex-col justify-center items-center h-48 bg-slate-900/[0.04] hover:bg-slate-900/[0.04] border border-dashed border-slate-900/10 hover:border-[#d4af37]/30 rounded-2xl cursor-pointer relative overflow-hidden transition-all group">
+              <label className="flex flex-col justify-center items-center h-48 bg-slate-900/[0.04] hover:bg-slate-900/[0.04] border border-dashed border-slate-900/10 hover:border-[#1ca34c]/30 rounded-2xl cursor-pointer relative overflow-hidden transition-all group">
                 <input
                   type="file"
                   accept=".jpg,.png,.pdf"
@@ -230,7 +233,7 @@ export default function PayoutRequest() {
                 
                 {/* Visual state selector */}
                 <div className="text-center p-4 space-y-2">
-                  <div className="w-12 h-12 rounded-xl bg-white border border-slate-900/10 flex items-center justify-center mx-auto text-slate-500 group-hover:text-[#8a6d1f] transition-all">
+                  <div className="w-12 h-12 rounded-xl bg-white border border-slate-900/10 flex items-center justify-center mx-auto text-slate-500 group-hover:text-[#15803d] transition-all">
                     <Upload className="w-5 h-5" />
                   </div>
                   <div>
@@ -241,7 +244,7 @@ export default function PayoutRequest() {
 
                 {invoiceFile && invoiceFile.length > 0 && (
                   <div className="absolute inset-0 bg-slate-900/[0.05] flex flex-col justify-center items-center p-4">
-                    <FileText className="w-8 h-8 text-[#8a6d1f] mb-2" />
+                    <FileText className="w-8 h-8 text-[#15803d] mb-2" />
                     <span className="text-xs font-semibold text-slate-900 truncate max-w-xs">{invoiceFile[0].name}</span>
                     <span className="text-[10px] text-slate-500 mt-1">File attached successfully</span>
                   </div>
@@ -262,7 +265,7 @@ export default function PayoutRequest() {
             
             {/* INVOICE META DETAILS */}
             <div className="glass-panel p-6 rounded-2xl relative shadow-xl">
-              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/20 to-transparent" />
+              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#1ca34c]/20 to-transparent" />
               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-5">Billing Ledger Meta</span>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -272,7 +275,7 @@ export default function PayoutRequest() {
                     type="text"
                     {...register('invoiceTitle')}
                     placeholder="e.g. Contract Retainer (May)"
-                    className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                    className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                   />
                   {errors.invoiceTitle && <p className="text-[9px] text-rose-600 mt-1">{String(errors.invoiceTitle.message)}</p>}
                 </div>
@@ -283,7 +286,7 @@ export default function PayoutRequest() {
                     type="text"
                     {...register('invoiceNumber')}
                     placeholder="e.g. INV-2026-102"
-                    className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                    className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                   />
                   {errors.invoiceNumber && <p className="text-[9px] text-rose-600 mt-1">{String(errors.invoiceNumber.message)}</p>}
                 </div>
@@ -295,7 +298,7 @@ export default function PayoutRequest() {
                     step="0.01"
                     {...register('amount')}
                     placeholder="0.00"
-                    className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                    className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                   />
                   {errors.amount && <p className="text-[9px] text-rose-600 mt-1">{String(errors.amount.message)}</p>}
                 </div>
@@ -306,7 +309,7 @@ export default function PayoutRequest() {
                     type="text"
                     {...register('description')}
                     placeholder="Technical services provided..."
-                    className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                    className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                   />
                 </div>
               </div>
@@ -314,7 +317,7 @@ export default function PayoutRequest() {
 
             {/* GATEWAY TRANSFER TARGET SELECTOR */}
             <div className="glass-panel p-6 rounded-2xl relative shadow-xl">
-              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/20 to-transparent" />
+              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#1ca34c]/20 to-transparent" />
               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-4">Payout Clearance Channels</span>
 
               {/* Grid Selector */}
@@ -333,11 +336,11 @@ export default function PayoutRequest() {
                       onClick={() => changeMethod(item.id as any)}
                       className={`p-3 rounded-xl border flex flex-col items-center gap-2 cursor-pointer transition-all ${
                         isChosen 
-                          ? 'bg-[#d4af37]/10 border-[#d4af37] text-white shadow-lg shadow-[#d4af37]/5' 
+                          ? 'bg-[#1ca34c]/10 border-[#1ca34c] text-slate-900 shadow-lg shadow-[#1ca34c]/5' 
                           : 'bg-slate-900/[0.04] border-slate-900/5 text-slate-500 hover:text-slate-900 hover:bg-slate-900/[0.04]'
                       }`}
                     >
-                      <item.icon className={`w-4 h-4 ${isChosen ? 'text-[#8a6d1f]' : ''}`} />
+                      <item.icon className={`w-4 h-4 ${isChosen ? 'text-[#15803d]' : ''}`} />
                       <span className="text-[10px] font-semibold">{item.name}</span>
                     </button>
                   )
@@ -364,7 +367,7 @@ export default function PayoutRequest() {
                               type="text"
                               {...register('accountName')}
                               placeholder="Legal Account Name"
-                              className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-2.5 pl-9 pr-3 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/40"
+                              className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-2.5 pl-9 pr-3 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/40"
                             />
                           </div>
                         </div>
@@ -377,7 +380,7 @@ export default function PayoutRequest() {
                               type="text"
                               {...register('mobileNumber')}
                               placeholder="017xxxxxxxx"
-                              className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-2.5 pl-9 pr-3 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/40"
+                              className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-2.5 pl-9 pr-3 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/40"
                             />
                           </div>
                         </div>
@@ -464,7 +467,7 @@ export default function PayoutRequest() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-gradient-to-r from-[#d4af37] to-white text-black font-semibold py-4 rounded-2xl text-xs tracking-wider uppercase flex items-center justify-center gap-2 cursor-pointer disabled:opacity-55"
+              className="w-full bg-[#1ca34c] hover:bg-[#15803d] text-white font-semibold py-4 rounded-full text-xs tracking-wider uppercase flex items-center justify-center gap-2 cursor-pointer disabled:opacity-55"
             >
               {isSubmitting ? (
                 <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />

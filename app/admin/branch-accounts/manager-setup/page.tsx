@@ -111,24 +111,24 @@ export default function ManagerSetupPage() {
   })
 
   if (isLoading) {
-    return <div className="min-h-screen bg-white flex items-center justify-center"><div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" /></div>
+    return <div className="min-h-screen bg-white flex items-center justify-center"><div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" /></div>
   }
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/3 w-[400px] h-[400px] bg-[#d4af37]/3 rounded-full filter blur-[130px]" />
+        <div className="absolute top-0 left-1/3 w-[400px] h-[400px] bg-[#1ca34c]/3 rounded-full filter blur-[130px]" />
       </div>
 
       <div className="relative z-10 p-4 md:p-6 max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
-          <Link href="/admin/branch-accounts" className="p-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 text-slate-500 hover:text-slate-900 transition-all">
+          <Link href="/admin/branch-accounts" className="p-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 text-slate-500 hover:text-slate-900 transition-all">
             <ChevronLeft className="w-4 h-4" />
           </Link>
           <div>
             <h1 className="text-xl font-bold font-serif flex items-center gap-2">
-              <UserCog className="w-5 h-5 text-[#8a6d1f]" /> Manager Setup
+              <UserCog className="w-5 h-5 text-[#15803d]" /> Manager Setup
             </h1>
             <p className="text-[11px] text-slate-500">Assign employees as Branch Managers</p>
           </div>
@@ -146,9 +146,9 @@ export default function ManagerSetupPage() {
         )}
 
         {/* Assign form */}
-        <div className="mb-8 p-6 rounded-2xl border border-[#d4af37]/20 bg-[#d4af37]/5">
+        <div className="mb-8 p-6 rounded-3xl border border-[#1ca34c]/20 bg-[#1ca34c]/5">
           <h3 className="text-sm font-bold text-slate-900 mb-4 flex items-center gap-2">
-            <Plus className="w-4 h-4 text-[#8a6d1f]" /> Assign New Manager
+            <Plus className="w-4 h-4 text-[#15803d]" /> Assign New Manager
           </h3>
           <form onSubmit={handleAssign} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -157,7 +157,7 @@ export default function ManagerSetupPage() {
                 <select
                   value={selectedEmployee}
                   onChange={e => setSelectedEmployee(e.target.value)}
-                  className="w-full bg-white border border-slate-900/10 rounded-xl px-3 py-3 text-slate-900 text-xs focus:outline-none focus:border-[#d4af37]/40"
+                  className="w-full bg-white border border-slate-900/10 rounded-xl px-3 py-3 text-slate-900 text-xs focus:outline-none focus:border-[#1ca34c]/40"
                   required
                 >
                   <option value="">— Select Employee —</option>
@@ -173,7 +173,7 @@ export default function ManagerSetupPage() {
                 <select
                   value={selectedBranch}
                   onChange={e => setSelectedBranch(e.target.value)}
-                  className="w-full bg-white border border-slate-900/10 rounded-xl px-3 py-3 text-slate-900 text-xs focus:outline-none focus:border-[#d4af37]/40"
+                  className="w-full bg-white border border-slate-900/10 rounded-xl px-3 py-3 text-slate-900 text-xs focus:outline-none focus:border-[#1ca34c]/40"
                   required
                 >
                   <option value="">— Select Branch —</option>
@@ -188,7 +188,7 @@ export default function ManagerSetupPage() {
                 value={notes}
                 onChange={e => setNotes(e.target.value)}
                 placeholder="e.g. Transferred from Dhaka branch"
-                className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-xs placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40"
+                className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-xs placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40"
               />
             </div>
             <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-600 text-[11px]">
@@ -197,7 +197,7 @@ export default function ManagerSetupPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-[#d4af37] to-white text-black font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-full bg-[#1ca34c] text-white font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isSubmitting ? <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" /> : <UserCog className="w-4 h-4" />}
               Assign as Branch Manager
@@ -222,14 +222,14 @@ export default function ManagerSetupPage() {
           </div>
 
           {filteredAssignments.length === 0 ? (
-            <div className="text-center py-12 rounded-2xl border border-slate-900/5 bg-slate-900/[0.04]">
+            <div className="text-center py-12 rounded-3xl border border-slate-900/5 bg-slate-900/[0.04]">
               <User className="w-10 h-10 text-slate-600 mx-auto mb-3" />
               <p className="text-slate-500 text-sm">No manager assignments found</p>
             </div>
           ) : (
             <div className="space-y-3">
               {filteredAssignments.map((a: any) => (
-                <div key={a.id} className={`p-5 rounded-2xl border group transition-all ${
+                <div key={a.id} className={`p-5 rounded-3xl border group transition-all ${
                   a.is_active
                     ? 'border-emerald-500/20 bg-emerald-500/5 hover:border-emerald-500/30'
                     : 'border-slate-900/5 bg-slate-900/[0.04] opacity-60'
@@ -248,8 +248,8 @@ export default function ManagerSetupPage() {
                         </div>
                         <span className="text-slate-600">→</span>
                         <div className="flex items-center gap-1.5">
-                          <Building2 className="w-3.5 h-3.5 text-[#8a6d1f]" />
-                          <span className="text-sm font-semibold text-[#8a6d1f]">{a.branch?.name || '—'}</span>
+                          <Building2 className="w-3.5 h-3.5 text-[#15803d]" />
+                          <span className="text-sm font-semibold text-[#15803d]">{a.branch?.name || '—'}</span>
                         </div>
                       </div>
                       <div className="flex gap-4 text-[10px] text-slate-500">

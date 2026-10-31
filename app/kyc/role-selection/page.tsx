@@ -67,7 +67,7 @@ export default function RoleSelectionPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center text-slate-900 font-sans">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 rounded-full border-2 border-[#d4af37] border-t-transparent animate-spin" />
+          <div className="w-8 h-8 rounded-full border-2 border-[#1ca34c] border-t-transparent animate-spin" />
           <p className="text-xs text-slate-500 tracking-widest uppercase">Initializing Secure Module...</p>
         </div>
       </div>
@@ -78,8 +78,8 @@ export default function RoleSelectionPage() {
     <div className="min-h-screen bg-white flex items-center justify-center text-slate-900 font-sans p-4 relative overflow-hidden">
       <KycSignOutButton />
       {/* Glow Backdrops */}
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#d4af37]/5 rounded-full filter blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[55%] h-[55%] bg-amber-500/5 rounded-full filter blur-[150px] pointer-events-none" />
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#1ca34c]/5 rounded-full filter blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[55%] h-[55%] bg-[#1ca34c]/5 rounded-full filter blur-[150px] pointer-events-none" />
 
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
@@ -87,8 +87,8 @@ export default function RoleSelectionPage() {
         className="w-full max-w-md p-6 sm:p-8 rounded-3xl border border-slate-900/10 bg-white shadow-2xl text-center relative z-10"
       >
         <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 rounded-2xl bg-amber-500/10 flex items-center justify-center border border-amber-500/20">
-            <ShieldAlert className="w-8 h-8 text-amber-600" />
+          <div className="w-16 h-16 rounded-2xl bg-[#e8f7ee] flex items-center justify-center border border-[#1ca34c]/20">
+            <ShieldAlert className="w-8 h-8 text-[#15803d]" />
           </div>
         </div>
 
@@ -102,17 +102,17 @@ export default function RoleSelectionPage() {
           <button
             onClick={() => selectRole('employee')}
             disabled={isUpdating}
-            className="w-full relative group overflow-hidden rounded-xl border border-slate-900/5 bg-slate-900/[0.04] hover:bg-slate-900/[0.04] transition-all p-4 flex items-center justify-between"
+            className="w-full relative group overflow-hidden rounded-xl border border-slate-900/5 bg-slate-900/[0.04] hover:bg-[#1ca34c]/[0.04] hover:border-[#1ca34c]/40 transition-all p-4 flex items-center justify-between"
           >
             <div className="flex items-center gap-3">
-              <UserCircle className="w-5 h-5 text-slate-500 group-hover:text-[#8a6d1f] transition-colors" />
+              <UserCircle className="w-5 h-5 text-slate-500 group-hover:text-[#15803d] transition-colors" />
               <div className="text-left">
                 <div className="text-sm font-semibold text-slate-900">Verify as Employee</div>
                 <div className="text-[10px] text-slate-500">Standard ledger access</div>
               </div>
             </div>
-            <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center border border-slate-900/5 group-hover:border-[#d4af37]/30 transition-colors">
-              <div className="w-2 h-2 rounded-full bg-[#d4af37] opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center border border-slate-900/5 group-hover:border-[#1ca34c]/30 transition-colors">
+              <div className="w-2 h-2 rounded-full bg-[#1ca34c] opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
           </button>
 
@@ -120,22 +120,22 @@ export default function RoleSelectionPage() {
           <button
             onClick={() => selectRole('head_office')}
             disabled={isUpdating}
-            className="w-full relative group overflow-hidden rounded-xl border border-[#d4af37]/15 bg-[#d4af37]/[0.02] hover:bg-[#d4af37]/[0.05] transition-all p-4 flex items-center justify-between"
+            className="w-full relative group overflow-hidden rounded-xl border border-[#1ca34c]/15 bg-[#1ca34c]/[0.02] hover:bg-[#1ca34c]/[0.05] transition-all p-4 flex items-center justify-between"
           >
             <div className="flex items-center gap-3">
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-slate-500 group-hover:text-[#8a6d1f] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-slate-500 group-hover:text-[#15803d] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3 21h18M3 7l9-4 9 4M4 7v14M20 7v14M9 21V12h6v9" />
               </svg>
               <div className="text-left">
                 <div className="text-sm font-semibold text-slate-900 flex items-center gap-2">
                   Verify as Head Office
-                  <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#d4af37]/20 text-[#8a6d1f] font-bold uppercase tracking-wider border border-[#d4af37]/30">HO</span>
+                  <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#1ca34c]/20 text-[#15803d] font-bold uppercase tracking-wider border border-[#1ca34c]/30">HO</span>
                 </div>
                 <div className="text-[10px] text-slate-500">Branch chalan management access</div>
               </div>
             </div>
-            <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center border border-[#d4af37]/10 group-hover:border-[#d4af37]/40 transition-colors">
-              <div className="w-2 h-2 rounded-full bg-[#d4af37] opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center border border-[#1ca34c]/10 group-hover:border-[#1ca34c]/40 transition-colors">
+              <div className="w-2 h-2 rounded-full bg-[#1ca34c] opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
           </button>
 
@@ -143,17 +143,17 @@ export default function RoleSelectionPage() {
           <button
             onClick={() => selectRole('partner')}
             disabled={isUpdating}
-            className="w-full relative group overflow-hidden rounded-xl border border-slate-900/5 bg-slate-900/[0.04] hover:bg-slate-900/[0.04] transition-all p-4 flex items-center justify-between"
+            className="w-full relative group overflow-hidden rounded-xl border border-slate-900/5 bg-slate-900/[0.04] hover:bg-[#1ca34c]/[0.04] hover:border-[#1ca34c]/40 transition-all p-4 flex items-center justify-between"
           >
             <div className="flex items-center gap-3">
-              <Globe className="w-5 h-5 text-slate-500 group-hover:text-[#8a6d1f] transition-colors" />
+              <Globe className="w-5 h-5 text-slate-500 group-hover:text-[#15803d] transition-colors" />
               <div className="text-left">
                 <div className="text-sm font-semibold text-slate-900">Verify as Partner</div>
                 <div className="text-[10px] text-slate-500">Extended network access</div>
               </div>
             </div>
-            <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center border border-slate-900/5 group-hover:border-[#d4af37]/30 transition-colors">
-              <div className="w-2 h-2 rounded-full bg-[#d4af37] opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center border border-slate-900/5 group-hover:border-[#1ca34c]/30 transition-colors">
+              <div className="w-2 h-2 rounded-full bg-[#1ca34c] opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
           </button>
         </div>

@@ -258,7 +258,7 @@ export default function LedgerHeadsPage() {
   if (!allowed || isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -268,7 +268,7 @@ export default function LedgerHeadsPage() {
     <div className="min-h-screen bg-white text-slate-900">
       {/* Background glows */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 right-1/4 w-[500px] h-[400px] bg-[#d4af37]/3 rounded-full filter blur-[140px]" />
+        <div className="absolute top-0 right-1/4 w-[500px] h-[400px] bg-[#1ca34c]/3 rounded-full filter blur-[140px]" />
         <div className="absolute bottom-0 left-1/4 w-[400px] h-[300px] bg-indigo-500/3 rounded-full filter blur-[120px]" />
       </div>
 
@@ -277,13 +277,13 @@ export default function LedgerHeadsPage() {
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Link href="/admin/dashboard"
-            className="p-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 text-slate-500 hover:text-slate-900 transition-all"
+            className="p-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 text-slate-500 hover:text-slate-900 transition-all"
           >
             <ChevronLeft className="w-4 h-4" />
           </Link>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-              <BookMarked className="w-6 h-6 text-[#8a6d1f]" />
+            <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 flex items-center gap-2">
+              <BookMarked className="w-6 h-6 text-[#15803d]" />
               Ledger Head Master
             </h1>
             <p className="text-[11px] text-slate-500 mt-0.5">
@@ -299,13 +299,13 @@ export default function LedgerHeadsPage() {
             </button>
             <button
               onClick={handleRefresh}
-              className={`p-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'animate-spin text-[#8a6d1f]' : ''}`}
+              className={`p-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'animate-spin text-[#15803d]' : ''}`}
             >
               <RefreshCw className="w-4 h-4" />
             </button>
             <button
               onClick={() => { setShowAddModal(true); setError(null); setSuccess(null) }}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#d4af37] to-white text-black font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-all"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-[#1ca34c] text-white font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-all"
             >
               <Plus className="w-4 h-4" /> New Head
             </button>
@@ -329,11 +329,11 @@ export default function LedgerHeadsPage() {
         {/* Stats bar */}
         <div className="grid grid-cols-3 gap-3 mb-6">
           {[
-            { label: 'Total Heads',   val: heads.length,                          color: 'text-[#8a6d1f]' },
+            { label: 'Total Heads',   val: heads.length,                          color: 'text-[#15803d]' },
             { label: 'Active',        val: heads.filter(h => h.is_active).length, color: 'text-emerald-600' },
             { label: 'Inactive',      val: heads.filter(h => !h.is_active).length,color: 'text-slate-500' },
           ].map(s => (
-            <div key={s.label} className="p-4 rounded-2xl bg-slate-900/[0.04] border border-slate-900/5 text-center">
+            <div key={s.label} className="p-4 rounded-3xl bg-slate-900/[0.04] border border-slate-900/5 text-center">
               <p className={`text-2xl font-bold font-serif ${s.color}`}>{s.val}</p>
               <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-1">{s.label}</p>
             </div>
@@ -349,13 +349,13 @@ export default function LedgerHeadsPage() {
               placeholder="Search by code, name, or type..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl pl-9 pr-3 py-2.5 text-slate-900 text-xs placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40"
+              className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl pl-9 pr-3 py-2.5 text-slate-900 text-xs placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40"
             />
           </div>
           <select
             value={typeFilter}
             onChange={e => setTypeFilter(e.target.value)}
-            className="bg-white border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-xs focus:outline-none focus:border-[#d4af37]/40 cursor-pointer"
+            className="bg-white border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-xs focus:outline-none focus:border-[#1ca34c]/40 cursor-pointer"
           >
             <option value="all">All Types</option>
             {ledgerTypes.map(t => <option key={t} value={t}>{t}</option>)}
@@ -363,7 +363,7 @@ export default function LedgerHeadsPage() {
           <select
             value={activeFilter}
             onChange={e => setActiveFilter(e.target.value as any)}
-            className="bg-white border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-xs focus:outline-none focus:border-[#d4af37]/40 cursor-pointer"
+            className="bg-white border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-xs focus:outline-none focus:border-[#1ca34c]/40 cursor-pointer"
           >
             <option value="all">All Status</option>
             <option value="active">Active Only</option>
@@ -380,7 +380,7 @@ export default function LedgerHeadsPage() {
         </div>
 
         {/* Table */}
-        <div className="rounded-2xl border border-slate-900/5 overflow-hidden">
+        <div className="rounded-3xl border border-slate-900/5 overflow-hidden">
           {/* Table header */}
           <div className="grid grid-cols-[60px_1fr_100px_120px_80px_120px] gap-3 px-5 py-3 bg-slate-900/[0.04] border-b border-slate-900/5">
             {['Code', 'Ledger Head Name', 'Type', 'Ref Date', 'Status', 'Actions'].map(h => (
@@ -402,7 +402,7 @@ export default function LedgerHeadsPage() {
                 >
                   {/* Code */}
                   <div className="flex items-center">
-                    <span className="text-xs font-bold text-[#8a6d1f] font-mono">{h.code_number}</span>
+                    <span className="text-xs font-bold text-[#15803d] font-mono">{h.code_number}</span>
                   </div>
 
                   {/* Name */}
@@ -440,7 +440,7 @@ export default function LedgerHeadsPage() {
                     <button
                       onClick={() => openEdit(h)}
                       title="Edit"
-                      className="p-2.5 rounded-lg bg-slate-900/[0.04] hover:bg-[#d4af37]/10 hover:text-[#8a6d1f] text-slate-500 transition-all cursor-pointer"
+                      className="p-2.5 rounded-lg bg-slate-900/[0.04] hover:bg-[#1ca34c]/10 hover:text-[#15803d] text-slate-500 transition-all cursor-pointer"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
@@ -473,10 +473,10 @@ export default function LedgerHeadsPage() {
       {/* ─── Add Modal ─────────────────────────────────────────────────────── */}
       {showAddModal && (
         <div className="fixed inset-0 bg-slate-950/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white border border-slate-900/10 rounded-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white border border-slate-900/10 rounded-3xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <Plus className="w-4 h-4 text-[#8a6d1f]" /> New Ledger Head
+                <Plus className="w-4 h-4 text-[#15803d]" /> New Ledger Head
               </h2>
               <button onClick={() => { setShowAddModal(false); setError(null) }} className="text-slate-500 hover:text-slate-900 cursor-pointer p-3 rounded-lg">
                 <X className="w-4 h-4" />
@@ -501,7 +501,7 @@ export default function LedgerHeadsPage() {
                     value={addForm.code_number}
                     onChange={e => setAddForm(f => ({ ...f, code_number: e.target.value }))}
                     placeholder="e.g. 39"
-                    className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-xs placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 [appearance:textfield]"
+                    className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-xs placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 [appearance:textfield]"
                     required
                   />
                 </div>
@@ -514,7 +514,7 @@ export default function LedgerHeadsPage() {
                     value={addForm.ledger_type}
                     onChange={e => setAddForm(f => ({ ...f, ledger_type: e.target.value }))}
                     placeholder="All"
-                    className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-xs placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40"
+                    className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-xs placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40"
                   />
                 </div>
               </div>
@@ -526,7 +526,7 @@ export default function LedgerHeadsPage() {
                   onChange={e => setAddForm(f => ({ ...f, name: e.target.value }))}
                   placeholder="e.g. New Expense Category"
                   maxLength={100}
-                  className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-xs placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40"
+                  className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-xs placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40"
                   required
                 />
               </div>
@@ -538,14 +538,14 @@ export default function LedgerHeadsPage() {
                   type="date"
                   value={addForm.reference_creation_date}
                   onChange={e => setAddForm(f => ({ ...f, reference_creation_date: e.target.value }))}
-                  className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-xs focus:outline-none focus:border-[#d4af37]/40 [color-scheme:light]"
+                  className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-xs focus:outline-none focus:border-[#1ca34c]/40 [color-scheme:light]"
                 />
               </div>
               <div className="flex gap-3 pt-1">
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 py-3 rounded-xl bg-gradient-to-r from-[#d4af37] to-white text-black font-bold text-xs uppercase tracking-widest hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                  className="flex-1 py-3 rounded-full bg-[#1ca34c] text-white font-bold text-xs uppercase tracking-widest hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
                 >
                   {isSubmitting
                     ? <div className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />
@@ -568,10 +568,10 @@ export default function LedgerHeadsPage() {
       {/* ─── Edit Modal ────────────────────────────────────────────────────── */}
       {editHead && (
         <div className="fixed inset-0 bg-slate-950/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white border border-slate-900/10 rounded-2xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white border border-slate-900/10 rounded-3xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <Edit2 className="w-4 h-4 text-[#8a6d1f]" />
+                <Edit2 className="w-4 h-4 text-[#15803d]" />
                 Edit — Code {editHead.code_number}
               </h2>
               <button onClick={() => { setEditHead(null); setError(null) }} className="text-slate-500 hover:text-slate-900 cursor-pointer p-3 rounded-lg">
@@ -581,7 +581,7 @@ export default function LedgerHeadsPage() {
 
             <div className="mb-4 p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5">
               <p className="text-[10px] text-slate-500 uppercase tracking-widest">Code Number (immutable)</p>
-              <p className="text-sm font-bold text-[#8a6d1f] font-mono mt-0.5">{editHead.code_number}</p>
+              <p className="text-sm font-bold text-[#15803d] font-mono mt-0.5">{editHead.code_number}</p>
             </div>
 
             {error && (
@@ -598,7 +598,7 @@ export default function LedgerHeadsPage() {
                   value={editForm.name}
                   onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))}
                   maxLength={100}
-                  className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-xs focus:outline-none focus:border-[#d4af37]/40"
+                  className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-xs focus:outline-none focus:border-[#1ca34c]/40"
                   required
                 />
               </div>
@@ -608,7 +608,7 @@ export default function LedgerHeadsPage() {
                   type="text"
                   value={editForm.ledger_type}
                   onChange={e => setEditForm(f => ({ ...f, ledger_type: e.target.value }))}
-                  className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-xs focus:outline-none focus:border-[#d4af37]/40"
+                  className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-xs focus:outline-none focus:border-[#1ca34c]/40"
                 />
               </div>
               <div>
@@ -619,14 +619,14 @@ export default function LedgerHeadsPage() {
                   type="date"
                   value={editForm.reference_creation_date}
                   onChange={e => setEditForm(f => ({ ...f, reference_creation_date: e.target.value }))}
-                  className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-xs focus:outline-none focus:border-[#d4af37]/40 [color-scheme:light]"
+                  className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-xs focus:outline-none focus:border-[#1ca34c]/40 [color-scheme:light]"
                 />
               </div>
               <div className="flex gap-3 pt-1">
                 <button
                   type="submit"
                   disabled={isEditing}
-                  className="flex-1 py-3 rounded-xl bg-gradient-to-r from-[#d4af37] to-white text-black font-bold text-xs uppercase tracking-widest hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
+                  className="flex-1 py-3 rounded-full bg-[#1ca34c] text-white font-bold text-xs uppercase tracking-widest hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
                 >
                   {isEditing
                     ? <div className="w-3.5 h-3.5 border-2 border-black border-t-transparent rounded-full animate-spin" />

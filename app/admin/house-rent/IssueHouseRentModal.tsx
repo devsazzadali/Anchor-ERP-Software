@@ -258,13 +258,13 @@ export default function IssueHouseRentModal({ isOpen, onClose, onSuccess }: Issu
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             className="fixed inset-0 flex items-center justify-center z-50 p-4 pointer-events-none"
           >
-            <div className="bg-white border border-slate-900/8 rounded-2xl w-full max-w-2xl shadow-2xl pointer-events-auto max-h-[90vh] overflow-y-auto custom-scrollbar flex flex-col">
+            <div className="bg-white border border-slate-900/8 rounded-3xl w-full max-w-2xl shadow-2xl pointer-events-auto max-h-[90vh] overflow-y-auto custom-scrollbar flex flex-col">
 
               {/* Header */}
               <div className="flex items-center justify-between px-6 py-4 border-b border-slate-900/[0.08] shrink-0">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#d4af37]/20 to-[#d4af37]/5 flex items-center justify-center border border-[#d4af37]/20">
-                    <Building2 className="w-5 h-5 text-[#8a6d1f]" />
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1ca34c]/20 to-[#1ca34c]/5 flex items-center justify-center border border-[#1ca34c]/20">
+                    <Building2 className="w-5 h-5 text-[#15803d]" />
                   </div>
                   <div>
                     <h3 className="text-base font-bold text-slate-900 font-serif">Issue House Rent</h3>
@@ -296,7 +296,7 @@ export default function IssueHouseRentModal({ isOpen, onClose, onSuccess }: Issu
                   <div>
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Ledger Head *</label>
                     <select required value={ledgerHeadId} onChange={e => setLedgerHeadId(e.target.value)}
-                      className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50 transition-all cursor-pointer shadow-inner">
+                      className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 transition-all cursor-pointer shadow-inner">
                       <option value="" disabled className="bg-white text-slate-900">Select target ledger head</option>
                       {ledgerHeads.map(l => (
                         <option key={l.id} value={l.id} className="bg-white text-slate-900">{l.name}</option>
@@ -308,7 +308,7 @@ export default function IssueHouseRentModal({ isOpen, onClose, onSuccess }: Issu
                   <div>
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Branch *</label>
                     <select required value={branchId} onChange={handleBranchChange}
-                      className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50 transition-all cursor-pointer shadow-inner">
+                      className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 transition-all cursor-pointer shadow-inner">
                       <option value="" disabled className="bg-white text-slate-900">Select branch to pay rent for</option>
                       {branches.map(b => (
                         <option key={b.id} value={b.id} className="bg-white text-slate-900">{b.name}</option>
@@ -322,7 +322,7 @@ export default function IssueHouseRentModal({ isOpen, onClose, onSuccess }: Issu
                       <div>
                         <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Rent Month *</label>
                         <select required value={month} onChange={e => setMonth(e.target.value)}
-                          className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50 transition-all cursor-pointer">
+                          className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 transition-all cursor-pointer">
                           {MONTHS.map(m => (
                             <option key={m} value={m} className="bg-white text-slate-900">{m}</option>
                           ))}
@@ -332,7 +332,7 @@ export default function IssueHouseRentModal({ isOpen, onClose, onSuccess }: Issu
                       <div>
                         <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Year *</label>
                         <input required type="number" value={year} onChange={e => setYear(e.target.value)}
-                          className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/50 transition-all" />
+                          className="w-full bg-white border border-slate-900/10 rounded-xl py-3 px-4 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/50 transition-all" />
                       </div>
 
                       {/* Status Checkers */}
@@ -382,20 +382,20 @@ export default function IssueHouseRentModal({ isOpen, onClose, onSuccess }: Issu
                                   setRentAccountId(a.id);
                                   setAmount(Number(a.rent_amount || 0));
                                 }}
-                                className={`relative p-5 rounded-2xl border cursor-pointer transition-all group overflow-hidden ${
+                                className={`relative p-5 rounded-3xl border cursor-pointer transition-all group overflow-hidden ${
                                   isSelected
-                                    ? 'bg-[#d4af37]/10 border-[#d4af37]/50 shadow-[0_0_20px_rgba(212,175,55,0.15)]'
+                                    ? 'bg-[#1ca34c]/10 border-[#1ca34c]/50 shadow-[0_0_20px_rgba(28,163,76,0.15)]'
                                     : 'bg-slate-900/[0.04] border-slate-900/10 hover:border-slate-900/20 hover:bg-slate-900/[0.04]'
                                 }`}
                               >
                                 {isSelected && (
-                                  <div className="absolute top-0 right-0 p-3 text-[#8a6d1f]">
-                                    <CheckCircle className="w-5 h-5 drop-shadow-[0_0_8px_rgba(212,175,55,0.8)]" />
+                                  <div className="absolute top-0 right-0 p-3 text-[#15803d]">
+                                    <CheckCircle className="w-5 h-5 drop-shadow-[0_0_8px_rgba(28,163,76,0.8)]" />
                                   </div>
                                 )}
 
                                 <div className="flex items-center gap-3 mb-3">
-                                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold ${isSelected ? 'bg-[#d4af37]/20 text-[#8a6d1f]' : 'bg-slate-900/[0.04] text-slate-500'}`}>
+                                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold ${isSelected ? 'bg-[#1ca34c]/20 text-[#15803d]' : 'bg-slate-900/[0.04] text-slate-500'}`}>
                                     {a.bank_name.charAt(0)}
                                   </div>
                                   <div>
@@ -407,7 +407,7 @@ export default function IssueHouseRentModal({ isOpen, onClose, onSuccess }: Issu
                                 </div>
 
                                 <div className="flex items-center justify-between p-2 rounded-lg bg-white border border-slate-900/5">
-                                  <code className="text-xs text-[#8a6d1f] font-bold tracking-wide">{a.account_number}</code>
+                                  <code className="text-xs text-[#15803d] font-bold tracking-wide">{a.account_number}</code>
                                   <button type="button" onClick={(e) => handleCopy(e, accDetails)}
                                     className="text-slate-500 hover:text-slate-900 transition-colors p-2.5 rounded-md hover:bg-slate-900/[0.07]" title="Copy Details">
                                     <Copy className="w-3.5 h-3.5" />
@@ -434,20 +434,20 @@ export default function IssueHouseRentModal({ isOpen, onClose, onSuccess }: Issu
                   {/* Payment Amount & Status */}
                   <div className="col-span-2 space-y-4">
                     {/* Total Amount */}
-                    <div className="bg-gradient-to-r from-[#d4af37]/20 to-[#d4af37]/5 rounded-2xl p-5 border border-[#d4af37]/20 relative overflow-hidden">
-                      <div className="absolute inset-0 bg-[#d4af37]/5 blur-xl pointer-events-none" />
+                    <div className="bg-gradient-to-r from-[#1ca34c]/20 to-[#1ca34c]/5 rounded-3xl p-5 border border-[#1ca34c]/20 relative overflow-hidden">
+                      <div className="absolute inset-0 bg-[#1ca34c]/5 blur-xl pointer-events-none" />
                       <div className="relative flex items-center justify-between">
                         <div>
-                          <span className="text-[10px] text-[#8a6d1f] uppercase font-bold tracking-widest block mb-1">Total Rent Amount</span>
+                          <span className="text-[10px] text-[#15803d] uppercase font-bold tracking-widest block mb-1">Total Rent Amount</span>
                           <div className="flex items-center gap-2">
-                             <Info className="w-3.5 h-3.5 text-[#8a6d1f]/60" />
+                             <Info className="w-3.5 h-3.5 text-[#15803d]/60" />
                              <p className="text-[10px] text-slate-500">Modify if paying advance/short</p>
                           </div>
                         </div>
                         <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8a6d1f] font-bold text-xl">৳</span>
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#15803d] font-bold text-xl">৳</span>
                           <input type="number" step="0.01" min="0.01" value={amount || ''} onChange={e => setAmount(Number(e.target.value))} required placeholder="0.00"
-                            className="w-40 bg-white border border-[#d4af37]/30 rounded-xl py-2 pl-8 pr-4 text-right text-xl font-bold text-[#8a6d1f] focus:outline-none focus:border-[#d4af37] transition-all shadow-inner placeholder-slate-700" />
+                            className="w-40 bg-white border border-[#1ca34c]/30 rounded-xl py-2 pl-8 pr-4 text-right text-xl font-bold text-[#15803d] focus:outline-none focus:border-[#1ca34c] transition-all shadow-inner placeholder-slate-700" />
                         </div>
                       </div>
                     </div>
@@ -527,7 +527,7 @@ export default function IssueHouseRentModal({ isOpen, onClose, onSuccess }: Issu
                         ? 'bg-rose-500/80 text-white shadow-[0_4px_20px_rgba(239,68,68,0.3)]'
                         : paymentStatus === 'partial'
                         ? 'bg-amber-500/80 text-white shadow-[0_4px_20px_rgba(245,158,11,0.3)]'
-                        : 'bg-gradient-to-r from-[#d4af37] to-white text-black shadow-[0_4px_20px_rgba(212,175,55,0.3)]'
+                        : 'bg-[#1ca34c] text-white shadow-lg shadow-[#1ca34c]/25'
                     }`}>
                     {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
                     {paymentStatus === 'unpaid' ? 'Record as Unpaid' : paymentStatus === 'partial' ? 'Record Partial Payment' : 'Confirm Rent Payment'}

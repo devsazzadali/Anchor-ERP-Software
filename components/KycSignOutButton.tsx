@@ -36,7 +36,7 @@ export default function KycSignOutButton() {
       type="button"
       onClick={handleSignOut}
       disabled={isSigningOut}
-      className="absolute top-4 right-4 z-20 inline-flex items-center gap-2 rounded-full border border-slate-900/10 bg-white/90 px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-slate-600 shadow-sm transition-all hover:border-[#d4af37]/50 hover:text-[#8a6d1f] active:scale-95 disabled:opacity-60 cursor-pointer"
+      className="absolute top-4 right-4 z-20 inline-flex items-center gap-2 rounded-full border border-slate-900/10 bg-white/90 px-4 py-2 text-[11px] font-bold uppercase tracking-widest text-slate-600 shadow-sm transition-all hover:border-[#1ca34c]/50 hover:text-[#15803d] active:scale-95 disabled:opacity-60 cursor-pointer"
     >
       <LogOut className="w-3.5 h-3.5" />
       {isSigningOut ? 'Signing Out…' : 'Sign Out'}

@@ -33,7 +33,7 @@ const FileInput = ({ registration, label, error, watchValue }: FileInputProps) =
         {...registration}
         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
       />
-      <div className="w-full bg-slate-900/[0.04] border border-slate-900/5 border-dashed hover:border-[#d4af37]/50 rounded-xl py-4 flex flex-col items-center justify-center gap-2 transition-all">
+      <div className="w-full bg-slate-900/[0.04] border border-slate-900/5 border-dashed hover:border-[#1ca34c]/50 rounded-xl py-4 flex flex-col items-center justify-center gap-2 transition-all">
         <Upload className="w-5 h-5 text-slate-500" />
         <span className="text-xs text-slate-500">
           {watchValue && watchValue.length > 0
@@ -223,18 +223,20 @@ export default function KycPage() {
       suppressHydrationWarning={true}
     >
       <KycSignOutButton />
-      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#d4af37]/5 rounded-full filter blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[55%] h-[55%] bg-amber-500/5 rounded-full filter blur-[150px] pointer-events-none" />
+      <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#1ca34c]/5 rounded-full filter blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[55%] h-[55%] bg-[#1ca34c]/5 rounded-full filter blur-[150px] pointer-events-none" />
 
       <div className="w-full max-w-2xl glass-panel p-8 rounded-2xl relative shadow-2xl overflow-hidden z-10 bg-white">
-        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/40 to-transparent" />
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#1ca34c]/40 to-transparent" />
 
         {/* Header */}
         <div className="text-center mb-8">
-          <img src="/logos.png" alt="Anchor ERP Official Logo" className="w-14 h-14 object-contain mx-auto mb-4 drop-shadow-lg" />
+          <div className="w-14 h-14 rounded-2xl bg-[#1ca34c] flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[#1ca34c]/25">
+            <img src="/logos.png" alt="Anchor ERP Official Logo" className="w-9 h-9 object-contain brightness-0 invert" />
+          </div>
           <h1 className="text-2xl font-serif text-slate-900 tracking-wide">Verification Dossier</h1>
           <p className="text-xs text-slate-500 uppercase tracking-widest mt-2">
-            Completing KYC as <strong className="text-[#8a6d1f]">{role}</strong>
+            Completing KYC as <strong className="text-[#15803d]">{role}</strong>
           </p>
         </div>
 
@@ -274,7 +276,7 @@ export default function KycPage() {
                   {...register('address')}
                   placeholder="Street address, City, Region..."
                   rows={3}
-                  className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/50 focus:ring-1 focus:ring-[#d4af37]/30 transition-all resize-none"
+                  className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/50 focus:ring-1 focus:ring-[#1ca34c]/30 transition-all resize-none"
                 />
               </div>
               {errors.address && (
@@ -288,7 +290,7 @@ export default function KycPage() {
           {/* Bank info */}
           <div className="pt-4 border-t border-slate-900/5">
             <h3 className="text-xs font-semibold text-slate-600 tracking-widest uppercase mb-4 flex items-center gap-2">
-              <CreditCard className="w-4 h-4 text-[#8a6d1f]" /> Bank Information
+              <CreditCard className="w-4 h-4 text-[#15803d]" /> Bank Information
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -296,7 +298,7 @@ export default function KycPage() {
                 <input
                   {...register('bankName')}
                   placeholder="e.g. City Bank"
-                  className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/50"
+                  className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/50"
                 />
                 {errors.bankName && (
                   <p className="text-[10px] text-rose-600 mt-1">
@@ -309,7 +311,7 @@ export default function KycPage() {
                 <input
                   {...register('bankAccountName')}
                   placeholder="e.g. Sazzad Ali"
-                  className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/50"
+                  className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/50"
                 />
                 {errors.bankAccountName && (
                   <p className="text-[10px] text-rose-600 mt-1">
@@ -322,7 +324,7 @@ export default function KycPage() {
                 <input
                   {...register('bankAccountNumber')}
                   placeholder="e.g. 1502XXXXX"
-                  className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/50"
+                  className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/50"
                 />
                 {errors.bankAccountNumber && (
                   <p className="text-[10px] text-rose-600 mt-1">
@@ -335,7 +337,7 @@ export default function KycPage() {
                 <input
                   {...register('district')}
                   placeholder="e.g. Dhaka"
-                  className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/50"
+                  className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/50"
                 />
                 {errors.district && (
                   <p className="text-[10px] text-rose-600 mt-1">
@@ -349,7 +351,7 @@ export default function KycPage() {
           {/* Documents */}
           <div className="pt-4 border-t border-slate-900/5">
             <h3 className="text-xs font-semibold text-slate-600 tracking-widest uppercase mb-4 flex items-center gap-2">
-              <FileText className="w-4 h-4 text-[#8a6d1f]" /> Identity Documents
+              <FileText className="w-4 h-4 text-[#15803d]" /> Identity Documents
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FileInput
@@ -376,7 +378,7 @@ export default function KycPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-gradient-to-r from-[#d4af37] to-white text-black font-semibold py-4 rounded-xl text-xs tracking-wider uppercase mt-8 flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-[#d4af37]/20 transition-all disabled:opacity-50"
+            className="w-full bg-[#1ca34c] hover:bg-[#15803d] text-white font-semibold py-4 rounded-full text-xs tracking-wider uppercase mt-8 flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-[#1ca34c]/20 transition-all disabled:opacity-50"
           >
             {isSubmitting ? (
               <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />

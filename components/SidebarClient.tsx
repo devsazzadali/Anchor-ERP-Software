@@ -20,10 +20,10 @@ export default function SidebarClient(props: SidebarProps) {
       <button
         type="button"
         onClick={toggle}
-        className="fixed top-4 left-4 z-50 p-3 rounded-xl bg-white/95 backdrop-blur-md border border-slate-900/10 shadow-[0_2px_12px_rgba(15,18,25,0.15)] hover:bg-slate-50 transition-all md:hidden active:scale-95"
+        className="fixed top-4 left-4 z-50 p-3 rounded-full bg-white/95 backdrop-blur-md border border-slate-900/10 shadow-[0_2px_12px_rgba(15,18,25,0.15)] hover:bg-slate-50 transition-all md:hidden active:scale-95"
         aria-label={isOpen ? 'Close menu' : 'Open menu'}
       >
-        {isOpen ? <X className="w-5 h-5 text-slate-900" /> : <Menu className="w-5 h-5 text-[#8a6d1f]" />}
+        {isOpen ? <X className="w-5 h-5 text-slate-900" /> : <Menu className="w-5 h-5 text-[#15803d]" />}
       </button>
 
       {/* Slide-in drawer */}

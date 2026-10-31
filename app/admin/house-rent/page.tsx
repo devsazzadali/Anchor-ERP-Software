@@ -75,17 +75,17 @@ export default function HouseRentPage() {
       <div className="max-w-5xl mx-auto">
         <div className="flex justify-between items-center mb-8 pb-4 border-b border-slate-900/5">
           <div>
-            <h2 className="text-2xl font-bold font-serif text-[#8a6d1f]">House Rent Accounts</h2>
+            <h2 className="text-2xl font-extrabold font-serif text-slate-900 flex items-center gap-3"><span className="w-1.5 h-9 rounded-full bg-[#1ca34c] shrink-0" />House Rent Accounts</h2>
             <p className="text-xs text-slate-500">Setup and manage bank accounts for branch house rent.</p>
           </div>
-          <button onClick={() => setIsModalOpen(true)} className="px-4 py-2.5 bg-gradient-to-r from-[#d4af37] to-white text-black font-bold text-xs rounded-xl flex items-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-[#d4af37]/20">
+          <button onClick={() => setIsModalOpen(true)} className="px-4 py-2.5 bg-[#1ca34c] text-white font-bold text-xs rounded-full flex items-center gap-2 hover:opacity-90 transition-all shadow-lg shadow-[#1ca34c]/20">
             <Plus className="w-4 h-4" /> Add Account
           </button>
         </div>
 
         {isLoading ? (
           <div className="flex justify-center py-20">
-            <Loader2 className="w-8 h-8 text-[#8a6d1f] animate-spin" />
+            <Loader2 className="w-8 h-8 text-[#15803d] animate-spin" />
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -101,10 +101,10 @@ export default function HouseRentPage() {
                 const isPartial = !!status && paidTotal > 0 && paidTotal < rentDue
                 const isUnpaid = !!status && paidTotal === 0
                 return (
-                <div key={acc.id} className="p-6 border border-slate-900/10 rounded-2xl bg-slate-900/[0.04] hover:bg-slate-900/[0.04] hover:border-[#d4af37]/30 transition-all group">
+                <div key={acc.id} className="p-6 border border-slate-900/10 rounded-3xl bg-slate-900/[0.04] hover:bg-slate-900/[0.04] hover:border-[#1ca34c]/30 transition-all group">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-slate-900/[0.04] flex items-center justify-center font-bold text-lg text-slate-600 group-hover:text-[#8a6d1f] group-hover:bg-[#d4af37]/10 transition-all">
+                      <div className="w-10 h-10 rounded-xl bg-slate-900/[0.04] flex items-center justify-center font-bold text-lg text-slate-600 group-hover:text-[#15803d] group-hover:bg-[#1ca34c]/10 transition-all">
                         {acc.bank_name?.charAt(0)}
                       </div>
                       <div>
@@ -124,7 +124,7 @@ export default function HouseRentPage() {
                     </div>
                     <div>
                       <span className="text-[10px] text-slate-500 block">Account Number</span>
-                      <code className="text-xs text-[#8a6d1f] tracking-wider font-bold">{acc.account_number}</code>
+                      <code className="text-xs text-[#15803d] tracking-wider font-bold">{acc.account_number}</code>
                     </div>
                   </div>
 
@@ -163,7 +163,7 @@ export default function HouseRentPage() {
                 )
               })}
             {accounts.length === 0 && (
-              <div className="col-span-full py-20 text-center border border-slate-900/5 bg-slate-900/[0.04] rounded-2xl">
+              <div className="col-span-full py-20 text-center border border-slate-900/5 bg-slate-900/[0.04] rounded-3xl">
                 <Building className="w-8 h-8 text-slate-600 mx-auto mb-3" />
                 <p className="text-slate-500 text-sm font-medium">No rent accounts found</p>
                 <p className="text-xs text-slate-600 mt-1">Click Add Account to setup a bank account for a branch.</p>
@@ -234,7 +234,7 @@ function AddAccountModal({ isOpen, onClose, onSuccess, branches }: { isOpen: boo
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
             className="fixed inset-0 flex items-center justify-center z-50 p-4 pointer-events-none"
           >
-            <div className="bg-white border border-slate-900/10 rounded-2xl w-full max-w-md shadow-2xl pointer-events-auto max-h-[90vh] overflow-y-auto">
+            <div className="bg-white border border-slate-900/10 rounded-3xl w-full max-w-md shadow-2xl pointer-events-auto max-h-[90vh] overflow-y-auto">
               <div className="flex items-center justify-between px-6 py-4 border-b border-slate-900/5">
                 <h3 className="text-sm font-bold text-slate-900 font-serif">Setup Rent Account</h3>
                 <button onClick={onClose} className="text-slate-500 hover:text-slate-900 p-3 rounded-md hover:bg-slate-900/[0.04]">
@@ -248,7 +248,7 @@ function AddAccountModal({ isOpen, onClose, onSuccess, branches }: { isOpen: boo
                 <div>
                   <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Branch *</label>
                   <select required value={form.branch_id} onChange={e => setForm({...form, branch_id: e.target.value})}
-                    className="w-full bg-white border border-slate-900/10 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50">
+                    className="w-full bg-white border border-slate-900/10 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50">
                     <option value="" disabled>Select Branch</option>
                     {branches.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
                   </select>
@@ -257,30 +257,30 @@ function AddAccountModal({ isOpen, onClose, onSuccess, branches }: { isOpen: boo
                 <div>
                   <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Bank Name (e.g. City Bank / bKash) *</label>
                   <input required type="text" value={form.bank_name} onChange={e => setForm({...form, bank_name: e.target.value})}
-                    className="w-full bg-white border border-slate-900/10 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50" />
+                    className="w-full bg-white border border-slate-900/10 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" />
                 </div>
 
                 <div>
                   <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Account Name *</label>
                   <input required type="text" value={form.account_name} onChange={e => setForm({...form, account_name: e.target.value})}
-                    className="w-full bg-white border border-slate-900/10 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50" />
+                    className="w-full bg-white border border-slate-900/10 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" />
                 </div>
 
                 <div>
                   <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Account Number *</label>
                   <input required type="text" value={form.account_number} onChange={e => setForm({...form, account_number: e.target.value})}
-                    className="w-full bg-white border border-slate-900/10 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 font-mono focus:outline-none focus:border-[#d4af37]/50" />
+                    className="w-full bg-white border border-slate-900/10 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 font-mono focus:outline-none focus:border-[#1ca34c]/50" />
                 </div>
 
                 <div>
                   <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Fixed Rent Amount (BDT) *</label>
                   <input required type="number" step="0.01" value={form.rent_amount} onChange={e => setForm({...form, rent_amount: e.target.value})}
-                    className="w-full bg-white border border-slate-900/10 rounded-xl py-2.5 px-3.5 text-xs text-[#8a6d1f] font-bold focus:outline-none focus:border-[#d4af37]/50" />
+                    className="w-full bg-white border border-slate-900/10 rounded-xl py-2.5 px-3.5 text-xs text-[#15803d] font-bold focus:outline-none focus:border-[#1ca34c]/50" />
                 </div>
 
                 <div className="flex gap-3 pt-4">
                   <button type="button" onClick={onClose} className="flex-1 py-3 bg-slate-900/[0.04] hover:bg-slate-900/[0.07] text-slate-600 rounded-xl text-xs font-bold transition-all">Cancel</button>
-                  <button type="submit" disabled={isSubmitting} className="flex-1 py-3 bg-gradient-to-r from-[#d4af37] to-white text-black rounded-xl text-xs font-bold hover:opacity-90 flex items-center justify-center gap-2">
+                  <button type="submit" disabled={isSubmitting} className="flex-1 py-3 bg-[#1ca34c] text-white rounded-full text-xs font-bold hover:opacity-90 flex items-center justify-center gap-2">
                     {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                     Save Account
                   </button>

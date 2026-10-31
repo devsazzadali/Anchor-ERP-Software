@@ -485,7 +485,7 @@ export default function AdminExpenses() {
   return (
     <div className="min-h-screen w-full bg-white text-slate-900 font-sans overflow-y-auto">
       {/* Glows */}
-      <div className="fixed top-0 right-0 w-[40%] h-[40%] bg-[#d4af37]/3 rounded-full filter blur-[120px] pointer-events-none z-0" />
+      <div className="fixed top-0 right-0 w-[40%] h-[40%] bg-[#1ca34c]/3 rounded-full filter blur-[120px] pointer-events-none z-0" />
       <div className="fixed bottom-0 left-[10%] w-[40%] h-[40%] bg-slate-900/[0.05] rounded-full filter blur-[120px] pointer-events-none z-0" />
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 py-8">
@@ -510,7 +510,7 @@ export default function AdminExpenses() {
             {/* Page Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
               <div>
-                <h1 className="text-2xl font-bold font-serif text-slate-900">Company <span className="premium-text-gradient">Expenditures</span></h1>
+                <h1 className="text-2xl font-extrabold font-serif text-slate-900 flex items-center gap-3"><span className="w-1.5 h-9 rounded-full bg-[#1ca34c] shrink-0" />Company <span className="premium-text-gradient">Expenditures</span></h1>
                 <p className="text-xs text-slate-500 mt-1">Branch-wise expense tracking & reporting</p>
               </div>
               <div className="flex items-center gap-2 self-start sm:self-auto">
@@ -518,7 +518,7 @@ export default function AdminExpenses() {
                   <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
                 </button>
                 <button onClick={() => setShowBranchModal(true)}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#d4af37] to-white text-black font-bold rounded-lg text-[11px] uppercase tracking-wider hover:brightness-110 transition-all shadow-md shadow-[#d4af37]/10 cursor-pointer">
+                  className="flex items-center gap-1.5 px-4 py-2 bg-[#1ca34c] text-white font-bold rounded-full text-[11px] uppercase tracking-wider hover:brightness-110 transition-all shadow-md shadow-[#1ca34c]/10 cursor-pointer">
                   <Plus className="w-3.5 h-3.5" /> New Branch
                 </button>
               </div>
@@ -532,7 +532,7 @@ export default function AdminExpenses() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                   {[0, 1, 2].map(i => (
                     <div key={i} className="glass-panel p-5 rounded-2xl h-[155px] animate-pulse">
-                      <div className="h-2.5 w-24 rounded bg-[#d4af37]/25 mb-3" />
+                      <div className="h-2.5 w-24 rounded bg-[#1ca34c]/25 mb-3" />
                       <div className="h-7 w-36 rounded bg-slate-900/10 mb-4" />
                       <div className="h-2.5 w-28 rounded bg-slate-900/[0.07]" />
                     </div>
@@ -541,7 +541,7 @@ export default function AdminExpenses() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                   {[0, 1].map(i => (
                     <div key={i} className="glass-panel p-5 rounded-2xl h-[155px] animate-pulse">
-                      <div className="h-2.5 w-32 rounded bg-[#d4af37]/25 mb-3" />
+                      <div className="h-2.5 w-32 rounded bg-[#1ca34c]/25 mb-3" />
                       <div className="h-7 w-36 rounded bg-slate-900/10 mb-4" />
                       <div className="h-2.5 w-44 rounded bg-slate-900/[0.07]" />
                     </div>
@@ -603,10 +603,10 @@ export default function AdminExpenses() {
 
             {isLoading ? (
               <div className="flex items-center justify-center py-24">
-                <Loader2 className="w-6 h-6 animate-spin text-[#8a6d1f]" />
+                <Loader2 className="w-6 h-6 animate-spin text-[#15803d]" />
               </div>
             ) : (
-              <div className="rounded-2xl border border-slate-900/[0.08] overflow-hidden">
+              <div className="rounded-3xl border border-slate-900/[0.08] overflow-hidden">
                 <div className="overflow-x-auto custom-scrollbar">
                   <div className="min-w-[650px]">
                     {/* List Header */}
@@ -621,7 +621,7 @@ export default function AdminExpenses() {
 
                 {/* All Branches Row */}
                 {[
-                  { id: 'all', name: 'All Branches', icon: Globe, iconBg: 'bg-[#d4af37]/10', iconColor: 'text-[#8a6d1f]', badge: 'text-[#8a6d1f] bg-[#d4af37]/10 border-[#d4af37]/15' },
+                  { id: 'all', name: 'All Branches', icon: Globe, iconBg: 'bg-[#1ca34c]/10', iconColor: 'text-[#15803d]', badge: 'text-[#15803d] bg-[#1ca34c]/10 border-[#1ca34c]/15' },
                   { id: 'general', name: 'Head Office / General', icon: Building2, iconBg: 'bg-blue-500/10', iconColor: 'text-blue-600', badge: 'text-blue-600 bg-blue-500/10 border-blue-500/15' }
                 ].map(row => {
                   const st = branchStats[row.id] || { total: 0, paid: 0, due: 0, count: 0 }
@@ -632,7 +632,7 @@ export default function AdminExpenses() {
                   return (
                     <motion.button
                       key={row.id}
-                      whileHover={{ backgroundColor: 'rgba(212,175,55,0.03)' }}
+                      whileHover={{ backgroundColor: 'rgba(28,163,76,0.03)' }}
                       whileTap={{ scale: 0.995 }}
                       onClick={() => { setSelectedBranch({ id: row.id, name: row.name }); setSearch('') }}
                       className="w-full flex items-center px-5 py-4 border-b border-slate-900/[0.08] cursor-pointer group transition-colors text-left"
@@ -642,11 +642,12 @@ export default function AdminExpenses() {
                           <row.icon className={`w-3.5 h-3.5 ${row.iconColor}`} />
                         </div>
                         <div className="min-w-0">
-                          <div className="text-sm font-semibold text-slate-900 group-hover:text-[#8a6d1f] transition-colors truncate">{row.name}</div>
+                          <div className="text-sm font-semibold text-slate-900 group-hover:text-[#15803d] transition-colors truncate">{row.name}</div>
                           <div className="flex items-center gap-2 mt-0.5">
-                            <div className="h-1 w-20 bg-slate-900/[0.04] rounded-full overflow-hidden">
-                              <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${paidPct}%` }} />
-                            </div>
+                            <svg width="36" height="36" viewBox="0 0 36 36" className="shrink-0 -rotate-90" aria-hidden="true">
+                              <circle cx="18" cy="18" r="16" fill="none" stroke="#e8f7ee" strokeWidth="3.5" />
+                              <circle cx="18" cy="18" r="16" fill="none" stroke="#1ca34c" strokeWidth="3.5" strokeLinecap="round" strokeDasharray={2 * Math.PI * 16} strokeDashoffset={2 * Math.PI * 16 * (1 - Math.min(paidPct, 100) / 100)} className="transition-all" />
+                            </svg>
                             <span className="text-[10px] text-slate-600">{paidPct.toFixed(1)}% paid</span>
                           </div>
                         </div>
@@ -656,7 +657,7 @@ export default function AdminExpenses() {
                       <div className="w-28 text-right text-sm font-semibold">{st.due > 0 ? <span className="text-rose-600">৳{st.due.toLocaleString()}</span> : <span className="text-slate-600 text-xs">—</span>}</div>
                       <div className="w-24 text-right text-[11px] text-slate-500">{st.count} records</div>
                       <div className="w-8 flex justify-end">
-                        <ChevronRight className="w-4 h-4 text-slate-700 group-hover:text-[#8a6d1f] transition-colors" />
+                        <ChevronRight className="w-4 h-4 text-slate-700 group-hover:text-[#15803d] transition-colors" />
                       </div>
                     </motion.button>
                   )
@@ -670,21 +671,22 @@ export default function AdminExpenses() {
                   return (
                     <motion.button
                       key={b.id}
-                      whileHover={{ backgroundColor: 'rgba(212,175,55,0.03)' }}
+                      whileHover={{ backgroundColor: 'rgba(28,163,76,0.03)' }}
                       whileTap={{ scale: 0.995 }}
                       onClick={() => { setSelectedBranch(b); setSearch('') }}
                       className={`w-full flex items-center px-5 py-4 cursor-pointer group transition-colors text-left ${idx < branches.length - 1 ? 'border-b border-slate-900/[0.08]' : ''}`}
                     >
                       <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <div className="w-8 h-8 rounded-xl bg-[#d4af37]/8 flex items-center justify-center flex-shrink-0">
-                          <MapPin className="w-3.5 h-3.5 text-[#8a6d1f]" />
+                        <div className="w-8 h-8 rounded-xl bg-[#1ca34c]/8 flex items-center justify-center flex-shrink-0">
+                          <MapPin className="w-3.5 h-3.5 text-[#15803d]" />
                         </div>
                         <div className="min-w-0">
-                          <div className="text-sm font-semibold text-slate-900 group-hover:text-[#8a6d1f] transition-colors truncate">{b.name}</div>
+                          <div className="text-sm font-semibold text-slate-900 group-hover:text-[#15803d] transition-colors truncate">{b.name}</div>
                           <div className="flex items-center gap-2 mt-0.5">
-                            <div className="h-1 w-20 bg-slate-900/[0.04] rounded-full overflow-hidden">
-                              <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${paidPct}%` }} />
-                            </div>
+                            <svg width="36" height="36" viewBox="0 0 36 36" className="shrink-0 -rotate-90" aria-hidden="true">
+                              <circle cx="18" cy="18" r="16" fill="none" stroke="#e8f7ee" strokeWidth="3.5" />
+                              <circle cx="18" cy="18" r="16" fill="none" stroke="#1ca34c" strokeWidth="3.5" strokeLinecap="round" strokeDasharray={2 * Math.PI * 16} strokeDashoffset={2 * Math.PI * 16 * (1 - Math.min(paidPct, 100) / 100)} className="transition-all" />
+                            </svg>
                             <span className="text-[10px] text-slate-600">{paidPct.toFixed(1)}% paid</span>
                           </div>
                         </div>
@@ -694,7 +696,7 @@ export default function AdminExpenses() {
                       <div className="w-28 text-right text-sm font-semibold">{st.due > 0 ? <span className="text-rose-600">৳{st.due.toLocaleString()}</span> : <span className="text-slate-600 text-xs">—</span>}</div>
                       <div className="w-24 text-right text-[11px] text-slate-500">{st.count} records</div>
                       <div className="w-8 flex justify-end">
-                        <ChevronRight className="w-4 h-4 text-slate-700 group-hover:text-[#8a6d1f] transition-colors" />
+                        <ChevronRight className="w-4 h-4 text-slate-700 group-hover:text-[#15803d] transition-colors" />
                       </div>
                     </motion.button>
                   )
@@ -704,8 +706,8 @@ export default function AdminExpenses() {
                 {branches.length === 0 && (
                   <button onClick={() => setShowBranchModal(true)}
                     className="w-full flex flex-col items-center justify-center gap-3 py-14 hover:bg-slate-900/[0.04] transition-colors cursor-pointer group">
-                    <div className="w-11 h-11 rounded-2xl bg-slate-900/[0.04] border border-dashed border-slate-900/10 group-hover:border-[#d4af37]/30 flex items-center justify-center transition-colors">
-                      <Plus className="w-4.5 h-4.5 text-slate-600 group-hover:text-[#8a6d1f] transition-colors" />
+                    <div className="w-11 h-11 rounded-2xl bg-slate-900/[0.04] border border-dashed border-slate-900/10 group-hover:border-[#1ca34c]/30 flex items-center justify-center transition-colors">
+                      <Plus className="w-4.5 h-4.5 text-slate-600 group-hover:text-[#15803d] transition-colors" />
                     </div>
                     <div className="text-center">
                       <p className="text-sm font-semibold text-slate-500 group-hover:text-slate-900 transition-colors">No branches yet</p>
@@ -738,10 +740,10 @@ export default function AdminExpenses() {
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     {selectedBranch.id === 'all'
-                      ? <Globe className="w-4 h-4 text-[#8a6d1f] shrink-0" />
+                      ? <Globe className="w-4 h-4 text-[#15803d] shrink-0" />
                       : selectedBranch.id === 'general'
                         ? <Building2 className="w-4 h-4 text-slate-500 shrink-0" />
-                        : <MapPin className="w-4 h-4 text-[#8a6d1f] shrink-0" />
+                        : <MapPin className="w-4 h-4 text-[#15803d] shrink-0" />
                     }
                     <h1 className="text-xl font-bold font-serif text-slate-900 truncate">{selectedBranch.name}</h1>
                   </div>
@@ -752,7 +754,7 @@ export default function AdminExpenses() {
               </div>
               <button
                 onClick={() => setShowAddModal(true)}
-                className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#d4af37] to-white text-black font-bold rounded-lg text-[11px] uppercase tracking-wider hover:brightness-110 transition-all shadow-md shadow-[#d4af37]/10 cursor-pointer self-start sm:self-auto shrink-0"
+                className="flex items-center gap-1.5 px-4 py-2 bg-[#1ca34c] text-white font-bold rounded-full text-[11px] uppercase tracking-wider hover:brightness-110 transition-all shadow-md shadow-[#1ca34c]/10 cursor-pointer self-start sm:self-auto shrink-0"
               >
                 <Plus className="w-3.5 h-3.5" /> Add Expense
               </button>
@@ -794,34 +796,34 @@ export default function AdminExpenses() {
             {/* Table Card */}
             {(dateFrom || dateTo) && (
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-[10px] bg-[#d4af37]/20 text-[#8a6d1f] border border-[#d4af37]/30 px-3 py-1.5 rounded-lg font-bold tracking-wider flex items-center gap-2">
+                <span className="text-[10px] bg-[#1ca34c]/20 text-[#15803d] border border-[#1ca34c]/30 px-3 py-1.5 rounded-lg font-bold tracking-wider flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
                   Filtered by Date: {dateFrom || 'Start'} to {dateTo || 'Present'}
                 </span>
               </div>
             )}
-            <div className="rounded-2xl border border-slate-900/[0.08] bg-slate-900/[0.04] overflow-hidden">
+            <div className="rounded-3xl border border-slate-900/[0.08] bg-slate-900/[0.04] overflow-hidden">
               {/* Toolbar */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 px-5 py-3.5 border-b border-slate-900/[0.08]">
                 <div className="relative w-full sm:w-auto">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-600" />
                   <input type="text" placeholder="Search expenses..." value={search} onChange={e => setSearch(e.target.value)}
-                    className="bg-transparent border border-slate-900/8 rounded-lg py-1.5 pl-9 pr-3 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/30 w-full sm:w-48 transition-all" />
+                    className="bg-transparent border border-slate-900/8 rounded-lg py-1.5 pl-9 pr-3 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/30 w-full sm:w-48 transition-all" />
                 </div>
                 <div className="flex items-center justify-end gap-2 flex-wrap">
                   <button
                     onClick={() => setShowFilters(!showFilters)}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${showFilters ? 'border-[#d4af37]/40 bg-[#d4af37]/10 text-[#8a6d1f]' : 'border-slate-900/8 bg-slate-900/[0.04] text-slate-500 hover:border-slate-900/15 hover:text-slate-900'}`}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[10px] font-bold uppercase tracking-wider transition-all ${showFilters ? 'border-[#1ca34c]/40 bg-[#1ca34c]/10 text-[#15803d]' : 'border-slate-900/8 bg-slate-900/[0.04] text-slate-500 hover:border-slate-900/15 hover:text-slate-900'}`}
                   >
                     <Filter className="w-3.5 h-3.5" /> Filters
-                    {(dateFrom || dateTo || kindFilter !== 'all') && <span className="w-1.5 h-1.5 rounded-full bg-[#d4af37]" />}
+                    {(dateFrom || dateTo || kindFilter !== 'all') && <span className="w-1.5 h-1.5 rounded-full bg-[#1ca34c]" />}
                   </button>
 
 
                     {!isSelectMode ? (
                       <button
                         onClick={() => setIsSelectMode(true)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#d4af37]/40 text-slate-600 hover:text-slate-900 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer shrink-0"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#1ca34c]/40 text-slate-600 hover:text-slate-900 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer shrink-0"
                       >
                         Select Mode
                       </button>
@@ -839,7 +841,7 @@ export default function AdminExpenses() {
                         <label className="flex items-center gap-1.5 cursor-pointer select-none">
                           <div className="relative flex items-center justify-center shrink-0 w-4 h-4">
                             <input type="checkbox" checked={detailExpenses.length > 0 && selectedIds.length === detailExpenses.length} onChange={(e) => { if (e.target.checked) setSelectedIds(detailExpenses.map(r => r.id)); else setSelectedIds([]); }} className="peer absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-                            <div className="w-full h-full rounded-[4px] border border-slate-900/20 bg-white peer-checked:bg-[#d4af37] peer-checked:border-[#d4af37] flex items-center justify-center transition-all duration-200">
+                            <div className="w-full h-full rounded-[4px] border border-slate-900/20 bg-white peer-checked:bg-[#1ca34c] peer-checked:border-[#1ca34c] flex items-center justify-center transition-all duration-200">
                               <Check className="w-3 h-3 text-black opacity-0 peer-checked:opacity-100 transition-opacity" strokeWidth={3} />
                             </div>
                           </div>
@@ -851,7 +853,7 @@ export default function AdminExpenses() {
                     {(!isSelectMode || (isSelectMode && selectedIds.length > 0)) && (
                       <div className="relative">
                     <button onClick={() => setShowExportDropdown(p => !p)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#d4af37] to-white text-black font-bold rounded-lg text-[10px] uppercase tracking-wider hover:brightness-110 cursor-pointer">
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1ca34c] text-white font-bold rounded-full text-[10px] uppercase tracking-wider hover:brightness-110 cursor-pointer">
                       <Download className="w-3 h-3" /> Export ({isSelectMode ? selectedIds.length : detailExpenses.length}) ▼
                     </button>
                     {showExportDropdown && (
@@ -864,7 +866,7 @@ export default function AdminExpenses() {
                             { label: 'PDF (.pdf)', fn: doExportPDF }
                           ].map((o, i) => (
                             <button key={i} onClick={() => { o.fn(); setShowExportDropdown(false) }}
-                              className="w-full text-left px-4 py-2 text-[11px] text-slate-600 hover:text-[#8a6d1f] hover:bg-slate-900/[0.04] transition-colors cursor-pointer">
+                              className="w-full text-left px-4 py-2 text-[11px] text-slate-600 hover:text-[#15803d] hover:bg-slate-900/[0.04] transition-colors cursor-pointer">
                               {o.label}
                             </button>
                           ))}
@@ -887,19 +889,19 @@ export default function AdminExpenses() {
                     <div className="p-4 flex flex-wrap gap-3 items-end">
                       <div>
                         <label className="block text-[9px] text-slate-600 uppercase tracking-wider mb-1">From</label>
-                        <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="bg-white border border-slate-900/5 rounded-xl py-2 px-3 text-[11px] text-slate-500 focus:outline-none focus:border-[#d4af37]/40 cursor-pointer" />
+                        <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="bg-white border border-slate-900/5 rounded-xl py-2 px-3 text-[11px] text-slate-500 focus:outline-none focus:border-[#1ca34c]/40 cursor-pointer" />
                       </div>
                       <div>
                         <label className="block text-[9px] text-slate-600 uppercase tracking-wider mb-1">To</label>
-                        <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="bg-white border border-slate-900/5 rounded-xl py-2 px-3 text-[11px] text-slate-500 focus:outline-none focus:border-[#d4af37]/40 cursor-pointer" />
+                        <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="bg-white border border-slate-900/5 rounded-xl py-2 px-3 text-[11px] text-slate-500 focus:outline-none focus:border-[#1ca34c]/40 cursor-pointer" />
                       </div>
-                      <button onClick={() => setDateRange(1)} className="px-3 py-2 rounded-xl border border-slate-900/5 bg-slate-900/[0.04] text-[10px] text-slate-500 hover:border-[#d4af37]/20 hover:text-slate-900 transition-all font-semibold">
+                      <button onClick={() => setDateRange(1)} className="px-3 py-2 rounded-xl border border-slate-900/5 bg-slate-900/[0.04] text-[10px] text-slate-500 hover:border-[#1ca34c]/20 hover:text-slate-900 transition-all font-semibold">
                         Last 1 Month
                       </button>
-                      <button onClick={() => setDateRange(3)} className="px-3 py-2 rounded-xl border border-slate-900/5 bg-slate-900/[0.04] text-[10px] text-slate-500 hover:border-[#d4af37]/20 hover:text-slate-900 transition-all font-semibold">
+                      <button onClick={() => setDateRange(3)} className="px-3 py-2 rounded-xl border border-slate-900/5 bg-slate-900/[0.04] text-[10px] text-slate-500 hover:border-[#1ca34c]/20 hover:text-slate-900 transition-all font-semibold">
                         Last 3 Months
                       </button>
-                      <button onClick={() => setDateRange(6)} className="px-3 py-2 rounded-xl border border-slate-900/5 bg-slate-900/[0.04] text-[10px] text-slate-500 hover:border-[#d4af37]/20 hover:text-slate-900 transition-all font-semibold">
+                      <button onClick={() => setDateRange(6)} className="px-3 py-2 rounded-xl border border-slate-900/5 bg-slate-900/[0.04] text-[10px] text-slate-500 hover:border-[#1ca34c]/20 hover:text-slate-900 transition-all font-semibold">
                         Last 6 Months
                       </button>
 
@@ -917,7 +919,7 @@ export default function AdminExpenses() {
                         <div className="flex gap-2">
                           {([['all', 'All Types'], ['setup', 'Setup (One-time)'], ['operating', 'Regular']] as const).map(([k, label]) => (
                             <button key={k} onClick={() => setKindFilter(k)}
-                              className={`px-3 py-2 rounded-xl border text-[10px] font-semibold transition-all ${kindFilter === k ? 'border-[#d4af37]/40 bg-[#d4af37]/10 text-[#8a6d1f]' : 'border-slate-900/5 bg-slate-900/[0.04] text-slate-500 hover:border-[#d4af37]/20 hover:text-slate-900'}`}>
+                              className={`px-3 py-2 rounded-xl border text-[10px] font-semibold transition-all ${kindFilter === k ? 'border-[#1ca34c]/40 bg-[#1ca34c]/10 text-[#15803d]' : 'border-slate-900/5 bg-slate-900/[0.04] text-slate-500 hover:border-[#1ca34c]/20 hover:text-slate-900'}`}>
                               {label}
                             </button>
                           ))}
@@ -942,7 +944,7 @@ export default function AdminExpenses() {
                   </div>
                   {!search && (
                     <button onClick={() => setShowAddModal(true)}
-                      className="flex items-center gap-1.5 px-4 py-2 bg-slate-900/[0.04] border border-slate-900/8 hover:border-[#d4af37]/30 text-slate-600 hover:text-slate-900 rounded-lg text-xs font-semibold transition-all cursor-pointer">
+                      className="flex items-center gap-1.5 px-4 py-2 bg-slate-900/[0.04] border border-slate-900/8 hover:border-[#1ca34c]/30 text-slate-600 hover:text-slate-900 rounded-lg text-xs font-semibold transition-all cursor-pointer">
                       <Plus className="w-3.5 h-3.5" /> Add First Expense
                     </button>
                   )}
@@ -972,13 +974,13 @@ export default function AdminExpenses() {
                                 if (isChecked) setSelectedIds(selectedIds.filter(id => id !== exp.id))
                                 else setSelectedIds([...selectedIds, exp.id])
                               }
-                            }} className={`border-b border-slate-900/[0.08] text-xs transition-colors hover:bg-slate-900/[0.04] ${isSelectMode ? 'cursor-pointer' : ''} ${isChecked ? 'bg-[#d4af37]/5' : ''}`}>
+                            }} className={`border-b border-slate-900/[0.08] text-xs transition-colors hover:bg-slate-900/[0.04] ${isSelectMode ? 'cursor-pointer' : ''} ${isChecked ? 'bg-[#1ca34c]/5' : ''}`}>
                             <td className="py-3.5 pl-5 text-slate-900 font-medium max-w-[220px]">
                                 <div className="flex items-center gap-3">
                                   {isSelectMode && (
                                     <div className="relative flex items-center justify-center shrink-0 w-4 h-4">
                                       <input type="checkbox" checked={isChecked} onChange={() => {}} className="peer absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-                                      <div className="w-full h-full rounded-[4px] border border-slate-900/20 bg-white peer-checked:bg-[#d4af37] peer-checked:border-[#d4af37] flex items-center justify-center transition-all duration-200">
+                                      <div className="w-full h-full rounded-[4px] border border-slate-900/20 bg-white peer-checked:bg-[#1ca34c] peer-checked:border-[#1ca34c] flex items-center justify-center transition-all duration-200">
                                         <Check className="w-3 h-3 text-black opacity-0 peer-checked:opacity-100 transition-opacity" strokeWidth={3} />
                                       </div>
                                     </div>
@@ -986,7 +988,7 @@ export default function AdminExpenses() {
                                   <div className="min-w-0">
                                     <div className="truncate" title={exp.purpose}>{exp.purpose}</div>
                                     {expenseKindOf(exp) === 'setup' ? (
-                                      <span className="inline-flex items-center mt-1 px-1.5 py-px rounded bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20 text-[8px] font-bold uppercase tracking-wider">Setup · One-time</span>
+                                      <span className="inline-flex items-center mt-1 px-1.5 py-px rounded bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 text-[8px] font-bold uppercase tracking-wider">Setup · One-time</span>
                                     ) : (
                                       <span className="inline-flex items-center mt-1 px-1.5 py-px rounded bg-slate-900/[0.04] text-slate-500 border border-slate-900/10 text-[8px] font-bold uppercase tracking-wider">Regular</span>
                                     )}
@@ -999,7 +1001,7 @@ export default function AdminExpenses() {
                                   <Globe className="w-2.5 h-2.5" /> All
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#d4af37]/8 text-[#8a6d1f] border border-[#d4af37]/15 text-[9px] font-bold uppercase">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#1ca34c]/8 text-[#15803d] border border-[#1ca34c]/15 text-[9px] font-bold uppercase">
                                   <MapPin className="w-2.5 h-2.5" /> {(exp.branch_name || 'HO').length > 14 ? (exp.branch_name || 'HO').slice(0, 14) + '…' : (exp.branch_name || 'HO')}
                                 </span>
                               )}
@@ -1032,7 +1034,7 @@ export default function AdminExpenses() {
                             <td className="py-3.5 pr-5">
                               {!isEditing && (
                                 <div className="flex items-center justify-end gap-2">
-                                  <button onClick={() => { setEditId(exp.id); setEditPaid(String(exp.paid_amount)); setEditKind(expenseKindOf(exp)) }} className="text-slate-600 hover:text-amber-600 transition-colors p-2 rounded-md"><Edit className="w-3.5 h-3.5" /></button>
+                                  <button onClick={() => { setEditId(exp.id); setEditPaid(String(exp.paid_amount)); setEditKind(expenseKindOf(exp)) }} className="text-slate-600 hover:text-[#15803d] transition-colors p-2 rounded-md"><Edit className="w-3.5 h-3.5" /></button>
                                   <button onClick={() => handleDelete(exp.id)} className="text-slate-600 hover:text-rose-600 transition-colors p-2 rounded-md"><Trash2 className="w-3.5 h-3.5" /></button>
                                 </div>
                               )}
@@ -1064,7 +1066,7 @@ export default function AdminExpenses() {
               transition={{ type: 'spring', stiffness: 320, damping: 28 }}
               className="fixed inset-0 flex items-center justify-center z-50 p-4"
             >
-              <div className="bg-white border border-slate-900/8 rounded-2xl w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+              <div className="bg-white border border-slate-900/8 rounded-3xl w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-slate-900/[0.08]">
                   <div>
@@ -1072,7 +1074,7 @@ export default function AdminExpenses() {
                     <div className="flex items-center gap-1.5 mt-0.5">
                       {selectedBranch.id === 'all'
                         ? <Globe className="w-3 h-3 text-blue-600" />
-                        : <MapPin className="w-3 h-3 text-[#8a6d1f]" />
+                        : <MapPin className="w-3 h-3 text-[#15803d]" />
                       }
                       <span className="text-[10px] text-slate-500">{selectedBranch.name}</span>
                     </div>
@@ -1088,20 +1090,20 @@ export default function AdminExpenses() {
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Description *</label>
                     <textarea required rows={2} value={purpose} onChange={e => setPurpose(e.target.value)}
                       placeholder="What was this expense for?"
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/8 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all resize-none" />
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/8 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all resize-none" />
                   </div>
 
                   <div>
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Expense Type *</label>
                     <div className="grid grid-cols-2 gap-2">
                       <button type="button" onClick={() => setExpenseKind('operating')}
-                        className={`text-left px-3 py-2.5 rounded-xl border transition-all ${expenseKind === 'operating' ? 'border-[#d4af37]/50 bg-[#d4af37]/10' : 'border-slate-900/8 bg-slate-900/[0.04] hover:border-slate-900/15'}`}>
-                        <span className={`block text-[11px] font-bold ${expenseKind === 'operating' ? 'text-[#8a6d1f]' : 'text-slate-900'}`}>Regular company expense</span>
+                        className={`text-left px-3 py-2.5 rounded-xl border transition-all ${expenseKind === 'operating' ? 'border-[#1ca34c]/50 bg-[#1ca34c]/10' : 'border-slate-900/8 bg-slate-900/[0.04] hover:border-slate-900/15'}`}>
+                        <span className={`block text-[11px] font-bold ${expenseKind === 'operating' ? 'text-[#15803d]' : 'text-slate-900'}`}>Regular company expense</span>
                         <span className="block text-[9px] text-slate-500 mt-0.5">Ongoing company spending</span>
                       </button>
                       <button type="button" onClick={() => setExpenseKind('setup')}
-                        className={`text-left px-3 py-2.5 rounded-xl border transition-all ${expenseKind === 'setup' ? 'border-[#d4af37]/50 bg-[#d4af37]/10' : 'border-slate-900/8 bg-slate-900/[0.04] hover:border-slate-900/15'}`}>
-                        <span className={`block text-[11px] font-bold ${expenseKind === 'setup' ? 'text-[#8a6d1f]' : 'text-slate-900'}`}>One-time setup (company opening)</span>
+                        className={`text-left px-3 py-2.5 rounded-xl border transition-all ${expenseKind === 'setup' ? 'border-[#1ca34c]/50 bg-[#1ca34c]/10' : 'border-slate-900/8 bg-slate-900/[0.04] hover:border-slate-900/15'}`}>
+                        <span className={`block text-[11px] font-bold ${expenseKind === 'setup' ? 'text-[#15803d]' : 'text-slate-900'}`}>One-time setup (company opening)</span>
                         <span className="block text-[9px] text-slate-500 mt-0.5">AC, lights, furnishing &amp; other opening costs</span>
                       </button>
                     </div>
@@ -1112,13 +1114,13 @@ export default function AdminExpenses() {
                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Total (BDT) *</label>
                       <input required type="number" step="0.01" min="0.01" value={total} onChange={e => setTotal(e.target.value)}
                         placeholder="0.00"
-                        className="w-full bg-slate-900/[0.04] border border-slate-900/8 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all" />
+                        className="w-full bg-slate-900/[0.04] border border-slate-900/8 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all" />
                     </div>
                     <div>
                       <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Paid (BDT) *</label>
                       <input required type="number" step="0.01" min="0" value={paid} onChange={e => setPaid(e.target.value)}
                         placeholder="0.00"
-                        className="w-full bg-slate-900/[0.04] border border-slate-900/8 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all" />
+                        className="w-full bg-slate-900/[0.04] border border-slate-900/8 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all" />
                     </div>
                   </div>
 
@@ -1137,7 +1139,7 @@ export default function AdminExpenses() {
                       Cancel
                     </button>
                     <button type="submit" disabled={isSubmitting}
-                      className="flex-1 bg-gradient-to-r from-[#d4af37] to-white text-black font-bold py-2.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 hover:brightness-110 disabled:opacity-60 cursor-pointer shadow-lg shadow-[#d4af37]/15">
+                      className="flex-1 bg-[#1ca34c] text-white font-bold py-2.5 rounded-full text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 hover:brightness-110 disabled:opacity-60 cursor-pointer shadow-lg shadow-[#1ca34c]/15">
                       {isSubmitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
                       Log Expense
                     </button>
@@ -1164,7 +1166,7 @@ export default function AdminExpenses() {
               transition={{ type: 'spring', stiffness: 320, damping: 28 }}
               className="fixed inset-0 flex items-center justify-center z-50 p-4"
             >
-              <div className="bg-white border border-slate-900/8 rounded-2xl w-full max-w-sm shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+              <div className="bg-white border border-slate-900/8 rounded-3xl w-full max-w-sm shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-slate-900/[0.08]">
                   <div>
                     <h3 className="text-sm font-bold text-slate-900 font-serif">Create New Branch</h3>
@@ -1177,7 +1179,7 @@ export default function AdminExpenses() {
                     <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Branch Name *</label>
                     <input required type="text" value={newBranchName} onChange={e => setNewBranchName(e.target.value)}
                       placeholder="e.g. Dhaka Main, Chittagong North"
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/8 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all" />
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/8 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all" />
                   </div>
                   <div className="flex gap-3">
                     <button type="button" onClick={() => setShowBranchModal(false)}
@@ -1185,7 +1187,7 @@ export default function AdminExpenses() {
                       Cancel
                     </button>
                     <button type="submit" disabled={isCreatingBranch}
-                      className="flex-1 bg-gradient-to-r from-[#d4af37] to-white text-black font-bold py-2.5 rounded-xl text-xs uppercase flex items-center justify-center gap-1.5 hover:brightness-110 disabled:opacity-60 cursor-pointer shadow-lg shadow-[#d4af37]/15">
+                      className="flex-1 bg-[#1ca34c] text-white font-bold py-2.5 rounded-full text-xs uppercase flex items-center justify-center gap-1.5 hover:brightness-110 disabled:opacity-60 cursor-pointer shadow-lg shadow-[#1ca34c]/15">
                       {isCreatingBranch ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
                       Create Branch
                     </button>

@@ -273,7 +273,7 @@ export default function EmployeeSettings() {
       <div className="min-h-screen w-full flex bg-white">
 {/* Sidebar removed – global layout provides it */}
         <div className="flex-1 flex items-center justify-center">
-           <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+           <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" />
         </div>
       </div>
     )
@@ -281,12 +281,14 @@ export default function EmployeeSettings() {
 
   return (
     <div className="min-h-screen w-full flex bg-white text-slate-900 font-sans">
-      <div className="absolute top-[-10%] right-[-5%] w-[50%] h-[50%] bg-[#d4af37]/5 rounded-full filter blur-[150px] pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-5%] w-[50%] h-[50%] bg-[#1ca34c]/5 rounded-full filter blur-[150px] pointer-events-none" />
 {/* Sidebar removed – global layout provides it */}
 
       <div className="flex-1 p-6 lg:p-10 overflow-y-auto max-h-screen relative z-10">
-        <div className="mb-8 pb-4 border-b border-slate-900/5">
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900 font-serif">
+        <div className="mb-8 pb-4 border-b border-slate-900/5 flex items-start gap-3">
+          <span className="w-1.5 h-9 rounded-full bg-[#1ca34c] shrink-0" />
+          <div>
+          <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 font-serif">
             Profile <span className="premium-text-gradient">Settings</span>
           </h2>
           <p className="text-xs text-slate-500 mt-1">
@@ -294,6 +296,7 @@ export default function EmployeeSettings() {
               ? 'Manage your partner profile and banking details for payment settlements.'
               : 'Manage your employee profile and banking details for salary disbursement.'}
           </p>
+          </div>
         </div>
 
         {feedback && (
@@ -315,7 +318,7 @@ export default function EmployeeSettings() {
               
               {/* Personal Details */}
               <div className="glass-panel p-6 rounded-2xl relative shadow-xl">
-                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/20 to-transparent" />
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#1ca34c]/20 to-transparent" />
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-5">Personal Information</span>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -327,7 +330,7 @@ export default function EmployeeSettings() {
                         type="text"
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
-                        className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                        className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                         required
                       />
                     </div>
@@ -340,7 +343,7 @@ export default function EmployeeSettings() {
                         type="text"
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
-                        className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                        className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                         required
                       />
                     </div>
@@ -350,7 +353,7 @@ export default function EmployeeSettings() {
 
               {/* Bank Details */}
               <div className="glass-panel p-6 rounded-2xl relative shadow-xl">
-                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/20 to-transparent" />
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#1ca34c]/20 to-transparent" />
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-5">Banking & Disbursement Information</span>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -361,7 +364,7 @@ export default function EmployeeSettings() {
                       value={bankInfo.bankName}
                       onChange={(e) => handleBankChange('bankName', e.target.value)}
                       placeholder="e.g. Example Bank"
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                     />
                   </div>
                   <div>
@@ -371,7 +374,7 @@ export default function EmployeeSettings() {
                       value={bankInfo.accountName}
                       onChange={(e) => handleBankChange('accountName', e.target.value)}
                       placeholder="e.g. Account Holder Name"
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                     />
                   </div>
                   <div>
@@ -381,7 +384,7 @@ export default function EmployeeSettings() {
                       value={bankInfo.accountNumber}
                       onChange={(e) => handleBankChange('accountNumber', e.target.value)}
                       placeholder="e.g. 123456789"
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                     />
                   </div>
                   <div>
@@ -391,7 +394,7 @@ export default function EmployeeSettings() {
                       value={bankInfo.district}
                       onChange={(e) => handleBankChange('district', e.target.value)}
                       placeholder="e.g. City Name"
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                     />
                   </div>
                 </div>
@@ -406,7 +409,7 @@ export default function EmployeeSettings() {
                       value={bankInfo.mobileBankingProvider}
                       onChange={(e) => handleBankChange('mobileBankingProvider', e.target.value)}
                       placeholder="e.g. Provider Name"
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                     />
                   </div>
                   <div>
@@ -416,7 +419,7 @@ export default function EmployeeSettings() {
                       value={bankInfo.mobileBankingNumber}
                       onChange={(e) => handleBankChange('mobileBankingNumber', e.target.value)}
                       placeholder="e.g. Phone Number"
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                     />
                   </div>
                 </div>
@@ -424,7 +427,7 @@ export default function EmployeeSettings() {
 
               {/* Settings & Privacy (Password) */}
               <div className="glass-panel p-6 rounded-2xl relative shadow-xl">
-                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/20 to-transparent" />
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#1ca34c]/20 to-transparent" />
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-5">Settings & Privacy</span>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -437,7 +440,7 @@ export default function EmployeeSettings() {
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                         placeholder="Leave blank to keep current"
-                        className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                        className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                       />
                     </div>
                   </div>
@@ -450,7 +453,7 @@ export default function EmployeeSettings() {
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         placeholder="Confirm new password"
-                        className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                        className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                       />
                     </div>
                   </div>
@@ -459,7 +462,7 @@ export default function EmployeeSettings() {
 
               {/* Account Recovery (Security Question) */}
               <div className="glass-panel p-6 rounded-2xl relative shadow-xl">
-                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/20 to-transparent" />
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#1ca34c]/20 to-transparent" />
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-5 flex items-center gap-2">
                   <ShieldAlert className="w-4 h-4 text-amber-600" />
                   Account Recovery (Security Question)
@@ -471,7 +474,7 @@ export default function EmployeeSettings() {
                     <select
                       value={securityQuestion}
                       onChange={(e) => setSecurityQuestion(e.target.value)}
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                     >
                       <option value="" className="bg-white text-slate-900">Select a question...</option>
                       <option value="What was your childhood nickname?" className="bg-white text-slate-900">What was your childhood nickname?</option>
@@ -490,7 +493,7 @@ export default function EmployeeSettings() {
                         value={securityAnswer}
                         onChange={(e) => setSecurityAnswer(e.target.value)}
                         placeholder={profile?.has_security_answer ? "•••••••• (Saved)" : "Enter secret answer"}
-                        className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                        className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                       />
                     </div>
                   </div>
@@ -499,7 +502,7 @@ export default function EmployeeSettings() {
 
               {/* Two-Factor Authentication (2FA) */}
               <div className="glass-panel p-6 rounded-2xl relative shadow-xl">
-                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/20 to-transparent" />
+                <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#1ca34c]/20 to-transparent" />
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
                     <ShieldAlert className={`w-4 h-4 ${is2FAEnabled ? 'text-emerald-600' : 'text-slate-500'}`} />
@@ -523,7 +526,7 @@ export default function EmployeeSettings() {
               <button
                 type="submit"
                 disabled={isSaving}
-                className="w-full bg-gradient-to-r from-[#d4af37] to-white text-black font-semibold py-4 rounded-xl text-xs tracking-wider uppercase flex items-center justify-center gap-2 cursor-pointer shadow-lg hover:shadow-[#d4af37]/20 transition-all disabled:opacity-50"
+                className="w-full bg-[#1ca34c] hover:bg-[#15803d] text-white font-semibold py-4 rounded-full text-xs tracking-wider uppercase flex items-center justify-center gap-2 cursor-pointer shadow-lg hover:shadow-[#1ca34c]/20 transition-all disabled:opacity-50"
               >
                 {isSaving ? (
                   <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
@@ -540,8 +543,8 @@ export default function EmployeeSettings() {
 
           {/* RIGHT: READ-ONLY COMPANY INFO */}
           <div className="lg:col-span-4 space-y-6">
-            <div className="glass-panel p-6 rounded-2xl relative shadow-xl border border-[#d4af37]/20 bg-[#d4af37]/5">
-              <span className="text-[10px] font-bold text-[#8a6d1f] uppercase tracking-widest block mb-5 flex items-center gap-2">
+            <div className="glass-panel p-6 rounded-2xl relative shadow-xl border border-[#1ca34c]/20 bg-[#1ca34c]/5">
+              <span className="text-[10px] font-bold text-[#15803d] uppercase tracking-widest block mb-5 flex items-center gap-2">
                 <Landmark className="w-4 h-4" />
                 Company Placement
               </span>
@@ -549,30 +552,30 @@ export default function EmployeeSettings() {
               <div className="space-y-4">
                 <div>
                   <span className="block text-[9px] font-semibold text-slate-500 tracking-wider uppercase mb-1.5 flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-[#8a6d1f]" /> Joining Date
+                    <Calendar className="w-3.5 h-3.5 text-[#15803d]" /> Joining Date
                   </span>
-                  <div className="text-slate-900 font-semibold text-sm font-mono bg-white border border-[#d4af37]/20 px-3 py-1.5 rounded-lg inline-flex items-center gap-3">
+                  <div className="text-slate-900 font-semibold text-sm font-mono bg-white border border-[#1ca34c]/20 px-3 py-1.5 rounded-lg inline-flex items-center gap-3">
                     <span>{profile?.created_at ? new Date(profile.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : <span className="text-slate-500 italic font-sans">Not Available</span>}</span>
                     {profile?.created_at && (
-                      <span className="text-[9px] bg-[#d4af37]/10 text-[#8a6d1f] px-2 py-0.5 rounded uppercase tracking-wider font-bold font-sans">
+                      <span className="text-[9px] bg-[#1ca34c]/10 text-[#15803d] px-2 py-0.5 rounded uppercase tracking-wider font-bold font-sans">
                         {getDuration(profile.created_at)}
                       </span>
                     )}
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-[#d4af37]/10">
+                <div className="pt-4 border-t border-[#1ca34c]/10">
                   <span className="block text-[9px] font-semibold text-slate-500 tracking-wider uppercase mb-1">Assigned Branch</span>
                   <div className="text-slate-900 font-semibold text-sm">
                     {profile?.branch || <span className="text-slate-500 italic">Not Assigned</span>}
                   </div>
                 </div>
                 
-                <div className="pt-4 border-t border-[#d4af37]/10">
+                <div className="pt-4 border-t border-[#1ca34c]/10">
                   <span className="block text-[9px] font-semibold text-slate-500 tracking-wider uppercase mb-1">Base Salary Setup</span>
                   <div className="text-2xl font-bold text-slate-900">
                     {profile?.salary ? (
-                      <>{Number(profile.salary).toLocaleString()} <span className="text-xs text-[#8a6d1f] font-mono font-normal">BDT / mo</span></>
+                      <>{Number(profile.salary).toLocaleString()} <span className="text-xs text-[#15803d] font-mono font-normal">BDT / mo</span></>
                     ) : (
                       <span className="text-slate-500 italic text-sm">Pending Admin Setup</span>
                     )}
@@ -580,7 +583,7 @@ export default function EmployeeSettings() {
                 </div>
               </div>
 
-              <div className="mt-6 p-4 rounded-xl bg-white border border-[#d4af37]/10 text-[10px] text-slate-500 leading-relaxed flex items-center justify-between">
+              <div className="mt-6 p-4 rounded-xl bg-white border border-[#1ca34c]/10 text-[10px] text-slate-500 leading-relaxed flex items-center justify-between">
                 <span>Branch and Salary configurations are managed exclusively by the Executive Administration. Contact HR for discrepancies.</span>
               </div>
             </div>
@@ -590,22 +593,22 @@ export default function EmployeeSettings() {
               <button
                 type="button"
                 onClick={() => setShowExportDropdown(!showExportDropdown)}
-                className="w-full bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/40 hover:bg-[#d4af37]/5 text-white font-semibold py-4 rounded-xl text-xs tracking-wider uppercase flex items-center justify-center gap-2 cursor-pointer transition-all"
+                className="w-full bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/40 hover:bg-[#1ca34c]/5 text-slate-900 font-semibold py-4 rounded-xl text-xs tracking-wider uppercase flex items-center justify-center gap-2 cursor-pointer transition-all"
               >
-                <Download className="w-4 h-4 text-[#8a6d1f]" />
+                <Download className="w-4 h-4 text-[#15803d]" />
                 Export Comprehensive Dossier
               </button>
               {showExportDropdown && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setShowExportDropdown(false)} />
                   <div className="absolute right-0 mt-2 w-full bg-white border border-slate-900/10 rounded-xl shadow-2xl py-2 z-20 flex flex-col">
-                    <button onClick={() => { handleExportDossierExcel(); setShowExportDropdown(false) }} className="px-4 py-3 text-left text-xs font-semibold hover:bg-slate-900/[0.04] hover:text-[#8a6d1f] text-slate-900 transition-colors cursor-pointer">
+                    <button onClick={() => { handleExportDossierExcel(); setShowExportDropdown(false) }} className="px-4 py-3 text-left text-xs font-semibold hover:bg-slate-900/[0.04] hover:text-[#15803d] text-slate-900 transition-colors cursor-pointer">
                       Export Full Dossier (.xlsx)
                     </button>
-                    <button onClick={() => { handleExportDossierCSV(); setShowExportDropdown(false) }} className="px-4 py-3 text-left text-xs font-semibold hover:bg-slate-900/[0.04] hover:text-[#8a6d1f] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer">
+                    <button onClick={() => { handleExportDossierCSV(); setShowExportDropdown(false) }} className="px-4 py-3 text-left text-xs font-semibold hover:bg-slate-900/[0.04] hover:text-[#15803d] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer">
                       Export Full Dossier (.csv)
                     </button>
-                    <button onClick={() => { handleExportDossierPDF(); setShowExportDropdown(false) }} className="px-4 py-3 text-left text-xs font-semibold hover:bg-slate-900/[0.04] hover:text-[#8a6d1f] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer">
+                    <button onClick={() => { handleExportDossierPDF(); setShowExportDropdown(false) }} className="px-4 py-3 text-left text-xs font-semibold hover:bg-slate-900/[0.04] hover:text-[#15803d] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer">
                       Export Ledger (.pdf)
                     </button>
                   </div>
@@ -631,7 +634,7 @@ export default function EmployeeSettings() {
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <span className="text-[11px] font-bold text-slate-900 flex items-center gap-1.5">
-                            <Calendar className="w-3 h-3 text-[#8a6d1f]" />
+                            <Calendar className="w-3 h-3 text-[#15803d]" />
                             {new Date(salary.payment_date).toLocaleDateString()}
                           </span>
                         </div>
@@ -642,7 +645,7 @@ export default function EmployeeSettings() {
                       </div>
                       <div className="flex items-center gap-3 text-[10px] text-slate-500">
                         {salary.transaction_id && <span>Trx: <span className="font-mono text-slate-600">{salary.transaction_id}</span></span>}
-                        {salary.notes && <span className="text-[#8a6d1f]/80">Note: {salary.notes}</span>}
+                        {salary.notes && <span className="text-[#15803d]/80">Note: {salary.notes}</span>}
                       </div>
                     </div>
                   ))

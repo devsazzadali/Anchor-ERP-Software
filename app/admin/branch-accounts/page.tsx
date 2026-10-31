@@ -655,7 +655,7 @@ export default function AdminBranchAccountsPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -664,7 +664,7 @@ export default function AdminBranchAccountsPage() {
     <div className="min-h-screen bg-white text-slate-900">
       {/* Background ambience */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[400px] bg-[#d4af37]/4 rounded-full filter blur-[150px]" />
+        <div className="absolute top-0 left-1/4 w-[600px] h-[400px] bg-[#1ca34c]/4 rounded-full filter blur-[150px]" />
         <div className="absolute bottom-0 right-1/4 w-[450px] h-[350px] bg-blue-500/3 rounded-full filter blur-[140px]" />
       </div>
 
@@ -673,12 +673,12 @@ export default function AdminBranchAccountsPage() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-6">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
-              <Building2 className="w-5 h-5 text-[#8a6d1f]" />
-              <span className="text-[10px] uppercase tracking-[0.25em] text-[#8a6d1f]/80 font-semibold">
+              <Building2 className="w-5 h-5 text-[#15803d]" />
+              <span className="text-[10px] uppercase tracking-[0.25em] text-[#15803d]/80 font-semibold">
                 Branch Accounts & Executive Audit
               </span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold font-serif">Daily Cash Closings & Digital Ledgers</h1>
+            <h1 className="text-2xl md:text-3xl font-extrabold font-serif text-slate-900 flex items-center gap-3"><span className="w-1.5 h-9 rounded-full bg-[#1ca34c] shrink-0" />Daily Cash Closings & Digital Ledgers</h1>
             <p className="text-xs text-slate-500 mt-1">
               Real-time branch closing history, physical drawer cash reconciliation, and digital collections
             </p>
@@ -687,13 +687,13 @@ export default function AdminBranchAccountsPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={handleOpenAddModal}
-              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#d4af37] to-white text-black text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-lg shadow-[#d4af37]/10 hover:opacity-90 transition-all cursor-pointer"
+              className="px-4 py-2.5 rounded-full bg-[#1ca34c] text-white text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-lg shadow-[#1ca34c]/10 hover:opacity-90 transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4" /> Add Daily Closing
             </button>
             <button
               onClick={handleRefresh}
-              className={`p-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'animate-spin text-[#8a6d1f]' : ''}`}
+              className={`p-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'animate-spin text-[#15803d]' : ''}`}
               title="Refresh Data"
             >
               <RefreshCw className="w-4 h-4" />
@@ -714,17 +714,17 @@ export default function AdminBranchAccountsPage() {
         )}
 
         {/* TOP FILTER BAR */}
-        <div className="mb-8 p-4 rounded-2xl border border-slate-900/10 bg-slate-900/[0.04] space-y-4">
+        <div className="mb-8 p-4 rounded-3xl border border-slate-900/10 bg-slate-900/[0.04] space-y-4">
           <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
             {/* Branch Selector */}
             <div className="flex items-center gap-3 flex-wrap">
               <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500 flex items-center gap-1.5">
-                <Building2 className="w-3.5 h-3.5 text-[#8a6d1f]" /> Branch:
+                <Building2 className="w-3.5 h-3.5 text-[#15803d]" /> Branch:
               </span>
               <select
                 value={selectedBranch}
                 onChange={e => setSelectedBranch(e.target.value)}
-                className="bg-white border border-slate-900/15 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-900 focus:outline-none focus:border-[#d4af37]/50 cursor-pointer"
+                className="bg-white border border-slate-900/15 rounded-xl px-3.5 py-2 text-xs font-medium text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 cursor-pointer"
               >
                 <option value="all">All Branches ({branches.length})</option>
                 {branches.map(b => (
@@ -747,7 +747,7 @@ export default function AdminBranchAccountsPage() {
                     onClick={() => setDatePreset(p.id as any)}
                     className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
                       datePreset === p.id
-                        ? 'bg-[#d4af37] text-black shadow'
+                        ? 'bg-[#1ca34c] text-white shadow'
                         : 'text-slate-500 hover:text-slate-900 hover:bg-slate-900/[0.04]'
                     }`}
                   >
@@ -785,7 +785,7 @@ export default function AdminBranchAccountsPage() {
 
         {/* Global Executive KPIs */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="p-5 rounded-2xl border border-emerald-500/20 bg-emerald-500/5">
+          <div className="p-5 rounded-3xl border border-emerald-500/20 bg-emerald-500/5">
             <div className="flex items-center justify-between mb-2">
               <TrendingUp className="w-5 h-5 text-emerald-600" />
               <span className="text-[9px] font-bold text-emerald-600/80 uppercase tracking-widest">Revenue</span>
@@ -795,7 +795,7 @@ export default function AdminBranchAccountsPage() {
             <p className="text-[10px] text-slate-500 mt-1">Cash: {fmt(metrics.totalCashSales)} | Digital: {fmt(metrics.totalDigitalCollections)}</p>
           </div>
 
-          <div className="p-5 rounded-2xl border border-blue-500/20 bg-blue-500/5">
+          <div className="p-5 rounded-3xl border border-blue-500/20 bg-blue-500/5">
             <div className="flex items-center justify-between mb-2">
               <Building2 className="w-5 h-5 text-blue-600" />
               <span className="text-[9px] font-bold text-blue-600/80 uppercase tracking-widest">Remittance</span>
@@ -805,17 +805,17 @@ export default function AdminBranchAccountsPage() {
             <p className="text-[10px] text-slate-500 mt-1">Deducted from drawer cash to bank</p>
           </div>
 
-          <div className="p-5 rounded-2xl border border-[#d4af37]/20 bg-[#d4af37]/5">
+          <div className="p-5 rounded-3xl border border-[#1ca34c]/20 bg-[#1ca34c]/5">
             <div className="flex items-center justify-between mb-2">
-              <Wallet className="w-5 h-5 text-[#8a6d1f]" />
-              <span className="text-[9px] font-bold text-[#8a6d1f]/80 uppercase tracking-widest">Drawer Cash</span>
+              <Wallet className="w-5 h-5 text-[#15803d]" />
+              <span className="text-[9px] font-bold text-[#15803d]/80 uppercase tracking-widest">Drawer Cash</span>
             </div>
             <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Closing Cash Retained (ক্লোজিং ক্যাশ)</p>
-            <p className="text-xl md:text-2xl font-bold font-serif text-[#8a6d1f]">{fmt(metrics.totalClosingCash)}</p>
+            <p className="text-xl md:text-2xl font-bold font-serif text-[#15803d]">{fmt(metrics.totalClosingCash)}</p>
             <p className="text-[10px] text-slate-500 mt-1">Current closing cash (latest entries)</p>
           </div>
 
-          <div className="p-5 rounded-2xl border border-amber-500/20 bg-amber-500/5">
+          <div className="p-5 rounded-3xl border border-amber-500/20 bg-amber-500/5">
             <div className="flex items-center justify-between mb-2">
               <ShieldAlert className="w-5 h-5 text-amber-600" />
               <span className="text-[9px] font-bold text-amber-600/80 uppercase tracking-widest">Audit</span>
@@ -831,7 +831,7 @@ export default function AdminBranchAccountsPage() {
         {/* Quick Navigation Modules */}
         <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 mb-8">
           <Link href="/admin/branch-accounts/deposit-approvals"
-            className="p-3.5 sm:p-4 rounded-2xl border border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/15 flex items-center justify-between group transition-all"
+            className="p-3.5 sm:p-4 rounded-3xl border border-amber-500/20 bg-amber-500/10 hover:bg-amber-500/15 flex items-center justify-between group transition-all"
           >
             <div className="flex items-center gap-2 min-w-0">
               <Clock className="w-4 h-4 text-amber-600 shrink-0" />
@@ -848,7 +848,7 @@ export default function AdminBranchAccountsPage() {
           </Link>
 
           <Link href="/admin/bundle-requests"
-            className="p-3.5 sm:p-4 rounded-2xl border border-teal-500/20 bg-teal-500/10 hover:bg-teal-500/15 flex items-center justify-between group transition-all"
+            className="p-3.5 sm:p-4 rounded-3xl border border-teal-500/20 bg-teal-500/10 hover:bg-teal-500/15 flex items-center justify-between group transition-all"
           >
             <div className="flex items-center gap-2 min-w-0">
               <Coins className="w-4 h-4 text-teal-600 shrink-0" />
@@ -865,7 +865,7 @@ export default function AdminBranchAccountsPage() {
           </Link>
 
           <Link href="/admin/branch-accounts/audit"
-            className="p-3.5 sm:p-4 rounded-2xl border border-purple-500/20 bg-purple-500/10 hover:bg-purple-500/15 flex items-center justify-between group transition-all"
+            className="p-3.5 sm:p-4 rounded-3xl border border-purple-500/20 bg-purple-500/10 hover:bg-purple-500/15 flex items-center justify-between group transition-all"
           >
             <div className="flex items-center gap-2 min-w-0">
               <ShieldAlert className="w-4 h-4 text-purple-600 shrink-0" />
@@ -875,7 +875,7 @@ export default function AdminBranchAccountsPage() {
           </Link>
 
           <Link href="/admin/branch-financial-reports"
-            className="p-3.5 sm:p-4 rounded-2xl border border-blue-500/20 bg-blue-500/10 hover:bg-blue-500/15 flex items-center justify-between group transition-all"
+            className="p-3.5 sm:p-4 rounded-3xl border border-blue-500/20 bg-blue-500/10 hover:bg-blue-500/15 flex items-center justify-between group transition-all"
           >
             <div className="flex items-center gap-2 min-w-0">
               <BarChart3 className="w-4 h-4 text-blue-600 shrink-0" />
@@ -885,7 +885,7 @@ export default function AdminBranchAccountsPage() {
           </Link>
 
           <Link href="/admin/branch-performance"
-            className="p-3.5 sm:p-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/15 flex items-center justify-between group transition-all"
+            className="p-3.5 sm:p-4 rounded-3xl border border-emerald-500/20 bg-emerald-500/10 hover:bg-emerald-500/15 flex items-center justify-between group transition-all"
           >
             <div className="flex items-center gap-2 min-w-0">
               <TrendingUp className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -895,20 +895,20 @@ export default function AdminBranchAccountsPage() {
           </Link>
 
           <Link href="/admin/branch-accounts/manager-setup"
-            className="p-3.5 sm:p-4 rounded-2xl border border-[#d4af37]/20 bg-[#d4af37]/10 hover:bg-[#d4af37]/15 flex items-center justify-between group transition-all"
+            className="p-3.5 sm:p-4 rounded-3xl border border-[#1ca34c]/20 bg-[#1ca34c]/10 hover:bg-[#1ca34c]/15 flex items-center justify-between group transition-all"
           >
             <div className="flex items-center gap-2 min-w-0">
-              <Building2 className="w-4 h-4 text-[#8a6d1f] shrink-0" />
-              <span className="text-[11px] sm:text-xs font-bold text-[#8a6d1f] uppercase tracking-wider leading-snug">Manager Setup</span>
+              <Building2 className="w-4 h-4 text-[#15803d] shrink-0" />
+              <span className="text-[11px] sm:text-xs font-bold text-[#15803d] uppercase tracking-wider leading-snug">Manager Setup</span>
             </div>
-            <ArrowRight className="w-3.5 h-3.5 text-[#8a6d1f] group-hover:translate-x-0.5 transition-transform shrink-0 ml-1" />
+            <ArrowRight className="w-3.5 h-3.5 text-[#15803d] group-hover:translate-x-0.5 transition-transform shrink-0 ml-1" />
           </Link>
         </div>
 
 
 
         {/* DATE-WISE DAILY CASH CLOSINGS TABLE */}
-        <div className="rounded-2xl border border-slate-900/10 bg-slate-900/[0.04] overflow-hidden shadow-xl">
+        <div className="rounded-3xl border border-slate-900/10 bg-slate-900/[0.04] overflow-hidden shadow-xl">
           <div className="p-5 border-b border-slate-900/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/[0.04]">
             <div>
               <p className="text-sm font-bold font-serif text-slate-900">Daily Cash Closing History & Digital Log</p>
@@ -921,9 +921,9 @@ export default function AdminBranchAccountsPage() {
               <button
                 onClick={() => setShowExportMenu(!showExportMenu)}
                 disabled={isExportingPdf || safeLedgerEntries.length === 0}
-                className="px-3.5 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#d4af37]/30 text-slate-600 hover:text-slate-900 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                className="px-3.5 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#1ca34c]/30 text-slate-600 hover:text-slate-900 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
               >
-                <Download className="w-3.5 h-3.5 text-[#8a6d1f]" />
+                <Download className="w-3.5 h-3.5 text-[#15803d]" />
                 <span>{isExportingPdf ? 'Exporting...' : 'Export'}</span>
                 <ChevronDown className="w-3 h-3 text-slate-500" />
               </button>
@@ -940,7 +940,7 @@ export default function AdminBranchAccountsPage() {
                       onClick={handleExportPdf}
                       className="w-full px-4 py-2.5 text-left text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-900/[0.04] flex items-center gap-2.5 transition-colors cursor-pointer"
                     >
-                      <FileText className="w-4 h-4 text-[#8a6d1f]" /> Export PDF (Official)
+                      <FileText className="w-4 h-4 text-[#15803d]" /> Export PDF (Official)
                     </button>
                     <button
                       onClick={handleExportExcel}
@@ -1020,7 +1020,7 @@ export default function AdminBranchAccountsPage() {
                       <td className="p-3.5 font-medium text-blue-600 whitespace-nowrap">
                         {fmt(item.bank_deposits_out)}
                       </td>
-                      <td className="p-3.5 font-serif font-bold text-[#8a6d1f] whitespace-nowrap">
+                      <td className="p-3.5 font-serif font-bold text-[#15803d] whitespace-nowrap">
                         {item.actual_cash !== null && item.actual_cash !== undefined ? fmt(item.actual_cash) : '—'}
                       </td>
                       <td className="p-3.5 whitespace-nowrap">
@@ -1084,7 +1084,7 @@ export default function AdminBranchAccountsPage() {
         {/* MODAL: ADD DAILY CLOSING */}
         {isAddModalOpen && (
           <div className="fixed inset-0 z-50 bg-slate-950/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-            <div className="bg-white border border-slate-900/10 rounded-2xl w-full max-w-2xl p-6 relative shadow-2xl my-8">
+            <div className="bg-white border border-slate-900/10 rounded-3xl w-full max-w-2xl p-6 relative shadow-2xl my-8">
               <button
                 onClick={() => setIsAddModalOpen(false)}
                 className="absolute top-5 right-5 text-slate-500 hover:text-slate-900"
@@ -1093,7 +1093,7 @@ export default function AdminBranchAccountsPage() {
               </button>
 
               <div className="flex items-center gap-2 mb-4">
-                <Plus className="w-5 h-5 text-[#8a6d1f]" />
+                <Plus className="w-5 h-5 text-[#15803d]" />
                 <h2 className="text-lg font-bold font-serif text-slate-900">Record Daily Closing for Branch</h2>
               </div>
               <p className="text-xs text-slate-500 mb-6">
@@ -1109,7 +1109,7 @@ export default function AdminBranchAccountsPage() {
                       value={formBranchId}
                       onChange={e => setFormBranchId(e.target.value)}
                       required
-                      className="w-full px-3 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/15 text-slate-900 text-xs focus:outline-none focus:border-[#d4af37]/50"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/15 text-slate-900 text-xs focus:outline-none focus:border-[#1ca34c]/50"
                     >
                       <option value="">Select Branch</option>
                       {branches.map(b => (
@@ -1124,7 +1124,7 @@ export default function AdminBranchAccountsPage() {
                       value={formDate}
                       onChange={e => setFormDate(e.target.value)}
                       required
-                      className="w-full px-3 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/15 text-slate-900 text-xs focus:outline-none focus:border-[#d4af37]/50"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/15 text-slate-900 text-xs focus:outline-none focus:border-[#1ca34c]/50"
                     />
                   </div>
                 </div>
@@ -1140,7 +1140,7 @@ export default function AdminBranchAccountsPage() {
                       value={formOpeningCash}
                       onChange={e => setFormOpeningCash(e.target.value)}
                       placeholder="0.00"
-                      className="w-full px-3 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/15 text-slate-900 text-xs focus:outline-none focus:border-[#d4af37]/50"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/15 text-slate-900 text-xs focus:outline-none focus:border-[#1ca34c]/50"
                     />
                   </div>
                   <div>
@@ -1152,7 +1152,7 @@ export default function AdminBranchAccountsPage() {
                       value={formCashSales}
                       onChange={e => setFormCashSales(e.target.value)}
                       placeholder="0.00"
-                      className="w-full px-3 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/15 text-slate-900 text-xs focus:outline-none focus:border-[#d4af37]/50"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/15 text-slate-900 text-xs focus:outline-none focus:border-[#1ca34c]/50"
                     />
                   </div>
                 </div>
@@ -1245,14 +1245,14 @@ export default function AdminBranchAccountsPage() {
                     onChange={e => setFormActualCash(e.target.value)}
                     placeholder="Enter counted physical notes & coins"
                     required
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/15 text-slate-900 font-serif font-bold text-sm focus:outline-none focus:border-[#d4af37]/50"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/15 text-slate-900 font-serif font-bold text-sm focus:outline-none focus:border-[#1ca34c]/50"
                   />
                 </div>
 
                 {/* Live Net Drawer Cash Banner */}
-                <div className="p-3 rounded-xl bg-[#d4af37]/10 border border-[#d4af37]/20 flex justify-between items-center text-xs">
+                <div className="p-3 rounded-xl bg-[#1ca34c]/10 border border-[#1ca34c]/20 flex justify-between items-center text-xs">
                   <span className="text-slate-600">Net Drawer Cash Generated Today (Closing − Khuchra):</span>
-                  <span className="font-bold font-serif text-[#8a6d1f] text-base">
+                  <span className="font-bold font-serif text-[#15803d] text-base">
                     {modalNetDrawer !== null ? fmt(modalNetDrawer) : '৳0'}
                   </span>
                 </div>
@@ -1265,7 +1265,7 @@ export default function AdminBranchAccountsPage() {
                     value={formNotes}
                     onChange={e => setFormNotes(e.target.value)}
                     placeholder="Optional notes or remarks"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/15 text-slate-900 text-xs focus:outline-none focus:border-[#d4af37]/50"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/15 text-slate-900 text-xs focus:outline-none focus:border-[#1ca34c]/50"
                   />
                 </div>
 
@@ -1275,7 +1275,7 @@ export default function AdminBranchAccountsPage() {
                     id="is_closed_add"
                     checked={formIsClosed}
                     onChange={e => setFormIsClosed(e.target.checked)}
-                    className="rounded border-slate-900/20 bg-slate-900/[0.04] text-[#8a6d1f] focus:ring-0 cursor-pointer"
+                    className="rounded border-slate-900/20 bg-slate-900/[0.04] text-[#15803d] focus:ring-0 cursor-pointer"
                   />
                   <label htmlFor="is_closed_add" className="text-xs text-slate-600 cursor-pointer">
                     Mark day as officially Closed
@@ -1293,7 +1293,7 @@ export default function AdminBranchAccountsPage() {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#d4af37] to-white text-black text-xs font-bold uppercase tracking-wider hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer"
+                    className="px-5 py-2 rounded-full bg-[#1ca34c] text-white text-xs font-bold uppercase tracking-wider hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer"
                   >
                     {isSubmitting ? 'Saving...' : 'Save Closing'}
                   </button>
@@ -1306,7 +1306,7 @@ export default function AdminBranchAccountsPage() {
         {/* MODAL: EDIT DAILY CLOSING */}
         {isEditModalOpen && editingItem && (
           <div className="fixed inset-0 z-50 bg-slate-950/50 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
-            <div className="bg-white border border-slate-900/10 rounded-2xl w-full max-w-2xl p-6 relative shadow-2xl my-8">
+            <div className="bg-white border border-slate-900/10 rounded-3xl w-full max-w-2xl p-6 relative shadow-2xl my-8">
               <button
                 onClick={() => { setIsEditModalOpen(false); setEditingItem(null) }}
                 className="absolute top-5 right-5 text-slate-500 hover:text-slate-900"
@@ -1335,7 +1335,7 @@ export default function AdminBranchAccountsPage() {
                       step="0.01"
                       value={formOpeningCash}
                       onChange={e => setFormOpeningCash(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/15 text-slate-900 text-xs focus:outline-none focus:border-[#d4af37]/50"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/15 text-slate-900 text-xs focus:outline-none focus:border-[#1ca34c]/50"
                     />
                   </div>
                   <div>
@@ -1346,7 +1346,7 @@ export default function AdminBranchAccountsPage() {
                       step="0.01"
                       value={formCashSales}
                       onChange={e => setFormCashSales(e.target.value)}
-                      className="w-full px-3 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/15 text-slate-900 text-xs focus:outline-none focus:border-[#d4af37]/50"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/15 text-slate-900 text-xs focus:outline-none focus:border-[#1ca34c]/50"
                     />
                   </div>
                 </div>
@@ -1433,14 +1433,14 @@ export default function AdminBranchAccountsPage() {
                     value={formActualCash}
                     onChange={e => setFormActualCash(e.target.value)}
                     placeholder="Physical drawer count"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/15 text-slate-900 font-serif font-bold text-sm focus:outline-none focus:border-[#d4af37]/50"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/15 text-slate-900 font-serif font-bold text-sm focus:outline-none focus:border-[#1ca34c]/50"
                   />
                 </div>
 
                 {/* Live Net Drawer Cash Banner */}
-                <div className="p-3 rounded-xl bg-[#d4af37]/10 border border-[#d4af37]/20 flex justify-between items-center text-xs">
+                <div className="p-3 rounded-xl bg-[#1ca34c]/10 border border-[#1ca34c]/20 flex justify-between items-center text-xs">
                   <span className="text-slate-600">Net Drawer Cash Generated Today (Closing − Khuchra):</span>
-                  <span className="font-bold font-serif text-[#8a6d1f] text-base">
+                  <span className="font-bold font-serif text-[#15803d] text-base">
                     {modalNetDrawer !== null ? fmt(modalNetDrawer) : '৳0'}
                   </span>
                 </div>
@@ -1453,7 +1453,7 @@ export default function AdminBranchAccountsPage() {
                     value={formNotes}
                     onChange={e => setFormNotes(e.target.value)}
                     placeholder="Discrepancy notes"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/15 text-slate-900 text-xs focus:outline-none focus:border-[#d4af37]/50"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/15 text-slate-900 text-xs focus:outline-none focus:border-[#1ca34c]/50"
                   />
                 </div>
 
@@ -1463,7 +1463,7 @@ export default function AdminBranchAccountsPage() {
                     id="is_closed_edit"
                     checked={formIsClosed}
                     onChange={e => setFormIsClosed(e.target.checked)}
-                    className="rounded border-slate-900/20 bg-slate-900/[0.04] text-[#8a6d1f] focus:ring-0 cursor-pointer"
+                    className="rounded border-slate-900/20 bg-slate-900/[0.04] text-[#15803d] focus:ring-0 cursor-pointer"
                   />
                   <label htmlFor="is_closed_edit" className="text-xs text-slate-600 cursor-pointer">
                     Mark day as Closed

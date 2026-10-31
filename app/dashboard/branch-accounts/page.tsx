@@ -25,14 +25,14 @@ function StatCard({
   trend?: 'up' | 'down' | 'neutral'
 }) {
   const colorMap = {
-    gold:   'from-[#d4af37]/20 to-[#d4af37]/5 border-[#d4af37]/20 text-[#8a6d1f]',
+    gold:   'from-[#1ca34c]/20 to-[#1ca34c]/5 border-[#1ca34c]/20 text-[#15803d]',
     green:  'from-emerald-500/20 to-emerald-500/5 border-emerald-500/20 text-emerald-600',
     red:    'from-rose-500/20 to-rose-500/5 border-rose-500/20 text-rose-600',
     blue:   'from-blue-500/20 to-blue-500/5 border-blue-500/20 text-blue-600',
     purple: 'from-purple-500/20 to-purple-500/5 border-purple-500/20 text-purple-600',
   }
   return (
-    <div className={`relative overflow-hidden rounded-2xl border bg-gradient-to-br p-5 ${colorMap[color]}`}>
+    <div className={`relative overflow-hidden rounded-3xl border bg-gradient-to-br p-5 ${colorMap[color]}`}>
       <div className="flex items-start justify-between mb-3">
         <div className={`w-10 h-10 rounded-xl flex items-center justify-center bg-slate-900/[0.04] ${colorMap[color].split(' ').pop()}`}>
           <Icon className="w-5 h-5" />
@@ -46,7 +46,7 @@ function StatCard({
         )}
       </div>
       <p className="text-[10px] uppercase tracking-widest text-slate-500 mb-1">{title}</p>
-      <p className="text-xl font-bold text-slate-900 tracking-tight">{value}</p>
+      <p className="text-xl font-extrabold text-slate-900 tracking-tight">{value}</p>
       {sub && <p className="text-[10px] text-slate-500 mt-1">{sub}</p>}
     </div>
   )
@@ -149,7 +149,7 @@ export default function BranchAccountsDashboard() {
   if (isLoading && !dashboard) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -161,7 +161,7 @@ export default function BranchAccountsDashboard() {
     <div className="min-h-screen bg-white text-slate-900">
       {/* Ambient glow */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[400px] bg-[#d4af37]/3 rounded-full filter blur-[150px]" />
+        <div className="absolute top-0 left-1/4 w-[600px] h-[400px] bg-[#1ca34c]/3 rounded-full filter blur-[150px]" />
         <div className="absolute bottom-0 right-1/4 w-[400px] h-[300px] bg-blue-500/3 rounded-full filter blur-[120px]" />
       </div>
 
@@ -171,14 +171,14 @@ export default function BranchAccountsDashboard() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-lg bg-[#d4af37]/10 border border-[#d4af37]/20 flex items-center justify-center">
-                <Building2 className="w-4 h-4 text-[#8a6d1f]" />
+              <div className="w-8 h-8 rounded-lg bg-[#1ca34c]/10 border border-[#1ca34c]/20 flex items-center justify-center">
+                <Building2 className="w-4 h-4 text-[#15803d]" />
               </div>
-              <span className="text-[10px] uppercase tracking-[0.3em] text-[#8a6d1f]/70 font-semibold">
+              <span className="text-[10px] uppercase tracking-[0.3em] text-[#15803d]/70 font-semibold">
                 Branch Accounts
               </span>
             </div>
-            <h1 className="text-2xl md:text-3xl font-bold font-serif text-slate-900">
+            <h1 className="text-2xl md:text-3xl font-extrabold font-serif text-slate-900">
               {profile?.branch || 'Branch'} Dashboard
             </h1>
             <p className="text-sm text-slate-500 mt-1">
@@ -188,7 +188,7 @@ export default function BranchAccountsDashboard() {
           </div>
           <button
             onClick={handleRefresh}
-            className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 text-slate-500 hover:text-slate-900 transition-all cursor-pointer flex-shrink-0 ${isRefreshing ? 'animate-spin text-[#8a6d1f]' : ''}`}
+            className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 text-slate-500 hover:text-slate-900 transition-all cursor-pointer flex-shrink-0 ${isRefreshing ? 'animate-spin text-[#15803d]' : ''}`}
           >
             <RefreshCw className="w-4 h-4" />
           </button>
@@ -267,9 +267,9 @@ export default function BranchAccountsDashboard() {
               { label: 'Monthly Report', href: '/dashboard/branch-accounts/monthly-report', icon: FileText,      desc: 'View this month' },
             ].map(({ label, href, icon: Icon, desc }) => (
               <Link key={href} href={href}
-                className="group p-4 rounded-2xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 hover:bg-[#d4af37]/5 transition-all cursor-pointer"
+                className="group p-4 rounded-2xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 hover:bg-[#1ca34c]/5 transition-all cursor-pointer"
               >
-                <Icon className="w-5 h-5 text-[#8a6d1f] mb-2 group-hover:scale-110 transition-transform" />
+                <Icon className="w-5 h-5 text-[#15803d] mb-2 group-hover:scale-110 transition-transform" />
                 <p className="text-xs font-semibold text-slate-900">{label}</p>
                 <p className="text-[10px] text-slate-500 mt-0.5">{desc}</p>
               </Link>
@@ -283,7 +283,7 @@ export default function BranchAccountsDashboard() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold">Recent Deposits</h2>
               <Link href="/dashboard/branch-accounts/deposit-history"
-                className="text-[10px] text-[#8a6d1f]/70 hover:text-[#8a6d1f] flex items-center gap-1 transition-colors"
+                className="text-[10px] text-[#15803d]/70 hover:text-[#15803d] flex items-center gap-1 transition-colors"
               >
                 View all <ChevronRight className="w-3 h-3" />
               </Link>

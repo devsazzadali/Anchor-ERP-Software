@@ -151,20 +151,20 @@ export default function FinancialSummaryPage() {
     const pct = streamTotal > 0 ? (total / streamTotal) * 100 : 0
     return (
       <div className="bg-slate-900/[0.04] border border-slate-900/5 rounded-xl p-4 flex flex-col md:flex-row items-center gap-4 hover:bg-slate-900/[0.04] transition-colors">
-        <div className="w-8 h-8 rounded-full bg-[#d4af37]/10 flex items-center justify-center text-[#8a6d1f] font-bold text-xs shrink-0">
+        <div className="w-8 h-8 rounded-full bg-[#1ca34c]/10 flex items-center justify-center text-[#15803d] font-bold text-xs shrink-0">
           {rank}
         </div>
         <div className="flex-1 w-full">
           <div className="flex items-center justify-between mb-2">
             <span className="font-semibold text-sm">{name}{sub ? <span className="text-slate-500 font-normal text-xs ml-2">{sub}</span> : null}</span>
-            <span className="font-mono font-bold text-[#8a6d1f]">৳ {total.toLocaleString('en-BD')}</span>
+            <span className="font-mono font-bold text-[#15803d]">৳ {total.toLocaleString('en-BD')}</span>
           </div>
           <div className="w-full h-1.5 bg-white rounded-full overflow-hidden">
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${pct}%` }}
               transition={{ duration: 1, ease: 'easeOut' }}
-              className="h-full bg-gradient-to-r from-[#d4af37] to-white rounded-full"
+              className="h-full bg-[#1ca34c] rounded-full"
             />
           </div>
         </div>
@@ -183,7 +183,7 @@ export default function FinancialSummaryPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
           <h3 className="text-lg font-bold font-serif flex items-center gap-2">
-            <Icon className="w-5 h-5 text-[#8a6d1f]" />
+            <Icon className="w-5 h-5 text-[#15803d]" />
             {title}
           </h3>
           <p className="text-xs text-slate-500 mt-1">{subtitle}</p>
@@ -194,7 +194,7 @@ export default function FinancialSummaryPage() {
         </div>
       </div>
       {isEmpty ? (
-        <div className="py-10 text-center text-slate-500 bg-slate-900/[0.04] rounded-2xl border border-dashed border-slate-900/10">
+        <div className="py-10 text-center text-slate-500 bg-slate-900/[0.04] rounded-3xl border border-dashed border-slate-900/10">
           No expenses in this stream for this period.
         </div>
       ) : (
@@ -204,13 +204,13 @@ export default function FinancialSummaryPage() {
   )
 
   return (
-    <div className="min-h-screen bg-white text-slate-900 pb-20 font-sans selection:bg-[#d4af37]/30">
+    <div className="min-h-screen bg-white text-slate-900 pb-20 font-sans selection:bg-[#1ca34c]/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 pb-6 border-b border-slate-900/5">
           <div>
             <h1 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-slate-900 to-slate-500 font-serif flex items-center gap-2">
-              <Layers className="w-6 h-6 text-[#8a6d1f]" />
+              <Layers className="w-6 h-6 text-[#15803d]" />
               Financial Summary Dashboard
             </h1>
             <p className="text-slate-500 text-sm mt-1 flex items-center gap-1.5">
@@ -229,16 +229,16 @@ export default function FinancialSummaryPage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-slate-900/[0.05] border border-slate-900/[0.08] rounded-2xl p-4 flex flex-col md:flex-row gap-4 mb-8 relative z-10">
+        <div className="bg-slate-900/[0.05] border border-slate-900/[0.08] rounded-3xl p-4 flex flex-col md:flex-row gap-4 mb-8 relative z-10">
           {/* Branch Select */}
           <div className="flex-1">
             <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">Branch</label>
             <div className="relative">
-              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8a6d1f]" />
+              <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#15803d]" />
               <select
                 value={selectedBranch}
                 onChange={e => setSelectedBranch(e.target.value)}
-                className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl pl-9 pr-4 py-2.5 text-sm font-semibold focus:outline-none focus:border-[#d4af37]/40 transition-all appearance-none"
+                className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl pl-9 pr-4 py-2.5 text-sm font-semibold focus:outline-none focus:border-[#1ca34c]/40 transition-all appearance-none"
               >
                 <option value="all">Global (All Branches)</option>
                 {branches.map(b => (
@@ -256,14 +256,14 @@ export default function FinancialSummaryPage() {
                 type="date"
                 value={dateRange.startDate}
                 onChange={e => setDateRange(p => ({ ...p, startDate: e.target.value }))}
-                className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-sm font-semibold focus:outline-none focus:border-[#d4af37]/40 transition-all text-slate-600"
+                className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-sm font-semibold focus:outline-none focus:border-[#1ca34c]/40 transition-all text-slate-600"
               />
               <span className="text-slate-500 font-bold text-sm">to</span>
               <input
                 type="date"
                 value={dateRange.endDate}
                 onChange={e => setDateRange(p => ({ ...p, endDate: e.target.value }))}
-                className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-sm font-semibold focus:outline-none focus:border-[#d4af37]/40 transition-all text-slate-600"
+                className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-sm font-semibold focus:outline-none focus:border-[#1ca34c]/40 transition-all text-slate-600"
               />
             </div>
           </div>
@@ -271,7 +271,7 @@ export default function FinancialSummaryPage() {
 
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-[#8a6d1f] mb-4" />
+            <Loader2 className="w-8 h-8 animate-spin text-[#15803d] mb-4" />
             <p className="text-slate-500 font-semibold text-sm">Calculating Financials...</p>
           </div>
         ) : (
@@ -289,7 +289,7 @@ export default function FinancialSummaryPage() {
             {/* Top Stat Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {/* Income */}
-              <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-900/5 border border-emerald-500/20 rounded-2xl p-6 relative overflow-hidden group">
+              <div className="bg-gradient-to-br from-emerald-500/10 to-emerald-900/5 border border-emerald-500/20 rounded-3xl p-6 relative overflow-hidden group">
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                   <ArrowUpRight className="w-24 h-24 text-emerald-500" />
                 </div>
@@ -303,7 +303,7 @@ export default function FinancialSummaryPage() {
               </div>
 
               {/* Expenses */}
-              <div className="bg-gradient-to-br from-rose-500/10 to-rose-900/5 border border-rose-500/20 rounded-2xl p-6 relative overflow-hidden group">
+              <div className="bg-gradient-to-br from-rose-500/10 to-rose-900/5 border border-rose-500/20 rounded-3xl p-6 relative overflow-hidden group">
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                   <ArrowDownRight className="w-24 h-24 text-rose-500" />
                 </div>
@@ -317,7 +317,7 @@ export default function FinancialSummaryPage() {
               </div>
 
               {/* Net Balance */}
-              <div className={`bg-gradient-to-br border rounded-2xl p-6 relative overflow-hidden group ${
+              <div className={`bg-gradient-to-br border rounded-3xl p-6 relative overflow-hidden group ${
                 netBalance >= 0
                   ? 'from-blue-500/10 to-blue-900/5 border-blue-500/20'
                   : 'from-orange-500/10 to-orange-900/5 border-orange-500/20'
@@ -379,7 +379,7 @@ export default function FinancialSummaryPage() {
             </StreamBlock>
 
             {/* Reconciliation: the three streams ARE the total. */}
-            <div className="bg-slate-900/[0.04] border border-slate-900/5 rounded-2xl px-5 py-4 text-xs text-slate-500 font-semibold space-y-2">
+            <div className="bg-slate-900/[0.04] border border-slate-900/5 rounded-3xl px-5 py-4 text-xs text-slate-500 font-semibold space-y-2">
               <p>
                 Grand total ৳{streams.grandTotal.toLocaleString('en-BD')} = Branch ৳{streams.branch.total.toLocaleString('en-BD')}
                 {selectedBranch === 'all' ? <> + Company ৳{streams.company.total.toLocaleString('en-BD')} (setup ৳{streams.company.setup.toLocaleString('en-BD')} + operating ৳{streams.company.operating.toLocaleString('en-BD')})</> : null}

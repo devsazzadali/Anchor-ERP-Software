@@ -287,7 +287,7 @@ export default function AdminBundleRequestsPage() {
   if (accessDenied) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center p-4">
-        <div className="max-w-md w-full p-8 rounded-2xl border border-slate-900/10 bg-slate-900/[0.04] text-center shadow-2xl">
+        <div className="max-w-md w-full p-8 rounded-3xl border border-slate-900/10 bg-slate-900/[0.04] text-center shadow-2xl">
           <ShieldAlert className="w-12 h-12 text-rose-500 mx-auto mb-4" />
           <h1 className="text-xl font-bold text-slate-900 mb-2 font-serif">Access Restricted</h1>
           <p className="text-sm text-slate-500 mb-6">
@@ -307,7 +307,7 @@ export default function AdminBundleRequestsPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -315,7 +315,7 @@ export default function AdminBundleRequestsPage() {
   return (
     <div className="min-h-screen w-full bg-white text-slate-900 font-sans relative">
       {/* Background glow */}
-      <div className="absolute top-[-5%] right-[-5%] w-[40%] h-[40%] bg-[#d4af37]/5 rounded-full filter blur-[120px] pointer-events-none" />
+      <div className="absolute top-[-5%] right-[-5%] w-[40%] h-[40%] bg-[#1ca34c]/5 rounded-full filter blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-5%] left-[10%] w-[45%] h-[45%] bg-blue-500/5 rounded-full filter blur-[150px] pointer-events-none" />
 
       <div className="relative z-10 flex flex-col p-4 md:p-6 max-w-7xl mx-auto custom-scrollbar">
@@ -324,7 +324,7 @@ export default function AdminBundleRequestsPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-5 border-b border-slate-900/10">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
-              <span className="text-[10px] bg-[#d4af37]/15 text-[#8a6d1f] border border-[#d4af37]/20 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider flex items-center gap-1.5">
+              <span className="text-[10px] bg-[#1ca34c]/15 text-[#15803d] border border-[#1ca34c]/20 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider flex items-center gap-1.5">
                 <Coins className="w-3 h-3" /> Treasury Operations
               </span>
               <span className="text-[10px] bg-slate-900/[0.04] text-slate-500 border border-slate-900/10 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider">
@@ -342,7 +342,7 @@ export default function AdminBundleRequestsPage() {
           <div className="flex flex-wrap items-center gap-2.5">
             <button
               onClick={handleRefresh}
-              className={`p-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#d4af37]/30 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'animate-spin text-[#8a6d1f]' : ''}`}
+              className={`p-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#1ca34c]/30 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'animate-spin text-[#15803d]' : ''}`}
               title="Refresh requisitions"
             >
               <RefreshCw className="w-4 h-4" />
@@ -360,7 +360,7 @@ export default function AdminBundleRequestsPage() {
               onClick={handleExportPdf}
               className="px-3.5 py-2.5 rounded-xl bg-slate-900/[0.04] hover:bg-slate-900/[0.04] border border-slate-900/10 text-slate-600 hover:text-slate-900 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
             >
-              <Download className="w-4 h-4 text-[#8a6d1f]" />
+              <Download className="w-4 h-4 text-[#15803d]" />
               PDF Statement
             </button>
           </div>
@@ -385,7 +385,7 @@ export default function AdminBundleRequestsPage() {
 
         {/* ── Metric Cards ── */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="p-5 rounded-2xl border border-amber-500/20 bg-amber-500/5">
+          <div className="p-5 rounded-3xl border border-amber-500/20 bg-amber-500/5">
             <div className="flex items-center justify-between mb-2">
               <Clock className="w-5 h-5 text-amber-600" />
               <span className="text-[9px] font-bold text-amber-600/80 uppercase tracking-widest">Pending Review</span>
@@ -397,7 +397,7 @@ export default function AdminBundleRequestsPage() {
             </div>
           </div>
 
-          <div className="p-5 rounded-2xl border border-blue-500/20 bg-blue-500/5">
+          <div className="p-5 rounded-3xl border border-blue-500/20 bg-blue-500/5">
             <div className="flex items-center justify-between mb-2">
               <RefreshCw className="w-5 h-5 text-blue-600" />
               <span className="text-[9px] font-bold text-blue-600/80 uppercase tracking-widest">In-Transit</span>
@@ -409,7 +409,7 @@ export default function AdminBundleRequestsPage() {
             </div>
           </div>
 
-          <div className="p-5 rounded-2xl border border-emerald-500/20 bg-emerald-500/5">
+          <div className="p-5 rounded-3xl border border-emerald-500/20 bg-emerald-500/5">
             <div className="flex items-center justify-between mb-2">
               <CheckCircle2 className="w-5 h-5 text-emerald-600" />
               <span className="text-[9px] font-bold text-emerald-600/80 uppercase tracking-widest">Fulfilled</span>
@@ -418,18 +418,18 @@ export default function AdminBundleRequestsPage() {
             <p className="text-2xl font-bold font-serif text-emerald-600">{fmt(completedTotal)}</p>
           </div>
 
-          <div className="p-5 rounded-2xl border border-[#d4af37]/20 bg-[#d4af37]/5">
+          <div className="p-5 rounded-3xl border border-[#1ca34c]/20 bg-[#1ca34c]/5">
             <div className="flex items-center justify-between mb-2">
-              <Coins className="w-5 h-5 text-[#8a6d1f]" />
-              <span className="text-[9px] font-bold text-[#8a6d1f]/80 uppercase tracking-widest">Total Volume</span>
+              <Coins className="w-5 h-5 text-[#15803d]" />
+              <span className="text-[9px] font-bold text-[#15803d]/80 uppercase tracking-widest">Total Volume</span>
             </div>
             <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Cumulative Cash Requisitions</p>
-            <p className="text-2xl font-bold font-serif text-[#8a6d1f]">{fmt(totalAllCash)}</p>
+            <p className="text-2xl font-bold font-serif text-[#15803d]">{fmt(totalAllCash)}</p>
           </div>
         </div>
 
         {/* ── Filter Bar ── */}
-        <div className="mb-6 p-4 rounded-2xl border border-slate-900/10 bg-slate-900/[0.04] flex flex-col md:flex-row gap-3">
+        <div className="mb-6 p-4 rounded-3xl border border-slate-900/10 bg-slate-900/[0.04] flex flex-col md:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
             <input
@@ -437,14 +437,14 @@ export default function AdminBundleRequestsPage() {
               placeholder="Search by branch, manager, or reason..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl py-2.5 pl-10 pr-3.5 text-xs text-slate-900 placeholder-slate-500 focus:outline-none focus:border-[#d4af37]/40 w-full transition-colors"
+              className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl py-2.5 pl-10 pr-3.5 text-xs text-slate-900 placeholder-slate-500 focus:outline-none focus:border-[#1ca34c]/40 w-full transition-colors"
             />
           </div>
 
           <select
             value={filterStatus}
             onChange={e => setFilterStatus(e.target.value)}
-            className="bg-white border border-slate-900/15 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/40 md:w-44 cursor-pointer"
+            className="bg-white border border-slate-900/15 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 md:w-44 cursor-pointer"
           >
             <option value="all">All Statuses ({requests.length})</option>
             <option value="requested">Requested ({pendingCount})</option>
@@ -456,7 +456,7 @@ export default function AdminBundleRequestsPage() {
           <select
             value={filterBranch}
             onChange={e => setFilterBranch(e.target.value)}
-            className="bg-white border border-slate-900/15 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/40 md:w-48 cursor-pointer"
+            className="bg-white border border-slate-900/15 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 md:w-48 cursor-pointer"
           >
             <option value="">All Branches ({branches.length})</option>
             {branches.map(b => (
@@ -467,7 +467,7 @@ export default function AdminBundleRequestsPage() {
           <select
             value={filterUrgency}
             onChange={e => setFilterUrgency(e.target.value)}
-            className="bg-white border border-slate-900/15 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/40 md:w-36 cursor-pointer"
+            className="bg-white border border-slate-900/15 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 md:w-36 cursor-pointer"
           >
             <option value="all">All Urgency</option>
             <option value="normal">Normal</option>
@@ -485,10 +485,10 @@ export default function AdminBundleRequestsPage() {
         </div>
 
         {/* ── Data Table ── */}
-        <div className="rounded-2xl border border-slate-900/10 bg-slate-900/[0.04] overflow-hidden shadow-xl">
+        <div className="rounded-3xl border border-slate-900/10 bg-slate-900/[0.04] overflow-hidden shadow-xl">
           <div className="p-4 sm:p-5 border-b border-slate-900/10 bg-slate-900/[0.04] flex items-center justify-between">
             <p className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-2">
-              <Coins className="w-4 h-4 text-[#8a6d1f]" />
+              <Coins className="w-4 h-4 text-[#15803d]" />
               Branch Change Requisitions ({filtered.length})
             </p>
             <span className="text-[10px] text-slate-500">1 Bundle = 100 Notes</span>
@@ -533,7 +533,7 @@ export default function AdminBundleRequestsPage() {
                         <td className="p-3.5 whitespace-nowrap">
                           <div>
                             <p className="font-semibold text-slate-900 flex items-center gap-1.5">
-                              <Building2 className="w-3.5 h-3.5 text-[#8a6d1f]" /> {req.branch_name || 'Branch'}
+                              <Building2 className="w-3.5 h-3.5 text-[#15803d]" /> {req.branch_name || 'Branch'}
                             </p>
                             <p className="text-[11px] text-slate-500 mt-0.5">
                               {req.manager_name || 'Branch Manager'}
@@ -582,7 +582,7 @@ export default function AdminBundleRequestsPage() {
                         </td>
 
                         {/* Total Amount */}
-                        <td className="p-3.5 whitespace-nowrap text-right font-serif font-bold text-[#8a6d1f] text-sm">
+                        <td className="p-3.5 whitespace-nowrap text-right font-serif font-bold text-[#15803d] text-sm">
                           {fmt(req.total_amount)}
                         </td>
 
@@ -675,7 +675,7 @@ export default function AdminBundleRequestsPage() {
             >
               <div className="flex items-center justify-between pb-4 border-b border-slate-900/10 mb-4">
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-[#8a6d1f] tracking-wider">Treasury Action</span>
+                  <span className="text-[10px] uppercase font-bold text-[#15803d] tracking-wider">Treasury Action</span>
                   <h3 className="text-base font-bold text-slate-900 font-serif mt-0.5">
                     Update Requisition Status
                   </h3>
@@ -696,7 +696,7 @@ export default function AdminBundleRequestsPage() {
                   </div>
                   <div className="flex justify-between items-center text-xs mb-1">
                     <span className="text-slate-500">Requisition Amount:</span>
-                    <strong className="text-[#8a6d1f] font-serif">{fmt(activeRequest.total_amount)}</strong>
+                    <strong className="text-[#15803d] font-serif">{fmt(activeRequest.total_amount)}</strong>
                   </div>
                   <div className="flex justify-between items-center text-xs">
                     <span className="text-slate-500">New Target Status:</span>
@@ -713,7 +713,7 @@ export default function AdminBundleRequestsPage() {
                   <select
                     value={actionStatus}
                     onChange={e => setActionStatus(e.target.value as any)}
-                    className="w-full bg-white border border-slate-900/15 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/40 cursor-pointer"
+                    className="w-full bg-white border border-slate-900/15 rounded-xl p-2.5 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 cursor-pointer"
                   >
                     <option value="processing">In-Transit / Processing</option>
                     <option value="completed">Completed / Fulfilled</option>
@@ -730,7 +730,7 @@ export default function AdminBundleRequestsPage() {
                     value={actionNotes}
                     onChange={e => setActionNotes(e.target.value)}
                     placeholder="e.g. Dispatched with armored courier ref #AC-9921..."
-                    className="w-full bg-white border border-slate-900/15 rounded-xl p-2.5 text-xs text-slate-900 placeholder-slate-500 focus:outline-none focus:border-[#d4af37]/40"
+                    className="w-full bg-white border border-slate-900/15 rounded-xl p-2.5 text-xs text-slate-900 placeholder-slate-500 focus:outline-none focus:border-[#1ca34c]/40"
                   />
                 </div>
 
@@ -745,7 +745,7 @@ export default function AdminBundleRequestsPage() {
                   <button
                     type="submit"
                     disabled={isSubmittingAction}
-                    className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#d4af37] to-white text-black text-xs font-bold uppercase tracking-wider disabled:opacity-50 flex items-center justify-center gap-1.5 shadow-lg shadow-[#d4af37]/20 hover:opacity-95 cursor-pointer"
+                    className="flex-1 py-2.5 rounded-full bg-[#1ca34c] text-white text-xs font-bold uppercase tracking-wider disabled:opacity-50 flex items-center justify-center gap-1.5 shadow-lg shadow-[#1ca34c]/20 hover:opacity-95 cursor-pointer"
                   >
                     {isSubmittingAction ? (
                       <RefreshCw className="w-4 h-4 animate-spin" />
@@ -774,7 +774,7 @@ export default function AdminBundleRequestsPage() {
             >
               <div className="flex items-center justify-between pb-4 border-b border-slate-900/10 mb-4">
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-[#8a6d1f] tracking-wider">Requisition Inspector</span>
+                  <span className="text-[10px] uppercase font-bold text-[#15803d] tracking-wider">Requisition Inspector</span>
                   <h3 className="text-base font-bold text-slate-900 font-serif mt-0.5">
                     {viewDetailReq.branch_name}
                   </h3>
@@ -806,7 +806,7 @@ export default function AdminBundleRequestsPage() {
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-900/5">
                   <span className="text-slate-500">Grand Total</span>
-                  <span className="text-[#8a6d1f] font-bold font-serif text-sm">{fmt(viewDetailReq.total_amount)}</span>
+                  <span className="text-[#15803d] font-bold font-serif text-sm">{fmt(viewDetailReq.total_amount)}</span>
                 </div>
 
                 <div className="pt-2">

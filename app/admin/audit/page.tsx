@@ -194,7 +194,7 @@ export default function SecurityAuditLogPage() {
   return (
     <div className="min-h-screen w-full flex bg-white text-slate-900 font-sans relative">
       {/* Background ambient lighting */}
-      <div className="absolute top-[-5%] left-[20%] w-[50%] h-[40%] bg-[#d4af37]/3 rounded-full filter blur-[150px] pointer-events-none" />
+      <div className="absolute top-[-5%] left-[20%] w-[50%] h-[40%] bg-[#1ca34c]/3 rounded-full filter blur-[150px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[10%] w-[40%] h-[40%] bg-rose-500/3 rounded-full filter blur-[140px] pointer-events-none" />
 
       {/* Main Container */}
@@ -204,14 +204,15 @@ export default function SecurityAuditLogPage() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-5 border-b border-slate-900/5">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
-              <span className="text-[10px] bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider flex items-center gap-1">
-                <Shield className="w-3 h-3 text-[#8a6d1f]" /> Immutable Security Core
+              <span className="text-[10px] bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider flex items-center gap-1">
+                <Shield className="w-3 h-3 text-[#15803d]" /> Immutable Security Core
               </span>
               <span className="flex items-center gap-1 text-[10px] text-emerald-600 font-mono bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Live Realtime Telemetry
               </span>
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-900 font-serif">
+            <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 font-serif flex items-center gap-3">
+              <span className="w-1.5 h-9 rounded-full bg-[#1ca34c] shrink-0" />
               Security Audit <span className="premium-text-gradient">& Financial Trail</span>
             </h1>
             <p className="text-[11px] text-slate-500 mt-0.5">
@@ -223,17 +224,17 @@ export default function SecurityAuditLogPage() {
             <button
               onClick={fetchAuditData}
               disabled={isLoading}
-              className="p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 text-slate-500 hover:text-slate-900 transition-all cursor-pointer disabled:opacity-50"
+              className="p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 text-slate-500 hover:text-slate-900 transition-all cursor-pointer disabled:opacity-50"
               title="Refresh audit logs"
             >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-[#8a6d1f]' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-[#15803d]' : ''}`} />
             </button>
 
             <button
               onClick={handleExportExcel}
               className="bg-slate-900/[0.04] hover:bg-slate-900/[0.07] border border-slate-900/10 hover:border-slate-900/20 text-slate-900 font-medium px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 transition-all cursor-pointer shadow"
             >
-              <Download className="w-3.5 h-3.5 text-[#8a6d1f]" />
+              <Download className="w-3.5 h-3.5 text-[#15803d]" />
               <span>Export Audit</span>
             </button>
           </div>
@@ -260,7 +261,7 @@ export default function SecurityAuditLogPage() {
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">Branch Ledger Audits</span>
                 <h3 className="text-2xl font-bold tracking-tight text-slate-900 font-serif">{branchTrail.length}</h3>
               </div>
-              <div className="p-2 rounded-xl bg-[#d4af37]/10 border border-[#d4af37]/20 text-[#8a6d1f]">
+              <div className="p-2 rounded-xl bg-[#1ca34c]/10 border border-[#1ca34c]/20 text-[#15803d]">
                 <Building2 className="w-4 h-4" />
               </div>
             </div>
@@ -302,7 +303,7 @@ export default function SecurityAuditLogPage() {
               onClick={() => setActiveTab('activity')}
               className={`px-3.5 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 ${
                 activeTab === 'activity'
-                  ? 'bg-[#d4af37] text-black shadow-md font-bold'
+                  ? 'bg-[#1ca34c] text-white shadow-md font-bold'
                   : 'text-slate-500 hover:text-slate-900 hover:bg-slate-900/[0.04]'
               }`}
             >
@@ -314,7 +315,7 @@ export default function SecurityAuditLogPage() {
               onClick={() => setActiveTab('branch_trail')}
               className={`px-3.5 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 ${
                 activeTab === 'branch_trail'
-                  ? 'bg-[#d4af37] text-black shadow-md font-bold'
+                  ? 'bg-[#1ca34c] text-white shadow-md font-bold'
                   : 'text-slate-500 hover:text-slate-900 hover:bg-slate-900/[0.04]'
               }`}
             >
@@ -326,7 +327,7 @@ export default function SecurityAuditLogPage() {
               onClick={() => setActiveTab('threats')}
               className={`px-3.5 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 ${
                 activeTab === 'threats'
-                  ? 'bg-[#d4af37] text-black shadow-md font-bold'
+                  ? 'bg-[#1ca34c] text-white shadow-md font-bold'
                   : 'text-slate-500 hover:text-slate-900 hover:bg-slate-900/[0.04]'
               }`}
             >
@@ -344,7 +345,7 @@ export default function SecurityAuditLogPage() {
                 placeholder="Search operator, action, IP..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="bg-slate-900/[0.04] border border-slate-900/10 focus:border-[#d4af37]/40 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 placeholder-slate-500 focus:outline-none transition-colors w-64 max-w-full"
+                className="bg-slate-900/[0.04] border border-slate-900/10 focus:border-[#1ca34c]/40 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 placeholder-slate-500 focus:outline-none transition-colors w-64 max-w-full"
               />
             </div>
 
@@ -352,7 +353,7 @@ export default function SecurityAuditLogPage() {
               <select
                 value={actionCategory}
                 onChange={(e) => setActionCategory(e.target.value)}
-                className="bg-white border border-slate-900/10 focus:border-[#d4af37]/40 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none transition-colors cursor-pointer"
+                className="bg-white border border-slate-900/10 focus:border-[#1ca34c]/40 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none transition-colors cursor-pointer"
               >
                 <option value="all">All Actions</option>
                 <option value="kyc">KYC Events</option>
@@ -490,7 +491,7 @@ export default function SecurityAuditLogPage() {
                       </td>
                       <td className="py-3.5 font-semibold text-slate-900">
                         <div className="flex items-center gap-1.5">
-                          <Building2 className="w-3.5 h-3.5 text-[#8a6d1f]" />
+                          <Building2 className="w-3.5 h-3.5 text-[#15803d]" />
                           <span>{item.branches?.name || 'All Branches'}</span>
                         </div>
                       </td>
@@ -511,7 +512,7 @@ export default function SecurityAuditLogPage() {
                       <td className="py-3.5 text-right pr-4">
                         <button
                           onClick={() => setSelectedLogDetails({ type: 'branch', data: item })}
-                          className="p-3 rounded-lg bg-slate-900/[0.04] hover:bg-slate-900/[0.07] text-slate-500 hover:text-[#8a6d1f] transition-colors cursor-pointer"
+                          className="p-3 rounded-lg bg-slate-900/[0.04] hover:bg-slate-900/[0.07] text-slate-500 hover:text-[#15803d] transition-colors cursor-pointer"
                           title="Inspect changes diff"
                         >
                           <Eye className="w-3.5 h-3.5" />
@@ -600,7 +601,7 @@ export default function SecurityAuditLogPage() {
               <div className="flex justify-between items-start mb-4 pb-3 border-b border-slate-900/5 flex-shrink-0">
                 <div>
                   <h3 className="text-base font-bold text-slate-900 font-serif flex items-center gap-2">
-                    <Terminal className="w-4 h-4 text-[#8a6d1f]" />
+                    <Terminal className="w-4 h-4 text-[#15803d]" />
                     Audit Entry Payload Inspection
                   </h3>
                   <p className="text-[10px] text-slate-500 font-mono mt-0.5">
@@ -625,7 +626,7 @@ export default function SecurityAuditLogPage() {
                       </div>
                       <div>
                         <span className="text-[10px] text-slate-500 uppercase block mb-0.5">Action Code</span>
-                        <span className="text-[#8a6d1f] font-semibold">{selectedLogDetails.data.action}</span>
+                        <span className="text-[#15803d] font-semibold">{selectedLogDetails.data.action}</span>
                       </div>
                       <div>
                         <span className="text-[10px] text-slate-500 uppercase block mb-0.5">IP Address</span>
@@ -653,7 +654,7 @@ export default function SecurityAuditLogPage() {
                       </div>
                       <div>
                         <span className="text-[10px] text-slate-500 uppercase block mb-0.5">Entity / Table</span>
-                        <span className="text-[#8a6d1f] font-semibold">{selectedLogDetails.data.table_name}</span>
+                        <span className="text-[#15803d] font-semibold">{selectedLogDetails.data.table_name}</span>
                       </div>
                       <div>
                         <span className="text-[10px] text-slate-500 uppercase block mb-0.5">Performed By</span>

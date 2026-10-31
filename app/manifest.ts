@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'Anchor ERP - Premium Payment & Liquidity Management',
     start_url: '/',
     display: 'standalone',
-    background_color: '#f4f5f7',
-    theme_color: '#f4f5f7',
+    background_color: '#f4f6f5',
+    theme_color: '#f4f6f5',
     orientation: 'portrait-primary',
     icons: [
       {

@@ -129,7 +129,7 @@ export default function BankDepositPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" />
       </div>
     }>
       <BankDepositContent />
@@ -584,7 +584,7 @@ function BankDepositContent() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -593,7 +593,7 @@ function BankDepositContent() {
     <div className="min-h-screen bg-white text-slate-900">
       {/* Background ambience */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/4 right-0 w-[500px] h-[500px] bg-[#d4af37]/3 rounded-full filter blur-[150px]" />
+        <div className="absolute top-1/4 right-0 w-[500px] h-[500px] bg-[#1ca34c]/3 rounded-full filter blur-[150px]" />
       </div>
 
       <div className="relative z-10 p-4 md:p-6 lg:p-8 max-w-2xl mx-auto">
@@ -601,13 +601,13 @@ function BankDepositContent() {
         <div className="flex items-center gap-4 mb-6">
           <Link
             href="/dashboard/branch-accounts"
-            className="p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 text-slate-500 hover:text-slate-900 transition-all"
+            className="p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 text-slate-500 hover:text-slate-900 transition-all"
           >
             <ChevronLeft className="w-4 h-4" />
           </Link>
           <div>
             <h1 className="text-xl font-bold font-serif flex items-center gap-2">
-              <PiggyBank className="w-5 h-5 text-[#8a6d1f]" /> Create Bank Deposit
+              <PiggyBank className="w-5 h-5 text-[#15803d]" /> Create Bank Deposit
             </h1>
             <p className="text-[11px] text-slate-500">
               {step === 1 ? 'Select sales period, review daily cash sales, and enter deposit amount' : 'Upload photo of deposit slip/book to complete submission'}
@@ -618,13 +618,13 @@ function BankDepositContent() {
         {/* Step Indicator */}
         <div className="flex items-center justify-between mb-6 p-1 rounded-xl bg-slate-900/[0.04] border border-slate-900/5">
           <div className={`flex-1 py-2 text-center text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${
-            step === 1 ? 'bg-[#d4af37]/20 text-[#8a6d1f] border border-[#d4af37]/30' : 'text-slate-500'
+            step === 1 ? 'bg-[#1ca34c]/20 text-[#15803d] border border-[#1ca34c]/30' : 'text-slate-500'
           }`}>
             1. Period & Amount
           </div>
           <div className="px-2 text-slate-600">→</div>
           <div className={`flex-1 py-2 text-center text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${
-            step === 2 ? 'bg-[#d4af37]/20 text-[#8a6d1f] border border-[#d4af37]/30' : 'text-slate-500'
+            step === 2 ? 'bg-[#1ca34c]/20 text-[#15803d] border border-[#1ca34c]/30' : 'text-slate-500'
           }`}>
             2. Slip Photo & Confirm
           </div>
@@ -638,14 +638,14 @@ function BankDepositContent() {
         )}
         {/* Rejected Deposit Re-application Banner */}
         {rejectedDepositForDate && !existingDepositForDate && (
-          <div className="mb-6 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-200 shadow-xl">
+          <div className="mb-6 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-700 shadow-xl">
             <div className="flex items-start gap-3">
               <div className="p-2 rounded-xl bg-amber-500/20 text-amber-600 shrink-0 mt-0.5">
                 <AlertTriangle className="w-5 h-5" />
               </div>
               <div className="flex-1">
                 <div className="flex items-center justify-between gap-2 flex-wrap">
-                  <h4 className="font-bold text-sm text-amber-300">
+                  <h4 className="font-bold text-sm text-amber-700">
                     পূর্ববর্তী ডিপোজিট প্রত্যাখ্যাত (Previous Deposit Rejected)
                   </h4>
                   <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300">
@@ -678,7 +678,7 @@ function BankDepositContent() {
                 </h4>
                 <p className="text-xs text-slate-600 mt-1">
                   তারিখ: <span className="text-slate-900 font-medium">{form.deposit_date}</span> · পরিমাণ:{' '}
-                  <span className="text-[#8a6d1f] font-semibold">৳{Number(existingDepositForDate.amount || 0).toLocaleString()}</span> · স্ট্যাটাস:{' '}
+                  <span className="text-[#15803d] font-semibold">৳{Number(existingDepositForDate.amount || 0).toLocaleString()}</span> · স্ট্যাটাস:{' '}
                   <span className="uppercase font-bold text-amber-600">{existingDepositForDate.status}</span>
                 </p>
                 <p className="text-[11px] text-rose-600/80 mt-1">
@@ -701,7 +701,7 @@ function BankDepositContent() {
                 onClick={() => handleDateModeChange('single')}
                 className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
                   dateMode === 'single'
-                    ? 'bg-[#d4af37] text-black shadow-lg shadow-[#d4af37]/20'
+                    ? 'bg-[#1ca34c] text-white shadow-lg shadow-[#1ca34c]/20'
                     : 'text-slate-500 hover:text-slate-900'
                 }`}
               >
@@ -712,7 +712,7 @@ function BankDepositContent() {
                 onClick={() => handleDateModeChange('range')}
                 className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
                   dateMode === 'range'
-                    ? 'bg-[#d4af37] text-black shadow-lg shadow-[#d4af37]/20'
+                    ? 'bg-[#1ca34c] text-white shadow-lg shadow-[#1ca34c]/20'
                     : 'text-slate-500 hover:text-slate-900'
                 }`}
               >
@@ -721,15 +721,15 @@ function BankDepositContent() {
             </div>
 
             {/* Date Pickers Card */}
-            <div className="p-5 rounded-2xl bg-slate-900/[0.04] border border-slate-900/5 space-y-4">
+            <div className="p-5 rounded-3xl bg-slate-900/[0.04] border border-slate-900/5 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-[#8a6d1f] flex items-center gap-2">
+                <span className="text-xs font-semibold text-[#15803d] flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
                   {dateMode === 'single' ? 'Select Sales Date' : 'Select Sales Date Range'}
                 </span>
                 {isFetchingLedger && (
                   <span className="text-[10px] text-slate-500 flex items-center gap-1">
-                    <RefreshCw className="w-3 h-3 animate-spin text-[#8a6d1f]" /> Fetching sales...
+                    <RefreshCw className="w-3 h-3 animate-spin text-[#15803d]" /> Fetching sales...
                   </span>
                 )}
               </div>
@@ -744,7 +744,7 @@ function BankDepositContent() {
                       const d = e.target.value
                       setForm(f => ({ ...f, sales_from_date: d, sales_to_date: d }))
                     }}
-                    className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-[#d4af37]/40 transition-colors cursor-pointer [color-scheme:light]"
+                    className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-[#1ca34c]/40 transition-colors cursor-pointer [color-scheme:light]"
                   />
                 </div>
               ) : (
@@ -755,7 +755,7 @@ function BankDepositContent() {
                       type="date"
                       value={form.sales_from_date}
                       onChange={e => setForm(f => ({ ...f, sales_from_date: e.target.value }))}
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-[#d4af37]/40 transition-colors cursor-pointer [color-scheme:light]"
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-[#1ca34c]/40 transition-colors cursor-pointer [color-scheme:light]"
                     />
                   </div>
                   <div>
@@ -764,7 +764,7 @@ function BankDepositContent() {
                       type="date"
                       value={form.sales_to_date}
                       onChange={e => setForm(f => ({ ...f, sales_to_date: e.target.value }))}
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-[#d4af37]/40 transition-colors cursor-pointer [color-scheme:light]"
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-[#1ca34c]/40 transition-colors cursor-pointer [color-scheme:light]"
                     />
                   </div>
                 </div>
@@ -772,9 +772,9 @@ function BankDepositContent() {
             </div>
 
             {/* DAY-BY-DAY SALES BREAKDOWN CARD (Audio Requirement) */}
-            <div className="p-5 rounded-2xl bg-gradient-to-br from-[#d4af37]/10 to-transparent border border-[#d4af37]/20 space-y-3">
-              <div className="flex items-center justify-between border-b border-[#d4af37]/20 pb-2">
-                <span className="text-[10px] uppercase tracking-widest text-[#8a6d1f] font-bold flex items-center gap-1.5">
+            <div className="p-5 rounded-3xl bg-gradient-to-br from-[#1ca34c]/10 to-transparent border border-[#1ca34c]/20 space-y-3">
+              <div className="flex items-center justify-between border-b border-[#1ca34c]/20 pb-2">
+                <span className="text-[10px] uppercase tracking-widest text-[#15803d] font-bold flex items-center gap-1.5">
                   <Layers className="w-3.5 h-3.5" />
                   {dateMode === 'single' ? 'Single Day Sales' : `Daily Sales Breakdown (${currentDates.length} Days)`}
                 </span>
@@ -817,7 +817,7 @@ function BankDepositContent() {
                           value={val}
                           placeholder="0.00"
                           onChange={e => handleDayAmountChange(d, e.target.value)}
-                          className="w-full pl-6 pr-2.5 py-1.5 rounded-lg bg-white border border-slate-900/20 text-slate-900 font-serif font-bold text-xs focus:outline-none focus:border-[#d4af37] text-right transition-colors"
+                          className="w-full pl-6 pr-2.5 py-1.5 rounded-lg bg-white border border-slate-900/20 text-slate-900 font-serif font-bold text-xs focus:outline-none focus:border-[#1ca34c] text-right transition-colors"
                         />
                       </div>
                     </div>
@@ -826,18 +826,18 @@ function BankDepositContent() {
               </div>
 
               {/* Total Accumulated Sum (Auto-calculated) */}
-              <div className="pt-3 border-t border-[#d4af37]/20 flex items-center justify-between">
+              <div className="pt-3 border-t border-[#1ca34c]/20 flex items-center justify-between">
                 <div>
-                  <p className="text-[10px] uppercase tracking-wider text-[#8a6d1f] font-bold">Total Accumulated Cash</p>
+                  <p className="text-[10px] uppercase tracking-wider text-[#15803d] font-bold">Total Accumulated Cash</p>
                   <p className="text-[9px] text-slate-500">Sum of daily cash sales (auto-fills Deposit Amount)</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-2xl font-bold font-serif text-[#8a6d1f]">{fmt(totalCalculatedSales)}</p>
+                  <p className="text-2xl font-bold font-serif text-[#15803d]">{fmt(totalCalculatedSales)}</p>
                   {form.amount !== String(totalCalculatedSales) && totalCalculatedSales > 0 && (
                     <button
                       type="button"
                       onClick={() => setForm(f => ({ ...f, amount: String(totalCalculatedSales) }))}
-                      className="text-[10px] text-[#8a6d1f] underline hover:text-[#8a6d1f]/80 cursor-pointer"
+                      className="text-[10px] text-[#15803d] underline hover:text-[#15803d]/80 cursor-pointer"
                     >
                       Use calculated total
                     </button>
@@ -847,7 +847,7 @@ function BankDepositContent() {
             </div>
 
             {/* Deposit Details Form */}
-            <div className="space-y-4 p-5 rounded-2xl bg-slate-900/[0.04] border border-slate-900/5">
+            <div className="space-y-4 p-5 rounded-3xl bg-slate-900/[0.04] border border-slate-900/5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[10px] uppercase tracking-widest text-slate-500 mb-1.5">Deposit Date *</label>
@@ -855,11 +855,11 @@ function BankDepositContent() {
                     type="date"
                     value={form.deposit_date}
                     onChange={e => setForm(f => ({ ...f, deposit_date: e.target.value }))}
-                    className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-[#d4af37]/40 transition-colors"
+                    className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-[#1ca34c]/40 transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] uppercase tracking-widest text-[#8a6d1f] font-semibold mb-1.5">
+                  <label className="block text-[10px] uppercase tracking-widest text-[#15803d] font-semibold mb-1.5">
                     Deposit Amount (৳) *
                   </label>
                   <input
@@ -869,13 +869,13 @@ function BankDepositContent() {
                     value={form.amount}
                     placeholder="0.00"
                     onChange={e => setForm(f => ({ ...f, amount: e.target.value }))}
-                    className="w-full bg-slate-900/[0.04] border border-[#d4af37]/40 rounded-xl px-3 py-2.5 text-slate-900 font-serif font-bold text-base focus:outline-none focus:border-[#d4af37] transition-colors"
+                    className="w-full bg-slate-900/[0.04] border border-[#1ca34c]/40 rounded-xl px-3 py-2.5 text-slate-900 font-serif font-bold text-base focus:outline-none focus:border-[#1ca34c] transition-colors"
                   />
                   {/* Quick-rounding buttons */}
                   {totalCalculatedSales > 0 && (
                     <div className="flex gap-1.5 mt-2 flex-wrap">
                       <button type="button" onClick={() => handleRoundDeposit('full')}
-                        className="text-[9px] px-2 py-1 rounded-lg bg-[#d4af37]/10 border border-[#d4af37]/20 text-[#8a6d1f] hover:bg-[#d4af37]/20 transition-colors font-bold cursor-pointer">
+                        className="text-[9px] px-2 py-1 rounded-lg bg-[#1ca34c]/10 border border-[#1ca34c]/20 text-[#15803d] hover:bg-[#1ca34c]/20 transition-colors font-bold cursor-pointer">
                         Full Amount
                       </button>
                       {[5000, 1000, 500].map(v => {
@@ -883,7 +883,7 @@ function BankDepositContent() {
                         if (rounded <= 0 || rounded === totalCalculatedSales) return null
                         return (
                           <button key={v} type="button" onClick={() => handleRoundDeposit(v as any)}
-                            className="text-[9px] px-2 py-1 rounded-lg bg-slate-900/[0.04] border border-slate-900/10 text-slate-600 hover:border-[#d4af37]/30 hover:text-[#8a6d1f] transition-colors cursor-pointer">
+                            className="text-[9px] px-2 py-1 rounded-lg bg-slate-900/[0.04] border border-slate-900/10 text-slate-600 hover:border-[#1ca34c]/30 hover:text-[#15803d] transition-colors cursor-pointer">
                             Round ৳{v.toLocaleString()}
                           </button>
                         )
@@ -893,7 +893,7 @@ function BankDepositContent() {
                 </div>
 
                 {existingDepositForDate && (
-                  <div className="col-span-2 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-xs flex items-center gap-2">
+                  <div className="col-span-2 p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 text-xs flex items-center gap-2">
                     <AlertTriangle className="w-4 h-4 shrink-0 text-amber-600" />
                     <span>
                       A bank deposit of <strong>{fmt(existingDepositForDate.amount)}</strong> has already been submitted for {form.deposit_date} ({existingDepositForDate.status}). Only 1 deposit per branch is permitted per day.
@@ -925,7 +925,7 @@ function BankDepositContent() {
                       <div className="text-slate-500 text-lg font-light">−</div>
                       <div>
                         <p className="text-[10px] uppercase tracking-wider font-bold text-slate-500">Bank Deposit</p>
-                        <p className="text-base font-bold font-serif text-[#8a6d1f]">{fmt(Number(form.amount || 0))}</p>
+                        <p className="text-base font-bold font-serif text-[#15803d]">{fmt(Number(form.amount || 0))}</p>
                       </div>
                       <div className="text-slate-500 text-lg font-light">=</div>
                       <div className="text-right">
@@ -935,7 +935,7 @@ function BankDepositContent() {
                           {khuchraAmount > 0 ? '🪙 Khuchra (Drawer)' : '✓ Full Deposit'}
                         </p>
                         <p className={`text-xl font-bold font-serif ${
-                          khuchraAmount > 0 ? 'text-amber-300' : 'text-emerald-600'
+                          khuchraAmount > 0 ? 'text-amber-700' : 'text-emerald-600'
                         }`}>
                           {khuchraAmount > 0 ? fmt(khuchraAmount) : '৳0'}
                         </p>
@@ -953,13 +953,13 @@ function BankDepositContent() {
 
               {/* Bangladeshi Banks Selector & Account Title */}
               <div>
-                <label className="block text-[10px] uppercase tracking-widest text-[#8a6d1f] font-semibold mb-1.5">
+                <label className="block text-[10px] uppercase tracking-widest text-[#15803d] font-semibold mb-1.5">
                   Select Bank (বাংলাদেশের ব্যাংক নির্বাচন করুন) *
                 </label>
                 <select
                   value={selectedBank}
                   onChange={e => handleBankSelect(e.target.value)}
-                  className="w-full bg-white border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-[#d4af37]/40 transition-colors mb-2.5 cursor-pointer"
+                  className="w-full bg-white border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-[#1ca34c]/40 transition-colors mb-2.5 cursor-pointer"
                 >
                   <option value="">-- Select Bank (ব্যাংক নির্বাচন করুন) --</option>
                   {BD_BANKS.map(b => (
@@ -975,7 +975,7 @@ function BankDepositContent() {
                   value={form.bank_account_name}
                   placeholder="e.g. Anchor Fashion Main Account — BRAC Bank PLC"
                   onChange={e => setForm(f => ({ ...f, bank_account_name: e.target.value }))}
-                  className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-[#d4af37]/40 transition-colors"
+                  className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-[#1ca34c]/40 transition-colors"
                 />
               </div>
 
@@ -987,7 +987,7 @@ function BankDepositContent() {
                     value={form.deposit_slip_number}
                     placeholder="e.g. DEP-2026-001"
                     onChange={e => setForm(f => ({ ...f, deposit_slip_number: e.target.value }))}
-                    className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/40 transition-colors"
+                    className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-colors"
                   />
                 </div>
                 <div>
@@ -997,7 +997,7 @@ function BankDepositContent() {
                     value={form.bank_transaction_id}
                     placeholder="e.g. TXN98765432"
                     onChange={e => setForm(f => ({ ...f, bank_transaction_id: e.target.value }))}
-                    className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/40 transition-colors"
+                    className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-colors"
                   />
                 </div>
               </div>
@@ -1008,7 +1008,7 @@ function BankDepositContent() {
               type="button"
               onClick={handleProceedToPhoto}
               disabled={Boolean(existingDepositForDate)}
-              className="w-full py-4 rounded-xl bg-gradient-to-r from-[#d4af37] to-white text-black font-bold text-sm uppercase tracking-widest hover:opacity-95 transition-all shadow-lg shadow-[#d4af37]/15 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full py-4 rounded-full bg-[#1ca34c] hover:bg-[#15803d] text-white font-bold text-sm uppercase tracking-widest hover:opacity-95 transition-all shadow-lg shadow-[#1ca34c]/15 cursor-pointer flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {existingDepositForDate ? 'Deposit Already Recorded for this Date' : `Deposit ${form.amount ? `(${fmt(Number(form.amount))})` : ''} →`}
             </button>
@@ -1028,7 +1028,7 @@ function BankDepositContent() {
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">Sales Period:</span>
-                <span className="text-[#8a6d1f] font-semibold">{form.sales_from_date} → {form.sales_to_date}</span>
+                <span className="text-[#15803d] font-semibold">{form.sales_from_date} → {form.sales_to_date}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">Bank Account:</span>
@@ -1037,8 +1037,8 @@ function BankDepositContent() {
             </div>
 
             {/* Big Photo Uploader Card */}
-            <div className="p-6 rounded-2xl border-2 border-dashed border-[#d4af37]/40 bg-[#d4af37]/5 text-center space-y-4">
-              <div className="w-14 h-14 mx-auto rounded-2xl bg-[#d4af37]/15 border border-[#d4af37]/30 flex items-center justify-center text-[#8a6d1f]">
+            <div className="p-6 rounded-3xl border-2 border-dashed border-[#1ca34c]/40 bg-[#1ca34c]/5 text-center space-y-4">
+              <div className="w-14 h-14 mx-auto rounded-2xl bg-[#1ca34c]/15 border border-[#1ca34c]/30 flex items-center justify-center text-[#15803d]">
                 <Camera className="w-7 h-7" />
               </div>
 
@@ -1051,7 +1051,7 @@ function BankDepositContent() {
 
               {/* Image Preview if selected */}
               {slipPreview ? (
-                <div className="relative inline-block max-w-sm rounded-xl overflow-hidden border border-[#d4af37]/40 shadow-xl">
+                <div className="relative inline-block max-w-sm rounded-xl overflow-hidden border border-[#1ca34c]/40 shadow-xl">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={slipPreview} alt="Deposit Slip Preview" className="max-h-56 object-contain mx-auto" />
                   <button
@@ -1069,7 +1069,7 @@ function BankDepositContent() {
               ) : (
                 <div className="space-y-3">
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-                    <label className="w-full sm:w-auto px-5 py-3 rounded-xl bg-[#d4af37] hover:bg-[#c5a02e] text-black font-bold text-xs uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 shadow-md">
+                    <label className="w-full sm:w-auto px-5 py-3 rounded-full bg-[#1ca34c] hover:bg-[#15803d] text-white font-bold text-xs uppercase tracking-wider transition-all cursor-pointer flex items-center justify-center gap-2 shadow-md">
                       <Camera className="w-4 h-4" /> Take Photo (Camera)
                       <input
                         type="file"
@@ -1090,7 +1090,7 @@ function BankDepositContent() {
                     </label>
                   </div>
                   {isCompressing && (
-                    <p className="text-[11px] text-[#8a6d1f] animate-pulse">⚡ Optimizing photo for ultra-fast upload...</p>
+                    <p className="text-[11px] text-[#15803d] animate-pulse">⚡ Optimizing photo for ultra-fast upload...</p>
                   )}
                 </div>
               )}
@@ -1111,7 +1111,7 @@ function BankDepositContent() {
                 type="button"
                 onClick={handleSubmitDeposit}
                 disabled={isSubmitting || !slipFile}
-                className="flex-1 py-3.5 rounded-xl bg-gradient-to-r from-[#d4af37] to-white text-black font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-[#d4af37]/15 cursor-pointer"
+                className="flex-1 py-3.5 rounded-full bg-[#1ca34c] hover:bg-[#15803d] text-white font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-[#1ca34c]/15 cursor-pointer"
               >
                 {isSubmitting ? (
                   <>

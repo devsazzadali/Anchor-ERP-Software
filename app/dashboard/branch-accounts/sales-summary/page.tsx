@@ -68,7 +68,7 @@ export default function SalesSummaryPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -77,7 +77,7 @@ export default function SalesSummaryPage() {
     (ledger?.nagad_sales || 0) + (ledger?.rocket_sales || 0) + (ledger?.card_sales || 0) + (ledger?.bank_transfer_sales || 0)
 
   const paymentBreakdown = [
-    { label: 'Cash',          value: ledger?.cash_sales || 0,           icon: Banknote,       color: 'text-[#8a6d1f]',   bg: 'bg-[#d4af37]/10 border-[#d4af37]/20' },
+    { label: 'Cash',          value: ledger?.cash_sales || 0,           icon: Banknote,       color: 'text-[#15803d]',   bg: 'bg-[#1ca34c]/10 border-[#1ca34c]/20' },
     { label: 'bKash',         value: ledger?.bkash_sales || 0,          icon: CreditCard,     color: 'text-pink-400',    bg: 'bg-pink-500/10 border-pink-500/20' },
     { label: 'Nagad',         value: ledger?.nagad_sales || 0,          icon: CreditCard,     color: 'text-orange-600',  bg: 'bg-orange-500/10 border-orange-500/20' },
     { label: 'Rocket',        value: ledger?.rocket_sales || 0,         icon: CreditCard,     color: 'text-purple-600',  bg: 'bg-purple-500/10 border-purple-500/20' },
@@ -88,14 +88,14 @@ export default function SalesSummaryPage() {
   return (
     <div className="min-h-screen bg-white text-slate-900">
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-0 right-1/3 w-[500px] h-[300px] bg-[#d4af37]/3 rounded-full filter blur-[130px]" />
+        <div className="absolute top-0 right-1/3 w-[500px] h-[300px] bg-[#1ca34c]/3 rounded-full filter blur-[130px]" />
       </div>
 
       <div className="relative z-10 p-4 md:p-6 lg:p-8 max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Link href="/dashboard/branch-accounts"
-            className="p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 text-slate-500 hover:text-slate-900 transition-all"
+            className="p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 text-slate-500 hover:text-slate-900 transition-all"
           >
             <ChevronLeft className="w-4 h-4" />
           </Link>
@@ -104,7 +104,7 @@ export default function SalesSummaryPage() {
             <p className="text-[11px] text-slate-500">Payment method breakdown for selected date</p>
           </div>
           <button onClick={handleRefresh}
-            className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'animate-spin text-[#8a6d1f]' : ''}`}
+            className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'animate-spin text-[#15803d]' : ''}`}
           >
             <RefreshCw className="w-4 h-4" />
           </button>
@@ -113,7 +113,7 @@ export default function SalesSummaryPage() {
         {/* Date selector */}
         <div className="mb-6 flex items-center gap-3">
           <div className="flex items-center gap-2 bg-slate-900/[0.04] border border-slate-900/5 rounded-xl px-4 py-2.5">
-            <Calendar className="w-4 h-4 text-[#8a6d1f]" />
+            <Calendar className="w-4 h-4 text-[#15803d]" />
             <input
               type="date"
               value={selectedDate}
@@ -130,9 +130,9 @@ export default function SalesSummaryPage() {
         )}
 
         {/* Total Sales Hero */}
-        <div className="mb-6 p-6 rounded-2xl bg-gradient-to-br from-[#d4af37]/15 to-[#d4af37]/3 border border-[#d4af37]/20 text-center">
-          <p className="text-[10px] uppercase tracking-widest text-[#8a6d1f]/70 mb-2">Total Sales — {selectedDate}</p>
-          <p className="text-4xl font-bold tracking-tight text-slate-900">{fmt(totalSales)}</p>
+        <div className="mb-6 p-6 rounded-3xl bg-gradient-to-br from-[#1ca34c]/15 to-[#1ca34c]/3 border border-[#1ca34c]/20 text-center">
+          <p className="text-[10px] uppercase tracking-widest text-[#15803d]/70 mb-2">Total Sales — {selectedDate}</p>
+          <p className="text-4xl font-extrabold tracking-tight text-slate-900">{fmt(totalSales)}</p>
           {!ledger && <p className="text-[11px] text-slate-500 mt-2">No ledger entry for this date. Sales data will appear once the ledger is created.</p>}
         </div>
 
@@ -141,7 +141,7 @@ export default function SalesSummaryPage() {
           {paymentBreakdown.map(({ label, value, icon: Icon, color, bg }) => {
             const pct = totalSales > 0 ? ((value / totalSales) * 100).toFixed(1) : '0.0'
             return (
-              <div key={label} className={`p-5 rounded-2xl border ${bg}`}>
+              <div key={label} className={`p-5 rounded-3xl border ${bg}`}>
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <Icon className={`w-4 h-4 ${color}`} />
@@ -149,7 +149,7 @@ export default function SalesSummaryPage() {
                   </div>
                   <span className={`text-[10px] font-bold ${color}`}>{pct}%</span>
                 </div>
-                <p className="text-xl font-bold text-slate-900 tracking-tight">{fmt(value)}</p>
+                <p className="text-xl font-extrabold text-slate-900 tracking-tight">{fmt(value)}</p>
                 {/* Progress bar */}
                 <div className="mt-3 h-1 bg-slate-900/[0.04] rounded-full overflow-hidden">
                   <div
@@ -164,7 +164,7 @@ export default function SalesSummaryPage() {
 
         {/* Cash Flow Summary */}
         {ledger && (
-          <div className="rounded-2xl border border-slate-900/5 bg-slate-900/[0.04] p-6">
+          <div className="rounded-3xl border border-slate-900/5 bg-slate-900/[0.04] p-6">
             <h3 className="text-[10px] uppercase tracking-widest text-slate-500 mb-4 font-semibold">Cash Flow</h3>
             <div className="space-y-3">
               {[
@@ -183,7 +183,7 @@ export default function SalesSummaryPage() {
               ))}
               <div className="flex items-center justify-between pt-3">
                 <span className="text-sm font-bold text-slate-900">Expected Closing Cash</span>
-                <span className="text-lg font-bold text-[#8a6d1f] tracking-tight">{fmt(ledger.expected_closing_cash || 0)}</span>
+                <span className="text-lg font-bold text-[#15803d] tracking-tight">{fmt(ledger.expected_closing_cash || 0)}</span>
               </div>
               {ledger.is_closed && (
                 <div className="flex items-center justify-between pt-1 border-t border-slate-900/5">

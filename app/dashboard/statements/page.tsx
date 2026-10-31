@@ -176,24 +176,27 @@ export default function StatementsPage() {
   return (
     <div className="min-h-screen flex bg-white text-slate-900 font-sans md:ml-64">
       {/* Neon gold background */}
-      <div className="absolute top-[-10%] left-[20%] w-[50%] h-[50%] bg-[#d4af37]/3 rounded-full filter blur-[150px] pointer-events-none" />
+      <div className="absolute top-[-10%] left-[20%] w-[50%] h-[50%] bg-[#1ca34c]/3 rounded-full filter blur-[150px] pointer-events-none" />
       
       <div className="flex-1 flex flex-col p-6 overflow-y-auto max-h-screen relative z-10">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 pb-4 border-b border-slate-900/5 gap-4">
-          <div>
-            <h2 className="text-xl font-bold tracking-tight text-slate-900 font-serif">
+          <div className="flex items-start gap-3">
+            <span className="w-1.5 h-9 rounded-full bg-[#1ca34c] shrink-0" />
+            <div>
+            <h2 className="text-xl font-extrabold tracking-tight text-slate-900 font-serif">
               Statements for <span className="premium-text-gradient">{userName}</span>
             </h2>
             <p className="text-[11px] text-slate-500">Historic payment statements.</p>
+            </div>
           </div>
           <div className="flex gap-2">
-            <button onClick={exportCSV} className="px-3 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/30 text-slate-500 hover:text-[#8a6d1f] transition-all cursor-pointer flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider" title="Export CSV">
+            <button onClick={exportCSV} className="px-3 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/30 text-slate-500 hover:text-[#15803d] transition-all cursor-pointer flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider" title="Export CSV">
               <FileText className="w-3.5 h-3.5" /> <span className="hidden sm:inline">CSV</span>
             </button>
-            <button onClick={exportExcel} className="px-3 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/30 text-slate-500 hover:text-[#8a6d1f] transition-all cursor-pointer flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider" title="Export Excel">
+            <button onClick={exportExcel} className="px-3 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/30 text-slate-500 hover:text-[#15803d] transition-all cursor-pointer flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider" title="Export Excel">
               <FileSpreadsheet className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Excel</span>
             </button>
-            <button onClick={exportPDF} className="px-3 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/30 text-slate-500 hover:text-[#8a6d1f] transition-all cursor-pointer flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider" title="Export PDF">
+            <button onClick={exportPDF} className="px-3 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/30 text-slate-500 hover:text-[#15803d] transition-all cursor-pointer flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider" title="Export PDF">
               <Download className="w-3.5 h-3.5" /> <span className="hidden sm:inline">PDF</span>
             </button>
 
@@ -201,7 +204,7 @@ export default function StatementsPage() {
 
             <button
               onClick={handleRefresh}
-              className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'animate-spin text-[#8a6d1f]' : ''}`}
+              className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'animate-spin text-[#15803d]' : ''}`}
             >
               <RefreshCw className="w-4 h-4" />
             </button>
@@ -214,7 +217,7 @@ export default function StatementsPage() {
             onClick={() => setActiveTab('payout_request')}
             className={`px-4 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all ${
               activeTab === 'payout_request'
-                ? 'bg-[#d4af37] text-black shadow-lg shadow-[#d4af37]/20'
+                ? 'bg-[#1ca34c] text-white shadow-lg shadow-[#1ca34c]/20'
                 : 'text-slate-500 hover:text-slate-900 hover:bg-slate-900/[0.04]'
             }`}
           >
@@ -224,7 +227,7 @@ export default function StatementsPage() {
             onClick={() => setActiveTab('value_transfer')}
             className={`px-4 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all ${
               activeTab === 'value_transfer'
-                ? 'bg-[#d4af37] text-black shadow-lg shadow-[#d4af37]/20'
+                ? 'bg-[#1ca34c] text-white shadow-lg shadow-[#1ca34c]/20'
                 : 'text-slate-500 hover:text-slate-900 hover:bg-slate-900/[0.04]'
             }`}
           >
@@ -265,7 +268,7 @@ export default function StatementsPage() {
                       <button
                         type="button"
                         onClick={() => exportIndividualStatementPDF(s)}
-                        className="px-2.5 py-1 rounded-lg bg-[#d4af37]/10 hover:bg-[#d4af37]/20 border border-[#d4af37]/30 text-[#8a6d1f] text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1 transition-all cursor-pointer shadow-sm"
+                        className="px-2.5 py-1 rounded-lg bg-[#1ca34c]/10 hover:bg-[#1ca34c]/20 border border-[#1ca34c]/30 text-[#15803d] text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1 transition-all cursor-pointer shadow-sm"
                       >
                         <Download className="w-3 h-3" />
                         Export PDF

@@ -444,7 +444,7 @@ export default function AdminBranchChalansPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -453,7 +453,7 @@ export default function AdminBranchChalansPage() {
   return (
     <div className="min-h-screen w-full bg-white text-slate-900 font-sans relative">
       {/* Ambient glows */}
-      <div className="absolute top-[-5%] right-[-5%] w-[40%] h-[40%] bg-[#d4af37]/3 rounded-full filter blur-[120px] pointer-events-none" />
+      <div className="absolute top-[-5%] right-[-5%] w-[40%] h-[40%] bg-[#1ca34c]/3 rounded-full filter blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-5%] left-[10%] w-[50%] h-[50%] bg-indigo-500/3 rounded-full filter blur-[150px] pointer-events-none" />
 
       <div className="relative z-10 flex flex-col p-4 md:p-6 max-h-screen overflow-y-auto custom-scrollbar">
@@ -461,10 +461,10 @@ export default function AdminBranchChalansPage() {
         {/* ── Page Header ── */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 pb-4 border-b border-slate-900/5">
           <div>
-            <span className="text-[10px] bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider inline-flex items-center gap-1 mb-1">
+            <span className="text-[10px] bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider inline-flex items-center gap-1 mb-1">
               <Package className="w-3 h-3" /> Branch Dispatch
             </span>
-            <h1 className="text-xl font-bold tracking-tight text-slate-900 font-serif">Branch Product Chalans</h1>
+            <h1 className="text-xl font-extrabold tracking-tight text-slate-900 font-serif flex items-center gap-3"><span className="w-1.5 h-8 rounded-full bg-[#1ca34c] shrink-0" />Branch Product Chalans</h1>
             <p className="text-[11px] text-slate-500 mt-0.5">Create, manage, and export product dispatch chalans for all branches.</p>
           </div>
           <div className="flex items-center gap-3">
@@ -472,7 +472,7 @@ export default function AdminBranchChalansPage() {
               <select
                 value={monthFilter}
                 onChange={e => setMonthFilter(e.target.value)}
-                className="bg-slate-900/[0.04] border border-slate-900/5 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#d4af37]/40 transition-all cursor-pointer"
+                className="bg-slate-900/[0.04] border border-slate-900/5 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 transition-all cursor-pointer"
               >
                 <option value="all" className="bg-white text-slate-900">All Time</option>
                 {Array.from(new Set(chalans.map(c => c.created_at.slice(0, 7)))).sort().reverse().map(m => (
@@ -484,7 +484,7 @@ export default function AdminBranchChalansPage() {
             )}
             <button
               onClick={handleRefresh}
-              className={`p-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 text-slate-500 hover:text-slate-900 transition-all ${isRefreshing ? 'animate-spin text-[#8a6d1f]' : ''}`}
+              className={`p-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 text-slate-500 hover:text-slate-900 transition-all ${isRefreshing ? 'animate-spin text-[#15803d]' : ''}`}
             >
               <RefreshCw className="w-4 h-4" />
             </button>
@@ -515,9 +515,9 @@ export default function AdminBranchChalansPage() {
               {[
                 { label: 'Total Chalans',     value: overallStats.totalChalans,                               cls: 'text-slate-900',      icon: ClipboardList, bg: 'bg-slate-900/[0.04] border-slate-900/5' },
                 { label: 'Total Line Items',  value: overallStats.totalItems,                                 cls: 'text-indigo-600', icon: Package,       bg: 'bg-indigo-500/5 border-indigo-500/10' },
-                { label: 'Total Dispatched',  value: `৳ ${overallStats.totalAmount.toLocaleString('en-BD')}`, cls: 'text-[#8a6d1f]',  icon: Banknote,      bg: 'bg-[#d4af37]/5 border-[#d4af37]/10' },
+                { label: 'Total Dispatched',  value: `৳ ${overallStats.totalAmount.toLocaleString('en-BD')}`, cls: 'text-[#15803d]',  icon: Banknote,      bg: 'bg-[#1ca34c]/5 border-[#1ca34c]/10' },
               ].map(item => (
-                <div key={item.label} className={`p-4 rounded-2xl border flex items-center gap-3 ${item.bg}`}>
+                <div key={item.label} className={`p-4 rounded-3xl border flex items-center gap-3 ${item.bg}`}>
                   <div className="w-9 h-9 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 flex items-center justify-center flex-shrink-0">
                     <item.icon className={`w-4 h-4 ${item.cls}`} />
                   </div>
@@ -530,7 +530,7 @@ export default function AdminBranchChalansPage() {
             </div>
 
             {/* Branch list */}
-            <div className="rounded-2xl border border-slate-900/[0.08] overflow-hidden bg-slate-900/[0.05]">
+            <div className="rounded-3xl border border-slate-900/[0.08] overflow-hidden bg-slate-900/[0.05]">
               {/* List header */}
               <div className="hidden md:flex items-center px-5 py-3 border-b border-slate-900/[0.08] bg-slate-900/[0.04]">
                 <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-slate-600 flex-1">Branch</span>
@@ -547,24 +547,24 @@ export default function AdminBranchChalansPage() {
                   return (
                     <motion.button
                       key={b.id}
-                      whileHover={{ backgroundColor: 'rgba(212,175,55,0.03)' }}
+                      whileHover={{ backgroundColor: 'rgba(28,163,76,0.03)' }}
                       whileTap={{ scale: 0.995 }}
                       onClick={() => goToBranch(b)}
                       className={`w-full flex items-center px-5 py-4 cursor-pointer group transition-colors text-left ${idx < branches.length - 1 ? 'border-b border-slate-900/[0.08]' : ''}`}
                     >
                       <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <div className="w-8 h-8 rounded-xl bg-[#d4af37]/8 flex items-center justify-center flex-shrink-0">
-                          <MapPin className="w-3.5 h-3.5 text-[#8a6d1f]" />
+                        <div className="w-8 h-8 rounded-xl bg-[#1ca34c]/8 flex items-center justify-center flex-shrink-0">
+                          <MapPin className="w-3.5 h-3.5 text-[#15803d]" />
                         </div>
                         <div className="min-w-0">
-                          <div className="text-sm font-semibold text-slate-900 group-hover:text-[#8a6d1f] transition-colors truncate">{b.name}</div>
+                          <div className="text-sm font-semibold text-slate-900 group-hover:text-[#15803d] transition-colors truncate">{b.name}</div>
                           <div className="text-[10px] text-slate-600 mt-0.5">{st.count === 0 ? 'No chalans yet' : `${st.count} chalan${st.count !== 1 ? 's' : ''}`}</div>
                         </div>
                       </div>
                       <div className="hidden md:block w-28 text-right text-sm font-semibold text-slate-900">{st.count > 0 ? st.count : <span className="text-slate-600 font-normal text-xs">—</span>}</div>
-                      <div className="hidden md:block w-36 text-right text-sm font-bold text-[#8a6d1f]">{st.totalAmount > 0 ? `৳${st.totalAmount.toLocaleString('en-BD')}` : <span className="text-slate-600 font-normal text-xs">—</span>}</div>
+                      <div className="hidden md:block w-36 text-right text-sm font-bold text-[#15803d]">{st.totalAmount > 0 ? `৳${st.totalAmount.toLocaleString('en-BD')}` : <span className="text-slate-600 font-normal text-xs">—</span>}</div>
                       <div className="w-8 flex justify-end">
-                        <ChevronRight className="w-4 h-4 text-slate-700 group-hover:text-[#8a6d1f] transition-colors" />
+                        <ChevronRight className="w-4 h-4 text-slate-700 group-hover:text-[#15803d] transition-colors" />
                       </div>
                     </motion.button>
                   )
@@ -584,13 +584,13 @@ export default function AdminBranchChalansPage() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => goToBranch(null)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 text-slate-600 hover:text-slate-900 hover:border-[#d4af37]/30 transition-all text-xs font-semibold cursor-pointer"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 text-slate-600 hover:text-slate-900 hover:border-[#1ca34c]/30 transition-all text-xs font-semibold cursor-pointer"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" /> Back to Branches
                 </button>
                 <div>
                   <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-[#8a6d1f]" />
+                    <MapPin className="w-4 h-4 text-[#15803d]" />
                     <h2 className="text-lg font-bold font-serif text-slate-900">{selectedBranch.name}</h2>
                   </div>
                   <p className="text-[10px] text-slate-500 mt-0.5">
@@ -606,14 +606,14 @@ export default function AdminBranchChalansPage() {
                   <input
                     type="text" placeholder="Search chalans..."
                     value={search} onChange={e => setSearch(e.target.value)}
-                    className="bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-2 pl-9 pr-3 text-[11px] placeholder-slate-600 text-slate-900 focus:outline-none focus:border-[#d4af37]/40 transition-all w-44"
+                    className="bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-2 pl-9 pr-3 text-[11px] placeholder-slate-600 text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 transition-all w-44"
                   />
                 </div>
 
                 {/* New Chalan */}
                 <button
                   onClick={() => { resetForm(); setShowNewModal(true) }}
-                  className="bg-gradient-to-r from-[#d4af37] to-white text-black font-semibold px-3 py-2 rounded-xl text-xs tracking-wider uppercase flex items-center gap-1.5 shadow-lg shadow-[#d4af37]/10 active:scale-95 transition-transform"
+                  className="bg-[#1ca34c] text-white font-semibold px-3 py-2 rounded-full text-xs tracking-wider uppercase flex items-center gap-1.5 shadow-lg shadow-[#1ca34c]/10 active:scale-95 transition-transform"
                 >
                   <Plus className="w-3.5 h-3.5" /> New Chalan
                 </button>
@@ -621,7 +621,7 @@ export default function AdminBranchChalansPage() {
             </div>
 
             {/* Chalan list */}
-            <div className="rounded-2xl border border-slate-900/[0.08] overflow-hidden bg-slate-900/[0.05]">
+            <div className="rounded-3xl border border-slate-900/[0.08] overflow-hidden bg-slate-900/[0.05]">
               {/* List header */}
               <div className="hidden md:grid grid-cols-[1fr_160px_140px_220px] items-center px-5 py-3 border-b border-slate-900/[0.08] bg-slate-900/[0.04] gap-4">
                 {['Chalan Ref', 'Date', 'Grand Total', 'Actions'].map(h => (
@@ -647,8 +647,8 @@ export default function AdminBranchChalansPage() {
                     {/* Top row (mobile) / Col 1 (desktop): Ref & Notes */}
                     <div className="flex justify-between items-start w-full md:w-auto min-w-0">
                       <div className="flex items-start gap-3 w-full">
-                        <div className="w-8 h-8 mt-0.5 rounded-lg bg-[#d4af37]/10 border border-[#d4af37]/20 flex items-center justify-center flex-shrink-0">
-                          <Hash className="w-3.5 h-3.5 text-[#8a6d1f]" />
+                        <div className="w-8 h-8 mt-0.5 rounded-lg bg-[#1ca34c]/10 border border-[#1ca34c]/20 flex items-center justify-center flex-shrink-0">
+                          <Hash className="w-3.5 h-3.5 text-[#15803d]" />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-bold text-slate-900 font-mono truncate">{chalan.chalan_ref || chalan.id.slice(0, 8).toUpperCase()}</p>
@@ -657,7 +657,7 @@ export default function AdminBranchChalansPage() {
                           <div className="flex flex-wrap gap-1.5 mt-2">
                             {(chalan.items ?? []).map((it, i) => (
                               <span key={i} className="text-[9px] bg-slate-900/[0.04] border border-slate-900/5 text-slate-500 px-1.5 py-0.5 rounded-md">
-                                {it.code ? <span className="text-[#8a6d1f] font-mono">{it.code} </span> : null}{it.name} ×{it.quantity}
+                                {it.code ? <span className="text-[#15803d] font-mono">{it.code} </span> : null}{it.name} ×{it.quantity}
                               </span>
                             ))}
                           </div>
@@ -680,7 +680,7 @@ export default function AdminBranchChalansPage() {
                       {/* Total */}
                       <div className="text-left md:text-right">
                         <span className="text-xs text-slate-500 block md:hidden mb-0.5 uppercase tracking-wider font-bold">Total</span>
-                        <span className="text-sm font-bold text-[#8a6d1f]">৳ {Number(chalan.total_amount).toLocaleString('en-BD')}</span>
+                        <span className="text-sm font-bold text-[#15803d]">৳ {Number(chalan.total_amount).toLocaleString('en-BD')}</span>
                       </div>
 
                       {/* Actions */}
@@ -695,7 +695,7 @@ export default function AdminBranchChalansPage() {
                         <button
                           onClick={() => exportPdf(chalan)}
                           title="Export PDF"
-                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#d4af37]/10 border border-[#d4af37]/20 text-[#8a6d1f] hover:bg-[#d4af37]/20 transition-all text-[10px] font-bold uppercase tracking-wider"
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#1ca34c]/10 border border-[#1ca34c]/20 text-[#15803d] hover:bg-[#1ca34c]/20 transition-all text-[10px] font-bold uppercase tracking-wider"
                         >
                           <Download className="w-3 h-3" /> <span className="hidden sm:inline">PDF</span>
                         </button>
@@ -735,13 +735,13 @@ export default function AdminBranchChalansPage() {
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.96, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96, y: 20 }}
-              className="w-full max-w-xl bg-white border border-slate-900/10 rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+              className="w-full max-w-xl bg-white border border-slate-900/10 rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
             >
               {/* Modal Header */}
               <div className="p-5 border-b border-slate-900/5 flex items-center justify-between shrink-0">
                 <div>
                   <h2 className="text-base font-bold text-slate-900 font-serif flex items-center gap-2">
-                    <Package className="w-4 h-4 text-[#8a6d1f]" /> New Product Chalan
+                    <Package className="w-4 h-4 text-[#15803d]" /> New Product Chalan
                   </h2>
                   <p className="text-[10px] text-slate-500 mt-0.5 flex items-center gap-1">
                     <Building2 className="w-3 h-3" /> Branch: {selectedBranch.name}
@@ -786,32 +786,32 @@ export default function AdminBranchChalansPage() {
                                   if (e.target.closest('#new-chalan-form')) updateItem(idx, 'code', e.target.value);
                                   else if (typeof updateEditItem !== 'undefined') updateEditItem(idx, 'code', e.target.value);
                                 }}
-                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all w-full font-mono"
+                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all w-full font-mono"
                               />
                               <input
                                 type="text"
                                 placeholder={`e.g. Shirt, Dress`}
                                 value={item.name}
                                 onChange={e => updateItem(idx, 'name', e.target.value)}
-                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all w-full"
+                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all w-full"
                               />
                               <input
                                 type="number" min="1" step="1" placeholder="0"
                                 value={item.quantity}
                                 onChange={e => updateItem(idx, 'quantity', e.target.value)}
-                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all text-center w-full"
+                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-center w-full"
                               />
                               <input
                                 type="number" min="0" step="0.01" placeholder="0"
                                 value={item.cost_price}
                                 onChange={e => updateItem(idx, 'cost_price', e.target.value)}
-                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all text-right w-full"
+                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-right w-full"
                               />
                               <input
                                 type="number" min="0" step="0.01" placeholder="0"
                                 value={item.sale_price}
                                 onChange={e => updateItem(idx, 'sale_price', e.target.value)}
-                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all text-right w-full"
+                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-right w-full"
                               />
                               <button
                                 type="button"
@@ -825,7 +825,7 @@ export default function AdminBranchChalansPage() {
                             {/* Row subtotal */}
                             {(rowCost > 0 || rowSale > 0) && (
                               <div className="text-right text-[10px] text-slate-500 pr-9 mt-0.5">
-                                Cost: <span className="text-slate-900 font-semibold">৳{rowCost.toLocaleString('en-BD')}</span> | Sale: <span className="text-[#8a6d1f] font-semibold">৳{rowSale.toLocaleString('en-BD')}</span>
+                                Cost: <span className="text-slate-900 font-semibold">৳{rowCost.toLocaleString('en-BD')}</span> | Sale: <span className="text-[#15803d] font-semibold">৳{rowSale.toLocaleString('en-BD')}</span>
                               </div>
                             )}
                           </div>
@@ -837,7 +837,7 @@ export default function AdminBranchChalansPage() {
                     <button
                       type="button"
                       onClick={addItemRow}
-                      className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-xl border border-dashed border-slate-900/10 hover:border-[#d4af37]/30 text-slate-500 hover:text-[#8a6d1f] text-[10px] font-semibold uppercase tracking-wider transition-all"
+                      className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-xl border border-dashed border-slate-900/10 hover:border-[#1ca34c]/30 text-slate-500 hover:text-[#15803d] text-[10px] font-semibold uppercase tracking-wider transition-all"
                     >
                       <Plus className="w-3 h-3" /> Add Product Row
                     </button>
@@ -849,9 +849,9 @@ export default function AdminBranchChalansPage() {
                       <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Total Cost</span>
                       <span className="text-xl font-bold text-slate-900">৳ {grandTotalCost.toLocaleString('en-BD')}</span>
                     </div>
-                    <div className="p-4 rounded-xl bg-[#d4af37]/5 border border-[#d4af37]/15 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+                    <div className="p-4 rounded-xl bg-[#1ca34c]/5 border border-[#1ca34c]/15 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
                       <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Total Sale</span>
-                      <span className="text-xl font-bold text-[#8a6d1f]">৳ {grandTotalSale.toLocaleString('en-BD')}</span>
+                      <span className="text-xl font-bold text-[#15803d]">৳ {grandTotalSale.toLocaleString('en-BD')}</span>
                     </div>
                   </div>
 
@@ -863,7 +863,7 @@ export default function AdminBranchChalansPage() {
                     <textarea
                       placeholder="e.g. Dispatched for Eid season, special delivery..."
                       value={formNotes} onChange={e => setFormNotes(e.target.value)} rows={2}
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all resize-none"
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all resize-none"
                     />
                   </div>
                 </form>
@@ -879,7 +879,7 @@ export default function AdminBranchChalansPage() {
                 </button>
                 <button
                   type="submit" form="new-chalan-form" disabled={isSubmitting || computedItems.length === 0}
-                  className="flex-1 bg-gradient-to-r from-[#d4af37] to-white text-black font-bold px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-[#d4af37]/10 active:scale-95 transition-transform disabled:opacity-50"
+                  className="flex-1 bg-[#1ca34c] text-white font-bold px-4 py-2.5 rounded-full text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-[#1ca34c]/10 active:scale-95 transition-transform disabled:opacity-50"
                 >
                   {isSubmitting ? (
                     <><Loader2 className="w-3.5 h-3.5 animate-spin" />Saving...</>
@@ -904,7 +904,7 @@ export default function AdminBranchChalansPage() {
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-sm bg-white border border-rose-500/20 rounded-2xl p-6 shadow-2xl text-center"
+              className="w-full max-w-sm bg-white border border-rose-500/20 rounded-3xl p-6 shadow-2xl text-center"
             >
               <div className="w-12 h-12 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mx-auto mb-4">
                 <Trash2 className="w-5 h-5 text-rose-600" />
@@ -943,7 +943,7 @@ export default function AdminBranchChalansPage() {
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.96, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96, y: 20 }}
-              className="w-full max-w-2xl bg-white border border-emerald-500/20 rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+              className="w-full max-w-2xl bg-white border border-emerald-500/20 rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
             >
               {/* Header */}
               <div className="p-5 border-b border-slate-900/5 flex items-center justify-between shrink-0 bg-emerald-500/5">
@@ -958,7 +958,7 @@ export default function AdminBranchChalansPage() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => exportPdf(viewingChalan)}
-                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#d4af37]/10 border border-[#d4af37]/20 text-[#8a6d1f] hover:bg-[#d4af37]/20 transition-all text-[10px] font-bold uppercase tracking-wider"
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#1ca34c]/10 border border-[#1ca34c]/20 text-[#15803d] hover:bg-[#1ca34c]/20 transition-all text-[10px] font-bold uppercase tracking-wider"
                   >
                     <Download className="w-3 h-3" /> PDF
                   </button>
@@ -1016,13 +1016,13 @@ export default function AdminBranchChalansPage() {
                       <div className="px-3 py-3 text-right text-xs text-slate-600">
                         ৳{Number(item.cost_price).toLocaleString('en-BD')}
                       </div>
-                      <div className="px-3 py-3 text-right text-xs text-[#8a6d1f] font-semibold">
+                      <div className="px-3 py-3 text-right text-xs text-[#15803d] font-semibold">
                         ৳{Number(item.sale_price).toLocaleString('en-BD')}
                       </div>
                       <div className="px-3 py-3 text-right text-xs text-slate-500">
                         ৳{Number(item.total_cost).toLocaleString('en-BD')}
                       </div>
-                      <div className="px-3 py-3 text-right text-xs font-bold text-[#8a6d1f]">
+                      <div className="px-3 py-3 text-right text-xs font-bold text-[#15803d]">
                         ৳{Number(item.total_sale).toLocaleString('en-BD')}
                       </div>
                     </div>
@@ -1038,12 +1038,12 @@ export default function AdminBranchChalansPage() {
                     </div>
                     <Banknote className="w-5 h-5 text-slate-600" />
                   </div>
-                  <div className="p-4 rounded-xl bg-[#d4af37]/5 border border-[#d4af37]/20 flex items-center justify-between">
+                  <div className="p-4 rounded-xl bg-[#1ca34c]/5 border border-[#1ca34c]/20 flex items-center justify-between">
                     <div>
                       <p className="text-[9px] text-slate-500 uppercase tracking-wider">Total Sale Value</p>
-                      <p className="text-lg font-bold text-[#8a6d1f] mt-0.5">৳ {Number(viewingChalan.total_amount).toLocaleString('en-BD')}</p>
+                      <p className="text-lg font-bold text-[#15803d] mt-0.5">৳ {Number(viewingChalan.total_amount).toLocaleString('en-BD')}</p>
                     </div>
-                    <Banknote className="w-5 h-5 text-[#8a6d1f]/40" />
+                    <Banknote className="w-5 h-5 text-[#15803d]/40" />
                   </div>
                 </div>
               </div>
@@ -1080,7 +1080,7 @@ export default function AdminBranchChalansPage() {
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.96, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96, y: 20 }}
-              className="w-full max-w-xl bg-white border border-indigo-500/20 rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+              className="w-full max-w-xl bg-white border border-indigo-500/20 rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
             >
               {/* Modal Header */}
               <div className="p-5 border-b border-slate-900/5 flex items-center justify-between shrink-0">
@@ -1129,7 +1129,7 @@ export default function AdminBranchChalansPage() {
                                   if (e.target.closest('#new-chalan-form')) updateItem(idx, 'code', e.target.value);
                                   else if (typeof updateEditItem !== 'undefined') updateEditItem(idx, 'code', e.target.value);
                                 }}
-                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/40 transition-all w-full font-mono"
+                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all w-full font-mono"
                               />
                               <input
                                 type="text" placeholder="e.g. Shirt, Dress"

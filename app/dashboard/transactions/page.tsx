@@ -73,9 +73,9 @@ function UserTransactions() {
         const el = document.getElementById(`item-${highlightId}`);
         if (el) {
           el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          el.classList.add('ring-2', 'ring-[#d4af37]', 'ring-offset-2', 'ring-offset-white');
+          el.classList.add('ring-2', 'ring-[#1ca34c]', 'ring-offset-2', 'ring-offset-white');
           setTimeout(() => {
-            el.classList.remove('ring-2', 'ring-[#d4af37]', 'ring-offset-2', 'ring-offset-white');
+            el.classList.remove('ring-2', 'ring-[#1ca34c]', 'ring-offset-2', 'ring-offset-white');
           }, 3000);
           
           // Switch to the correct tab if it's a value transfer vs payout request
@@ -247,16 +247,19 @@ function UserTransactions() {
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-white text-slate-900 font-sans relative overflow-hidden">
-      <div className="absolute top-[-10%] right-[-5%] w-[50%] h-[50%] bg-[#d4af37]/5 rounded-full filter blur-[150px] pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-5%] w-[50%] h-[50%] bg-[#1ca34c]/5 rounded-full filter blur-[150px] pointer-events-none" />
 
       <div className="flex-1 p-6 lg:p-10 overflow-y-auto max-h-screen relative z-10 w-full">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 pb-4 border-b border-slate-900/5 gap-4">
           <div className="flex flex-col gap-4">
-            <div>
-              <h2 className="text-2xl font-bold tracking-tight text-slate-900 font-serif">
+            <div className="flex items-start gap-3">
+              <span className="w-1.5 h-9 rounded-full bg-[#1ca34c] shrink-0" />
+              <div>
+              <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 font-serif">
                 Payout <span className="premium-text-gradient">Ledger</span>
               </h2>
               <p className="text-xs text-slate-500 mt-1">Track your clearance requests, completed transactions, and liquidity statuses.</p>
+              </div>
             </div>
             
             <div className="flex items-center gap-2 bg-slate-900/[0.04] border border-slate-900/5 rounded-xl p-1 overflow-x-auto w-fit">
@@ -264,7 +267,7 @@ function UserTransactions() {
                 onClick={() => handleTabChange('payout_request')}
                 className={`px-4 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
                   activeTab === 'payout_request'
-                    ? 'bg-[#d4af37] text-black shadow-lg shadow-[#d4af37]/20'
+                    ? 'bg-[#1ca34c] text-white shadow-lg shadow-[#1ca34c]/20'
                     : 'text-slate-500 hover:text-slate-900 hover:bg-slate-900/[0.04]'
                 }`}
               >
@@ -274,7 +277,7 @@ function UserTransactions() {
                 onClick={() => handleTabChange('value_transfer')}
                 className={`px-4 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
                   activeTab === 'value_transfer'
-                    ? 'bg-[#d4af37] text-black shadow-lg shadow-[#d4af37]/20'
+                    ? 'bg-[#1ca34c] text-white shadow-lg shadow-[#1ca34c]/20'
                     : 'text-slate-500 hover:text-slate-900 hover:bg-slate-900/[0.04]'
                 }`}
               >
@@ -285,8 +288,8 @@ function UserTransactions() {
 
           <div className="flex items-center min-h-[44px]">
             {selectedReqs.length > 0 && (
-              <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-wrap items-center gap-2 bg-[#d4af37]/10 border border-[#d4af37]/20 p-2 rounded-xl">
-                <span className="text-[#8a6d1f] text-xs font-bold px-2">{selectedReqs.length} Selected</span>
+              <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-wrap items-center gap-2 bg-[#1ca34c]/10 border border-[#1ca34c]/20 p-2 rounded-xl">
+                <span className="text-[#15803d] text-xs font-bold px-2">{selectedReqs.length} Selected</span>
               <button onClick={exportCSV} className="px-3 py-1.5 rounded-lg bg-white hover:bg-white text-slate-900 transition-all cursor-pointer flex items-center gap-1.5 text-[10px] font-bold uppercase" title="Export CSV">
                 <FileText className="w-3.5 h-3.5" /> CSV
               </button>
@@ -306,9 +309,9 @@ function UserTransactions() {
 
         {!isLoading && displayRequests.length > 0 && (
           <div className="mb-4 flex items-center gap-2">
-            <button onClick={toggleAll} className="flex items-center justify-center text-slate-500 hover:text-[#8a6d1f] transition-colors focus:outline-none">
+            <button onClick={toggleAll} className="flex items-center justify-center text-slate-500 hover:text-[#15803d] transition-colors focus:outline-none">
               {selectedReqs.length === displayRequests.length && displayRequests.length > 0 ? (
-                <CheckSquare className="w-5 h-5 text-[#8a6d1f]" />
+                <CheckSquare className="w-5 h-5 text-[#15803d]" />
               ) : (
                 <Square className="w-5 h-5" />
               )}
@@ -319,7 +322,7 @@ function UserTransactions() {
 
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-20 text-slate-500">
-            <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin mb-4" />
+            <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin mb-4" />
             <span className="text-xs tracking-wider uppercase">Syncing Ledger...</span>
           </div>
         ) : displayRequests.length === 0 ? (
@@ -365,19 +368,19 @@ function UserTransactions() {
                     <div className="flex items-center gap-4">
                       <button 
                         onClick={() => toggleSelection(req.id)}
-                        className="flex items-center justify-center text-slate-500 hover:text-[#8a6d1f] transition-colors focus:outline-none shrink-0"
+                        className="flex items-center justify-center text-slate-500 hover:text-[#15803d] transition-colors focus:outline-none shrink-0"
                       >
                         {selectedReqs.includes(req.id) ? (
-                          <CheckSquare className="w-5 h-5 text-[#8a6d1f]" />
+                          <CheckSquare className="w-5 h-5 text-[#15803d]" />
                         ) : (
                           <Square className="w-5 h-5" />
                         )}
                       </button>
                       <div className="w-12 h-12 rounded-xl bg-white border border-slate-900/5 flex items-center justify-center shrink-0">
                         {req.payment_method === 'bank_transfer' ? (
-                          <Landmark className="w-5 h-5 text-[#8a6d1f]" />
+                          <Landmark className="w-5 h-5 text-[#15803d]" />
                         ) : (
-                          <Phone className="w-5 h-5 text-[#8a6d1f]" />
+                          <Phone className="w-5 h-5 text-[#15803d]" />
                         )}
                       </div>
                       <div>
@@ -404,13 +407,13 @@ function UserTransactions() {
                     <div><span className="font-semibold text-slate-500">Date:</span> {new Date(req.created_at).toLocaleDateString()}</div>
                     <div><span className="font-semibold text-slate-500">Invoice:</span> {req.invoice_number}</div>
                     {req.transaction_id && (
-                      <div><span className="font-semibold text-[#8a6d1f]">Trx ID:</span> {req.transaction_id}</div>
+                      <div><span className="font-semibold text-[#15803d]">Trx ID:</span> {req.transaction_id}</div>
                     )}
                     <div className="ml-auto flex items-center gap-2">
                       <button
                         type="button"
                         onClick={() => exportIndividualVoucherPDF(req)}
-                        className="px-3 py-1.5 rounded-lg bg-[#d4af37]/10 hover:bg-[#d4af37]/20 border border-[#d4af37]/30 text-[#8a6d1f] text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                        className="px-3 py-1.5 rounded-lg bg-[#1ca34c]/10 hover:bg-[#1ca34c]/20 border border-[#1ca34c]/30 text-[#15803d] text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
                       >
                         <Download className="w-3 h-3" />
                         Export Voucher (PDF)
@@ -424,7 +427,7 @@ function UserTransactions() {
         )}
 
         <div id="png-export-container" style={{ display: 'none', padding: '30px', backgroundColor: '#ffffff', color: '#17181c', width: '1000px' }}>
-          <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '20px', color: '#8a6d1f', fontFamily: 'serif' }}>Transaction Ledger Statement</h2>
+          <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '20px', color: '#15803d', fontFamily: 'serif' }}>Transaction Ledger Statement</h2>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', fontFamily: 'sans-serif' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid #e2e8f0', textAlign: 'left', color: '#64748b' }}>

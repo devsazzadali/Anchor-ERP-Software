@@ -468,7 +468,7 @@ export default function AdminBranchPerformancePage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -477,7 +477,7 @@ export default function AdminBranchPerformancePage() {
     <div className="min-h-screen bg-white text-slate-900">
       {/* Ambient background glows */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[400px] bg-[#d4af37]/4 rounded-full filter blur-[150px]" />
+        <div className="absolute top-0 left-1/4 w-[600px] h-[400px] bg-[#1ca34c]/4 rounded-full filter blur-[150px]" />
         <div className="absolute bottom-0 right-1/4 w-[500px] h-[350px] bg-emerald-500/3 rounded-full filter blur-[140px]" />
       </div>
 
@@ -493,7 +493,8 @@ export default function AdminBranchPerformancePage() {
                 <Zap className="w-3 h-3 text-indigo-600" /> Fully Automated Ledger Engine
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 font-serif">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 font-serif flex items-center gap-3">
+              <span className="w-1.5 h-9 rounded-full bg-[#1ca34c] shrink-0" />
               Branch Performance &amp; Revenue Reports
             </h1>
             <p className="text-xs text-slate-500 mt-1">
@@ -507,9 +508,9 @@ export default function AdminBranchPerformancePage() {
               <button
                 onClick={() => setShowExportMenu(!showExportMenu)}
                 disabled={isExporting}
-                className="w-full sm:w-auto bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#d4af37]/30 text-slate-600 hover:text-slate-900 px-3.5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm"
+                className="w-full sm:w-auto bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#1ca34c]/30 text-slate-600 hover:text-slate-900 px-3.5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm"
               >
-                <Download className="w-3.5 h-3.5 text-[#8a6d1f]" />
+                <Download className="w-3.5 h-3.5 text-[#15803d]" />
                 <span>{isExporting ? 'Exporting...' : 'Export'}</span>
                 <ChevronDown className="w-3 h-3 text-slate-500" />
               </button>
@@ -526,7 +527,7 @@ export default function AdminBranchPerformancePage() {
                       onClick={() => handleExport('pdf')}
                       className="w-full px-4 py-2.5 text-left text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-900/[0.04] flex items-center gap-2.5 transition-colors cursor-pointer"
                     >
-                      <FileText className="w-4 h-4 text-[#8a6d1f]" /> Export PDF (Official)
+                      <FileText className="w-4 h-4 text-[#15803d]" /> Export PDF (Official)
                     </button>
                     <button
                       onClick={() => handleExport('excel')}
@@ -549,10 +550,10 @@ export default function AdminBranchPerformancePage() {
             <button
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className={`p-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#d4af37]/30 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'opacity-50' : ''}`}
+              className={`p-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#1ca34c]/30 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'opacity-50' : ''}`}
               title="Refresh Analytics"
             >
-              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-[#8a6d1f]' : ''}`} />
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-[#15803d]' : ''}`} />
             </button>
           </div>
         </div>
@@ -574,19 +575,19 @@ export default function AdminBranchPerformancePage() {
 
         {/* 4-KPI Overview Cards Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="p-5 rounded-2xl border border-[#d4af37]/20 bg-[#d4af37]/5">
+          <div className="p-5 rounded-3xl border border-[#1ca34c]/20 bg-[#1ca34c]/5">
             <div className="flex items-center justify-between mb-2">
-              <Banknote className="w-5 h-5 text-[#8a6d1f]" />
-              <span className="text-[9px] font-bold text-[#8a6d1f]/80 uppercase tracking-widest">Revenue</span>
+              <Banknote className="w-5 h-5 text-[#15803d]" />
+              <span className="text-[9px] font-bold text-[#15803d]/80 uppercase tracking-widest">Revenue</span>
             </div>
             <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Total Gross Sales (মোট বিক্রি)</p>
-            <p className="text-xl sm:text-2xl font-bold font-serif text-[#8a6d1f]">{fmt(overallStats.totalSales)}</p>
+            <p className="text-xl sm:text-2xl font-bold font-serif text-[#15803d]">{fmt(overallStats.totalSales)}</p>
             <p className="text-[10px] text-slate-500 mt-1">
               Pure Cash + Digital Collections
             </p>
           </div>
 
-          <div className="p-5 rounded-2xl border border-emerald-500/20 bg-emerald-500/5">
+          <div className="p-5 rounded-3xl border border-emerald-500/20 bg-emerald-500/5">
             <div className="flex items-center justify-between mb-2">
               <TrendingUp className="w-5 h-5 text-emerald-600" />
               <span className="text-[9px] font-bold text-emerald-600/80 uppercase tracking-widest">Collections</span>
@@ -598,7 +599,7 @@ export default function AdminBranchPerformancePage() {
             </p>
           </div>
 
-          <div className="p-5 rounded-2xl border border-blue-500/20 bg-blue-500/5">
+          <div className="p-5 rounded-3xl border border-blue-500/20 bg-blue-500/5">
             <div className="flex items-center justify-between mb-2">
               <Landmark className="w-5 h-5 text-blue-600" />
               <span className="text-[9px] font-bold text-blue-600/80 uppercase tracking-widest">Remittance</span>
@@ -610,13 +611,13 @@ export default function AdminBranchPerformancePage() {
             </p>
           </div>
 
-          <div className="p-5 rounded-2xl border border-amber-500/20 bg-amber-500/5">
+          <div className="p-5 rounded-3xl border border-[#1ca34c]/20 bg-[#1ca34c]/5">
             <div className="flex items-center justify-between mb-2">
-              <Coins className="w-5 h-5 text-amber-600" />
-              <span className="text-[9px] font-bold text-amber-600/80 uppercase tracking-widest">Drawer Float</span>
+              <Coins className="w-5 h-5 text-[#15803d]" />
+              <span className="text-[9px] font-bold text-[#15803d]/80 uppercase tracking-widest">Drawer Float</span>
             </div>
             <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Closing Cash Retained (ড্রয়ার ক্যাশ)</p>
-            <p className="text-xl sm:text-2xl font-bold font-serif text-amber-600">
+            <p className="text-xl sm:text-2xl font-bold font-serif text-[#15803d]">
               {fmt(overallStats.totalClosingCash)}
             </p>
             <p className="text-[10px] text-slate-500 font-semibold mt-0.5">
@@ -626,7 +627,7 @@ export default function AdminBranchPerformancePage() {
         </div>
 
         {/* KPI Reconciliation Breakdown */}
-        <div className="mb-8 p-5 rounded-2xl border border-slate-900/10 bg-slate-900/[0.04]">
+        <div className="mb-8 p-5 rounded-3xl border border-slate-900/10 bg-slate-900/[0.04]">
           <h3 className="text-xs font-bold uppercase tracking-wider text-slate-600 mb-4 flex items-center gap-2">
             <Calculator className="w-4 h-4 text-emerald-600" /> Executive Reconciliation Breakdown
           </h3>
@@ -641,7 +642,7 @@ export default function AdminBranchPerformancePage() {
             
             <div className="flex justify-between text-emerald-600"><span>Net Physical Cash Generated (Cash - Exp)</span> <span>{fmt(overallStats.totalCashSales - overallStats.totalExpenses)}</span></div>
             <div className="flex justify-between text-blue-600"><span>Less: Physical Bank Deposits</span> <span>- {fmt(overallStats.totalApprovedDeposits)}</span></div>
-            <div className="flex justify-between border-t border-slate-900/10 pt-2 font-bold text-amber-600" title="Cash generated during the selected period after physical expenses and bank deposits. Opening cash is excluded.">
+            <div className="flex justify-between border-t border-slate-900/10 pt-2 font-bold text-[#15803d]" title="Cash generated during the selected period after physical expenses and bank deposits. Opening cash is excluded.">
               <span>Pending Remittance</span>
               <span>{fmt((overallStats.totalCashSales - overallStats.totalExpenses) - overallStats.totalApprovedDeposits)}</span>
             </div>
@@ -655,7 +656,7 @@ export default function AdminBranchPerformancePage() {
               <span>Add: Opening Floats & Counted Differences (bridge)</span>
               <span>{fmt(overallStats.totalClosingCash - ((overallStats.totalCashSales - overallStats.totalExpenses) - overallStats.totalApprovedDeposits))}</span>
             </div>
-            <div className="flex justify-between border-t border-slate-900/10 pt-2 font-bold text-amber-600">
+            <div className="flex justify-between border-t border-slate-900/10 pt-2 font-bold text-[#15803d]">
               <span>Closing Cash Retained (counted, latest closed day per branch)</span>
               <span>{fmt(overallStats.totalClosingCash)}</span>
             </div>
@@ -664,7 +665,7 @@ export default function AdminBranchPerformancePage() {
         </div>
 
         {/* Live Period & Branch Search Toolbar */}
-        <div className="mb-6 p-4 rounded-2xl border border-slate-900/10 bg-slate-900/[0.04] flex flex-col md:flex-row items-center gap-3">
+        <div className="mb-6 p-4 rounded-3xl border border-slate-900/10 bg-slate-900/[0.04] flex flex-col md:flex-row items-center gap-3">
           <div className="relative flex-1 w-full">
             <TrendingUp className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
             <input
@@ -677,12 +678,12 @@ export default function AdminBranchPerformancePage() {
           </div>
 
           <div className="relative w-full md:w-56">
-            <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8a6d1f] pointer-events-none" />
+            <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#15803d] pointer-events-none" />
             <input
               type="month"
               value={selectedMonth}
               onChange={e => setSelectedMonth(e.target.value)}
-              className="bg-white border border-slate-900/15 rounded-xl py-2.5 pl-10 pr-3.5 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/40 w-full [color-scheme:light] transition-colors cursor-pointer font-mono font-bold"
+              className="bg-white border border-slate-900/15 rounded-xl py-2.5 pl-10 pr-3.5 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 w-full [color-scheme:light] transition-colors cursor-pointer font-mono font-bold"
             />
           </div>
 
@@ -701,7 +702,7 @@ export default function AdminBranchPerformancePage() {
         ═══════════════════════════════════════════════════════════════════ */}
         {!selectedBranch && (
           <div className="space-y-6">
-            <div className="rounded-2xl border border-slate-900/10 bg-slate-900/[0.04] overflow-hidden shadow-xl">
+            <div className="rounded-3xl border border-slate-900/10 bg-slate-900/[0.04] overflow-hidden shadow-xl">
               <div className="p-4 sm:p-5 border-b border-slate-900/10 bg-slate-900/[0.04] flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <p className="text-xs font-bold uppercase tracking-wider text-slate-600">
@@ -771,7 +772,7 @@ export default function AdminBranchPerformancePage() {
                                 {b.daysClosed} days
                               </span>
                             </td>
-                            <td className="p-3.5 text-right font-serif font-bold text-[#8a6d1f] whitespace-nowrap">
+                            <td className="p-3.5 text-right font-serif font-bold text-[#15803d] whitespace-nowrap">
                               {fmt(b.totalSales)}
                             </td>
                             <td className="p-3.5 text-right font-serif font-bold text-rose-600 whitespace-nowrap">
@@ -783,7 +784,7 @@ export default function AdminBranchPerformancePage() {
                             <td className="p-3.5 text-right font-serif font-bold text-blue-600 whitespace-nowrap">
                               {fmt(b.approvedDeposits)}
                             </td>
-                            <td className="p-3.5 text-right font-serif font-bold text-amber-600 whitespace-nowrap">
+                            <td className="p-3.5 text-right font-serif font-bold text-[#15803d] whitespace-nowrap">
                               {fmt(b.netCash)}
                             </td>
                             <td className="p-3.5 text-center whitespace-nowrap">
@@ -807,7 +808,7 @@ export default function AdminBranchPerformancePage() {
                         <td colSpan={2} className="p-3.5 text-left uppercase tracking-wider text-slate-600 font-mono">
                           NETWORK TOTALS ({filteredBranchSummaries.length} Branches)
                         </td>
-                        <td className="p-3.5 text-right font-serif font-bold text-[#8a6d1f]">
+                        <td className="p-3.5 text-right font-serif font-bold text-[#15803d]">
                           {fmt(overallStats.totalSales)}
                         </td>
                         <td className="p-3.5 text-right font-serif font-bold text-rose-600">
@@ -819,7 +820,7 @@ export default function AdminBranchPerformancePage() {
                         <td className="p-3.5 text-right font-serif font-bold text-blue-600">
                           {fmt(overallStats.totalApprovedDeposits)}
                         </td>
-                        <td className="p-3.5 text-right font-serif font-bold text-amber-600">
+                        <td className="p-3.5 text-right font-serif font-bold text-[#15803d]">
                           {fmt(overallStats.totalClosingCash)}
                         </td>
                         <td colSpan={2} className="p-3.5 text-center text-slate-500 text-[10px]">
@@ -840,7 +841,7 @@ export default function AdminBranchPerformancePage() {
         {selectedBranch && (
           <div className="space-y-6">
             {/* Navigation back and header */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 rounded-2xl border border-slate-900/10 bg-slate-900/[0.04]">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 rounded-3xl border border-slate-900/10 bg-slate-900/[0.04]">
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => goToBranch(null)}
@@ -854,7 +855,7 @@ export default function AdminBranchPerformancePage() {
                     <MapPin className="w-4 h-4 text-emerald-600" /> {selectedBranch.name}
                   </h2>
                   <p className="text-[11px] text-slate-500">
-                    Live revenue &amp; cash audit for <span className="text-[#8a6d1f] font-mono font-bold">{selectedMonth}</span> ({activeBranchLedger.length} Daily Ledger Records)
+                    Live revenue &amp; cash audit for <span className="text-[#15803d] font-mono font-bold">{selectedMonth}</span> ({activeBranchLedger.length} Daily Ledger Records)
                   </p>
                 </div>
               </div>
@@ -907,7 +908,7 @@ export default function AdminBranchPerformancePage() {
                 </div>
                 <div className="p-4 rounded-xl bg-slate-900/[0.04] border border-slate-900/5">
                   <p className="text-[9px] uppercase tracking-wider text-slate-500">Total Revenue (মোট বিক্রি)</p>
-                  <p className="text-base font-bold font-serif text-[#8a6d1f] mt-1">{fmt(activeBranchSummary.totalSales)}</p>
+                  <p className="text-base font-bold font-serif text-[#15803d] mt-1">{fmt(activeBranchSummary.totalSales)}</p>
                 </div>
                 <div className="p-4 rounded-xl bg-slate-900/[0.04] border border-slate-900/5">
                   <p className="text-[9px] uppercase tracking-wider text-slate-500">Store Expenses (খরচ)</p>
@@ -915,13 +916,13 @@ export default function AdminBranchPerformancePage() {
                 </div>
                 <div className="p-4 rounded-xl bg-slate-900/[0.04] border border-slate-900/5">
                   <p className="text-[9px] uppercase tracking-wider text-slate-500">Closing Cash (ড্রয়ার ক্যাশ)</p>
-                  <p className="text-base font-bold font-mono text-amber-600 mt-1">{fmt(activeBranchSummary.netCash)}</p>
+                  <p className="text-base font-bold font-mono text-[#15803d] mt-1">{fmt(activeBranchSummary.netCash)}</p>
                 </div>
               </div>
             )}
 
             {/* Branch Detailed Daily Ledger Records Table */}
-            <div className="rounded-2xl border border-slate-900/10 bg-slate-900/[0.04] overflow-hidden shadow-xl">
+            <div className="rounded-3xl border border-slate-900/10 bg-slate-900/[0.04] overflow-hidden shadow-xl">
               <div className="p-4 border-b border-slate-900/10 bg-slate-900/[0.04] flex items-center justify-between">
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-600">
                   Daily Shift Ledgers & Reconciliation Breakdown

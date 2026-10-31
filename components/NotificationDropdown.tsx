@@ -263,14 +263,14 @@ export function NotificationDropdown() {
     <div className="relative z-50" ref={dropdownRef}>
       <button
         onClick={toggleDropdown}
-        className="relative p-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#d4af37]/40 hover:bg-[#d4af37]/10 transition-all group"
+        className="relative p-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#1ca34c]/40 hover:bg-[#1ca34c]/10 transition-all group"
       >
-        <Bell className={`w-6 h-6 text-slate-600 group-hover:text-[#8a6d1f] transition-colors ${unreadCount > 0 ? 'animate-pulse' : ''}`} />
+        <Bell className={`w-6 h-6 text-slate-600 group-hover:text-[#15803d] transition-colors ${unreadCount > 0 ? 'animate-pulse' : ''}`} />
         {unreadCount > 0 && (
           <motion.span
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="absolute -top-1 -right-1 flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold bg-[#d4af37] text-black rounded-full border-2 border-white shadow-[0_0_10px_rgba(212,175,55,0.5)]"
+            className="absolute -top-1 -right-1 flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold bg-[#1ca34c] text-white rounded-full border-2 border-white shadow-[0_0_10px_rgba(28,163,76,0.5)]"
           >
             {unreadCount > 99 ? '99+' : unreadCount}
           </motion.span>
@@ -284,14 +284,14 @@ export function NotificationDropdown() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="fixed inset-x-4 top-20 sm:absolute sm:inset-auto sm:right-0 sm:top-auto sm:mt-3 sm:w-96 bg-white backdrop-blur-xl border border-slate-900/10 rounded-2xl shadow-[0_20px_40px_-15px_rgba(15,23,42,0.25)] overflow-hidden flex flex-col z-[100]"
+            className="fixed inset-x-4 top-20 sm:absolute sm:inset-auto sm:right-0 sm:top-auto sm:mt-3 sm:w-96 bg-white backdrop-blur-xl border border-slate-900/10 rounded-3xl shadow-[0_20px_40px_-15px_rgba(15,23,42,0.25)] overflow-hidden flex flex-col z-[100]"
           >
             {/* Header */}
             <div className="p-4 border-b border-slate-900/10 flex items-center justify-between bg-slate-900/[0.04]">
               <h3 className="text-slate-900 font-bold text-sm flex items-center gap-2">
                 Notifications
                 {unreadCount > 0 && (
-                  <span className="bg-[#d4af37]/20 text-[#8a6d1f] px-2 py-0.5 rounded-full text-[10px]">
+                  <span className="bg-[#1ca34c]/20 text-[#15803d] px-2 py-0.5 rounded-full text-[10px]">
                     {unreadCount} New
                   </span>
                 )}
@@ -299,7 +299,7 @@ export function NotificationDropdown() {
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
-                  className="text-[10px] text-slate-500 hover:text-[#8a6d1f] font-bold uppercase tracking-widest flex items-center gap-1 transition-colors min-h-[40px] px-2 -mr-2"
+                  className="text-[10px] text-slate-500 hover:text-[#15803d] font-bold uppercase tracking-widest flex items-center gap-1 transition-colors min-h-[40px] px-2 -mr-2"
                 >
                   <Check className="w-3 h-3" /> Mark Read
                 </button>
@@ -325,10 +325,10 @@ export function NotificationDropdown() {
                         exit={{ opacity: 0, x: 20, height: 0, overflow: 'hidden' }}
                         transition={{ duration: 0.2 }}
                         onClick={() => handleNotificationClick(notif)}
-                        className={`p-4 relative group transition-colors hover:bg-slate-900/[0.04] cursor-pointer ${!notif.read ? 'bg-[#d4af37]/[0.02]' : ''}`}
+                        className={`p-4 relative group transition-colors hover:bg-slate-900/[0.04] cursor-pointer ${!notif.read ? 'bg-[#1ca34c]/[0.02]' : ''}`}
                       >
                         {!notif.read && (
-                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#d4af37] to-white" />
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#1ca34c]" />
                         )}
                         <div className="flex justify-between items-start gap-4">
                           <div className="flex-1 min-w-0">

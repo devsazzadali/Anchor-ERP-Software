@@ -274,7 +274,7 @@ export default function AdminTasks() {
 
       {/* Glow Effects */}
       <div className="absolute top-[-10%] right-[-5%] w-[45%] h-[45%] bg-rose-500/3 rounded-full filter blur-[130px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[20%] w-[50%] h-[50%] bg-[#d4af37]/3 rounded-full filter blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] left-[20%] w-[50%] h-[50%] bg-[#1ca34c]/3 rounded-full filter blur-[150px] pointer-events-none" />
 
       {/* Main Core Dashboard panel */}
       <div className="flex-1 flex flex-col p-6 overflow-y-auto max-h-screen relative z-10">
@@ -288,7 +288,8 @@ export default function AdminTasks() {
                 Task Center
               </span>
             </div>
-            <h2 className="text-xl font-bold tracking-tight text-slate-900 font-serif">
+            <h2 className="text-xl font-extrabold tracking-tight text-slate-900 font-serif flex items-center gap-3">
+              <span className="w-1.5 h-8 rounded-full bg-[#1ca34c] shrink-0" />
               Task & Todo <span className="premium-text-gradient">Manager</span>
             </h2>
             <p className="text-[11px] text-slate-500">Assign operations, schedule deadlines, audit team completions, and monitor warnings.</p>
@@ -296,7 +297,7 @@ export default function AdminTasks() {
 
           <button
             onClick={fetchData}
-            className="p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 text-slate-500 hover:text-slate-900 transition-all cursor-pointer"
+            className="p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 text-slate-500 hover:text-slate-900 transition-all cursor-pointer"
           >
             <RefreshCw className="w-4 h-4" />
           </button>
@@ -363,7 +364,7 @@ export default function AdminTasks() {
 
           {/* TASK CREATOR COLUMN (col-span-4) */}
           <div className="lg:col-span-4 glass-panel p-6 rounded-2xl relative shadow-xl">
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/30 to-transparent" />
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#1ca34c]/30 to-transparent" />
 
             <h3 className="text-sm font-bold text-slate-900 font-serif mb-5">Create Operation Task</h3>
 
@@ -376,7 +377,7 @@ export default function AdminTasks() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. Test SSL Certificates validation"
-                  className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/50 transition-all"
+                  className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/50 transition-all"
                 />
               </div>
 
@@ -387,7 +388,7 @@ export default function AdminTasks() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Describe step requirements..."
-                  className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/50 transition-all resize-none"
+                  className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/50 transition-all resize-none"
                 />
               </div>
 
@@ -397,7 +398,7 @@ export default function AdminTasks() {
                   required
                   value={assignedToId}
                   onChange={(e) => handleAssigneeChange(e.target.value)}
-                  className="w-full bg-white border border-slate-900/5 rounded-xl py-3 px-3 text-xs text-slate-600 focus:outline-none focus:border-[#d4af37]/50 appearance-none cursor-pointer"
+                  className="w-full bg-white border border-slate-900/5 rounded-xl py-3 px-3 text-xs text-slate-600 focus:outline-none focus:border-[#1ca34c]/50 appearance-none cursor-pointer"
                 >
                   <option value="">Select registered operator...</option>
                   {profiles.map(p => (
@@ -418,7 +419,7 @@ export default function AdminTasks() {
                     value={assignedToName}
                     onChange={(e) => setAssignedToName(e.target.value)}
                     placeholder="Enter employee name..."
-                    className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-3.5 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50 transition-all"
+                    className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-3.5 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 transition-all"
                   />
                 </div>
               )}
@@ -430,7 +431,7 @@ export default function AdminTasks() {
                   type="datetime-local"
                   value={deadline}
                   onChange={(e) => setDeadline(e.target.value)}
-                  className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-3.5 text-xs text-slate-600 focus:outline-none focus:border-[#d4af37]/50 transition-all"
+                  className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-3.5 text-xs text-slate-600 focus:outline-none focus:border-[#1ca34c]/50 transition-all"
                 />
               </div>
 
@@ -441,14 +442,14 @@ export default function AdminTasks() {
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   placeholder="Additional notes for user..."
-                  className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/50 transition-all resize-none"
+                  className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-2.5 px-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/50 transition-all resize-none"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-gradient-to-r from-[#d4af37] to-white text-black font-semibold py-3 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg shadow-[#d4af37]/10 hover:shadow-[#d4af37]/20 transition-all cursor-pointer mt-4"
+                className="w-full bg-[#1ca34c] text-white font-semibold py-3 rounded-full text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-lg shadow-[#1ca34c]/10 hover:shadow-[#1ca34c]/20 transition-all cursor-pointer mt-4"
               >
                 {isLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -473,7 +474,7 @@ export default function AdminTasks() {
                   placeholder="Search tasks by title or assignee..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full bg-slate-900/[0.04] border border-slate-900/5 hover:border-slate-900/10 rounded-xl py-2 pl-10 pr-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/45 transition-all"
+                  className="w-full bg-slate-900/[0.04] border border-slate-900/5 hover:border-slate-900/10 rounded-xl py-2 pl-10 pr-3.5 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/45 transition-all"
                 />
               </div>
 
@@ -481,7 +482,7 @@ export default function AdminTasks() {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="bg-white border border-slate-900/5 rounded-xl py-2 pl-3 pr-8 text-xs text-slate-500 focus:outline-none focus:border-[#d4af37]/40 cursor-pointer w-full sm:w-36"
+                  className="bg-white border border-slate-900/5 rounded-xl py-2 pl-3 pr-8 text-xs text-slate-500 focus:outline-none focus:border-[#1ca34c]/40 cursor-pointer w-full sm:w-36"
                 >
                   <option value="all">All Statuses</option>
                   <option value="pending">Pending</option>
@@ -502,7 +503,7 @@ export default function AdminTasks() {
 
                   const statusColors = {
                     pending: 'bg-slate-100 text-slate-500 border border-slate-700',
-                    processing: 'bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20',
+                    processing: 'bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20',
                     completed: 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
                   }[task.status as 'pending' | 'processing' | 'completed'] || 'bg-slate-100 text-slate-500'
 
@@ -518,7 +519,7 @@ export default function AdminTasks() {
                     >
                       {/* Accent Line for status */}
                       <div className={`absolute top-0 left-0 bottom-0 w-[3px] rounded-l-2xl ${
-                        isOverdue ? 'bg-rose-500' : task.status === 'completed' ? 'bg-emerald-500' : task.status === 'processing' ? 'bg-[#d4af37]' : 'bg-slate-700'
+                        isOverdue ? 'bg-rose-500' : task.status === 'completed' ? 'bg-emerald-500' : task.status === 'processing' ? 'bg-[#1ca34c]' : 'bg-slate-700'
                       }`} />
 
                       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-3 pl-2.5">
@@ -546,7 +547,7 @@ export default function AdminTasks() {
                             )}
                           </div>
 
-                          <h4 className="text-sm font-bold text-slate-900 font-serif group-hover:text-[#8a6d1f] transition-colors">{task.title}</h4>
+                          <h4 className="text-sm font-bold text-slate-900 font-serif group-hover:text-[#15803d] transition-colors">{task.title}</h4>
                         </div>
 
                         {/* Top action: Status Switcher & Delete */}
@@ -555,7 +556,7 @@ export default function AdminTasks() {
                             <button
                               onClick={() => handleUpdateStatus(task.id, 'processing')}
                               title="Start Task"
-                              className="p-2.5 rounded-lg bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20 hover:bg-[#d4af37]/20 transition-all cursor-pointer"
+                              className="p-2.5 rounded-lg bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 hover:bg-[#1ca34c]/20 transition-all cursor-pointer"
                             >
                               <Play className="w-3.5 h-3.5" />
                             </button>
@@ -627,8 +628,8 @@ export default function AdminTasks() {
                       {/* Note / Remarks section */}
                       <div className="mt-4 pt-3 border-t border-slate-900/5 pl-2.5">
                         <div className="flex justify-between items-center mb-1">
-                          <span className="text-[9.5px] uppercase tracking-widest text-[#8a6d1f] font-semibold flex items-center gap-1.5">
-                            <MessageSquare className="w-3.5 h-3.5 text-[#8a6d1f]" />
+                          <span className="text-[9.5px] uppercase tracking-widest text-[#15803d] font-semibold flex items-center gap-1.5">
+                            <MessageSquare className="w-3.5 h-3.5 text-[#15803d]" />
                             Notes & Remarks
                           </span>
 
@@ -637,7 +638,7 @@ export default function AdminTasks() {
                               setEditingTaskId(task.id)
                               setEditingNoteValue(task.note || '')
                             }}
-                            className="text-[10px] text-slate-500 hover:text-[#8a6d1f] underline transition-colors"
+                            className="text-[10px] text-slate-500 hover:text-[#15803d] underline transition-colors"
                           >
                             Modify note
                           </button>
@@ -650,12 +651,12 @@ export default function AdminTasks() {
                               value={editingNoteValue}
                               onChange={(e) => setEditingNoteValue(e.target.value)}
                               placeholder="Add task status update details..."
-                              className="w-full bg-white border border-[#d4af37]/30 rounded-xl py-2 px-3 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37] resize-none"
+                              className="w-full bg-white border border-[#1ca34c]/30 rounded-xl py-2 px-3 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c] resize-none"
                             />
                             <div className="flex gap-2">
                               <button
                                 onClick={() => handleUpdateNote(task.id)}
-                                className="px-3 py-1 bg-gradient-to-r from-[#d4af37] to-white text-black font-semibold rounded-lg text-[10px] uppercase"
+                                className="px-3 py-1 bg-[#1ca34c] text-white font-semibold rounded-full text-[10px] uppercase"
                               >
                                 Save Note
                               </button>

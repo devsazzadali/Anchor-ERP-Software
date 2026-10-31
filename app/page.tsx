@@ -468,7 +468,7 @@ export default function AuthPage() {
       <motion.div
         animate={{ scale: [1, 1.05, 1], opacity: [0.3, 0.5, 0.3] }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#d4af37]/10 rounded-full filter blur-[120px] pointer-events-none"
+        className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#1ca34c]/10 rounded-full filter blur-[120px] pointer-events-none"
       />
       <motion.div
         animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.4, 0.2] }}
@@ -477,7 +477,7 @@ export default function AuthPage() {
       />
 
       {/* Decorative Gold Border Line */}
-      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#d4af37] to-transparent z-50" />
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#1ca34c] to-transparent z-50" />
 
       {/* LEFT PANEL: LUXURY BANNER & INFORMATION */}
       <div className="w-full md:w-[42%] flex flex-col justify-between p-8 md:p-16 border-b md:border-b-0 md:border-r border-slate-900/5 relative bg-gradient-to-b from-white to-white">
@@ -489,10 +489,12 @@ export default function AuthPage() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="flex items-center gap-3 mb-12"
           >
-            <img src="/logos.png" alt="Anchor ERP Official Logo" className="w-14 h-14 object-contain drop-shadow-lg" />
+            <div className="w-12 h-12 rounded-2xl bg-[#1ca34c] shadow flex items-center justify-center shrink-0">
+              <img src="/logos.png" alt="Anchor ERP Official Logo" className="w-7 h-7 object-contain brightness-0 invert" />
+            </div>
             <div>
-              <h1 className="text-xl font-bold tracking-wider premium-text-gradient font-serif">ANCHOR ERP</h1>
-              <p className="text-[9px] uppercase tracking-[0.25em] text-slate-500 font-sans">Enterprise & Payouts</p>
+              <h1 className="text-xl font-extrabold tracking-wider text-slate-900 font-serif">ANCHOR ERP</h1>
+              <p className="text-[9px] uppercase tracking-[0.25em] text-[#15803d] font-semibold font-sans">Enterprise & Payouts</p>
             </div>
           </motion.div>
 
@@ -502,7 +504,7 @@ export default function AuthPage() {
             transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
             className="space-y-6 max-w-md"
           >
-            <h2 className="text-3xl md:text-4xl font-semibold leading-tight tracking-tight font-serif">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 leading-tight tracking-tight font-serif">
               The Next Tier of <br />
               <span className="premium-text-gradient">Financial Assurance</span>
             </h2>
@@ -520,11 +522,11 @@ export default function AuthPage() {
             transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
             className="flex gap-4 items-start group"
           >
-            <div className="p-2.5 rounded-lg bg-slate-900/[0.04] border border-slate-900/5 text-[#8a6d1f] group-hover:scale-110 group-hover:bg-[#d4af37]/10 transition-all duration-300">
+            <div className="p-2.5 rounded-lg bg-slate-900/[0.04] border border-slate-900/5 text-[#15803d] group-hover:scale-110 group-hover:bg-[#1ca34c]/10 transition-all duration-300">
               <Lock className="w-4 h-4" />
             </div>
             <div>
-              <h4 className="text-xs font-semibold text-slate-900 group-hover:text-[#8a6d1f] transition-colors duration-300">Strict KYC Protocols</h4>
+              <h4 className="text-xs font-semibold text-slate-900 group-hover:text-[#15803d] transition-colors duration-300">Strict KYC Protocols</h4>
               <p className="text-[11px] text-slate-500">Biometric selfie matches and high-resolution NID verification safeguards every transacting node.</p>
             </div>
           </motion.div>
@@ -534,11 +536,11 @@ export default function AuthPage() {
             transition={{ duration: 0.6, delay: 0.5, ease: "easeOut" }}
             className="flex gap-4 items-start group"
           >
-            <div className="p-2.5 rounded-lg bg-slate-900/[0.04] border border-slate-900/5 text-[#8a6d1f] group-hover:scale-110 group-hover:bg-[#d4af37]/10 transition-all duration-300">
+            <div className="p-2.5 rounded-lg bg-slate-900/[0.04] border border-slate-900/5 text-[#15803d] group-hover:scale-110 group-hover:bg-[#1ca34c]/10 transition-all duration-300">
               <Sparkles className="w-4 h-4" />
             </div>
             <div>
-              <h4 className="text-xs font-semibold text-slate-900 group-hover:text-[#8a6d1f] transition-colors duration-300">Instant Liquid Payouts</h4>
+              <h4 className="text-xs font-semibold text-slate-900 group-hover:text-[#15803d] transition-colors duration-300">Instant Liquid Payouts</h4>
               <p className="text-[11px] text-slate-500">Direct integration to Premium Bangladeshi Mobile Banking channels (bKash/Nagad/Rocket) and SWIFT bank protocols.</p>
             </div>
           </motion.div>
@@ -559,24 +561,24 @@ export default function AuthPage() {
           initial={{ opacity: 0, scale: 0.95, y: 10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3, ease: "easeOut" }}
-          className="w-full max-w-lg glass-panel p-5 sm:p-6 md:p-8 rounded-2xl relative shadow-2xl overflow-hidden backdrop-blur-xl bg-white border border-slate-900/10"
+          className="w-full max-w-lg glass-panel p-5 sm:p-6 md:p-8 rounded-3xl relative shadow-2xl overflow-hidden backdrop-blur-xl bg-white border border-slate-900/10"
         >
 
           {/* Card Accent Top Glow */}
-          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/40 to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#1ca34c]/40 to-transparent" />
 
           {/* Form Tabs Toggle */}
-          <div className="flex w-full bg-white p-1.5 rounded-xl border border-slate-900/5 mb-8 relative">
+          <div className="flex w-full bg-white p-1.5 rounded-full border border-slate-900/5 mb-8 relative">
             <button
               onClick={() => { setTab('login'); setFeedback(null); }}
-              className={`flex-1 text-center py-2.5 rounded-lg text-xs font-semibold tracking-wide transition-all z-10 ${tab === 'login' ? 'text-black font-bold' : 'text-slate-500'
+              className={`flex-1 text-center py-2.5 rounded-full text-xs font-semibold tracking-wide transition-all z-10 ${tab === 'login' ? 'text-white font-bold' : 'text-slate-500'
                 }`}
             >
               Sign In to Account
             </button>
             <button
               onClick={() => { setTab('register'); setFeedback(null); }}
-              className={`flex-1 text-center py-2.5 rounded-lg text-xs font-semibold tracking-wide transition-all z-10 ${tab === 'register' ? 'text-black font-bold' : 'text-slate-500'
+              className={`flex-1 text-center py-2.5 rounded-full text-xs font-semibold tracking-wide transition-all z-10 ${tab === 'register' ? 'text-white font-bold' : 'text-slate-500'
                 }`}
             >
               Request Account Activation
@@ -585,7 +587,7 @@ export default function AuthPage() {
             <motion.div
               layout
               transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-              className="absolute top-1.5 bottom-1.5 left-1.5 rounded-lg bg-gradient-to-r from-[#d4af37] to-white shadow"
+              className="absolute top-1.5 bottom-1.5 left-1.5 rounded-full bg-[#1ca34c] shadow"
               style={{
                 width: 'calc(50% - 12px)',
                 x: tab === 'login' ? 0 : '100%',
@@ -630,7 +632,7 @@ export default function AuthPage() {
                       type="email"
                       {...loginRegister('email')}
                       placeholder="anchorfashionsupport@gmail.com"
-                      className="w-full bg-white hover:bg-white border border-slate-900/5 hover:border-slate-900/10 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/50 focus:ring-1 focus:ring-[#d4af37]/30 transition-all duration-300 shadow-inner"
+                      className="w-full bg-white hover:bg-white border border-slate-900/5 hover:border-slate-900/10 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/50 focus:ring-1 focus:ring-[#1ca34c]/30 transition-all duration-300 shadow-inner"
                     />
                   </div>
                   {loginErrors.email && (
@@ -644,7 +646,7 @@ export default function AuthPage() {
                     <button
                       type="button"
                       onClick={() => { setShowForgotPassword(true); setFpStep(1); setFpError(''); setFpEmail(''); setFpOtp(''); }}
-                      className="text-[10px] text-[#8a6d1f] hover:underline bg-transparent border-none cursor-pointer"
+                      className="text-[10px] text-[#15803d] hover:underline bg-transparent border-none cursor-pointer"
                     >
                       Forgot password?
                     </button>
@@ -655,7 +657,7 @@ export default function AuthPage() {
                       type={showLoginPassword ? 'text' : 'password'}
                       {...loginRegister('password')}
                       placeholder="••••••••"
-                      className="w-full bg-white hover:bg-white border border-slate-900/5 hover:border-slate-900/10 rounded-xl py-3 pl-10 pr-10 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/50 focus:ring-1 focus:ring-[#d4af37]/30 transition-all duration-300 shadow-inner"
+                      className="w-full bg-white hover:bg-white border border-slate-900/5 hover:border-slate-900/10 rounded-xl py-3 pl-10 pr-10 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/50 focus:ring-1 focus:ring-[#1ca34c]/30 transition-all duration-300 shadow-inner"
                     />
                     <button
                       type="button"
@@ -677,11 +679,11 @@ export default function AuthPage() {
                   whileTap={{ scale: 0.985 }}
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full relative group bg-gradient-to-r from-[#d4af37] to-white text-black font-semibold py-3.5 rounded-xl text-xs tracking-wider uppercase mt-4 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-55 transition-all overflow-hidden shadow-lg shadow-[#d4af37]/20"
+                  className="w-full relative group bg-[#1ca34c] hover:bg-[#15803d] text-white font-semibold py-3.5 rounded-full text-xs tracking-wider uppercase mt-4 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-55 transition-all overflow-hidden shadow-lg shadow-[#1ca34c]/20"
                 >
                   <div className="absolute inset-0 bg-slate-900/[0.09] group-hover:translate-x-full -translate-x-full transition-transform duration-500 ease-out skew-x-12" />
                   {isSubmitting ? (
-                    <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   ) : 'Access Private Dashboard'}
                 </motion.button>
               </motion.form>
@@ -703,7 +705,7 @@ export default function AuthPage() {
                       type="text"
                       {...regRegister('fullName')}
                       placeholder="Full Name"
-                      className="w-full bg-white hover:bg-white border border-slate-900/5 hover:border-slate-900/10 rounded-xl py-2.5 pl-9 pr-3 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/50 focus:ring-1 focus:ring-[#d4af37]/30 transition-all duration-300 shadow-inner"
+                      className="w-full bg-white hover:bg-white border border-slate-900/5 hover:border-slate-900/10 rounded-xl py-2.5 pl-9 pr-3 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/50 focus:ring-1 focus:ring-[#1ca34c]/30 transition-all duration-300 shadow-inner"
                     />
                   </div>
                   {regErrors.fullName && (
@@ -719,7 +721,7 @@ export default function AuthPage() {
                       type="email"
                       {...regRegister('email')}
                       placeholder="anchorfashionsupport@gmail.com"
-                      className="w-full bg-white hover:bg-white border border-slate-900/5 hover:border-slate-900/10 rounded-xl py-2.5 pl-9 pr-3 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/50 focus:ring-1 focus:ring-[#d4af37]/30 transition-all duration-300 shadow-inner"
+                      className="w-full bg-white hover:bg-white border border-slate-900/5 hover:border-slate-900/10 rounded-xl py-2.5 pl-9 pr-3 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/50 focus:ring-1 focus:ring-[#1ca34c]/30 transition-all duration-300 shadow-inner"
                     />
                   </div>
                   {regErrors.email && (
@@ -735,7 +737,7 @@ export default function AuthPage() {
                       type="tel"
                       {...regRegister('phoneNumber')}
                       placeholder="Phone Number"
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-2.5 pl-9 pr-3 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/50 transition-all"
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-2.5 pl-9 pr-3 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/50 transition-all"
                     />
                   </div>
                   {regErrors.phoneNumber && (
@@ -752,7 +754,7 @@ export default function AuthPage() {
                       {...regRegister('password')}
                       onChange={(e) => setRegisterPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full bg-white hover:bg-white border border-slate-900/5 hover:border-slate-900/10 rounded-xl py-2.5 pl-9 pr-10 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/50 focus:ring-1 focus:ring-[#d4af37]/30 transition-all duration-300 shadow-inner"
+                      className="w-full bg-white hover:bg-white border border-slate-900/5 hover:border-slate-900/10 rounded-xl py-2.5 pl-9 pr-10 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/50 focus:ring-1 focus:ring-[#1ca34c]/30 transition-all duration-300 shadow-inner"
                     />
                     <button
                       type="button"
@@ -772,11 +774,11 @@ export default function AuthPage() {
                   whileTap={{ scale: 0.985 }}
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full relative group bg-gradient-to-r from-[#d4af37] to-white text-black font-semibold py-3.5 rounded-xl text-xs tracking-wider uppercase mt-4 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-55 transition-all overflow-hidden shadow-lg shadow-[#d4af37]/20"
+                  className="w-full relative group bg-[#1ca34c] hover:bg-[#15803d] text-white font-semibold py-3.5 rounded-full text-xs tracking-wider uppercase mt-4 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-55 transition-all overflow-hidden shadow-lg shadow-[#1ca34c]/20"
                 >
                   <div className="absolute inset-0 bg-slate-900/[0.09] group-hover:translate-x-full -translate-x-full transition-transform duration-500 ease-out skew-x-12" />
                   {isSubmitting ? (
-                    <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   ) : 'Submit Verification Request'}
                 </motion.button>
               </motion.form>
@@ -799,15 +801,15 @@ export default function AuthPage() {
               initial={{ scale: 0.95, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.95, y: 20 }}
-              className="bg-white border border-slate-900/10 rounded-2xl p-8 max-w-sm w-full shadow-2xl relative max-h-[90vh] overflow-y-auto"
+              className="bg-white border border-slate-900/10 rounded-3xl p-8 max-w-sm w-full shadow-2xl relative max-h-[90vh] overflow-y-auto"
             >
-              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/60 to-transparent" />
+              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#1ca34c]/60 to-transparent" />
 
               <div className="text-center mb-8">
-                <div className="w-12 h-12 rounded-full bg-[#d4af37]/10 flex items-center justify-center mx-auto mb-4 border border-[#d4af37]/20">
-                  <Check className="w-6 h-6 text-[#8a6d1f]" />
+                <div className="w-12 h-12 rounded-full bg-[#1ca34c]/10 flex items-center justify-center mx-auto mb-4 border border-[#1ca34c]/20">
+                  <Check className="w-6 h-6 text-[#15803d]" />
                 </div>
-                <h3 className="text-xl font-serif text-slate-900 mb-2 tracking-wide">Account Created</h3>
+                <h3 className="text-xl font-extrabold font-serif text-slate-900 mb-2 tracking-wide">Account Created</h3>
                 <p className="text-xs text-slate-500">Please choose your verification profile to proceed with KYC.</p>
               </div>
 
@@ -817,14 +819,14 @@ export default function AuthPage() {
                   className="w-full relative group overflow-hidden rounded-xl border border-slate-900/5 bg-slate-900/[0.04] hover:bg-slate-900/[0.04] transition-all p-4 flex items-center justify-between"
                 >
                   <div className="flex items-center gap-3">
-                    <User className="w-5 h-5 text-slate-500 group-hover:text-[#8a6d1f] transition-colors" />
+                    <User className="w-5 h-5 text-slate-500 group-hover:text-[#15803d] transition-colors" />
                     <div className="text-left">
                       <div className="text-sm font-semibold text-slate-900">Verify as Employee</div>
                       <div className="text-[10px] text-slate-500">Standard ledger access</div>
                     </div>
                   </div>
-                  <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center border border-slate-900/5 group-hover:border-[#d4af37]/30 transition-colors">
-                    <div className="w-2 h-2 rounded-full bg-[#d4af37] opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center border border-slate-900/5 group-hover:border-[#1ca34c]/30 transition-colors">
+                    <div className="w-2 h-2 rounded-full bg-[#1ca34c] opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                 </button>
 
@@ -833,14 +835,14 @@ export default function AuthPage() {
                   className="w-full relative group overflow-hidden rounded-xl border border-slate-900/5 bg-slate-900/[0.04] hover:bg-slate-900/[0.04] transition-all p-4 flex items-center justify-between"
                 >
                   <div className="flex items-center gap-3">
-                    <Globe className="w-5 h-5 text-slate-500 group-hover:text-[#8a6d1f] transition-colors" />
+                    <Globe className="w-5 h-5 text-slate-500 group-hover:text-[#15803d] transition-colors" />
                     <div className="text-left">
                       <div className="text-sm font-semibold text-slate-900">Verify as Partner</div>
                       <div className="text-[10px] text-slate-500">Extended network access</div>
                     </div>
                   </div>
-                  <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center border border-slate-900/5 group-hover:border-[#d4af37]/30 transition-colors">
-                    <div className="w-2 h-2 rounded-full bg-[#d4af37] opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center border border-slate-900/5 group-hover:border-[#1ca34c]/30 transition-colors">
+                    <div className="w-2 h-2 rounded-full bg-[#1ca34c] opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                 </button>
               </div>
@@ -857,10 +859,10 @@ export default function AuthPage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md p-6 rounded-2xl border border-slate-900/10 bg-white shadow-2xl text-center max-h-[90vh] overflow-y-auto"
+              className="w-full max-w-md p-6 rounded-3xl border border-slate-900/10 bg-white shadow-2xl text-center max-h-[90vh] overflow-y-auto"
             >
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <h3 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
                   <ShieldAlert className="w-5 h-5 text-amber-600" />
                   Email Verification
                 </h3>
@@ -887,14 +889,14 @@ export default function AuthPage() {
                     value={regOtp}
                     onChange={(e) => setRegOtp(e.target.value.toUpperCase())}
                     placeholder="Enter 6-digit OTP"
-                    className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-center text-lg tracking-[0.5em] text-[#8a6d1f] font-bold focus:outline-none focus:border-[#d4af37]/50"
+                    className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 px-4 text-center text-lg tracking-[0.5em] text-[#15803d] font-bold focus:outline-none focus:border-[#1ca34c]/50"
                     maxLength={6}
                   />
                 </div>
                 <button
                   onClick={handleVerifyRegisterOtp}
                   disabled={isRegOtpLoading || regOtp.length !== 6}
-                  className="w-full bg-[#d4af37] text-black font-semibold py-3 rounded-xl text-xs uppercase disabled:opacity-50"
+                  className="w-full bg-[#1ca34c] hover:bg-[#15803d] text-white font-semibold py-3 rounded-full text-xs uppercase disabled:opacity-50"
                 >
                   {isRegOtpLoading ? 'Verifying...' : 'Verify & Register'}
                 </button>
@@ -912,13 +914,13 @@ export default function AuthPage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="w-full max-w-md p-6 sm:p-7 rounded-2xl border border-slate-900/10 bg-white shadow-2xl relative max-h-[90vh] overflow-y-auto"
+              className="w-full max-w-md p-6 sm:p-7 rounded-3xl border border-slate-900/10 bg-white shadow-2xl relative max-h-[90vh] overflow-y-auto"
             >
-              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#d4af37]/60 to-transparent" />
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#1ca34c]/60 to-transparent" />
 
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2 font-serif">
-                  <ShieldAlert className="w-5 h-5 text-[#8a6d1f]" />
+                <h3 className="text-lg font-extrabold text-slate-900 flex items-center gap-2 font-serif">
+                  <ShieldAlert className="w-5 h-5 text-[#15803d]" />
                   Account Recovery
                 </h3>
                 <button
@@ -968,18 +970,18 @@ export default function AuthPage() {
                         onKeyDown={(e) => { if (e.key === 'Enter') handleFpSendOtp(); }}
                         placeholder="yourname@gmail.com"
                         autoFocus
-                        className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/50 focus:ring-1 focus:ring-[#d4af37]/30 transition-all"
+                        className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/50 focus:ring-1 focus:ring-[#1ca34c]/30 transition-all"
                       />
                     </div>
                   </div>
                   <button
                     onClick={handleFpSendOtp}
                     disabled={fpLoading || !fpEmail}
-                    className="w-full bg-gradient-to-r from-[#d4af37] to-white text-black font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider disabled:opacity-50 hover:shadow-lg hover:shadow-[#d4af37]/15 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full bg-[#1ca34c] hover:bg-[#15803d] text-white font-bold py-3.5 rounded-full text-xs uppercase tracking-wider disabled:opacity-50 hover:shadow-lg hover:shadow-[#1ca34c]/15 transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
                     {fpLoading ? (
                       <>
-                        <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                         <span>Sending Code to Gmail...</span>
                       </>
                     ) : (
@@ -994,7 +996,7 @@ export default function AuthPage() {
                 <div className="space-y-4">
                   <div className="p-3.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 text-center">
                     <p className="text-[11px] text-slate-500">
-                      Code sent to <span className="text-[#8a6d1f] font-semibold">{fpEmail}</span>
+                      Code sent to <span className="text-[#15803d] font-semibold">{fpEmail}</span>
                     </p>
                     <p className="text-[10px] text-slate-500 mt-0.5">
                       Check your inbox or spam folder for the 6-digit code.
@@ -1013,18 +1015,18 @@ export default function AuthPage() {
                       placeholder="••••••"
                       maxLength={6}
                       autoFocus
-                      className="w-full bg-white border border-slate-900/10 rounded-xl py-3.5 px-4 text-center text-2xl tracking-[0.5em] text-[#8a6d1f] font-mono font-bold focus:outline-none focus:border-[#d4af37]/60 focus:ring-1 focus:ring-[#d4af37]/30 transition-all placeholder:text-slate-500"
+                      className="w-full bg-white border border-slate-900/10 rounded-xl py-3.5 px-4 text-center text-2xl tracking-[0.5em] text-[#15803d] font-mono font-bold focus:outline-none focus:border-[#1ca34c]/60 focus:ring-1 focus:ring-[#1ca34c]/30 transition-all placeholder:text-slate-500"
                     />
                   </div>
 
                   <button
                     onClick={handleFpVerifyOtp}
                     disabled={fpLoading || fpOtp.length !== 6}
-                    className="w-full bg-gradient-to-r from-[#d4af37] to-white text-black font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider disabled:opacity-50 hover:shadow-lg hover:shadow-[#d4af37]/15 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full bg-[#1ca34c] hover:bg-[#15803d] text-white font-bold py-3.5 rounded-full text-xs uppercase tracking-wider disabled:opacity-50 hover:shadow-lg hover:shadow-[#1ca34c]/15 transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
                     {fpLoading ? (
                       <>
-                        <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                         <span>Verifying Code...</span>
                       </>
                     ) : (
@@ -1037,7 +1039,7 @@ export default function AuthPage() {
                       type="button"
                       onClick={handleFpResendOtp}
                       disabled={fpLoading}
-                      className="text-[11px] text-[#8a6d1f] hover:underline disabled:opacity-50 transition-colors"
+                      className="text-[11px] text-[#15803d] hover:underline disabled:opacity-50 transition-colors"
                     >
                       {fpLoading ? 'Resending...' : "Didn't receive code? Resend"}
                     </button>

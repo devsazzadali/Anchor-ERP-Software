@@ -55,22 +55,25 @@ export default function EmployeeDashboard({ userId, userName, isBranchManager = 
   return (
     <div className="flex-1 flex flex-col p-4 md:p-6 overflow-y-auto max-h-screen relative z-10 custom-scrollbar">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-4 border-b border-slate-900/5">
-        <div>
-          <h2 className="text-xl font-bold tracking-tight text-slate-900 font-serif">
+        <div className="flex items-start gap-3">
+          <span className="w-1.5 h-9 rounded-full bg-[#1ca34c] shrink-0" />
+          <div>
+          <h2 className="text-xl font-extrabold tracking-tight text-slate-900 font-serif">
             Welcome back, <span className="premium-text-gradient">{userName}</span>
           </h2>
           <div className="flex items-center gap-2 mt-1">
             <p className="text-[11px] text-slate-500">Anchor ERP Employee Access. Review your recent assignments and ledgers.</p>
             {isBranchManager && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-widest uppercase bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20 flex-shrink-0">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold tracking-widest uppercase bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 flex-shrink-0">
                 <Building2 className="w-2.5 h-2.5" /> Branch Manager
               </span>
             )}
           </div>
+          </div>
         </div>
         <button 
           onClick={handleRefresh}
-          className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 text-slate-500 hover:text-slate-900 transition-all cursor-pointer active:scale-95 flex-shrink-0 ${isRefreshing ? 'animate-spin text-[#8a6d1f]' : ''}`}
+          className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 text-slate-500 hover:text-slate-900 transition-all cursor-pointer active:scale-95 flex-shrink-0 ${isRefreshing ? 'animate-spin text-[#15803d]' : ''}`}
         >
           <RefreshCw className="w-4 h-4" />
         </button>
@@ -100,18 +103,18 @@ export default function EmployeeDashboard({ userId, userName, isBranchManager = 
       {isBranchManager && (
         <Link
           href="/dashboard/branch-accounts"
-          className="group flex items-center justify-between gap-4 mb-8 p-4 rounded-2xl bg-gradient-to-r from-[#d4af37]/10 to-[#d4af37]/5 border border-[#d4af37]/20 hover:border-[#d4af37]/40 hover:from-[#d4af37]/15 hover:to-[#d4af37]/8 transition-all duration-300"
+          className="group flex items-center justify-between gap-4 mb-8 p-4 rounded-2xl bg-gradient-to-r from-[#1ca34c]/10 to-[#1ca34c]/5 border border-[#1ca34c]/20 hover:border-[#1ca34c]/40 hover:from-[#1ca34c]/15 hover:to-[#1ca34c]/8 transition-all duration-300"
         >
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#d4af37]/10 flex items-center justify-center flex-shrink-0 group-hover:bg-[#d4af37]/20 transition-colors">
-              <Building2 className="w-4 h-4 text-[#8a6d1f]" />
+            <div className="w-9 h-9 rounded-xl bg-[#1ca34c]/10 flex items-center justify-center flex-shrink-0 group-hover:bg-[#1ca34c]/20 transition-colors">
+              <Building2 className="w-4 h-4 text-[#15803d]" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-[#8a6d1f] leading-tight">Branch Management Portal</p>
+              <p className="text-sm font-semibold text-[#15803d] leading-tight">Branch Management Portal</p>
               <p className="text-[10px] text-slate-500 mt-0.5">Access your branch accounts, sales, cash ledger &amp; reports</p>
             </div>
           </div>
-          <ArrowRight className="w-4 h-4 text-[#8a6d1f]/60 group-hover:text-[#8a6d1f] group-hover:translate-x-1 transition-all flex-shrink-0" />
+          <ArrowRight className="w-4 h-4 text-[#15803d]/60 group-hover:text-[#15803d] group-hover:translate-x-1 transition-all flex-shrink-0" />
         </Link>
       )}
 
@@ -121,7 +124,7 @@ export default function EmployeeDashboard({ userId, userName, isBranchManager = 
         {/* Recent Tasks */}
         <div className="glass-panel p-4 rounded-2xl shadow-xl">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-sm font-bold text-slate-900 font-serif flex items-center gap-2"><ListTodo className="w-4 h-4 text-[#8a6d1f]" /> Recent Tasks</h3>
+            <h3 className="text-sm font-bold text-slate-900 font-serif flex items-center gap-2"><ListTodo className="w-4 h-4 text-[#15803d]" /> Recent Tasks</h3>
           </div>
           <div className="space-y-3">
             {tasks.length === 0 ? <p className="text-xs text-slate-500 italic">No tasks assigned.</p> : tasks.slice(0, 5).map(t => (

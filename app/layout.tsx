@@ -6,7 +6,7 @@ import SidebarWrapper from '../components/SidebarWrapper';
 import PwaInitializer from '../components/PwaInitializer';
 
 export const viewport = {
-  themeColor: '#f4f5f7',
+  themeColor: '#f4f6f5',
 };
 
 const geistSans = Geist({

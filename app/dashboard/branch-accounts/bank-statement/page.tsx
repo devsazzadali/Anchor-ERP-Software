@@ -62,7 +62,7 @@ export default function BankStatementPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -72,18 +72,18 @@ export default function BankStatementPage() {
       <div className="relative z-10 p-4 md:p-6 max-w-3xl mx-auto">
         <div className="flex items-center gap-4 mb-8">
           <Link href="/dashboard/branch-accounts"
-            className="p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 text-slate-500 hover:text-slate-900 transition-all"
+            className="p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 text-slate-500 hover:text-slate-900 transition-all"
           >
             <ChevronLeft className="w-4 h-4" />
           </Link>
           <div className="flex-1">
             <h1 className="text-xl font-bold tracking-tight flex items-center gap-2">
-              <FileText className="w-5 h-5 text-[#8a6d1f]" /> Bank Statements
+              <FileText className="w-5 h-5 text-[#15803d]" /> Bank Statements
             </h1>
             <p className="text-[11px] text-slate-500">Submitted deposit documents and bank proofs</p>
           </div>
           <button onClick={handleRefresh}
-            className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'animate-spin text-[#8a6d1f]' : ''}`}
+            className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'animate-spin text-[#15803d]' : ''}`}
           >
             <RefreshCw className="w-4 h-4" />
           </button>
@@ -105,7 +105,7 @@ export default function BankStatementPage() {
             <FileText className="w-12 h-12 text-slate-600 mx-auto mb-4" />
             <p className="text-slate-500 text-sm">No submitted deposits yet</p>
             <Link href="/dashboard/branch-accounts/bank-deposit"
-              className="mt-4 inline-block text-[#8a6d1f] text-xs hover:underline"
+              className="mt-4 inline-block text-[#15803d] text-xs hover:underline"
             >
               Create your first deposit →
             </Link>
@@ -113,7 +113,7 @@ export default function BankStatementPage() {
         ) : (
           <div className="space-y-4">
             {deposits.map((dep: any) => (
-              <div key={dep.id} className="p-5 rounded-2xl border border-slate-900/5 bg-slate-900/[0.04]">
+              <div key={dep.id} className="p-5 rounded-3xl border border-slate-900/5 bg-slate-900/[0.04]">
                 <div className="flex items-start justify-between mb-4">
                   <div>
                     <p className="text-sm font-semibold text-slate-900">{dep.bank_account_name}</p>

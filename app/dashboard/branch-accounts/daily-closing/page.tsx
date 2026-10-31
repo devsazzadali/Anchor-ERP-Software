@@ -358,7 +358,7 @@ export default function DailyClosingPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -376,7 +376,7 @@ export default function DailyClosingPage() {
     <div className="min-h-screen bg-white text-slate-900">
       {/* Background ambience */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-0 right-1/4 w-[500px] h-[400px] bg-[#d4af37]/4 rounded-full filter blur-[140px]" />
+        <div className="absolute top-0 right-1/4 w-[500px] h-[400px] bg-[#1ca34c]/4 rounded-full filter blur-[140px]" />
         <div className="absolute bottom-10 left-1/4 w-[400px] h-[300px] bg-blue-500/3 rounded-full filter blur-[130px]" />
       </div>
 
@@ -385,16 +385,16 @@ export default function DailyClosingPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-4">
             <Link href="/dashboard/branch-accounts"
-              className="p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/30 text-slate-500 hover:text-slate-900 transition-all"
+              className="p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/30 text-slate-500 hover:text-slate-900 transition-all"
             >
               <ChevronLeft className="w-4 h-4" />
             </Link>
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl md:text-2xl font-bold font-serif flex items-center gap-2">
-                  <Calculator className="w-5 h-5 text-[#8a6d1f]" /> Daily Cash Closing & Sales Audit
+                  <Calculator className="w-5 h-5 text-[#15803d]" /> Daily Cash Closing & Sales Audit
                 </h1>
-                <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20">
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5 rounded-full bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20">
                   {branchName}
                 </span>
               </div>
@@ -406,9 +406,9 @@ export default function DailyClosingPage() {
 
           {/* Date Selector with Day of Week */}
           <div className="flex items-center gap-3 bg-slate-900/[0.04] border border-slate-900/10 rounded-2xl px-4 py-2.5 self-start sm:self-auto shadow-sm">
-            <Calendar className="w-4 h-4 text-[#8a6d1f]" />
+            <Calendar className="w-4 h-4 text-[#15803d]" />
             <div className="flex flex-col">
-              <span className="text-[9px] uppercase tracking-wider text-[#8a6d1f] font-bold">
+              <span className="text-[9px] uppercase tracking-wider text-[#15803d] font-bold">
                 {getDayName(selectedDate)}
               </span>
               <input
@@ -466,7 +466,7 @@ export default function DailyClosingPage() {
               onClick={() => setIsEditingClosed(prev => !prev)}
               className="px-3.5 py-1.5 rounded-lg bg-slate-900/[0.07] hover:bg-slate-900/[0.09] text-slate-900 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
             >
-              <Edit3 className="w-3.5 h-3.5 text-[#8a6d1f]" />
+              <Edit3 className="w-3.5 h-3.5 text-[#15803d]" />
               {isEditingClosed ? 'Cancel Edit' : 'Edit Figures'}
             </button>
           )}
@@ -477,9 +477,9 @@ export default function DailyClosingPage() {
           <div className="space-y-6 mb-12">
             {/* Top 4 Clear Accounting Hero Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="p-5 rounded-2xl border border-[#d4af37]/20 bg-[#d4af37]/5 text-center flex flex-col justify-center">
-                <p className="text-[10px] uppercase tracking-widest text-[#8a6d1f]/80 mb-1 font-semibold">Total Day's Sales (মোট বিক্রি)</p>
-                <p className="text-2xl lg:text-3xl font-bold font-serif text-[#8a6d1f]">
+              <div className="p-5 rounded-3xl border border-[#1ca34c]/20 bg-[#1ca34c]/5 text-center flex flex-col justify-center">
+                <p className="text-[10px] uppercase tracking-widest text-[#15803d]/80 mb-1 font-semibold">Total Day's Sales (মোট বিক্রি)</p>
+                <p className="text-2xl lg:text-3xl font-extrabold text-[#15803d]">
                   {fmt(closedTotalRevenue)}
                 </p>
                 <p className="text-[10px] text-slate-500 mt-1">
@@ -487,17 +487,17 @@ export default function DailyClosingPage() {
                 </p>
               </div>
 
-              <div className="p-5 rounded-2xl border border-blue-500/20 bg-blue-500/5 text-center flex flex-col justify-center">
+              <div className="p-5 rounded-3xl border border-blue-500/20 bg-blue-500/5 text-center flex flex-col justify-center">
                 <p className="text-[10px] uppercase tracking-widest text-blue-600/80 mb-1 font-semibold">Bank Deposits (ব্যাংকে জমা)</p>
-                <p className="text-2xl lg:text-3xl font-bold font-serif text-slate-900">
+                <p className="text-2xl lg:text-3xl font-extrabold text-slate-900">
                   {fmt(ledger.bank_deposits_out || 0)}
                 </p>
                 <p className="text-[10px] text-slate-500 mt-1">Deducted from drawer cash</p>
               </div>
 
-              <div className="p-5 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 text-center flex flex-col justify-center">
+              <div className="p-5 rounded-3xl border border-emerald-500/20 bg-emerald-500/5 text-center flex flex-col justify-center">
                 <p className="text-[10px] uppercase tracking-widest text-emerald-600/80 mb-1 font-semibold">Counted Closing Cash (ড্রয়ার ক্যাশ)</p>
-                <p className="text-2xl lg:text-3xl font-bold font-serif text-emerald-600">
+                <p className="text-2xl lg:text-3xl font-extrabold text-emerald-600">
                   {fmt(ledger.actual_cash)}
                 </p>
                 <p className="text-[10px] text-slate-500 mt-1">
@@ -505,9 +505,9 @@ export default function DailyClosingPage() {
                 </p>
               </div>
 
-              <div className="p-5 rounded-2xl border border-amber-500/20 bg-amber-500/5 text-center flex flex-col justify-center">
+              <div className="p-5 rounded-3xl border border-amber-500/20 bg-amber-500/5 text-center flex flex-col justify-center">
                 <p className="text-[10px] uppercase tracking-widest text-amber-600/80 mb-1 font-semibold">Reconciliation Status (হিসাব স্থিতি)</p>
-                <p className={`text-2xl lg:text-3xl font-bold font-serif ${
+                <p className={`text-2xl lg:text-3xl font-extrabold ${
                   ledger.difference_status === 'matched' ? 'text-emerald-600' :
                   ledger.difference_status === 'shortage' ? 'text-rose-600' : 'text-amber-600'
                 }`}>
@@ -525,9 +525,9 @@ export default function DailyClosingPage() {
             {/* Detailed Breakdown Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Physical Drawer Cash Details */}
-              <div className="p-5 rounded-2xl border border-slate-900/5 bg-slate-900/[0.04] space-y-3">
+              <div className="p-5 rounded-3xl border border-slate-900/5 bg-slate-900/[0.04] space-y-3">
                 <div className="flex items-center gap-2 pb-2 border-b border-slate-900/5">
-                  <Banknote className="w-4 h-4 text-[#8a6d1f]" />
+                  <Banknote className="w-4 h-4 text-[#15803d]" />
                   <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">Physical Drawer Cash Reconciliation</h3>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-slate-900/[0.08] text-xs">
@@ -560,7 +560,7 @@ export default function DailyClosingPage() {
                   <div className="flex justify-between py-1.5 border-b border-slate-900/[0.08] text-xs">
                     <div>
                       <span className="text-slate-500">5. (−) Bank Deposits Taken to Bank (ব্যাংকে জমা)</span>
-                      <p className="text-[9px] text-[#8a6d1f]/80">Transferred from drawer to bank account</p>
+                      <p className="text-[9px] text-[#15803d]/80">Transferred from drawer to bank account</p>
                     </div>
                     <span className="font-semibold text-amber-600">−{fmt(ledger.bank_deposits_out)}</span>
                   </div>
@@ -574,9 +574,9 @@ export default function DailyClosingPage() {
                     <span className="font-semibold text-amber-600/90">{fmt(ledger.pending_deposits_out)}</span>
                   </div>
                 )}
-                <div className="flex justify-between py-1.5 border-b border-slate-900/[0.08] text-xs bg-[#d4af37]/10 px-2 rounded border border-[#d4af37]/20">
-                  <span className="text-[#8a6d1f] font-semibold">= Expected Closing Cash (ড্রয়ারে থাকা উচিত)</span>
-                  <span className="font-bold text-[#8a6d1f] font-serif">{fmt(ledger.expected_closing_cash)}</span>
+                <div className="flex justify-between py-1.5 border-b border-slate-900/[0.08] text-xs bg-[#1ca34c]/10 px-2 rounded border border-[#1ca34c]/20">
+                  <span className="text-[#15803d] font-semibold">= Expected Closing Cash (ড্রয়ারে থাকা উচিত)</span>
+                  <span className="font-bold text-[#15803d] font-serif">{fmt(ledger.expected_closing_cash)}</span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-slate-900/[0.08] text-xs">
                   <span className="text-slate-600 font-bold">Counted Physical Cash (ড্রয়ারে গুনে পাওয়া ক্যাশ)</span>
@@ -599,7 +599,7 @@ export default function DailyClosingPage() {
               </div>
 
               {/* Digital Collections Breakdown */}
-              <div className="p-5 rounded-2xl border border-slate-900/5 bg-slate-900/[0.04] space-y-3">
+              <div className="p-5 rounded-3xl border border-slate-900/5 bg-slate-900/[0.04] space-y-3">
                 <div className="flex items-center gap-2 pb-2 border-b border-slate-900/5">
                   <Smartphone className="w-4 h-4 text-blue-600" />
                   <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">Digital MFS & Online Collections</h3>
@@ -630,9 +630,9 @@ export default function DailyClosingPage() {
                     {fmt(closedDigitalTotal)}
                   </span>
                 </div>
-                <div className="flex justify-between py-2 text-xs bg-[#d4af37]/10 px-2 rounded border border-[#d4af37]/20 mt-2">
-                  <span className="text-[#8a6d1f] font-bold">Total Sales Revenue (Cash + Digital)</span>
-                  <span className="font-bold text-[#8a6d1f] font-serif text-sm">
+                <div className="flex justify-between py-2 text-xs bg-[#1ca34c]/10 px-2 rounded border border-[#1ca34c]/20 mt-2">
+                  <span className="text-[#15803d] font-bold">Total Sales Revenue (Cash + Digital)</span>
+                  <span className="font-bold text-[#15803d] font-serif text-sm">
                     {fmt(closedTotalRevenue)}
                   </span>
                 </div>
@@ -642,7 +642,7 @@ export default function DailyClosingPage() {
         ) : (
           /* ACTIVE / OPEN DAY FORM (OPENING CASH REMOVED - KHUCHRA INTEGRATED) */
           <div className="space-y-6 mb-12">
-            <form onSubmit={handleCloseDay} className="p-6 rounded-2xl border border-slate-900/10 bg-slate-900/[0.04] space-y-6">
+            <form onSubmit={handleCloseDay} className="p-6 rounded-3xl border border-slate-900/10 bg-slate-900/[0.04] space-y-6">
               <div className="flex items-center gap-2 pb-2 border-b border-slate-900/5">
                 <div className="w-7 h-7 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-600">
                   <Moon className="w-4 h-4" />
@@ -659,7 +659,7 @@ export default function DailyClosingPage() {
                   <label className="block text-[10px] uppercase tracking-widest text-slate-500 font-semibold">
                     Khuchra / Change Float (ড্রয়ারে থাকা খুচরা টাকা / ভাংতি) (৳)
                   </label>
-                  <span className="text-[9px] text-[#8a6d1f]">Petty Cash & Drawer Float</span>
+                  <span className="text-[9px] text-[#15803d]">Petty Cash & Drawer Float</span>
                 </div>
                 <div className="relative">
                   <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-serif">৳</span>
@@ -670,7 +670,7 @@ export default function DailyClosingPage() {
                     value={khuchraAmount}
                     onChange={e => setKhuchraAmount(e.target.value)}
                     placeholder="0.00"
-                    className="w-full pl-8 pr-4 py-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 text-slate-900 text-sm font-serif focus:outline-none focus:border-[#d4af37]/40 transition-colors"
+                    className="w-full pl-8 pr-4 py-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 text-slate-900 text-sm font-serif focus:outline-none focus:border-[#1ca34c]/40 transition-colors"
                   />
                 </div>
                 <p className="text-[9px] text-slate-500 mt-1">
@@ -763,7 +763,7 @@ export default function DailyClosingPage() {
                   <label className="block text-[10px] uppercase tracking-widest text-slate-500">
                     Physical Cash Sales (সারাদিনের ক্যাশ বিক্রি) (৳)
                   </label>
-                  <span className="text-[9px] text-[#8a6d1f]">
+                  <span className="text-[9px] text-[#15803d]">
                     {cashSales !== '' ? 'Custom Amount' : Number(ledger?.cash_sales || 0) > 0 ? 'Loaded from POS Register' : 'Pure cash sales'}
                   </span>
                 </div>
@@ -776,7 +776,7 @@ export default function DailyClosingPage() {
                     value={cashSales !== '' ? cashSales : (Number(ledger?.cash_sales || 0) > 0 ? String(ledger.cash_sales) : '')}
                     onChange={e => setCashSales(e.target.value)}
                     placeholder={Number(ledger?.cash_sales || 0) > 0 ? String(ledger.cash_sales) : '0.00'}
-                    className="w-full pl-8 pr-4 py-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 text-slate-900 text-sm font-serif focus:outline-none focus:border-[#d4af37]/40 transition-colors"
+                    className="w-full pl-8 pr-4 py-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 text-slate-900 text-sm font-serif focus:outline-none focus:border-[#1ca34c]/40 transition-colors"
                   />
                 </div>
               </div>
@@ -798,7 +798,7 @@ export default function DailyClosingPage() {
                     value={closingCash}
                     onChange={e => setClosingCash(e.target.value)}
                     placeholder="Enter total physical notes & coins in drawer"
-                    className="w-full pl-8 pr-4 py-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 text-slate-900 text-sm font-serif font-bold placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/40 transition-colors"
+                    className="w-full pl-8 pr-4 py-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 text-slate-900 text-sm font-serif font-bold placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-colors"
                     required
                   />
                 </div>
@@ -808,7 +808,7 @@ export default function DailyClosingPage() {
               <div className="p-4 rounded-xl bg-white border border-slate-900/10 space-y-3">
                 <div className="flex items-center justify-between pb-2 border-b border-slate-900/5">
                   <div className="flex items-center gap-2">
-                    <Calculator className="w-4 h-4 text-[#8a6d1f]" />
+                    <Calculator className="w-4 h-4 text-[#15803d]" />
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-900">Expected Drawer Cash Breakdown</span>
                   </div>
                   <span className="text-[10px] text-slate-500 font-mono hidden sm:inline">Khuchra + Sales − Expenses − Deposits</span>
@@ -839,7 +839,7 @@ export default function DailyClosingPage() {
                     <div className="flex justify-between items-center py-1 border-b border-slate-900/[0.08]">
                       <div>
                         <span className="text-slate-500">(−) Bank Deposits Taken to Bank (ব্যাংকে জমা দেওয়া ক্যাশ)</span>
-                        <p className="text-[9px] text-[#8a6d1f]/80">Deducted immediately from drawer — will not count as shortage</p>
+                        <p className="text-[9px] text-[#15803d]/80">Deducted immediately from drawer — will not count as shortage</p>
                       </div>
                       <span className="font-semibold text-amber-600 font-serif">− {fmt(currentBankDeposits)}</span>
                     </div>
@@ -854,8 +854,8 @@ export default function DailyClosingPage() {
                     </div>
                   )}
                   <div className="pt-2 flex justify-between items-center text-sm font-bold border-t border-slate-900/10 bg-slate-900/[0.04] p-2 rounded-lg">
-                    <span className="text-[#8a6d1f] uppercase tracking-wider text-xs">= Expected Cash in Drawer (ড্রয়ারে থাকা উচিত)</span>
-                    <span className="font-serif text-[#8a6d1f] text-base">{fmt(expectedCash)}</span>
+                    <span className="text-[#15803d] uppercase tracking-wider text-xs">= Expected Cash in Drawer (ড্রয়ারে থাকা উচিত)</span>
+                    <span className="font-serif text-[#15803d] text-base">{fmt(expectedCash)}</span>
                   </div>
                 </div>
               </div>
@@ -904,7 +904,7 @@ export default function DailyClosingPage() {
                     onChange={e => setDifferenceNotes(e.target.value)}
                     placeholder="Explain the difference (e.g. damaged note, petty cash used, etc.)"
                     rows={2}
-                    className="w-full p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 text-slate-900 text-xs placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/40 transition-colors resize-none"
+                    className="w-full p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 text-slate-900 text-xs placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-colors resize-none"
                     required
                   />
                 </div>
@@ -913,7 +913,7 @@ export default function DailyClosingPage() {
               <button
                 type="submit"
                 disabled={isSubmittingClosing || !closingCash}
-                className="w-full py-3.5 rounded-xl bg-gradient-to-r from-[#d4af37] to-white text-black font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#d4af37]/10"
+                className="w-full py-3.5 rounded-full bg-[#1ca34c] hover:bg-[#15803d] text-white font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#1ca34c]/10"
               >
                 {isSubmittingClosing
                   ? <><div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" /> {isEditingClosed ? 'Updating Figures...' : 'Closing Day...'}</>
@@ -930,7 +930,7 @@ export default function DailyClosingPage() {
         <div className="rounded-2xl border border-slate-900/10 bg-slate-900/[0.04] overflow-hidden shadow-xl">
           <div className="p-5 border-b border-slate-900/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/[0.04]">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-[#d4af37]/10 border border-[#d4af37]/20 flex items-center justify-center text-[#8a6d1f]">
+              <div className="w-8 h-8 rounded-xl bg-[#1ca34c]/10 border border-[#1ca34c]/20 flex items-center justify-center text-[#15803d]">
                 <History className="w-4 h-4" />
               </div>
               <div>
@@ -943,7 +943,7 @@ export default function DailyClosingPage() {
               <button
                 onClick={handleExportPdf}
                 disabled={isExportingPdf || historyList.length === 0}
-                className="px-3.5 py-2 rounded-xl bg-[#d4af37]/10 border border-[#d4af37]/30 hover:bg-[#d4af37]/20 text-[#8a6d1f] text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                className="px-3.5 py-2 rounded-xl bg-[#1ca34c]/10 border border-[#1ca34c]/30 hover:bg-[#1ca34c]/20 text-[#15803d] text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
               >
                 <Download className="w-3.5 h-3.5" />
                 {isExportingPdf ? 'Generating PDF...' : 'Export Statement (PDF)'}
@@ -954,7 +954,7 @@ export default function DailyClosingPage() {
                 className="p-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-slate-900/20 text-slate-500 hover:text-slate-900 transition-all cursor-pointer"
                 title="Refresh History"
               >
-                <RefreshCw className={`w-3.5 h-3.5 ${isHistoryLoading ? 'animate-spin text-[#8a6d1f]' : ''}`} />
+                <RefreshCw className={`w-3.5 h-3.5 ${isHistoryLoading ? 'animate-spin text-[#15803d]' : ''}`} />
               </button>
             </div>
           </div>
@@ -978,14 +978,14 @@ export default function DailyClosingPage() {
                   return (
                     <tr
                       key={item.id}
-                      className={`hover:bg-slate-900/[0.04] transition-colors ${isSelected ? 'bg-[#d4af37]/5' : ''}`}
+                      className={`hover:bg-slate-900/[0.04] transition-colors ${isSelected ? 'bg-[#1ca34c]/5' : ''}`}
                     >
                       <td className="p-3.5 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-slate-900">{formatDatePretty(item.ledger_date)}</span>
                           <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
                             dayName === 'Friday'
-                              ? 'bg-amber-500/15 text-amber-300 border border-amber-500/20'
+                              ? 'bg-amber-500/15 text-amber-700 border border-amber-500/20'
                               : 'bg-slate-900/[0.04] text-slate-500'
                           }`}>
                             {dayName}
@@ -1001,7 +1001,7 @@ export default function DailyClosingPage() {
                       <td className="p-3.5 font-medium text-blue-600 whitespace-nowrap" title={`bKash: ${fmt(item.bkash_sales)}, Nagad: ${fmt(item.nagad_sales)}, Rocket: ${fmt(item.rocket_sales)}, Card: ${fmt(item.card_sales)}`}>
                         {fmt(digitalTotal)}
                       </td>
-                      <td className="p-3.5 font-serif font-bold text-[#8a6d1f] whitespace-nowrap">
+                      <td className="p-3.5 font-serif font-bold text-[#15803d] whitespace-nowrap">
                         {fmt(totalSales)}
                       </td>
                       <td className="p-3.5 font-medium text-amber-600 whitespace-nowrap">
@@ -1040,7 +1040,7 @@ export default function DailyClosingPage() {
                           }}
                           className={`px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all cursor-pointer ${
                             isSelected
-                              ? 'bg-[#d4af37] text-black'
+                              ? 'bg-[#1ca34c] text-white'
                               : 'bg-slate-900/[0.04] hover:bg-slate-900/[0.07] text-slate-600'
                           }`}
                         >

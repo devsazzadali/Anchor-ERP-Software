@@ -77,7 +77,7 @@ export default function CashLedgerPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -92,19 +92,19 @@ export default function CashLedgerPage() {
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Link href="/dashboard/branch-accounts"
-            className="p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 text-slate-500 hover:text-slate-900 transition-all"
+            className="p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 text-slate-500 hover:text-slate-900 transition-all"
           >
             <ChevronLeft className="w-4 h-4" />
           </Link>
           <div className="flex-1">
             <h1 className="text-xl font-bold font-serif flex items-center gap-2">
-              <Wallet className="w-5 h-5 text-[#8a6d1f]" /> Cash Ledger
+              <Wallet className="w-5 h-5 text-[#15803d]" /> Cash Ledger
             </h1>
             <p className="text-[11px] text-slate-500">Daily cash balance tracker</p>
           </div>
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-2 bg-slate-900/[0.04] border border-slate-900/5 rounded-xl px-3 py-2">
-              <Calendar className="w-3.5 h-3.5 text-[#8a6d1f]" />
+              <Calendar className="w-3.5 h-3.5 text-[#15803d]" />
               <input
                 type="date"
                 value={selectedDate}
@@ -113,7 +113,7 @@ export default function CashLedgerPage() {
               />
             </div>
             <button onClick={handleRefresh}
-              className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'animate-spin text-[#8a6d1f]' : ''}`}
+              className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'animate-spin text-[#15803d]' : ''}`}
             >
               <RefreshCw className="w-4 h-4" />
             </button>
@@ -151,7 +151,7 @@ export default function CashLedgerPage() {
               </div>
               {!ledger.is_closed && (
                 <Link href="/dashboard/branch-accounts/daily-closing"
-                  className="text-[10px] font-bold uppercase tracking-widest text-amber-600 hover:text-amber-300 transition-colors"
+                  className="text-[10px] font-bold uppercase tracking-widest text-amber-600 hover:text-amber-700 transition-colors"
                 >
                   Close Day →
                 </Link>
@@ -159,9 +159,9 @@ export default function CashLedgerPage() {
             </div>
 
             {/* Physical Cash Drawer Flow Card */}
-            <div className="rounded-2xl border border-slate-900/5 bg-slate-900/[0.04] p-6">
+            <div className="rounded-3xl border border-slate-900/5 bg-slate-900/[0.04] p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-[10px] uppercase tracking-widest text-[#8a6d1f] font-semibold">Physical Cash Drawer Flow</h3>
+                <h3 className="text-[10px] uppercase tracking-widest text-[#15803d] font-semibold">Physical Cash Drawer Flow</h3>
                 <span className="text-[10px] text-slate-500">Excludes Digital Sales</span>
               </div>
 
@@ -175,7 +175,7 @@ export default function CashLedgerPage() {
                 <LedgerRow
                   label="= Expected Closing Cash"
                   value={fmt(ledger.expected_closing_cash || 0)}
-                  color="text-[#8a6d1f]"
+                  color="text-[#15803d]"
                   border={false}
                   large
                 />
@@ -183,7 +183,7 @@ export default function CashLedgerPage() {
             </div>
 
             {/* Digital Sales Card */}
-            <div className="rounded-2xl border border-slate-900/5 bg-slate-900/[0.04] p-6">
+            <div className="rounded-3xl border border-slate-900/5 bg-slate-900/[0.04] p-6">
               <h3 className="text-[10px] uppercase tracking-widest text-slate-500 mb-4 font-semibold">Digital Sales (Direct to Accounts / Wallets)</h3>
               <LedgerRow label="bKash Sales"          value={fmt(ledger.bkash_sales || 0)}  color="text-pink-400" />
               <LedgerRow label="Nagad Sales"          value={fmt(ledger.nagad_sales || 0)}  color="text-orange-600" />
@@ -202,12 +202,12 @@ export default function CashLedgerPage() {
 
             {/* Actual Cash (after close) */}
             {ledger.is_closed && (
-              <div className="rounded-2xl border border-slate-900/5 bg-slate-900/[0.04] p-6">
-                <h3 className="text-[10px] uppercase tracking-widest text-[#8a6d1f] mb-4 font-semibold">Actual Day Close Reconciliation</h3>
+              <div className="rounded-3xl border border-slate-900/5 bg-slate-900/[0.04] p-6">
+                <h3 className="text-[10px] uppercase tracking-widest text-[#15803d] mb-4 font-semibold">Actual Day Close Reconciliation</h3>
                 <LedgerRow label="Opening Cash"              value={fmt(ledger.opening_cash || 0)} />
                 <LedgerRow label="Total Cash Sales"          value={fmt(ledger.cash_sales || 0)} color="text-emerald-600" />
                 <LedgerRow label="Bank Deposits Remitted"    value={fmt(ledger.bank_deposits_out || 0)} color="text-blue-600" />
-                <LedgerRow label="Counted Closing Cash"      value={fmt(ledger.actual_cash || 0)} color="text-[#8a6d1f]" large />
+                <LedgerRow label="Counted Closing Cash"      value={fmt(ledger.actual_cash || 0)} color="text-[#15803d]" large />
                 <LedgerRow label="Expected Closing Cash"     value={fmt(ledger.expected_closing_cash || 0)} />
                 <LedgerRow
                   label="Reconciliation Discrepancy"
@@ -234,9 +234,9 @@ export default function CashLedgerPage() {
                 { label: 'Close Day',     href: '/dashboard/branch-accounts/daily-closing', icon: CheckCircle },
               ].map(({ label, href, icon: Icon }) => (
                 <Link key={href} href={href}
-                  className="flex flex-col items-center gap-2 p-4 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 hover:bg-[#d4af37]/5 transition-all text-center"
+                  className="flex flex-col items-center gap-2 p-4 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 hover:bg-[#1ca34c]/5 transition-all text-center"
                 >
-                  <Icon className="w-4 h-4 text-[#8a6d1f]" />
+                  <Icon className="w-4 h-4 text-[#15803d]" />
                   <span className="text-[10px] font-semibold text-slate-600">{label}</span>
                 </Link>
               ))}

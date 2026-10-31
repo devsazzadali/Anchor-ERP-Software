@@ -74,7 +74,10 @@ export default function InvoiceRequestsPage() {
 
   return (
     <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold text-slate-900">Invoice Requests</h1>
+      <div className="flex items-center gap-3">
+        <span className="w-1.5 h-9 rounded-full bg-[#1ca34c] shrink-0" />
+        <h1 className="text-2xl font-extrabold text-slate-900">Invoice Requests</h1>
+      </div>
       {error && <p className="text-red-600">{error}</p>}
       <InvoiceRequestForm onSubmit={handleCreate} />
       <div className="space-y-4">

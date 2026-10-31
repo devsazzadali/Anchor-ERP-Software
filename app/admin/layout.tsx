@@ -82,7 +82,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center pt-16 md:pt-0">
-        <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin mb-4" />
+        <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin mb-4" />
         <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Verifying Admin Access...</span>
       </div>
     )

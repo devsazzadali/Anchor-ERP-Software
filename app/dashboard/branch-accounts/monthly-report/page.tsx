@@ -144,27 +144,27 @@ export default function MonthlyReportPage() {
   }
 
   if (isLoading) {
-    return <div className="min-h-screen bg-white flex items-center justify-center"><div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" /></div>
+    return <div className="min-h-screen bg-white flex items-center justify-center"><div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" /></div>
   }
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
       <div className="relative z-10 p-4 md:p-6 max-w-4xl mx-auto">
         <div className="flex items-center gap-4 mb-8">
-          <Link href="/dashboard/branch-accounts" className="p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 text-slate-500 hover:text-slate-900 transition-all">
+          <Link href="/dashboard/branch-accounts" className="p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 text-slate-500 hover:text-slate-900 transition-all">
             <ChevronLeft className="w-4 h-4" />
           </Link>
           <div className="flex-1">
-            <h1 className="text-xl font-bold tracking-tight flex items-center gap-2"><FileText className="w-5 h-5 text-[#8a6d1f]" /> Monthly Financial Report</h1>
+            <h1 className="text-xl font-bold tracking-tight flex items-center gap-2"><FileText className="w-5 h-5 text-[#15803d]" /> Monthly Financial Report</h1>
             <p className="text-[11px] text-slate-500">{report?.branchName} — {MONTHS[month - 1]} {year}</p>
           </div>
           <div className="flex items-center gap-2">
             <button 
               onClick={handleExportPdf}
               disabled={isExporting || !report?.dailyLedger?.length}
-              className="px-3 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#d4af37]/40 text-slate-600 hover:text-slate-900 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer"
+              className="px-3 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#1ca34c]/40 text-slate-600 hover:text-slate-900 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all disabled:opacity-50 cursor-pointer"
             >
-              <Download className="w-3.5 h-3.5 text-[#8a6d1f]" /> PDF
+              <Download className="w-3.5 h-3.5 text-[#15803d]" /> PDF
             </button>
             <button 
               onClick={handleExportExcel}
@@ -173,7 +173,7 @@ export default function MonthlyReportPage() {
             >
               <Download className="w-3.5 h-3.5 text-emerald-600" /> Excel
             </button>
-            <button onClick={handleRefresh} className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'animate-spin text-[#8a6d1f]' : ''}`}>
+            <button onClick={handleRefresh} className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 text-slate-500 hover:text-slate-900 transition-all cursor-pointer ${isRefreshing ? 'animate-spin text-[#15803d]' : ''}`}>
               <RefreshCw className="w-4 h-4" />
             </button>
           </div>
@@ -182,17 +182,17 @@ export default function MonthlyReportPage() {
         {/* Month/Year selector */}
         <div className="flex gap-3 mb-8 p-3 rounded-2xl bg-slate-900/[0.04] border border-slate-900/5">
           <select value={month} onChange={e => setMonth(Number(e.target.value))}
-            className="bg-white border border-slate-900/10 rounded-xl px-3.5 py-2 text-slate-900 text-xs focus:outline-none focus:border-[#d4af37]/40 cursor-pointer"
+            className="bg-white border border-slate-900/10 rounded-xl px-3.5 py-2 text-slate-900 text-xs focus:outline-none focus:border-[#1ca34c]/40 cursor-pointer"
           >
             {MONTHS.map((m, i) => <option key={i} value={i + 1}>{m}</option>)}
           </select>
           <select value={year} onChange={e => setYear(Number(e.target.value))}
-            className="bg-white border border-slate-900/10 rounded-xl px-3.5 py-2 text-slate-900 text-xs focus:outline-none focus:border-[#d4af37]/40 cursor-pointer"
+            className="bg-white border border-slate-900/10 rounded-xl px-3.5 py-2 text-slate-900 text-xs focus:outline-none focus:border-[#1ca34c]/40 cursor-pointer"
           >
             {Array.from({ length: 5 }, (_, i) => now.getFullYear() - 2 + i).map(y => <option key={y} value={y}>{y}</option>)}
           </select>
           <button onClick={fetchReport}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#d4af37] to-white text-black font-bold text-xs uppercase tracking-wider hover:opacity-90 transition-all cursor-pointer ml-auto"
+            className="px-4 py-2 rounded-full bg-[#1ca34c] hover:bg-[#15803d] text-white font-bold text-xs uppercase tracking-wider hover:opacity-90 transition-all cursor-pointer ml-auto"
           >
             Filter Month
           </button>
@@ -207,50 +207,50 @@ export default function MonthlyReportPage() {
           <div className="space-y-6">
             {/* Hero cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="p-5 rounded-2xl bg-gradient-to-br from-[#d4af37]/15 to-transparent border border-[#d4af37]/20">
+              <div className="p-5 rounded-3xl bg-gradient-to-br from-[#1ca34c]/15 to-transparent border border-[#1ca34c]/20">
                 <div className="flex items-center justify-between mb-2">
-                  <TrendingUp className="w-4 h-4 text-[#8a6d1f]" />
-                  <span className="text-[9px] font-bold text-[#8a6d1f] uppercase tracking-widest">Gross Sales</span>
+                  <span className="w-9 h-9 rounded-xl bg-[#e8f7ee] flex items-center justify-center"><TrendingUp className="w-4 h-4 text-[#15803d]" /></span>
+                  <span className="text-[9px] font-bold text-[#15803d] uppercase tracking-widest">Gross Sales</span>
                 </div>
                 <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Total Sales (মোট বিক্রি)</p>
-                <p className="text-xl md:text-2xl font-bold font-serif text-slate-900">{fmt(s.totalSales)}</p>
+                <p className="text-xl md:text-2xl font-extrabold text-slate-900">{fmt(s.totalSales)}</p>
                 <p className="text-[10px] text-slate-500 mt-1">Cash: {fmt(s.totalCashSales)} · Digital: {fmt(s.totalDigitalSales)}</p>
               </div>
 
-              <div className="p-5 rounded-2xl bg-gradient-to-br from-blue-500/15 to-transparent border border-blue-500/20">
+              <div className="p-5 rounded-3xl bg-gradient-to-br from-blue-500/15 to-transparent border border-blue-500/20">
                 <div className="flex items-center justify-between mb-2">
-                  <Building2 className="w-4 h-4 text-blue-600" />
+                  <span className="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center"><Building2 className="w-4 h-4 text-blue-600" /></span>
                   <span className="text-[9px] font-bold text-blue-600 uppercase tracking-widest">Bank Remitted</span>
                 </div>
                 <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Bank Deposits (ব্যাংকে জমা)</p>
-                <p className="text-xl md:text-2xl font-bold font-serif text-blue-600">{fmt(s.totalApprovedDeposits)}</p>
+                <p className="text-xl md:text-2xl font-extrabold text-blue-600">{fmt(s.totalApprovedDeposits)}</p>
                 <p className="text-[10px] text-slate-500 mt-1">Pending: {fmt(s.totalPendingDeposits)}</p>
               </div>
 
-              <div className="p-5 rounded-2xl bg-gradient-to-br from-rose-500/15 to-transparent border border-rose-500/20">
+              <div className="p-5 rounded-3xl bg-gradient-to-br from-rose-500/15 to-transparent border border-rose-500/20">
                 <div className="flex items-center justify-between mb-2">
-                  <TrendingDown className="w-4 h-4 text-rose-600" />
+                  <span className="w-9 h-9 rounded-xl bg-rose-500/10 flex items-center justify-center"><TrendingDown className="w-4 h-4 text-rose-600" /></span>
                   <span className="text-[9px] font-bold text-rose-600 uppercase tracking-widest">Expenses</span>
                 </div>
                 <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Cash Expenses (খরচ)</p>
-                <p className="text-xl md:text-2xl font-bold font-serif text-rose-600">{fmt(s.totalExpenses)}</p>
+                <p className="text-xl md:text-2xl font-extrabold text-rose-600">{fmt(s.totalExpenses)}</p>
                 <p className="text-[10px] text-slate-500 mt-1">Paid out of physical cash</p>
               </div>
 
-              <div className="p-5 rounded-2xl bg-gradient-to-br from-emerald-500/15 to-transparent border border-emerald-500/20">
+              <div className="p-5 rounded-3xl bg-gradient-to-br from-emerald-500/15 to-transparent border border-emerald-500/20">
                 <div className="flex items-center justify-between mb-2">
-                  <Wallet className="w-4 h-4 text-emerald-600" />
+                  <span className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center"><Wallet className="w-4 h-4 text-emerald-600" /></span>
                   <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest">Closing Cash</span>
                 </div>
                 <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Drawer Cash (ক্লোজিং ক্যাশ)</p>
-                <p className="text-xl md:text-2xl font-bold font-serif text-emerald-600">{fmt(s.netCash)}</p>
+                <p className="text-xl md:text-2xl font-extrabold text-emerald-600">{fmt(s.netCash)}</p>
                 <p className="text-[10px] text-slate-500 mt-1">Closed across {s.daysClosed} days</p>
               </div>
             </div>
 
             {/* Bank Accounts Distribution Breakdown */}
             {bankBreakdown && bankBreakdown.length > 0 && (
-              <div className="p-5 rounded-2xl border border-blue-500/20 bg-blue-500/5">
+              <div className="p-5 rounded-3xl border border-blue-500/20 bg-blue-500/5">
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <Building2 className="w-4 h-4 text-blue-600" />
@@ -313,7 +313,7 @@ export default function MonthlyReportPage() {
                           <td className="p-3 text-rose-600 whitespace-nowrap">{fmt(row.cash_expenses)}</td>
                           <td className="p-3 text-blue-600 font-medium whitespace-nowrap">{fmt(row.bank_deposits_out)}</td>
                           <td className="p-3 text-slate-600 font-medium whitespace-nowrap">{fmt(row.expected_closing_cash)}</td>
-                          <td className="p-3 text-[#8a6d1f] font-serif font-bold whitespace-nowrap">
+                          <td className="p-3 text-[#15803d] font-serif font-bold whitespace-nowrap">
                             {row.actual_cash !== null && row.actual_cash !== undefined ? fmt(row.actual_cash) : '—'}
                           </td>
                           <td className="p-3 whitespace-nowrap">

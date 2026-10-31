@@ -514,7 +514,7 @@ export default function PayoutManagement() {
     <div className="min-h-screen w-full flex bg-white text-slate-900 font-sans">
 
       {/* Background neon filters */}
-      <div className="absolute top-[-10%] right-[-5%] w-[50%] h-[50%] bg-[#d4af37]/3 rounded-full filter blur-[150px] pointer-events-none" />
+      <div className="absolute top-[-10%] right-[-5%] w-[50%] h-[50%] bg-[#1ca34c]/3 rounded-full filter blur-[150px] pointer-events-none" />
 
       {/* Floating Sidebar */}
 
@@ -524,7 +524,8 @@ export default function PayoutManagement() {
         {/* Upper title */}
         <div className="mb-6 pb-4 border-b border-slate-900/5 flex justify-between items-center">
           <div>
-            <h2 className="text-xl font-bold tracking-tight text-slate-900 font-serif">
+            <h2 className="text-xl font-extrabold tracking-tight text-slate-900 font-serif flex items-center gap-3">
+              <span className="w-1.5 h-8 rounded-full bg-[#1ca34c] shrink-0" />
               Liquidity Payout <span className="premium-text-gradient">Manager Desk</span>
             </h2>
             <p className="text-[11px] text-slate-500">Clear settlement payouts, audit billing details, and verify transaction hashes.</p>
@@ -549,7 +550,7 @@ export default function PayoutManagement() {
                   {!isSelectMode ? (
                     <button
                       onClick={() => setIsSelectMode(true)}
-                      className="px-2.5 py-1 bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#d4af37]/40 text-slate-600 hover:text-slate-900 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all cursor-pointer"
+                      className="px-2.5 py-1 bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#1ca34c]/40 text-slate-600 hover:text-slate-900 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all cursor-pointer"
                     >
                       Select Mode
                     </button>
@@ -575,7 +576,7 @@ export default function PayoutManagement() {
                               setSelectedIds([])
                             }
                           }}
-                          className="w-3 h-3 rounded border-slate-900/10 bg-white text-[#8a6d1f] focus:ring-0 accent-[#d4af37] cursor-pointer"
+                          className="w-3 h-3 rounded border-slate-900/10 bg-white text-[#15803d] focus:ring-0 accent-[#1ca34c] cursor-pointer"
                         />
                         <span className="text-[8px] font-bold text-slate-500 uppercase tracking-wider">All</span>
                       </label>
@@ -585,7 +586,7 @@ export default function PayoutManagement() {
                     <div className="relative">
                       <button
                         onClick={() => setShowExportDropdown(prev => !prev)}
-                        className="flex items-center gap-1 px-2.5 py-1 bg-gradient-to-r from-[#d4af37] to-white text-black hover:brightness-110 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-md shadow-[#d4af37]/10 cursor-pointer"
+                        className="flex items-center gap-1 px-2.5 py-1 bg-[#1ca34c] text-white hover:brightness-110 rounded-full text-[9px] font-bold uppercase tracking-wider transition-all hover:scale-105 active:scale-95 shadow-md shadow-[#1ca34c]/10 cursor-pointer"
                       >
                         <FileText className="w-3 h-3" />
                         <span>Export ({selectedIds.length}) ▼</span>
@@ -600,7 +601,7 @@ export default function PayoutManagement() {
                                 handleExportExcel();
                                 setShowExportDropdown(false);
                               }}
-                              className="px-3 py-1.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#8a6d1f] text-slate-900 transition-colors cursor-pointer"
+                              className="px-3 py-1.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#15803d] text-slate-900 transition-colors cursor-pointer"
                             >
                               Export to Excel (.xlsx)
                             </button>
@@ -609,7 +610,7 @@ export default function PayoutManagement() {
                                 handleExportCSV();
                                 setShowExportDropdown(false);
                               }}
-                              className="px-3 py-1.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#8a6d1f] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer"
+                              className="px-3 py-1.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#15803d] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer"
                             >
                               Export to CSV (.csv)
                             </button>
@@ -618,7 +619,7 @@ export default function PayoutManagement() {
                                 handleExportPDF();
                                 setShowExportDropdown(false);
                               }}
-                              className="px-3 py-1.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#8a6d1f] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer"
+                              className="px-3 py-1.5 text-left text-[10px] font-semibold hover:bg-slate-900/[0.04] hover:text-[#15803d] text-slate-900 transition-colors border-t border-slate-900/5 cursor-pointer"
                             >
                               Export to PDF (.pdf)
                             </button>
@@ -638,7 +639,7 @@ export default function PayoutManagement() {
                     onClick={() => updateStatusFilter(tab)}
                     className={`px-2.5 py-1 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all cursor-pointer whitespace-nowrap ${
                       statusFilter === tab
-                        ? 'bg-[#d4af37] text-black shadow-md shadow-[#d4af37]/20 font-extrabold'
+                        ? 'bg-[#1ca34c] text-white shadow-md shadow-[#1ca34c]/20 font-extrabold'
                         : 'bg-slate-900/[0.04] text-slate-500 hover:text-slate-900 hover:bg-slate-900/[0.07]'
                     }`}
                   >
@@ -653,7 +654,7 @@ export default function PayoutManagement() {
                   const isChecked = selectedIds.includes(req.id)
                   const statusColors = {
                     pending: 'bg-amber-500/10 text-amber-600 border border-amber-500/15',
-                    processing: 'bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20',
+                    processing: 'bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20',
                     completed: 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/10',
                     hold: 'bg-slate-100 text-slate-500 border border-slate-700',
                     fraud_flagged: 'bg-rose-500/10 text-rose-600 border border-rose-500/20 animate-pulse'
@@ -672,20 +673,20 @@ export default function PayoutManagement() {
                               setSelectedIds(prev => prev.filter(id => id !== req.id))
                             }
                           }}
-                          className="w-4 h-4 rounded border-slate-900/10 bg-white text-[#8a6d1f] focus:ring-0 accent-[#d4af37] cursor-pointer transition-all hover:scale-110 shrink-0"
+                          className="w-4 h-4 rounded border-slate-900/10 bg-white text-[#15803d] focus:ring-0 accent-[#1ca34c] cursor-pointer transition-all hover:scale-110 shrink-0"
                         />
                       )}
                       <button
                         onClick={() => handleSelectReq(req)}
                         className={`flex-1 text-left p-4 rounded-xl border transition-all cursor-pointer relative overflow-hidden flex flex-col justify-between group gap-3 ${
                           isSelected
-                            ? 'bg-[#d4af37]/10 border-[#d4af37]/40 shadow-lg'
+                            ? 'bg-[#1ca34c]/10 border-[#1ca34c]/40 shadow-lg'
                             : 'bg-slate-900/[0.04] border-slate-900/5 hover:border-slate-900/10'
                         }`}
                       >
                         <div className="flex justify-between items-start w-full">
                           <div>
-                            <h4 className="text-xs font-bold text-slate-900 group-hover:text-[#8a6d1f] transition-colors">{req.invoiceTitle}</h4>
+                            <h4 className="text-xs font-bold text-slate-900 group-hover:text-[#15803d] transition-colors">{req.invoiceTitle}</h4>
                             <p className="text-[10px] text-slate-500 mt-1">{req.userName} ({req.userEmail})</p>
                           </div>
                           <span className={`px-2.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider ${statusColors}`}>
@@ -720,12 +721,12 @@ export default function PayoutManagement() {
                   exit={{ opacity: 0, x: -15 }}
                   className="glass-panel p-6 rounded-2xl relative shadow-2xl space-y-6"
                 >
-                  <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/30 to-transparent" />
+                  <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#1ca34c]/30 to-transparent" />
 
                   {/* Title & Status */}
                   <div className="flex justify-between items-start border-b border-slate-900/5 pb-4">
                     <div>
-                      <span className="text-[10px] font-bold text-[#8a6d1f] uppercase tracking-wider">Settlement Console</span>
+                      <span className="text-[10px] font-bold text-[#15803d] uppercase tracking-wider">Settlement Console</span>
                       <h3 className="text-base font-bold text-slate-900 font-serif">{selectedReq.invoiceTitle}</h3>
                       <p className="text-[10px] text-slate-500 font-mono">Invoice Reference: {selectedReq.invoiceNumber}</p>
                     </div>
@@ -736,7 +737,7 @@ export default function PayoutManagement() {
                   {/* Target Billing Specifics */}
                   <div className="p-4 rounded-xl bg-white border border-slate-900/5 space-y-3.5 text-xs">
                     <span className="text-[9px] font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                      <Landmark className="w-3.5 h-3.5 text-[#8a6d1f]" />
+                      <Landmark className="w-3.5 h-3.5 text-[#15803d]" />
                       Clearance Target specifications
                     </span>
 
@@ -794,7 +795,7 @@ export default function PayoutManagement() {
                         <div className="flex gap-4">
                           <button
                             onClick={() => handleAccept(selectedReq.id)}
-                            className="flex-1 bg-gradient-to-r from-[#d4af37] to-white text-black font-semibold py-3.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+                            className="flex-1 bg-[#1ca34c] text-white font-semibold py-3.5 rounded-full text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-lg"
                           >
                             <Check className="w-4 h-4" />
                             <span>Accept & Move to Processing</span>
@@ -812,14 +813,14 @@ export default function PayoutManagement() {
 
                     {selectedReq.status === 'processing' && (
                       <div className="space-y-4">
-                        <div className="p-3.5 rounded-xl bg-[#d4af37]/5 border border-[#d4af37]/20 text-[#8a6d1f] text-[10px] flex items-center gap-2">
+                        <div className="p-3.5 rounded-xl bg-[#1ca34c]/5 border border-[#1ca34c]/20 text-[#15803d] text-[10px] flex items-center gap-2">
                           <Clock className="w-4 h-4 animate-pulse" />
                           <span>Invoice Claim is currently under active Processing state. Transfer funds to client target bank specifications.</span>
                         </div>
 
                         <button
                           onClick={() => setShowConfirmModal(true)}
-                          className="w-full bg-gradient-to-r from-[#d4af37] to-white text-black font-semibold py-3.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-lg"
+                          className="w-full bg-[#1ca34c] text-white font-semibold py-3.5 rounded-full text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-lg"
                         >
                           <Compass className="w-4 h-4 animate-spin" />
                           <span>Input Transaction ID & Clear Payout</span>
@@ -858,7 +859,7 @@ export default function PayoutManagement() {
                         <div className="flex flex-wrap gap-2.5">
                           <button
                             onClick={() => changeStatus(selectedReq.id, 'hold')}
-                            className="px-3.5 py-2 rounded-lg bg-white border border-slate-900/5 hover:border-[#d4af37]/30 text-slate-500 hover:text-slate-900 text-[10px] font-semibold tracking-wider transition-colors cursor-pointer"
+                            className="px-3.5 py-2 rounded-lg bg-white border border-slate-900/5 hover:border-[#1ca34c]/30 text-slate-500 hover:text-slate-900 text-[10px] font-semibold tracking-wider transition-colors cursor-pointer"
                           >
                             Hold settlement
                           </button>
@@ -900,12 +901,12 @@ export default function PayoutManagement() {
               initial={{ scale: 0.95 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.95 }}
-              className="glass-panel p-6 rounded-2xl max-w-md w-full relative shadow-2xl overflow-y-auto max-h-[90vh] border border-[#d4af37]/30"
+              className="glass-panel p-6 rounded-2xl max-w-md w-full relative shadow-2xl overflow-y-auto max-h-[90vh] border border-[#1ca34c]/30"
             >
-              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/40 to-transparent" />
+              <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#1ca34c]/40 to-transparent" />
 
               <div className="flex gap-3 items-start mb-4">
-                <div className="p-2 rounded-lg bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20">
+                <div className="p-2 rounded-lg bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20">
                   <ShieldAlert className="w-5 h-5" />
                 </div>
                 <div>
@@ -924,7 +925,7 @@ export default function PayoutManagement() {
                       value={transactionId}
                       onChange={(e) => setTransactionId(e.target.value)}
                       placeholder="e.g. TRX-992102831"
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 pl-10 pr-4 text-xs font-mono text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#d4af37]/50"
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 pl-10 pr-4 text-xs font-mono text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/50"
                     />
                   </div>
                 </div>
@@ -952,7 +953,7 @@ export default function PayoutManagement() {
                       className={`w-full py-3.5 border border-dashed rounded-xl flex items-center justify-center gap-2 text-xs font-semibold transition-all ${
                         selectedFile
                           ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-600'
-                          : 'bg-slate-900/[0.04] border-slate-900/10 hover:border-[#d4af37]/30 text-slate-500 hover:text-slate-900'
+                          : 'bg-slate-900/[0.04] border-slate-900/10 hover:border-[#1ca34c]/30 text-slate-500 hover:text-slate-900'
                       }`}
                     >
                       <Camera className="w-4 h-4" />
@@ -967,7 +968,7 @@ export default function PayoutManagement() {
                   <button
                     onClick={handleConfirmCompletion}
                     disabled={!transactionId || isUploading}
-                    className="flex-1 bg-gradient-to-r from-[#d4af37] to-white text-black font-semibold py-2.5 rounded-xl text-xs uppercase cursor-pointer disabled:opacity-55 flex items-center justify-center gap-2"
+                    className="flex-1 bg-[#1ca34c] text-white font-semibold py-2.5 rounded-full text-xs uppercase cursor-pointer disabled:opacity-55 flex items-center justify-center gap-2"
                   >
                     {isUploading && <Compass className="w-4 h-4 animate-spin" />}
                     {isUploading ? 'Processing...' : 'Confirm Settlement'}

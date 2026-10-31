@@ -202,10 +202,10 @@ export default function Verify2FAPage() {
             <ShieldAlert className="w-10 h-10 text-rose-500 mx-auto mb-4" />
             <p className="text-sm font-bold text-slate-900 mb-2">Session Expired</p>
             <p className="text-xs text-slate-500 mb-6">Could not load your session. Please sign in again.</p>
-            <a href="/" className="text-[#8a6d1f] underline text-xs">Back to Login</a>
+            <a href="/" className="text-[#15803d] underline text-xs">Back to Login</a>
           </div>
         ) : (
-          <Loader2 className="w-8 h-8 text-[#8a6d1f] animate-spin" />
+          <Loader2 className="w-8 h-8 text-[#15803d] animate-spin" />
         )}
       </div>
     )
@@ -213,19 +213,21 @@ export default function Verify2FAPage() {
 
   return (
     <div className="min-h-screen w-full bg-white flex items-center justify-center p-4 relative overflow-hidden font-sans">
-      <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-[#d4af37]/10 rounded-full filter blur-[150px] pointer-events-none" />
-      <div className="absolute bottom-[-20%] left-[-10%] w-[60%] h-[60%] bg-[#d4af37]/5 rounded-full filter blur-[150px] pointer-events-none" />
+      <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-[#1ca34c]/10 rounded-full filter blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-[-20%] left-[-10%] w-[60%] h-[60%] bg-[#1ca34c]/5 rounded-full filter blur-[150px] pointer-events-none" />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md"
       >
-        <div className="bg-slate-900/[0.05] backdrop-blur-xl border border-slate-900/10 rounded-3xl p-8 sm:p-10 shadow-[0_0_50px_rgba(212,175,55,0.05)] relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#d4af37]/50 to-transparent" />
+        <div className="bg-slate-900/[0.05] backdrop-blur-xl border border-slate-900/10 rounded-3xl p-8 sm:p-10 shadow-[0_0_50px_rgba(28,163,76,0.05)] relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#1ca34c]/50 to-transparent" />
 
           <div className="flex justify-center mb-6">
-            <img src="/logos.png" alt="Anchor ERP Official Logo" className="w-16 h-16 object-contain drop-shadow-lg" />
+            <div className="w-16 h-16 rounded-2xl bg-[#1ca34c] flex items-center justify-center shadow-lg shadow-[#1ca34c]/25">
+              <img src="/logos.png" alt="Anchor ERP Official Logo" className="w-10 h-10 object-contain brightness-0 invert" />
+            </div>
           </div>
 
           <h2 className="text-2xl font-bold text-center text-slate-900 font-serif mb-2">Two-Step Verification</h2>
@@ -255,7 +257,7 @@ export default function Verify2FAPage() {
                 value={digit}
                 onChange={e => handleOtpChange(index, e.target.value)}
                 onKeyDown={e => handleKeyDown(index, e)}
-                className="flex-1 min-w-0 h-12 sm:h-14 text-center text-xl sm:text-2xl font-bold text-slate-900 bg-white border border-slate-900/10 rounded-xl focus:border-[#d4af37] focus:ring-1 focus:ring-[#d4af37] outline-none transition-all"
+                className="flex-1 min-w-0 h-12 sm:h-14 text-center text-xl sm:text-2xl font-bold text-slate-900 bg-white border border-slate-900/10 rounded-xl focus:border-[#1ca34c] focus:ring-1 focus:ring-[#1ca34c] outline-none transition-all"
               />
             ))}
           </div>
@@ -263,7 +265,7 @@ export default function Verify2FAPage() {
           <button
             onClick={handleVerify}
             disabled={isLoading || otp.join('').length !== 6}
-            className="w-full bg-gradient-to-r from-[#d4af37] to-white text-black font-bold py-4 rounded-xl text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all hover:shadow-[0_0_20px_rgba(212,175,55,0.3)] disabled:opacity-50 disabled:hover:shadow-none"
+            className="w-full bg-[#1ca34c] hover:bg-[#15803d] text-white font-bold py-4 rounded-full text-sm uppercase tracking-wider flex items-center justify-center gap-2 transition-all hover:shadow-[0_0_20px_rgba(28,163,76,0.3)] disabled:opacity-50 disabled:hover:shadow-none"
           >
             {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
               <>
@@ -276,13 +278,13 @@ export default function Verify2FAPage() {
           <div className="mt-8 text-center">
             {timeLeft > 0 ? (
               <p className="text-xs text-slate-500">
-                Resend code in <strong className="text-[#8a6d1f] font-mono">{formatTime(timeLeft)}</strong>
+                Resend code in <strong className="text-[#15803d] font-mono">{formatTime(timeLeft)}</strong>
               </p>
             ) : (
               <button
                 onClick={handleResend}
                 disabled={isResending}
-                className="text-xs text-[#8a6d1f] hover:text-slate-900 transition-colors font-semibold uppercase tracking-wider"
+                className="text-xs text-[#15803d] hover:text-slate-900 transition-colors font-semibold uppercase tracking-wider"
               >
                 {isResending ? 'Resending...' : 'Resend Code Now'}
               </button>

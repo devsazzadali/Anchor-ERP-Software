@@ -207,7 +207,7 @@ export default function UserExpenses() {
     <div className="min-h-screen flex bg-white text-slate-900 font-sans md:ml-64 relative overflow-hidden">
       
       {/* Dynamic Background neon glows */}
-      <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-[#d4af37]/5 rounded-full filter blur-[150px] pointer-events-none mix-blend-multiply" />
+      <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-[#1ca34c]/5 rounded-full filter blur-[150px] pointer-events-none mix-blend-multiply" />
       <div className="absolute bottom-[-10%] left-[10%] w-[50%] h-[50%] bg-[#10b981]/5 rounded-full filter blur-[150px] pointer-events-none mix-blend-multiply" />
       <div className="absolute top-[40%] left-[40%] w-[30%] h-[30%] bg-blue-500/5 rounded-full filter blur-[120px] pointer-events-none mix-blend-multiply" />
 
@@ -221,11 +221,13 @@ export default function UserExpenses() {
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
           className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 mb-10 pb-6 relative"
         >
-          <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-[#d4af37]/30 via-[#d4af37]/15 to-transparent" />
+          <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-[#1ca34c]/30 via-[#1ca34c]/15 to-transparent" />
           
-          <div>
+          <div className="flex items-start gap-3">
+            <span className="w-1.5 h-9 rounded-full bg-[#1ca34c] shrink-0" />
+            <div>
             <div className="flex items-center gap-3 mb-3">
-              <span className="text-[9px] bg-gradient-to-r from-[#d4af37]/20 to-[#d4af37]/5 text-[#8a6d1f] border border-[#d4af37]/30 px-3 py-1.5 rounded-full font-bold uppercase tracking-widest flex items-center gap-1.5 shadow-[0_0_20px_rgba(212,175,55,0.15)] backdrop-blur-md">
+              <span className="text-[9px] bg-gradient-to-r from-[#1ca34c]/20 to-[#1ca34c]/5 text-[#15803d] border border-[#1ca34c]/30 px-3 py-1.5 rounded-full font-bold uppercase tracking-widest flex items-center gap-1.5 shadow-[0_0_20px_rgba(28,163,76,0.15)] backdrop-blur-md">
                 <Landmark className="w-3 h-3" />
                 Dossier Verified
               </span>
@@ -234,14 +236,15 @@ export default function UserExpenses() {
               </span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black tracking-tighter text-slate-900 font-serif mb-1.5">
-              Company <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#d4af37] via-[#f1d570] to-[#d4af37]">Outlays Ledger</span>
+              Company <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1ca34c] via-[#86efac] to-[#1ca34c]">Outlays Ledger</span>
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 tracking-wide font-light">Welcome back, <span className="text-slate-900 font-medium">{userName}</span>. Transparency report on operational capital.</p>
+            </div>
           </div>
 
           <button 
             onClick={fetchExpenses}
-            className={`p-4 rounded-2xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#d4af37]/40 hover:bg-[#d4af37]/10 text-slate-500 hover:text-[#8a6d1f] transition-all duration-300 cursor-pointer shadow-lg hover:shadow-[0_0_25px_rgba(212,175,55,0.2)] group self-start sm:self-auto ${isLoading ? 'animate-pulse border-[#d4af37]/50 text-[#8a6d1f]' : ''}`}
+            className={`p-4 rounded-2xl bg-slate-900/[0.04] border border-slate-900/10 hover:border-[#1ca34c]/40 hover:bg-[#1ca34c]/10 text-slate-500 hover:text-[#15803d] transition-all duration-300 cursor-pointer shadow-lg hover:shadow-[0_0_25px_rgba(28,163,76,0.2)] group self-start sm:self-auto ${isLoading ? 'animate-pulse border-[#1ca34c]/50 text-[#15803d]' : ''}`}
           >
             <RefreshCw className={`w-5 h-5 transition-transform duration-700 ease-out group-hover:rotate-180 ${isLoading ? 'animate-spin' : ''}`} />
           </button>
@@ -281,22 +284,22 @@ export default function UserExpenses() {
             transition={{ delay: 0.2, duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             className="glass-panel p-5 sm:p-6 rounded-3xl relative shadow-2xl border border-slate-900/5 bg-gradient-to-br from-white to-black overflow-hidden group flex flex-col justify-between"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-[#d4af37]/0 via-[#d4af37]/5 to-[#d4af37]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none -translate-x-full group-hover:translate-x-full" />
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/30 to-transparent opacity-60" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#1ca34c]/0 via-[#1ca34c]/5 to-[#1ca34c]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none -translate-x-full group-hover:translate-x-full" />
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#1ca34c]/30 to-transparent opacity-60" />
             
             <div className="relative z-10 flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-2">Company Budget Logs</span>
-                <h3 className="text-3xl sm:text-4xl font-black text-slate-900 font-mono tracking-tighter group-hover:text-[#8a6d1f] transition-colors drop-shadow-lg truncate">
+                <h3 className="text-3xl sm:text-4xl font-black text-slate-900 font-mono tracking-tighter group-hover:text-[#15803d] transition-colors drop-shadow-lg truncate">
                   {branchFilteredExpenses.length} <span className="text-sm sm:text-base text-slate-500 font-sans tracking-normal ml-1 font-medium">Entries</span>
                 </h3>
                 <p className="text-[11px] text-slate-500 mt-3 flex items-center gap-2 flex-wrap">
-                  <Sparkles className="w-3.5 h-3.5 text-[#8a6d1f]/80 shrink-0" /> 
-                  <span className="bg-[#d4af37]/10 text-[#8a6d1f] px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border border-[#d4af37]/20 shrink-0">Active</span> 
+                  <Sparkles className="w-3.5 h-3.5 text-[#15803d]/80 shrink-0" /> 
+                  <span className="bg-[#1ca34c]/10 text-[#15803d] px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border border-[#1ca34c]/20 shrink-0">Active</span> 
                   <span>Audit footprints streamed</span>
                 </p>
               </div>
-              <div className="p-3.5 sm:p-4 bg-gradient-to-br from-[#d4af37]/20 to-[#d4af37]/5 border border-[#d4af37]/20 rounded-2xl text-[#8a6d1f] shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shrink-0">
+              <div className="p-3.5 sm:p-4 bg-gradient-to-br from-[#1ca34c]/20 to-[#1ca34c]/5 border border-[#1ca34c]/20 rounded-2xl text-[#15803d] shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 shrink-0">
                 <TrendingUp className="w-7 h-7 sm:w-8 sm:h-8" />
               </div>
             </div>
@@ -312,7 +315,7 @@ export default function UserExpenses() {
             transition={{ delay: 0.3, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
             className="glass-panel p-5 sm:p-6 rounded-3xl relative shadow-2xl border border-slate-900/5 bg-gradient-to-b from-white to-black w-full overflow-hidden"
           >
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/20 to-transparent opacity-40" />
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#1ca34c]/20 to-transparent opacity-40" />
             
             <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-5 mb-8 relative z-10">
               <div className="flex-1 w-full xl:w-auto">
@@ -323,7 +326,7 @@ export default function UserExpenses() {
                       <div className="relative">
                         <button
                           onClick={() => setShowExportDropdown(prev => !prev)}
-                          className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-[#d4af37] to-white text-black hover:brightness-110 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(212,175,55,0.3)] cursor-pointer border border-[#d4af37]/50 whitespace-nowrap"
+                          className="flex items-center gap-1.5 px-3.5 py-2 bg-[#1ca34c] hover:bg-[#15803d] text-white hover:brightness-110 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(28,163,76,0.3)] cursor-pointer border border-[#1ca34c]/50 whitespace-nowrap"
                         >
                           <FileText className="w-4 h-4 shrink-0" />
                           <span>Export ({filteredExpenses.length}) ▼</span>
@@ -338,14 +341,14 @@ export default function UserExpenses() {
                               animate={{ opacity: 1, y: 0, scale: 1 }}
                               exit={{ opacity: 0, y: -10, scale: 0.95 }}
                               transition={{ duration: 0.2 }}
-                              className="absolute right-0 mt-2 w-48 bg-white border border-[#d4af37]/20 rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.25)] py-2 z-20 flex flex-col backdrop-blur-xl"
+                              className="absolute right-0 mt-2 w-48 bg-white border border-[#1ca34c]/20 rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.25)] py-2 z-20 flex flex-col backdrop-blur-xl"
                             >
                               <button
                                 onClick={() => {
                                   handleExportExcel();
                                   setShowExportDropdown(false);
                                 }}
-                                className="px-4 py-2.5 text-left text-xs font-semibold hover:bg-[#d4af37]/10 hover:text-[#8a6d1f] text-slate-600 transition-colors cursor-pointer flex items-center gap-2"
+                                className="px-4 py-2.5 text-left text-xs font-semibold hover:bg-[#1ca34c]/10 hover:text-[#15803d] text-slate-600 transition-colors cursor-pointer flex items-center gap-2"
                               >
                                 Export Excel (.xlsx)
                               </button>
@@ -354,7 +357,7 @@ export default function UserExpenses() {
                                   handleExportCSV();
                                   setShowExportDropdown(false);
                                 }}
-                                className="px-4 py-2.5 text-left text-xs font-semibold hover:bg-[#d4af37]/10 hover:text-[#8a6d1f] text-slate-600 transition-colors cursor-pointer flex items-center gap-2"
+                                className="px-4 py-2.5 text-left text-xs font-semibold hover:bg-[#1ca34c]/10 hover:text-[#15803d] text-slate-600 transition-colors cursor-pointer flex items-center gap-2"
                               >
                                 Export CSV (.csv)
                               </button>
@@ -363,7 +366,7 @@ export default function UserExpenses() {
                                   handleExportPDF();
                                   setShowExportDropdown(false);
                                 }}
-                                className="px-4 py-2.5 text-left text-xs font-semibold hover:bg-[#d4af37]/10 hover:text-[#8a6d1f] text-slate-600 transition-colors cursor-pointer flex items-center gap-2"
+                                className="px-4 py-2.5 text-left text-xs font-semibold hover:bg-[#1ca34c]/10 hover:text-[#15803d] text-slate-600 transition-colors cursor-pointer flex items-center gap-2"
                               >
                                 Export PDF (.pdf)
                               </button>
@@ -382,8 +385,8 @@ export default function UserExpenses() {
                   <select
                     value={selectedBranchId}
                     onChange={(e) => setSelectedBranchId(e.target.value)}
-                    className="w-full sm:w-48 bg-white border border-slate-900/10 hover:border-[#d4af37]/30 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/60 focus:ring-1 focus:ring-[#d4af37]/20 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)] appearance-none cursor-pointer"
-                    style={{ backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23D4AF37%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem top 50%', backgroundSize: '0.65rem auto' }}
+                    className="w-full sm:w-48 bg-white border border-slate-900/10 hover:border-[#1ca34c]/30 rounded-xl py-3 px-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/60 focus:ring-1 focus:ring-[#1ca34c]/20 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)] appearance-none cursor-pointer"
+                    style={{ backgroundImage: 'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%231CA34C%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem top 50%', backgroundSize: '0.65rem auto' }}
                   >
                     <option value="all">All Branches</option>
                     <option value="head_office">Head Office</option>
@@ -395,22 +398,22 @@ export default function UserExpenses() {
                 
                 <button
                   onClick={() => setShowFilters(!showFilters)}
-                  className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border text-[10px] font-bold uppercase tracking-widest transition-all ${showFilters ? 'border-[#d4af37]/40 bg-[#d4af37]/10 text-[#8a6d1f]' : 'border-slate-900/10 bg-white text-slate-500 hover:border-slate-900/20 hover:text-slate-900'}`}
+                  className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl border text-[10px] font-bold uppercase tracking-widest transition-all ${showFilters ? 'border-[#1ca34c]/40 bg-[#1ca34c]/10 text-[#15803d]' : 'border-slate-900/10 bg-white text-slate-500 hover:border-slate-900/20 hover:text-slate-900'}`}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
                   Filters
-                  {(dateFrom || dateTo) && <span className="w-1.5 h-1.5 rounded-full bg-[#d4af37]" />}
+                  {(dateFrom || dateTo) && <span className="w-1.5 h-1.5 rounded-full bg-[#1ca34c]" />}
                 </button>
 
                 {/* Search */}
                 <div className="relative w-full sm:w-64 shrink-0 group">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-[#8a6d1f] transition-colors" />
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-[#15803d] transition-colors" />
                   <input
                     type="text"
                     placeholder="Search ledger..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="w-full bg-white border border-slate-900/10 hover:border-[#d4af37]/30 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/60 focus:ring-1 focus:ring-[#d4af37]/20 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)]"
+                    className="w-full bg-white border border-slate-900/10 hover:border-[#1ca34c]/30 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/60 focus:ring-1 focus:ring-[#1ca34c]/20 transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)]"
                   />
                 </div>
               </div>
@@ -426,19 +429,19 @@ export default function UserExpenses() {
                   <div className="p-4 flex flex-wrap gap-3 items-end">
                     <div>
                       <label className="block text-[9px] text-slate-600 uppercase tracking-wider mb-1">From</label>
-                      <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="bg-white border border-slate-900/10 hover:border-[#d4af37]/30 rounded-xl py-2 px-3 text-[11px] text-slate-500 focus:outline-none focus:border-[#d4af37]/40 cursor-pointer shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)] transition-all" />
+                      <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="bg-white border border-slate-900/10 hover:border-[#1ca34c]/30 rounded-xl py-2 px-3 text-[11px] text-slate-500 focus:outline-none focus:border-[#1ca34c]/40 cursor-pointer shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)] transition-all" />
                     </div>
                     <div>
                       <label className="block text-[9px] text-slate-600 uppercase tracking-wider mb-1">To</label>
-                      <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="bg-white border border-slate-900/10 hover:border-[#d4af37]/30 rounded-xl py-2 px-3 text-[11px] text-slate-500 focus:outline-none focus:border-[#d4af37]/40 cursor-pointer shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)] transition-all" />
+                      <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="bg-white border border-slate-900/10 hover:border-[#1ca34c]/30 rounded-xl py-2 px-3 text-[11px] text-slate-500 focus:outline-none focus:border-[#1ca34c]/40 cursor-pointer shadow-[inset_0_2px_4px_rgba(0,0,0,0.5)] transition-all" />
                     </div>
-                    <button onClick={() => setDateRange(1)} className="px-3 py-2 rounded-xl border border-slate-900/10 bg-slate-900/[0.04] text-[10px] text-slate-500 hover:border-[#d4af37]/30 hover:text-slate-900 transition-all font-semibold">
+                    <button onClick={() => setDateRange(1)} className="px-3 py-2 rounded-xl border border-slate-900/10 bg-slate-900/[0.04] text-[10px] text-slate-500 hover:border-[#1ca34c]/30 hover:text-slate-900 transition-all font-semibold">
                       Last 1 Month
                     </button>
-                    <button onClick={() => setDateRange(3)} className="px-3 py-2 rounded-xl border border-slate-900/10 bg-slate-900/[0.04] text-[10px] text-slate-500 hover:border-[#d4af37]/30 hover:text-slate-900 transition-all font-semibold">
+                    <button onClick={() => setDateRange(3)} className="px-3 py-2 rounded-xl border border-slate-900/10 bg-slate-900/[0.04] text-[10px] text-slate-500 hover:border-[#1ca34c]/30 hover:text-slate-900 transition-all font-semibold">
                       Last 3 Months
                     </button>
-                    <button onClick={() => setDateRange(6)} className="px-3 py-2 rounded-xl border border-slate-900/10 bg-slate-900/[0.04] text-[10px] text-slate-500 hover:border-[#d4af37]/30 hover:text-slate-900 transition-all font-semibold">
+                    <button onClick={() => setDateRange(6)} className="px-3 py-2 rounded-xl border border-slate-900/10 bg-slate-900/[0.04] text-[10px] text-slate-500 hover:border-[#1ca34c]/30 hover:text-slate-900 transition-all font-semibold">
                       Last 6 Months
                     </button>
 
@@ -459,7 +462,7 @@ export default function UserExpenses() {
             {/* LIST */}
             {(dateFrom || dateTo) && (
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-[10px] bg-[#d4af37]/20 text-[#8a6d1f] border border-[#d4af37]/30 px-3 py-1.5 rounded-lg font-bold tracking-wider flex items-center gap-2">
+                <span className="text-[10px] bg-[#1ca34c]/20 text-[#15803d] border border-[#1ca34c]/30 px-3 py-1.5 rounded-lg font-bold tracking-wider flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
                   Filtered by Date: {dateFrom || 'Start'} to {dateTo || 'Present'}
                 </span>
@@ -478,27 +481,27 @@ export default function UserExpenses() {
                       transition={{ delay: index * 0.04, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                       className={`p-4 rounded-2xl border flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 transition-all duration-300 group relative overflow-hidden ${
                         isChecked && isSelectMode 
-                          ? 'bg-[#d4af37]/10 border-[#d4af37]/50 shadow-[0_0_20px_rgba(212,175,55,0.15)]' 
-                          : 'bg-white border-slate-900/5 hover:border-[#d4af37]/40 hover:bg-slate-900/[0.04] hover:shadow-lg'
+                          ? 'bg-[#1ca34c]/10 border-[#1ca34c]/50 shadow-[0_0_20px_rgba(28,163,76,0.15)]' 
+                          : 'bg-white border-slate-900/5 hover:border-[#1ca34c]/40 hover:bg-slate-900/[0.04] hover:shadow-lg'
                       }`}
                     >
                       {/* Magical glow effect on hover */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-[#d4af37]/0 via-[#d4af37]/10 to-[#d4af37]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none -translate-x-full group-hover:translate-x-full" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-[#1ca34c]/0 via-[#1ca34c]/10 to-[#1ca34c]/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none -translate-x-full group-hover:translate-x-full" />
                       
                       <div className="flex items-center gap-4 min-w-0 flex-1 relative z-10">
-                        <div className="w-12 h-12 rounded-[14px] bg-gradient-to-tr from-[#d4af37]/20 to-white border border-[#d4af37]/30 flex items-center justify-center shrink-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)] group-hover:shadow-[0_0_20px_rgba(212,175,55,0.25)] group-hover:scale-105 transition-all duration-400">
-                          <Briefcase className="w-5 h-5 text-[#8a6d1f]" />
+                        <div className="w-12 h-12 rounded-[14px] bg-gradient-to-tr from-[#1ca34c]/20 to-white border border-[#1ca34c]/30 flex items-center justify-center shrink-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)] group-hover:shadow-[0_0_20px_rgba(28,163,76,0.25)] group-hover:scale-105 transition-all duration-400">
+                          <Briefcase className="w-5 h-5 text-[#15803d]" />
                         </div>
                         
                         <div className="space-y-1.5 min-w-0 flex-1">
                           <span className="text-xs font-bold text-slate-900/90 block truncate group-hover:text-slate-900 transition-colors">{exp.purpose}</span>
                           
                           <div className="flex flex-wrap items-center gap-2 text-[10px] text-slate-500 font-mono">
-                            <span className="bg-[#d4af37]/10 text-[#8a6d1f] px-2 py-0.5 rounded border border-[#d4af37]/20 font-bold uppercase tracking-wider shrink-0">
+                            <span className="bg-[#1ca34c]/10 text-[#15803d] px-2 py-0.5 rounded border border-[#1ca34c]/20 font-bold uppercase tracking-wider shrink-0">
                               {exp.branch_name || 'Head Office'}
                             </span>
                             <div className="flex items-center gap-1.5 shrink-0 bg-slate-900/[0.04] px-1.5 py-0.5 rounded-md border border-slate-900/5">
-                              <Calendar className="w-3 h-3 text-[#8a6d1f]/80" />
+                              <Calendar className="w-3 h-3 text-[#15803d]/80" />
                               <span>{new Date(exp.created_at).toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
                             </div>
                             <span className="w-1 h-1 rounded-full bg-slate-900/[0.09] shrink-0 hidden sm:inline-block" />
@@ -521,8 +524,8 @@ export default function UserExpenses() {
                           </span>
                         </div>
                         <div className="flex flex-col items-end border-l border-slate-900/10 pl-3 sm:pl-6 md:pl-10">
-                          <span className="text-[8px] text-[#8a6d1f]/80 uppercase tracking-widest font-bold mb-1">Due Amount</span>
-                          <span className="text-sm sm:text-base font-bold text-[#8a6d1f] font-mono drop-shadow-[0_0_10px_rgba(212,175,55,0.3)]">
+                          <span className="text-[8px] text-[#15803d]/80 uppercase tracking-widest font-bold mb-1">Due Amount</span>
+                          <span className="text-sm sm:text-base font-bold text-[#15803d] font-mono drop-shadow-[0_0_10px_rgba(28,163,76,0.3)]">
                             ৳{parseFloat(exp.due_amount !== undefined ? exp.due_amount : (exp.total_amount || 0)).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                           </span>
                         </div>

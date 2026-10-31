@@ -260,7 +260,7 @@ export default function UserDashboard() {
     return (
       <div className="min-h-screen w-full flex items-center justify-center bg-white text-slate-900">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" />
           <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">
             Entering Branch Management...
           </span>
@@ -273,7 +273,7 @@ export default function UserDashboard() {
   if (profileType === 'employee' || profileType === 'head_office') {
     return (
       <div className="min-h-screen w-full flex bg-white text-slate-900 font-sans">
-        <div className="absolute top-[-5%] right-[-5%] w-[45%] h-[45%] bg-[#d4af37]/3 rounded-full filter blur-[120px] pointer-events-none" />
+        <div className="absolute top-[-5%] right-[-5%] w-[45%] h-[45%] bg-[#1ca34c]/3 rounded-full filter blur-[120px] pointer-events-none" />
         <div className="absolute bottom-[-5%] left-[20%] w-[50%] h-[50%] bg-[#10b981]/3 rounded-full filter blur-[150px] pointer-events-none" />
         {userId ? <EmployeeDashboard userId={userId} userName={userName} isBranchManager={false} /> : (
           <div className="flex-1 flex flex-col p-4 md:p-6 overflow-y-auto max-h-screen relative z-10 custom-scrollbar items-center justify-center">
@@ -281,11 +281,11 @@ export default function UserDashboard() {
               // BUG-029 FIX: Show error after 10s timeout instead of infinite spin
               <>
                 <span className="text-[10px] text-rose-600 uppercase tracking-widest font-bold">Session Error</span>
-                <p className="text-xs text-slate-500 mt-2">Could not load user data. Please <a href="/" className="text-[#8a6d1f] underline">sign in again</a>.</p>
+                <p className="text-xs text-slate-500 mt-2">Could not load user data. Please <a href="/" className="text-[#15803d] underline">sign in again</a>.</p>
               </>
             ) : (
               <>
-                <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin mb-4" />
+                <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin mb-4" />
                 <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Loading Employee Data...</span>
               </>
             )}
@@ -299,7 +299,7 @@ export default function UserDashboard() {
     <div className="min-h-screen w-full flex flex-col bg-white text-slate-900 font-sans relative overflow-hidden">
       
       {/* Glow Effects */}
-      <div className="absolute top-[-5%] right-[-5%] w-[45%] h-[45%] bg-[#d4af37]/3 rounded-full filter blur-[120px] pointer-events-none" />
+      <div className="absolute top-[-5%] right-[-5%] w-[45%] h-[45%] bg-[#1ca34c]/3 rounded-full filter blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-5%] left-[20%] w-[50%] h-[50%] bg-[#10b981]/3 rounded-full filter blur-[150px] pointer-events-none" />
 
       {/* Main Core Dashboard panel */}
@@ -307,23 +307,26 @@ export default function UserDashboard() {
         
         {/* UPPER STATUS BAR */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-4 border-b border-slate-900/5">
-          <div>
+          <div className="flex items-start gap-3">
+            <span className="w-1.5 h-9 rounded-full bg-[#1ca34c] shrink-0" />
+            <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider flex items-center gap-1">
+              <span className="text-[10px] bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider flex items-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5" />
                 Dossier Verified
               </span>
             </div>
-            <h2 className="text-xl font-bold tracking-tight text-slate-900 font-serif">
+            <h2 className="text-xl font-extrabold tracking-tight text-slate-900 font-serif">
               Welcome back, <span className="premium-text-gradient">{userName}</span>
             </h2>
             <p className="text-[11px] text-slate-500">Account tier: Anchor ERP Sovereign Client. Last active logs secure.</p>
+            </div>
           </div>
 
           <div className="flex gap-3 w-full md:w-auto mt-2 md:mt-0">
             <button 
               onClick={handleRefresh}
-              className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 text-slate-500 hover:text-slate-900 transition-all cursor-pointer active:scale-95 flex-shrink-0 ${isRefreshing ? 'animate-spin text-[#8a6d1f]' : ''}`}
+              className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 text-slate-500 hover:text-slate-900 transition-all cursor-pointer active:scale-95 flex-shrink-0 ${isRefreshing ? 'animate-spin text-[#15803d]' : ''}`}
             >
               <RefreshCw className="w-4 h-4" />
             </button>
@@ -331,7 +334,7 @@ export default function UserDashboard() {
             {/* Quick action button */}
             <Link 
               href="/dashboard/payout"
-              className="bg-gradient-to-r from-[#d4af37] to-white text-black font-semibold px-4 py-2.5 rounded-xl text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-lg shadow-[#d4af37]/10 flex-1 md:flex-none active:scale-95 transition-transform"
+              className="bg-[#1ca34c] hover:bg-[#15803d] text-white font-semibold px-4 py-2.5 rounded-full text-xs tracking-wider uppercase flex items-center justify-center gap-2 shadow-lg shadow-[#1ca34c]/10 flex-1 md:flex-none active:scale-95 transition-transform"
             >
               <span>Initiate Payout</span>
             </Link>
@@ -380,12 +383,12 @@ export default function UserDashboard() {
         {/* Partner: Read-only Branch Expense Overview */}
         {profileType === 'partner' && (
           <div className="glass-panel p-4 md:p-5 rounded-2xl mb-8 relative shadow-xl overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/15 to-transparent" />
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#1ca34c]/15 to-transparent" />
             <div className="flex items-center justify-between mb-4">
               <div>
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-0.5">Read-Only Overview</span>
                 <h3 className="text-sm font-bold text-slate-900 font-serif flex items-center gap-2">
-                  <Wallet className="w-4 h-4 text-[#8a6d1f]" /> Branch Employee Expense Overview
+                  <Wallet className="w-4 h-4 text-[#15803d]" /> Branch Employee Expense Overview
                 </h3>
               </div>
               <span className="text-[9px] px-2 py-1 rounded-full bg-slate-100 border border-slate-900/5 text-slate-500 font-bold uppercase tracking-wider">View Only</span>
@@ -427,9 +430,9 @@ export default function UserDashboard() {
               <span className="text-[9px] px-2 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 font-bold uppercase tracking-wider">View Only</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="p-3 rounded-xl bg-[#d4af37]/5 border border-[#d4af37]/10 text-center">
-                <p className="text-[9px] text-[#8a6d1f]/70 uppercase tracking-wider mb-1">Total Sales</p>
-                <p className="text-sm font-bold text-[#8a6d1f]">৳ {partnerPerfStats.totalSales.toLocaleString('en-BD')}</p>
+              <div className="p-3 rounded-xl bg-[#1ca34c]/5 border border-[#1ca34c]/10 text-center">
+                <p className="text-[9px] text-[#15803d]/70 uppercase tracking-wider mb-1">Total Sales</p>
+                <p className="text-sm font-bold text-[#15803d]">৳ {partnerPerfStats.totalSales.toLocaleString('en-BD')}</p>
               </div>
               <div className="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10 text-center">
                 <p className="text-[9px] text-emerald-600 uppercase tracking-wider mb-1 flex items-center justify-center gap-1"><TrendingUp className="w-2.5 h-2.5" />Total Profit</p>
@@ -445,7 +448,7 @@ export default function UserDashboard() {
 
         {/* FINANCIAL ANALYTICS AREA CHART */}
         <div className="glass-panel p-4 md:p-6 rounded-2xl mb-8 relative shadow-xl overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#d4af37]/20 to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#1ca34c]/20 to-transparent" />
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">Monthly Payout Flow Volume</span>
@@ -456,7 +459,7 @@ export default function UserDashboard() {
             </div>
             <div className="flex items-center gap-4 text-[10px] text-slate-500">
               <div className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-[#d4af37]" />
+                <span className="w-2 h-2 rounded-full bg-[#1ca34c]" />
                 <span>Verified Transfers</span>
               </div>
             </div>
@@ -468,8 +471,8 @@ export default function UserDashboard() {
                 <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="goldGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#d4af37" stopOpacity={0.25}/>
-                      <stop offset="95%" stopColor="#d4af37" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#1ca34c" stopOpacity={0.25}/>
+                      <stop offset="95%" stopColor="#1ca34c" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(15,18,25,0.08)" vertical={false} />
@@ -487,7 +490,7 @@ export default function UserDashboard() {
                   <Area 
                     type="monotone" 
                     dataKey="volume" 
-                    stroke="#d4af37" 
+                    stroke="#1ca34c" 
                     strokeWidth={2}
                     fillOpacity={1} 
                     fill="url(#goldGradient)" 
@@ -517,7 +520,7 @@ export default function UserDashboard() {
                   onClick={() => setActiveLedgerTab('payout_request')}
                   className={`flex-1 md:flex-none px-4 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
                     activeLedgerTab === 'payout_request'
-                      ? 'bg-[#d4af37] text-black shadow-lg shadow-[#d4af37]/20'
+                      ? 'bg-[#1ca34c] text-white shadow-lg shadow-[#1ca34c]/20'
                       : 'text-slate-500 hover:text-slate-900 hover:bg-slate-900/[0.04]'
                   }`}
                 >
@@ -527,7 +530,7 @@ export default function UserDashboard() {
                   onClick={() => setActiveLedgerTab('value_transfer')}
                   className={`flex-1 md:flex-none px-4 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
                     activeLedgerTab === 'value_transfer'
-                      ? 'bg-[#d4af37] text-black shadow-lg shadow-[#d4af37]/20'
+                      ? 'bg-[#1ca34c] text-white shadow-lg shadow-[#1ca34c]/20'
                       : 'text-slate-500 hover:text-slate-900 hover:bg-slate-900/[0.04]'
                   }`}
                 >
@@ -547,7 +550,7 @@ export default function UserDashboard() {
                   placeholder="Search invoice or TRX ID..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full sm:min-w-[200px] bg-slate-900/[0.04] border border-slate-900/5 hover:border-slate-900/10 rounded-xl py-2 pl-9 pr-3 text-[11px] placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/40 transition-all text-slate-900"
+                  className="w-full sm:min-w-[200px] bg-slate-900/[0.04] border border-slate-900/5 hover:border-slate-900/10 rounded-xl py-2 pl-9 pr-3 text-[11px] placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-slate-900"
                 />
               </div>
 
@@ -556,7 +559,7 @@ export default function UserDashboard() {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full bg-white border border-slate-900/5 rounded-xl py-2 pl-3 pr-8 text-[11px] text-slate-500 focus:outline-none focus:border-[#d4af37]/40 cursor-pointer appearance-none min-w-[120px]"
+                  className="w-full bg-white border border-slate-900/5 rounded-xl py-2 pl-3 pr-8 text-[11px] text-slate-500 focus:outline-none focus:border-[#1ca34c]/40 cursor-pointer appearance-none min-w-[120px]"
                 >
                   <option value="all">All Status</option>
                   <option value="pending">Pending</option>
@@ -574,7 +577,7 @@ export default function UserDashboard() {
                 <select
                   value={methodFilter}
                   onChange={(e) => setMethodFilter(e.target.value)}
-                  className="w-full bg-white border border-slate-900/5 rounded-xl py-2 pl-3 pr-8 text-[11px] text-slate-500 focus:outline-none focus:border-[#d4af37]/40 cursor-pointer appearance-none min-w-[120px]"
+                  className="w-full bg-white border border-slate-900/5 rounded-xl py-2 pl-3 pr-8 text-[11px] text-slate-500 focus:outline-none focus:border-[#1ca34c]/40 cursor-pointer appearance-none min-w-[120px]"
                 >
                   <option value="all">All Methods</option>
                   <option value="bkash">bKash</option>
@@ -588,7 +591,7 @@ export default function UserDashboard() {
               {/* Export Trigger */}
               <button 
                 onClick={exportToExcel}
-                className="w-full sm:w-auto px-4 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 hover:bg-slate-900/[0.04] text-[#8a6d1f] hover:text-slate-900 transition-all cursor-pointer flex justify-center items-center gap-2 text-[11px] font-bold active:scale-95"
+                className="w-full sm:w-auto px-4 py-2 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 hover:bg-slate-900/[0.04] text-[#15803d] hover:text-slate-900 transition-all cursor-pointer flex justify-center items-center gap-2 text-[11px] font-bold active:scale-95"
               >
                 <ArrowDownToLine className="w-3.5 h-3.5" />
                 <span>Export XLS</span>
@@ -615,7 +618,7 @@ export default function UserDashboard() {
                     const statusConfig = {
                       pending: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
                       accepted: 'bg-blue-500/10 text-blue-600 border-blue-500/20',
-                      processing: 'bg-[#d4af37]/10 text-[#8a6d1f] border-[#d4af37]/20',
+                      processing: 'bg-[#1ca34c]/10 text-[#15803d] border-[#1ca34c]/20',
                       completed: 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20',
                       rejected: 'bg-rose-500/10 text-rose-600 border-rose-500/20',
                       hold: 'bg-slate-100 text-slate-500 border-slate-300',
@@ -632,7 +635,7 @@ export default function UserDashboard() {
                         className="hover:bg-slate-900/[0.04] transition-colors group"
                       >
                         <td className="py-4 pl-2 font-medium">
-                          <div className="font-semibold text-slate-900 group-hover:text-[#8a6d1f] transition-colors">{t.invoice_title}</div>
+                          <div className="font-semibold text-slate-900 group-hover:text-[#15803d] transition-colors">{t.invoice_title}</div>
                           <div className="text-[10px] text-slate-500 mt-0.5">{t.invoice_number}</div>
                         </td>
                         <td className="py-4 font-semibold text-slate-500 uppercase tracking-wide">

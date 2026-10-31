@@ -90,9 +90,9 @@ function EmployeeExpenseRequestsPage() {
         const el = document.getElementById(`item-${highlightId}`);
         if (el) {
           el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          el.classList.add('ring-2', 'ring-[#d4af37]', 'ring-offset-2', 'ring-offset-white');
+          el.classList.add('ring-2', 'ring-[#1ca34c]', 'ring-offset-2', 'ring-offset-white');
           setTimeout(() => {
-            el.classList.remove('ring-2', 'ring-[#d4af37]', 'ring-offset-2', 'ring-offset-white');
+            el.classList.remove('ring-2', 'ring-[#1ca34c]', 'ring-offset-2', 'ring-offset-white');
           }, 3000);
         }
       }, 100);
@@ -288,7 +288,7 @@ function EmployeeExpenseRequestsPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#d4af37] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -305,7 +305,7 @@ function EmployeeExpenseRequestsPage() {
       <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="max-w-md w-full p-8 rounded-2xl border border-slate-900/10 bg-slate-900/[0.04] text-center shadow-2xl">
           <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-4">
-            <Receipt className="w-7 h-7 text-[#8a6d1f]" />
+            <Receipt className="w-7 h-7 text-[#15803d]" />
           </div>
           <h1 className="text-xl font-bold text-slate-900 mb-2 font-serif">Expense Requests Restricted</h1>
           <p className="text-sm text-slate-500 mb-6 leading-relaxed">
@@ -313,7 +313,7 @@ function EmployeeExpenseRequestsPage() {
           </p>
           <a
             href="/dashboard"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#d4af37] to-white text-black text-xs font-bold uppercase tracking-wider shadow-lg shadow-[#d4af37]/10 hover:opacity-95 transition-all"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#1ca34c] hover:bg-[#15803d] text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-[#1ca34c]/10 hover:opacity-95 transition-all"
           >
             <ArrowLeft className="w-4 h-4" /> Return to Portal
           </a>
@@ -325,16 +325,18 @@ function EmployeeExpenseRequestsPage() {
   return (
     <div className="min-h-screen w-full bg-white text-slate-900 font-sans relative">
       {/* Background glows */}
-      <div className="absolute top-[-5%] right-[-5%] w-[40%] h-[40%] bg-[#d4af37]/3 rounded-full filter blur-[120px] pointer-events-none" />
+      <div className="absolute top-[-5%] right-[-5%] w-[40%] h-[40%] bg-[#1ca34c]/3 rounded-full filter blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-5%] left-[10%] w-[45%] h-[45%] bg-emerald-500/3 rounded-full filter blur-[150px] pointer-events-none" />
 
       <div className="relative z-10 flex flex-col p-4 md:p-6 overflow-y-auto max-h-screen custom-scrollbar">
 
         {/* ── Header ── */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 pb-4 border-b border-slate-900/5">
-          <div>
+          <div className="flex items-start gap-3">
+            <span className="w-1.5 h-9 rounded-full bg-[#1ca34c] shrink-0" />
+            <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] bg-[#d4af37]/10 text-[#8a6d1f] border border-[#d4af37]/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider flex items-center gap-1">
+              <span className="text-[10px] bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider flex items-center gap-1">
                 <Receipt className="w-3 h-3" /> Expense Requests
               </span>
               {profile?.branch_name && (
@@ -343,22 +345,23 @@ function EmployeeExpenseRequestsPage() {
                 </span>
               )}
             </div>
-            <h1 className="text-xl font-bold tracking-tight text-slate-900 font-serif">
+            <h1 className="text-xl font-extrabold tracking-tight text-slate-900 font-serif">
               My Expense Requests
             </h1>
             <p className="text-[11px] text-slate-500 mt-0.5">Submit and track your branch expense requests.</p>
+            </div>
           </div>
 
           <div className="flex gap-3">
             <button
               onClick={handleRefresh}
-              className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 text-slate-500 hover:text-slate-900 transition-all cursor-pointer active:scale-95 ${isRefreshing ? 'animate-spin text-[#8a6d1f]' : ''}`}
+              className={`p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 text-slate-500 hover:text-slate-900 transition-all cursor-pointer active:scale-95 ${isRefreshing ? 'animate-spin text-[#15803d]' : ''}`}
             >
               <RefreshCw className="w-4 h-4" />
             </button>
             <button
               onClick={() => { resetForm(); setShowModal(true) }}
-              className="bg-gradient-to-r from-[#d4af37] to-white text-black font-semibold px-4 py-2.5 rounded-xl text-xs tracking-wider uppercase flex items-center gap-2 shadow-lg shadow-[#d4af37]/10 active:scale-95 transition-transform"
+              className="bg-[#1ca34c] hover:bg-[#15803d] text-white font-semibold px-4 py-2.5 rounded-full text-xs tracking-wider uppercase flex items-center gap-2 shadow-lg shadow-[#1ca34c]/10 active:scale-95 transition-transform"
             >
               <Plus className="w-4 h-4" />
               New Request
@@ -395,7 +398,7 @@ function EmployeeExpenseRequestsPage() {
         <div className="glass-panel rounded-2xl shadow-xl overflow-hidden">
           <div className="p-4 md:p-5 border-b border-slate-900/5 flex items-center justify-between">
             <h2 className="text-sm font-bold text-slate-900 font-serif flex items-center gap-2">
-              <Receipt className="w-4 h-4 text-[#8a6d1f]" /> Request History
+              <Receipt className="w-4 h-4 text-[#15803d]" /> Request History
             </h2>
             <span className="text-[10px] text-slate-500">{requests.length} total</span>
           </div>
@@ -427,10 +430,10 @@ function EmployeeExpenseRequestsPage() {
                           <Icon className={`w-4 h-4 ${sc.cls.split(' ')[1]}`} />
                         </div>
                         <div className="min-w-0">
-                          <p className="text-sm font-semibold text-slate-900 truncate group-hover:text-[#8a6d1f] transition-colors">{req.title}</p>
+                          <p className="text-sm font-semibold text-slate-900 truncate group-hover:text-[#15803d] transition-colors">{req.title}</p>
                           <p className="text-[10px] text-slate-500 truncate mt-0.5">
                             {new Date(req.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                            {req.is_purchased && <span className="ml-2 text-[#8a6d1f]">· Already Purchased</span>}
+                            {req.is_purchased && <span className="ml-2 text-[#15803d]">· Already Purchased</span>}
                           </p>
                         </div>
                       </div>
@@ -472,7 +475,7 @@ function EmployeeExpenseRequestsPage() {
               <div className="p-5 border-b border-slate-900/5 flex items-center justify-between">
                 <div>
                   <h2 className="text-base font-bold text-slate-900 font-serif flex items-center gap-2">
-                    <Plus className="w-4 h-4 text-[#8a6d1f]" /> New Expense Request
+                    <Plus className="w-4 h-4 text-[#15803d]" /> New Expense Request
                   </h2>
                   {profile?.branch_name && (
                     <p className="text-[10px] text-slate-500 mt-0.5 flex items-center gap-1">
@@ -499,7 +502,7 @@ function EmployeeExpenseRequestsPage() {
                       placeholder="e.g., Office Fan, Light Bulbs"
                       value={formTitle}
                       onChange={e => setFormTitle(e.target.value)}
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                     />
                   </div>
 
@@ -513,7 +516,7 @@ function EmployeeExpenseRequestsPage() {
                       value={formDesc}
                       onChange={e => setFormDesc(e.target.value)}
                       rows={2}
-                      className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/40 transition-all resize-none"
+                      className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all resize-none"
                     />
                   </div>
 
@@ -531,7 +534,7 @@ function EmployeeExpenseRequestsPage() {
                         min="1"
                         step="0.01"
                         onChange={e => setFormAmount(e.target.value)}
-                        className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl pl-8 pr-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                        className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl pl-8 pr-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                       />
                     </div>
                   </div>
@@ -540,7 +543,7 @@ function EmployeeExpenseRequestsPage() {
                   <div className="p-3 rounded-xl border border-slate-900/5 bg-slate-900/[0.04]">
                     <label className="flex items-center justify-between cursor-pointer">
                       <div className="flex items-center gap-2">
-                        <ShoppingCart className="w-4 h-4 text-[#8a6d1f]" />
+                        <ShoppingCart className="w-4 h-4 text-[#15803d]" />
                         <div>
                           <p className="text-xs font-semibold text-slate-900">I already purchased this item</p>
                           <p className="text-[10px] text-slate-500">Upload invoice and request reimbursement</p>
@@ -548,7 +551,7 @@ function EmployeeExpenseRequestsPage() {
                       </div>
                       <div
                         onClick={() => setFormIsPurchased(!formIsPurchased)}
-                        className={`relative w-10 h-5 rounded-full transition-colors cursor-pointer ${formIsPurchased ? 'bg-[#d4af37]' : 'bg-slate-900/[0.07]'}`}
+                        className={`relative w-10 h-5 rounded-full transition-colors cursor-pointer ${formIsPurchased ? 'bg-[#1ca34c]' : 'bg-slate-900/[0.07]'}`}
                       >
                         <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-transform ${formIsPurchased ? 'translate-x-5' : 'translate-x-0.5'}`} />
                       </div>
@@ -565,14 +568,14 @@ function EmployeeExpenseRequestsPage() {
                             <label className="block text-[10px] text-slate-500 uppercase tracking-wider font-bold mb-1.5">
                               Invoice / Receipt <span className="text-slate-600">(Optional)</span>
                             </label>
-                            <label className="flex items-center justify-center gap-2 border-2 border-dashed border-slate-900/10 hover:border-[#d4af37]/30 rounded-xl p-4 cursor-pointer transition-colors group">
+                            <label className="flex items-center justify-center gap-2 border-2 border-dashed border-slate-900/10 hover:border-[#1ca34c]/30 rounded-xl p-4 cursor-pointer transition-colors group">
                               <input
                                 type="file"
                                 accept="image/*,application/pdf"
                                 className="hidden"
                                 onChange={e => setFormInvoiceFile(e.target.files?.[0] || null)}
                               />
-                              <Upload className="w-4 h-4 text-slate-500 group-hover:text-[#8a6d1f] transition-colors" />
+                              <Upload className="w-4 h-4 text-slate-500 group-hover:text-[#15803d] transition-colors" />
                               <span className="text-xs text-slate-500 group-hover:text-slate-600 transition-colors">
                                 {formInvoiceFile ? formInvoiceFile.name : 'Click to upload invoice / photo'}
                               </span>
@@ -604,7 +607,7 @@ function EmployeeExpenseRequestsPage() {
                             formPayMethod === key
                               ? key === 'cash'
                                 ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-600'
-                                : 'border-[#d4af37]/40 bg-[#d4af37]/10 text-[#8a6d1f]'
+                                : 'border-[#1ca34c]/40 bg-[#1ca34c]/10 text-[#15803d]'
                               : 'border-slate-900/5 bg-slate-900/[0.04] text-slate-500 hover:border-slate-900/10'
                           }`}
                         >
@@ -636,14 +639,14 @@ function EmployeeExpenseRequestsPage() {
                           placeholder="Account Holder Name *"
                           value={formAccountName}
                           onChange={e => setFormAccountName(e.target.value)}
-                          className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                          className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                         />
                         <input
                           type="text"
                           placeholder={formPayMethod === 'bkash' ? 'bKash / Mobile Number *' : 'Bank Account Number *'}
                           value={formAccountNum}
                           onChange={e => setFormAccountNum(e.target.value)}
-                          className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                          className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                         />
                         {formPayMethod === 'bank' && (
                           <>
@@ -652,14 +655,14 @@ function EmployeeExpenseRequestsPage() {
                               placeholder="Bank Name *"
                               value={formBankName}
                               onChange={e => setFormBankName(e.target.value)}
-                              className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                              className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                             />
                             <input
                               type="text"
                               placeholder="Branch Name *"
                               value={formBankBranch}
                               onChange={e => setFormBankBranch(e.target.value)}
-                              className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#d4af37]/40 transition-all"
+                              className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
                             />
                           </>
                         )}
@@ -682,7 +685,7 @@ function EmployeeExpenseRequestsPage() {
                   type="submit"
                   form="expense-form"
                   disabled={isSubmitting}
-                  className="flex-1 bg-gradient-to-r from-[#d4af37] to-white text-black font-bold px-4 py-2.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-[#d4af37]/10 active:scale-95 transition-transform disabled:opacity-60"
+                  className="flex-1 bg-[#1ca34c] hover:bg-[#15803d] text-white font-bold px-4 py-2.5 rounded-full text-xs uppercase tracking-wider flex items-center justify-center gap-2 shadow-lg shadow-[#1ca34c]/10 active:scale-95 transition-transform disabled:opacity-60"
                 >
                   {isSubmitting ? (
                     <><Loader2 className="w-3.5 h-3.5 animate-spin" />{uploadProgress ? 'Uploading...' : 'Submitting...'}</>
@@ -808,9 +811,9 @@ function EmployeeExpenseRequestsPage() {
                         }
                         alert('Failed to load invoice image.');
                       }}
-                      className="flex items-center gap-2 p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#d4af37]/20 transition-colors group w-full text-left"
+                      className="flex items-center gap-2 p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 hover:border-[#1ca34c]/20 transition-colors group w-full text-left"
                     >
-                      <Eye className="w-4 h-4 text-slate-500 group-hover:text-[#8a6d1f]" />
+                      <Eye className="w-4 h-4 text-slate-500 group-hover:text-[#15803d]" />
                       <span className="text-xs text-slate-500 group-hover:text-slate-900 transition-colors">View Uploaded Invoice</span>
                     </button>
                   )}

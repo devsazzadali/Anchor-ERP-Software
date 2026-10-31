@@ -107,7 +107,7 @@ export default function IssueDeveloperBillModal({ isOpen, onClose, onSuccess, le
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             className="fixed inset-0 flex items-center justify-center z-50 p-4 pointer-events-none"
           >
-            <div className="bg-white border border-slate-900/8 rounded-2xl w-full max-w-lg shadow-2xl pointer-events-auto max-h-[90vh] overflow-y-auto custom-scrollbar flex flex-col">
+            <div className="bg-white border border-slate-900/8 rounded-3xl w-full max-w-lg shadow-2xl pointer-events-auto max-h-[90vh] overflow-y-auto custom-scrollbar flex flex-col">
 
               {/* Header */}
               <div className="flex items-center justify-between px-6 py-4 border-b border-slate-900/[0.08] shrink-0">
@@ -183,7 +183,7 @@ export default function IssueDeveloperBillModal({ isOpen, onClose, onSuccess, le
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-slate-500">Total Bill (BDT)</span>
                     <input type="number" step="0.01" min="0.01" value={amount || ''} onChange={e => setAmount(Number(e.target.value))} required placeholder="0.00"
-                      className="w-32 bg-transparent text-right text-lg font-bold text-[#8a6d1f] focus:outline-none placeholder-slate-700" />
+                      className="w-32 bg-transparent text-right text-lg font-bold text-[#15803d] focus:outline-none placeholder-slate-700" />
                   </div>
                 </div>
 

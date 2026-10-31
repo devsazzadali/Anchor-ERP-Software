@@ -94,7 +94,7 @@ export default function InvoiceRequestForm({ onSubmit }: InvoiceRequestFormProps
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-gradient-to-r from-[#d4af37] to-white text-black font-medium py-2 rounded-lg hover:opacity-90 transition"
+        className="w-full bg-[#1ca34c] hover:bg-[#15803d] text-white font-medium py-2 rounded-full hover:opacity-90 transition"
       >
         {loading ? 'Submitting…' : 'Submit Request'}
       </button>

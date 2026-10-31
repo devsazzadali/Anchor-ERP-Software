@@ -79,7 +79,7 @@ function ResetPasswordForm() {
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="max-w-md w-full p-8 rounded-2xl bg-white border border-slate-900/10 shadow-2xl text-center"
+          className="max-w-md w-full p-8 rounded-3xl bg-white border border-slate-900/10 shadow-2xl text-center"
         >
           <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-6">
             <Check className="w-8 h-8 text-emerald-600" />
@@ -88,7 +88,7 @@ function ResetPasswordForm() {
           <p className="text-slate-500 mb-8">Your password has been successfully updated. You can now log in with your new password.</p>
           <button 
             onClick={() => router.push('/')} 
-            className="w-full bg-[#d4af37] hover:bg-[#c4a030] text-black font-semibold py-3.5 rounded-xl transition-colors uppercase tracking-wider text-sm"
+            className="w-full bg-[#1ca34c] hover:bg-[#15803d] text-white font-semibold py-3.5 rounded-full transition-colors uppercase tracking-wider text-sm"
           >
             Go to Login
           </button>
@@ -100,16 +100,16 @@ function ResetPasswordForm() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-white relative overflow-hidden">
       {/* Background aesthetics */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#d4af37]/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#1ca34c]/5 rounded-full blur-[120px] pointer-events-none" />
       
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-md w-full p-8 rounded-2xl bg-slate-900/[0.04] border border-slate-900/5 shadow-2xl backdrop-blur-xl relative z-10"
+        className="max-w-md w-full p-8 rounded-3xl bg-slate-900/[0.04] border border-slate-900/5 shadow-2xl backdrop-blur-xl relative z-10"
       >
         <div className="text-center mb-8">
-          <div className="w-12 h-12 bg-[#d4af37]/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-[#d4af37]/20">
-            <ShieldAlert className="w-6 h-6 text-[#8a6d1f]" />
+          <div className="w-12 h-12 bg-[#1ca34c]/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-[#1ca34c]/20">
+            <ShieldAlert className="w-6 h-6 text-[#15803d]" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900 mb-2">Create New Password</h1>
           <p className="text-sm text-slate-500">Your reset request has been approved. Please enter a secure new password.</p>
@@ -133,7 +133,7 @@ function ResetPasswordForm() {
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                className="w-full bg-white border border-slate-900/10 rounded-xl py-3.5 pl-10 pr-4 text-sm text-slate-900 focus:outline-none focus:border-[#d4af37]/50 focus:ring-1 focus:ring-[#d4af37]/30 transition-all"
+                className="w-full bg-white border border-slate-900/10 rounded-xl py-3.5 pl-10 pr-4 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 focus:ring-1 focus:ring-[#1ca34c]/30 transition-all"
               />
             </div>
           </div>
@@ -148,7 +148,7 @@ function ResetPasswordForm() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                className="w-full bg-white border border-slate-900/10 rounded-xl py-3.5 pl-10 pr-4 text-sm text-slate-900 focus:outline-none focus:border-[#d4af37]/50 focus:ring-1 focus:ring-[#d4af37]/30 transition-all"
+                className="w-full bg-white border border-slate-900/10 rounded-xl py-3.5 pl-10 pr-4 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50 focus:ring-1 focus:ring-[#1ca34c]/30 transition-all"
               />
             </div>
           </div>
@@ -156,7 +156,7 @@ function ResetPasswordForm() {
           <button
             type="submit"
             disabled={loading || !newPassword || !confirmPassword}
-            className="w-full bg-gradient-to-r from-[#d4af37] to-white hover:shadow-lg hover:shadow-[#d4af37]/15 transition-all text-black font-bold py-4 rounded-xl tracking-widest uppercase text-xs mt-4 disabled:opacity-50"
+            className="w-full bg-[#1ca34c] hover:bg-[#15803d] hover:shadow-lg hover:shadow-[#1ca34c]/15 transition-all text-white font-bold py-4 rounded-full tracking-widest uppercase text-xs mt-4 disabled:opacity-50"
           >
             {loading ? 'Updating...' : 'Set New Password'}
           </button>
@@ -168,7 +168,7 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center"><div className="w-8 h-8 border-4 border-[#d4af37] border-t-transparent rounded-full animate-spin" /></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center"><div className="w-8 h-8 border-4 border-[#1ca34c] border-t-transparent rounded-full animate-spin" /></div>}>
       <ResetPasswordForm />
     </Suspense>
   );
