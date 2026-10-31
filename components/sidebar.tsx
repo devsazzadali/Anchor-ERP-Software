@@ -205,9 +205,7 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
       <div>
         {/* Brand */}
         <div className="flex items-center gap-2 mb-8 mt-2 px-1">
-          <div className="w-12 h-12 rounded-2xl bg-[#1ca34c] shadow flex items-center justify-center shrink-0">
-            <img src="/logos.png" alt="Anchor ERP Official Logo" className="w-7 h-7 object-contain brightness-0 invert" />
-          </div>
+          <img src="/logos.png" alt="Anchor ERP Official Logo" className="w-12 h-12 object-contain drop-shadow-md shrink-0" />
           <div>
             <h1 className="text-sm font-extrabold tracking-wider text-slate-900 font-serif">ANCHOR ERP</h1>
             <p className="text-[7.5px] uppercase tracking-[0.25em] text-[#15803d] font-semibold">Enterprise Resource Planning</p>

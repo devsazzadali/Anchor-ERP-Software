@@ -225,9 +225,7 @@ export default function Verify2FAPage() {
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#1ca34c]/50 to-transparent" />
 
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 rounded-2xl bg-[#1ca34c] flex items-center justify-center shadow-lg shadow-[#1ca34c]/25">
-              <img src="/logos.png" alt="Anchor ERP Official Logo" className="w-10 h-10 object-contain brightness-0 invert" />
-            </div>
+            <img src="/logos.png" alt="Anchor ERP Official Logo" className="w-16 h-16 object-contain drop-shadow-lg" />
           </div>
 
           <h2 className="text-2xl font-bold text-center text-slate-900 font-serif mb-2">Two-Step Verification</h2>

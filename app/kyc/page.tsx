@@ -231,9 +231,7 @@ export default function KycPage() {
 
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-[#1ca34c] flex items-center justify-center mx-auto mb-4 shadow-lg shadow-[#1ca34c]/25">
-            <img src="/logos.png" alt="Anchor ERP Official Logo" className="w-9 h-9 object-contain brightness-0 invert" />
-          </div>
+          <img src="/logos.png" alt="Anchor ERP Official Logo" className="w-14 h-14 object-contain mx-auto mb-4 drop-shadow-lg" />
           <h1 className="text-2xl font-serif text-slate-900 tracking-wide">Verification Dossier</h1>
           <p className="text-xs text-slate-500 uppercase tracking-widest mt-2">
             Completing KYC as <strong className="text-[#15803d]">{role}</strong>

@@ -489,9 +489,7 @@ export default function AuthPage() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="flex items-center gap-3 mb-12"
           >
-            <div className="w-12 h-12 rounded-2xl bg-[#1ca34c] shadow flex items-center justify-center shrink-0">
-              <img src="/logos.png" alt="Anchor ERP Official Logo" className="w-7 h-7 object-contain brightness-0 invert" />
-            </div>
+            <img src="/logos.png" alt="Anchor ERP Official Logo" className="w-14 h-14 object-contain drop-shadow-lg shrink-0" />
             <div>
               <h1 className="text-xl font-extrabold tracking-wider text-slate-900 font-serif">ANCHOR ERP</h1>
               <p className="text-[9px] uppercase tracking-[0.25em] text-[#15803d] font-semibold font-sans">Enterprise & Payouts</p>
