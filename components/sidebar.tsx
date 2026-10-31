@@ -94,6 +94,9 @@ const adminNavigation = [
       { name: 'Trial Balance', href: '/admin/accounts/statements/trial-balance' },
       { name: 'Profit & Loss', href: '/admin/accounts/statements/pl' },
       { name: 'Balance Sheet', href: '/admin/accounts/statements/balance-sheet' },
+      // Accounts A10: one-click auditor package (ZIP/JSON) built
+      // from the same services as every screen above.
+      { name: 'Auditor Package', href: '/admin/accounts/auditor' },
     ]
   },
   { name: 'System Settings',         icon: Settings,        href: '/admin/settings', divider: true },
