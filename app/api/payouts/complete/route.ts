@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { callerIsAdmin, getCallerProfile } from '@/lib/server/auth'
 import { logAudit } from '@/lib/server/audit'
-import { hookPostSource } from '@/lib/server/accounting/hooks'
+import { hookPostSource, hookSyncPayables } from '@/lib/server/accounting/hooks'
 import { toPlain } from '@/lib/server/respond'
 
 // POST /api/payouts/complete replaces
@@ -88,6 +88,7 @@ export async function POST(req: Request) {
     // Accounts A1 (P9): completing a payout posts Dr Drawings /
     // Cr Cash–Head Office. Fail-soft.
     await hookPostSource('payment_requests', (result.request as any).id, caller, 'payout')
+    await hookSyncPayables('payment_requests', (result.request as any).id)
     return NextResponse.json({ request: toPlain(result.request), transaction: toPlain(result.transaction) })
   } catch (err: any) {
     const message = err?.message || 'Internal Server Error'

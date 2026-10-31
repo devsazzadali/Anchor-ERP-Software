@@ -6,7 +6,7 @@ import { parseMoneyAmount, sumMoney } from '@/lib/money'
 import { dhakaToday } from '@/lib/dhaka-time'
 import { syncExpenseToLedger } from '@/lib/server/ledger-sync'
 import { logAudit, diffFields } from '@/lib/server/audit'
-import { hookPostSource } from '@/lib/server/accounting/hooks'
+import { hookPostSource, hookSyncPayables } from '@/lib/server/accounting/hooks'
 
 export const dynamic = 'force-dynamic'
 
@@ -173,6 +173,7 @@ export async function POST(req: NextRequest) {
     // Accounts A1 (P5): post the salary journal entry. Fail-soft —
     // a posting failure never fails the salary issue itself.
     await hookPostSource('salary_payments', payment.id, caller, 'salary')
+    await hookSyncPayables('salary_payments', payment.id)
 
     return NextResponse.json({
       success: true,

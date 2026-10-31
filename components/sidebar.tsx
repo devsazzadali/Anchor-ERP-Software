@@ -73,6 +73,9 @@ const adminNavigation = [
       { name: 'Periods', href: '/admin/accounts/periods' },
       // Accounts A4: bank accounts, statement import + reconciliation.
       { name: 'Bank Reconciliation', href: '/admin/accounts/bank' },
+      // Accounts A5: counterparties + payables/receivables register with ageing.
+      { name: 'Counterparties', href: '/admin/accounts/parties' },
+      { name: 'Payables & Ageing', href: '/admin/accounts/payables' },
       // Accounts A2: statements over the journal.
       { name: 'Statements', href: '/admin/accounts/statements' },
       { name: 'Trial Balance', href: '/admin/accounts/statements/trial-balance' },

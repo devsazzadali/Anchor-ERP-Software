@@ -5,7 +5,7 @@ import { toPlain } from '@/lib/server/respond'
 import { parseMoneyAmount, roundMoney } from '@/lib/money'
 import { expenseKindOf } from '@/lib/expense-streams'
 import { logAudit, diffFields } from '@/lib/server/audit'
-import { hookPostSource, hookCompanyPaidChange, hookResyncSource, hookReverseSource } from '@/lib/server/accounting/hooks'
+import { hookPostSource, hookCompanyPaidChange, hookResyncSource, hookReverseSource, hookSyncPayables } from '@/lib/server/accounting/hooks'
 
 export const dynamic = 'force-dynamic'
 
@@ -85,6 +85,7 @@ export async function POST(req: NextRequest) {
     // Accounts A1 (P4): post the company-expense accrual + any
     // initial settlement. Fail-soft.
     await hookPostSource('company_expenses', data.id, caller, 'company_expense')
+    await hookSyncPayables('company_expenses', data.id)
     return NextResponse.json({ expense: toPlain(data) }, { status: 201 })
   } catch (err: any) {
     console.error('[api] app/api/admin/company-expenses/route.ts error:', err)
@@ -142,6 +143,7 @@ export async function PATCH(req: NextRequest) {
     await hookPostSource('company_expenses', id, caller, 'company_expense')
     await hookResyncSource('company_expenses', id, caller)
     await hookCompanyPaidChange(id, caller)
+    await hookSyncPayables('company_expenses', id)
     return NextResponse.json({ expense: toPlain(data) })
   } catch (err: any) {
     console.error('[api] app/api/admin/company-expenses/route.ts error:', err)
@@ -171,6 +173,7 @@ export async function DELETE(req: NextRequest) {
     // Accounts A1: deleting a posted expense reverses its journal
     // entries (the journal itself is append-only). Fail-soft.
     await hookReverseSource('company_expenses', id, caller, 'Company expense deleted')
+    await hookSyncPayables('company_expenses', id)
     return NextResponse.json({ success: true })
   } catch (err: any) {
     console.error('[api] app/api/admin/company-expenses/route.ts error:', err)

@@ -1427,10 +1427,47 @@ model Counterparty {
   phone      String?
   address    String?
   is_active  Boolean  @default(true)
+  // A5: counterparties are DERIVED from existing records — the
+  // source link records which record (profiles / house_rent_accounts
+  // / …) this party came from; derivation upserts on it. NULL for
+  // the one system party (unrecorded company-expense payees).
+  source_table String?
+  source_id    String?  @db.Uuid
+  // A5: set by the admin parties API on a human edit — derivation
+  // refreshes source facts but never clobbers a human-edited party.
+  edited_manually Boolean @default(false)
   created_at DateTime @default(now()) @db.Timestamptz(6)
   updated_at DateTime @default(now()) @db.Timestamptz(6)
 
   @@map("counterparties")
+}
+
+// Accounts A5 — one row per settlement recorded against a register
+// item, whichever path wrote it (see scripts/accounts-a5-ddl.mjs):
+//   journal      posted through the A1 engine (Dr AP / Cr paid-via)
+//   source_state the company-expense module's own paid_amount
+//                change, posted by hookCompanyPaidChange
+//   external     settled outside the module — NO journal entry,
+//                a note is mandatory
+// The registry is what makes the two journal-writing paths compose:
+// hookCompanyPaidChange computes its settled total from this table
+// (plus the create entry), never from journal archaeology alone.
+model PayableSettlement {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  payable_id       String   @db.Uuid
+  amount           Decimal  @db.Decimal(15, 2)
+  // Chart code the money left from (journal mode); null otherwise.
+  paid_via         String?
+  settlement_date  DateTime @db.Date
+  // journal | source_state | external
+  mode             String   @default("journal")
+  note             String?
+  journal_entry_id String?  @db.Uuid
+  created_by       String?  @db.Uuid
+  created_at       DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([payable_id])
+  @@map("payable_settlements")
 }
 
 model PayableReceivable {

@@ -6,7 +6,7 @@ import { getCallerProfile } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { syncExpenseToLedger } from '@/lib/server/ledger-sync'
 import { logAudit, diffFields } from '@/lib/server/audit'
-import { hookPostSource } from '@/lib/server/accounting/hooks'
+import { hookPostSource, hookSyncPayables } from '@/lib/server/accounting/hooks'
 
 // the dashboard expense-requests page's
 // OWN requests. Identity (employee_id/name, branch) always comes
@@ -137,6 +137,7 @@ export async function POST(req: Request) {
     // Accounts A1 (P6): cash requests are born paid — post the
     // journal entry (builder no-ops otherwise). Fail-soft.
     await hookPostSource('employee_expense_requests', created.id, caller, 'request_paid')
+    await hookSyncPayables('employee_expense_requests', created.id)
     return NextResponse.json({ request: toPlain(created) }, { status: 201 })
   } catch (err: any) {
     console.error('[POST /api/expense-requests] Error:', err)

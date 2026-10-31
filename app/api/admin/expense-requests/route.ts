@@ -6,7 +6,7 @@ import { parseMoneyAmount, roundMoney } from '@/lib/money'
 import { dhakaToday } from '@/lib/dhaka-time'
 import { syncExpenseToLedger } from '@/lib/server/ledger-sync'
 import { logAudit, diffFields } from '@/lib/server/audit'
-import { hookPostSource } from '@/lib/server/accounting/hooks'
+import { hookPostSource, hookSyncPayables } from '@/lib/server/accounting/hooks'
 
 export const dynamic = 'force-dynamic'
 
@@ -112,6 +112,7 @@ export async function POST(req: NextRequest) {
     // Accounts A1 (P6): a request created already-paid posts its
     // journal entry (the builder no-ops for non-paid rows). Fail-soft.
     await hookPostSource('employee_expense_requests', data.id, caller, 'request_paid')
+    await hookSyncPayables('employee_expense_requests', data.id)
     return NextResponse.json({ request: toPlain(data) }, { status: 201 })
   } catch (err: any) {
     console.error('[api] app/api/admin/expense-requests/route.ts error:', err)
@@ -214,6 +215,7 @@ export async function PATCH(req: NextRequest) {
       })
       // Accounts A1 (P6): settlement posts its journal entry. Fail-soft.
       await hookPostSource('employee_expense_requests', id, caller, 'request_paid')
+      await hookSyncPayables('employee_expense_requests', id)
       return NextResponse.json({ request: toPlain(result.request) })
     }
 

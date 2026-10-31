@@ -18,6 +18,8 @@ import { getPeriodForDate, postEvent, uuidFromString, type Db } from './post'
 import { postForSource, reverseForSource, syncClosingEntry, ACCT } from './events'
 import { recordIfPeriodBlocked } from './exceptions'
 import { toPoishaExact } from './reports'
+import { syncPayableItemForSource } from './payables'
+import { poishaToDecimalString } from './post'
 
 type Caller = Parameters<typeof logAudit>[0]['caller']
 
@@ -170,6 +172,21 @@ export async function hookResyncSource(
   }
 }
 
+/**
+ * A5 — keep the payables register in step with a source record
+ * (company expense, expense request, payout, branch expense,
+ * salary recipient). Fail-soft like every hook: the register is a
+ * mirror, and a missed sync surfaces in the register tie-out
+ * instead of breaking the operational write.
+ */
+export async function hookSyncPayables(sourceTable: string, sourceId: string): Promise<void> {
+  try {
+    await syncPayableItemForSource(prisma as Db, sourceTable, sourceId)
+  } catch (err: any) {
+    console.error(`[accounts] hookSyncPayables ${sourceTable}/${sourceId} failed (fail-soft):`, err?.message || err)
+  }
+}
+
 /** Keep a closing row's journal entry in step with its lifecycle. */
 export async function hookSyncClosing(ledgerRowId: string, caller?: Caller): Promise<void> {
   try {
@@ -234,7 +251,26 @@ export async function hookCompanyPaidChange(expenseId: string, caller?: Caller):
         if (code === ACCT.accountsPayable) settled += toPoishaExact(l.debit) - toPoishaExact(l.credit)
       }
     }
-    const delta = paidNow - settled
+    // A5: settlements can also be recorded through the Accounts
+    // register (payables.ts settlePayable, mode 'journal'), and
+    // this hook's own earlier settlements are invisible to the
+    // journal scan above — their entries carry a state-derived
+    // source_id, not the expense id. The payable_settlements
+    // registry is the complete settlement record: count it, or a
+    // second paid-change would post the first settlement again.
+    let registrySettled = 0
+    let registerItem = await prisma.payableReceivable.findFirst({
+      where: { source_table: 'company_expenses', source_id: expenseId, direction: 'payable' },
+      select: { id: true },
+    })
+    if (registerItem) {
+      const regs = await prisma.payableSettlement.findMany({
+        where: { payable_id: registerItem.id, mode: { in: ['journal', 'source_state'] } },
+        select: { amount: true },
+      })
+      registrySettled = regs.reduce((a, r) => a + toPoishaExact(r.amount), 0)
+    }
+    const delta = paidNow - settled - registrySettled
     if (delta === 0) return
     const amt = Math.abs(delta) / 100
     const res = await postEvent(prisma as Db, {
@@ -255,7 +291,38 @@ export async function hookCompanyPaidChange(expenseId: string, caller?: Caller):
               { account_code: ACCT.accountsPayable, credit: amt },
             ],
     })
-    if (res.created) await auditPost(caller, res.entry_id, 'company_expenses', expenseId, 'company_expense_payment')
+    if (res.created) {
+      await auditPost(caller, res.entry_id, 'company_expenses', expenseId, 'company_expense_payment')
+      // Record the settlement in the A5 registry so the NEXT
+      // paid-change (from either path) sees it. Fail-soft: the
+      // journal entry above is the money truth; a missed registry
+      // row would surface as a tie-out difference, never silently.
+      try {
+        if (!registerItem) {
+          await syncPayableItemForSource(prisma as Db, 'company_expenses', expenseId)
+          registerItem = await prisma.payableReceivable.findFirst({
+            where: { source_table: 'company_expenses', source_id: expenseId, direction: 'payable' },
+            select: { id: true },
+          })
+        }
+        if (registerItem) {
+          await prisma.payableSettlement.create({
+            data: {
+              payable_id: registerItem.id,
+              amount: poishaToDecimalString(delta),
+              paid_via: ACCT.cashHeadOffice,
+              settlement_date: new Date(`${dhakaToday()}T00:00:00Z`),
+              mode: 'source_state',
+              note: 'Recorded from the company-expenses module (paid_amount change)',
+              journal_entry_id: res.entry_id,
+              created_by: caller?.id ?? null,
+            },
+          })
+        }
+      } catch (e: any) {
+        console.error(`[accounts] settlement registry write for ${expenseId} failed (fail-soft):`, e?.message || e)
+      }
+    }
   } catch (err: any) {
     await recordIfPeriodBlocked(prisma as Db, err, {
       source_table: 'company_expenses',

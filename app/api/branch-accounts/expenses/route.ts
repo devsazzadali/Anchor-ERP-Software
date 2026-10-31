@@ -7,7 +7,7 @@ import { toPlain } from '@/lib/server/respond'
 import { attachExpenseLedgerHead } from '@/lib/server/attach'
 import { syncExpenseToLedger } from '@/lib/server/ledger-sync'
 import { logAudit, diffFields } from '@/lib/server/audit'
-import { hookPostSource, hookResyncSource, hookReverseSource } from '@/lib/server/accounting/hooks'
+import { hookPostSource, hookResyncSource, hookReverseSource, hookSyncPayables } from '@/lib/server/accounting/hooks'
 
 // auth via the single role-resolution
 // function (lib/server/auth.ts). FR-1.6 CONTRACT: this route is
@@ -356,6 +356,7 @@ export async function POST(req: NextRequest) {
     // (salary/request copies post from their sources; the builder
     // no-ops for them). Fail-soft.
     await hookPostSource('branch_cash_expenses', data.id, profile as any)
+    await hookSyncPayables('branch_cash_expenses', data.id)
 
     return NextResponse.json({ success: true, expense: toPlain(withHead) })
   } catch (err: any) {
@@ -515,6 +516,7 @@ export async function PATCH(req: NextRequest) {
     // Accounts A1: if the edit changed the posted figures, the
     // journal entry is reversed + reposted (no-op when unchanged).
     await hookResyncSource('branch_cash_expenses', id, profile as any)
+    await hookSyncPayables('branch_cash_expenses', id)
 
     return NextResponse.json({ success: true, expense: toPlain(withHead) })
   } catch (err: any) {
@@ -578,6 +580,7 @@ export async function DELETE(req: NextRequest) {
     // Accounts A1: deleting reverses the journal entry (append-only
     // contra; the journal never deletes). Fail-soft.
     await hookReverseSource('branch_cash_expenses', id, profile as any, 'Branch expense deleted')
+    await hookSyncPayables('branch_cash_expenses', id)
 
     return NextResponse.json({ success: true })
   } catch (err: any) {
