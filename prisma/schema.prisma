@@ -1364,6 +1364,8 @@ model BankAccount {
   chart_account_id String? @db.Uuid
   // Owner-entered at the opening wizard; NULL until confirmed.
   opening_balance Decimal? @db.Decimal(15, 2)
+  // Date the confirmed opening_balance is stated at (A4).
+  opening_balance_date DateTime? @db.Date
   // System-derived hint from deposit history — NEVER a confirmed
   // balance; shown to the owner as a draft candidate only.
   derived_hint    Decimal? @db.Decimal(15, 2)
@@ -1373,6 +1375,48 @@ model BankAccount {
   updated_at      DateTime @default(now()) @db.Timestamptz(6)
 
   @@map("bank_accounts")
+}
+
+// Accounts A4 — one row per statement CSV import (counts + the full
+// per-row error report, so a partial import is auditable).
+model BankImportBatch {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  bank_account_id String   @db.Uuid
+  file_name       String?
+  total_rows      Int      @default(0)
+  imported_rows   Int      @default(0)
+  error_rows      Int      @default(0)
+  error_report    Json?
+  created_by      String?  @db.Uuid
+  created_at      DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("bank_import_batches")
+}
+
+// Accounts A4 — external-evidence statement lines. They NEVER write
+// journal entries; they are matched 1:1 against journal lines on the
+// bank account's chart account (DB partial unique index on
+// matched_journal_line_id enforces the 1:1).
+model BankStatementLine {
+  id                      String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  bank_account_id         String   @db.Uuid
+  statement_date          DateTime @db.Date
+  description             String
+  reference               String?
+  debit                   Decimal  @default(0) @db.Decimal(15, 2)
+  credit                  Decimal  @default(0) @db.Decimal(15, 2)
+  balance                 Decimal? @db.Decimal(15, 2)
+  import_batch_id         String?  @db.Uuid
+  // unmatched | matched | ignored
+  match_status            String   @default("unmatched")
+  matched_journal_line_id String?  @db.Uuid
+  matched_entry_id        String?  @db.Uuid
+  matched_deposit_id      String?  @db.Uuid
+  created_at              DateTime @default(now()) @db.Timestamptz(6)
+  updated_at              DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([bank_account_id, statement_date])
+  @@map("bank_statement_lines")
 }
 
 model Counterparty {

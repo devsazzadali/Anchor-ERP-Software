@@ -71,6 +71,8 @@ const adminNavigation = [
       { name: 'Opening Position', href: '/admin/accounts/opening' },
       // Accounts A3: period close & lock, FY rollover.
       { name: 'Periods', href: '/admin/accounts/periods' },
+      // Accounts A4: bank accounts, statement import + reconciliation.
+      { name: 'Bank Reconciliation', href: '/admin/accounts/bank' },
       // Accounts A2: statements over the journal.
       { name: 'Statements', href: '/admin/accounts/statements' },
       { name: 'Trial Balance', href: '/admin/accounts/statements/trial-balance' },
