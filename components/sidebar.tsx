@@ -69,6 +69,11 @@ const adminNavigation = [
       { name: 'Chart of Accounts', href: '/admin/accounts/chart' },
       { name: 'Journal', href: '/admin/accounts/journal' },
       { name: 'Opening Position', href: '/admin/accounts/opening' },
+      // Accounts A2: statements over the journal.
+      { name: 'Statements', href: '/admin/accounts/statements' },
+      { name: 'Trial Balance', href: '/admin/accounts/statements/trial-balance' },
+      { name: 'Profit & Loss', href: '/admin/accounts/statements/pl' },
+      { name: 'Balance Sheet', href: '/admin/accounts/statements/balance-sheet' },
     ]
   },
   { name: 'System Settings',         icon: Settings,        href: '/admin/settings', divider: true },
