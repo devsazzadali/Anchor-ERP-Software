@@ -8,14 +8,14 @@ export const dynamic = 'force-dynamic'
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 import React, { useEffect, useState } from 'react'
-import { MapPin, Plus, Trash2, Users, ChevronRight, X, UserCircle, Download, FileText, ImageIcon, CreditCard, Landmark, Phone, Mail, ShieldCheck, Calendar, CheckCircle2, DollarSign, AlertCircle, Eye, ArrowLeft, Search, Filter } from 'lucide-react'
+import { MapPin, Plus, Trash2, Pencil, Users, ChevronRight, X, UserCircle, Download, FileText, ImageIcon, CreditCard, Landmark, Phone, Mail, ShieldCheck, Calendar, CheckCircle2, DollarSign, AlertCircle, Eye, ArrowLeft, Search, Filter } from 'lucide-react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import * as XLSX from 'xlsx'
 import { generatePdf } from '@/lib/pdf-generator'
 import IssueSalaryModal from '../salaries/IssueSalaryModal'
 
-type Branch = { id: string; name: string }
+type Branch = { id: string; name: string; address?: string | null; phone?: string | null; city?: string | null; manager_id?: string | null }
 type Employee = {
   id: string;
   full_name: string;
@@ -36,6 +36,12 @@ export default function BranchList() {
   const [branches, setBranches] = useState<Branch[]>([])
   const [loading, setLoading] = useState(true)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  // FR-14.4: branch edit (name/address/phone/city) — the registry
+  // previously offered create + delete only, so a typo'd name could
+  // never be corrected.
+  const [editBranch, setEditBranch] = useState<Branch | null>(null)
+  const [editForm, setEditForm] = useState({ name: '', address: '', phone: '', city: '' })
+  const [editSaving, setEditSaving] = useState(false)
   const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null)
   const [employees, setEmployees] = useState<Employee[]>([])
   const [employeesLoading, setEmployeesLoading] = useState(false)
@@ -250,6 +256,37 @@ const isHeadOffice = (name?: string | null) => {
       )
     }
     setShowEmpExportDropdown(false)
+  }
+
+  // FR-14.4: open the edit form with the FULL branch row (the list
+  // fetch carries id+name only), then PATCH the registry.
+  const openEditBranch = async (b: Branch) => {
+    try {
+      const res = await fetch('/api/admin/branches?full=1')
+      const { branches: full } = await res.json()
+      const row = (full || []).find((x: any) => x.id === b.id) || b
+      setEditBranch(row)
+      setEditForm({ name: row.name || '', address: row.address || '', phone: row.phone || '', city: row.city || '' })
+    } catch (e) { console.error(e) }
+  }
+  const handleEditSave = async () => {
+    if (!editBranch) return
+    if (!editForm.name.trim()) { setFeedback({ type: 'error', message: 'Branch name cannot be empty.' }); return }
+    setEditSaving(true)
+    try {
+      const res = await fetch('/api/admin/branches', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: editBranch.id, name: editForm.name.trim(), address: editForm.address.trim() || null, phone: editForm.phone.trim() || null, city: editForm.city.trim() || null }),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Failed to update branch')
+      setBranches(branches.map(b => b.id === editBranch.id ? { ...b, name: editForm.name.trim() } : b))
+      setFeedback({ type: 'success', message: `Branch updated: ${editForm.name.trim()}` })
+      setEditBranch(null)
+    } catch (e: any) {
+      setFeedback({ type: 'error', message: e.message || 'Failed to update branch' })
+    } finally { setEditSaving(false) }
   }
 
   const handleDelete = async (id: string) => {
@@ -801,6 +838,13 @@ const isHeadOffice = (name?: string | null) => {
                             </div>
                             <div className="flex items-center gap-2">
                               <ChevronRight className={`w-4 h-4 ${selectedBranch?.id === b.id ? 'text-[#15803d]' : 'text-slate-600 group-hover:text-slate-500'} transition-colors`} />
+                              <button
+                                onClick={(e) => { e.stopPropagation(); openEditBranch(b) }}
+                                className="text-slate-400 hover:text-[#15803d] transition-colors p-2.5 opacity-0 group-hover:opacity-100 cursor-pointer"
+                                title="Edit Branch"
+                              >
+                                <Pencil className="w-3.5 h-3.5" />
+                              </button>
                               {!isHq && (
                                 <button
                                   onClick={(e) => { e.stopPropagation(); handleDelete(b.id) }}
@@ -972,6 +1016,43 @@ const isHeadOffice = (name?: string | null) => {
         />
 
         {/* FULLSCREEN IMAGE MODAL */}
+        {/* FR-14.4: branch edit modal */}
+        <AnimatePresence>
+          {editBranch && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={() => setEditBranch(null)}>
+              <motion.div initial={{ scale: 0.96, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.96, opacity: 0 }} className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-base font-bold text-slate-900 font-serif">Edit Branch</h3>
+                  <button onClick={() => setEditBranch(null)} className="p-2 text-slate-400 hover:text-slate-700 cursor-pointer"><X className="w-4 h-4" /></button>
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Branch Name *</label>
+                    <input value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} className="mt-1 w-full rounded-xl border border-slate-900/10 bg-slate-900/[0.03] px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Address</label>
+                    <input value={editForm.address} onChange={(e) => setEditForm({ ...editForm, address: e.target.value })} className="mt-1 w-full rounded-xl border border-slate-900/10 bg-slate-900/[0.03] px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Phone</label>
+                      <input value={editForm.phone} onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })} className="mt-1 w-full rounded-xl border border-slate-900/10 bg-slate-900/[0.03] px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-slate-500">City</label>
+                      <input value={editForm.city} onChange={(e) => setEditForm({ ...editForm, city: e.target.value })} className="mt-1 w-full rounded-xl border border-slate-900/10 bg-slate-900/[0.03] px-3 py-2 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" />
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-5 flex gap-2">
+                  <button onClick={() => setEditBranch(null)} className="flex-1 rounded-xl border border-slate-900/10 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-slate-800 cursor-pointer">Cancel</button>
+                  <button onClick={handleEditSave} disabled={editSaving} className="flex-1 rounded-xl bg-[#1ca34c] py-2.5 text-xs font-bold uppercase tracking-wider text-white hover:bg-[#15803d] disabled:opacity-60 cursor-pointer">{editSaving ? 'Saving…' : 'Save Changes'}</button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
         <AnimatePresence>
           {fullscreenImage && (
             <motion.div

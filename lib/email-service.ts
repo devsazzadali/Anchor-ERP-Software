@@ -1,6 +1,7 @@
 import { Resend } from 'resend';
 import { bundleValueFor } from '@/lib/bundles';
 import { prisma } from '@/lib/db';
+import { isPartnerAccount } from '@/lib/server/auth';
 
 /**
  * Fetches dynamic system settings from the database.
@@ -924,18 +925,33 @@ export async function sendPositionChangeToUser(
 export async function getAdminEmails(): Promise<string[]> {
   // Admin emails from profiles; the fallback reads
   // auth_users (was auth.admin.listUsers).
-  let data: { email: string | null }[] = [];
+  // FR-1.1: partner accounts are NOT admin recipients — the filter
+  // below applies the resolver's shared predicate (isPartnerAccount
+  // in lib/server/auth.ts): profile_type 'partner' with no
+  // admin_users row is excluded even when its role column is
+  // 'admin'/'super_admin'.
+  let adminUserIds = new Set<string>();
+  try {
+    const rows = await prisma.adminUser.findMany({ select: { id: true } });
+    adminUserIds = new Set(rows.map((r: any) => r.id));
+  } catch {
+    adminUserIds = new Set<string>();
+  }
+  let data: { id: string; email: string | null; profile_type: string | null }[] = [];
   try {
     data = await prisma.profile.findMany({
       where: { role: { in: ['admin', 'super_admin'] }, email: { not: null } },
-      select: { email: true },
+      select: { id: true, email: true, profile_type: true },
     });
   } catch (error) {
     console.error('Error fetching admin emails from profiles:', error);
     return [];
   }
 
-  const emails = (data || []).map((p: any) => p.email).filter(Boolean) as string[];
+  const emails = (data || [])
+    .filter((p: any) => !isPartnerAccount(p.profile_type, adminUserIds.has(p.id)))
+    .map((p: any) => p.email)
+    .filter(Boolean) as string[];
 
   if (emails.length === 0) {
     const authUsers = await prisma.authUser.findMany({
@@ -944,9 +960,13 @@ export async function getAdminEmails(): Promise<string[]> {
     });
     const adminProfiles = await prisma.profile.findMany({
       where: { role: { in: ['admin', 'super_admin'] } },
-      select: { id: true },
+      select: { id: true, profile_type: true },
     });
-    const adminIds = new Set((adminProfiles || []).map((p: any) => p.id));
+    const adminIds = new Set(
+      (adminProfiles || [])
+        .filter((p: any) => !isPartnerAccount(p.profile_type, adminUserIds.has(p.id)))
+        .map((p: any) => p.id)
+    );
     return (authUsers || [])
       .filter((u: any) => adminIds.has(u.id) && u.email)
       .map((u: any) => u.email as string);

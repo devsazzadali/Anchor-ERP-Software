@@ -1,14 +1,15 @@
 import { NextResponse } from 'next/server'
 import { dhakaMonthWindow, dhakaRangeUtcWindow, addDays } from '@/lib/dhaka-time'
 import { prisma } from '@/lib/db'
-import { getCallerProfile, isAdminRole } from '@/lib/server/auth'
+import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 
 export const dynamic = 'force-dynamic'
 
-// admin = role column only (A1 —
-// profile_type is user-writable during KYC and is never admin
-// proof). Fetches are complete (no 1,000-row cap — C38). The
+// admin = the unified callerIsAdmin definition (FR-1.2: role
+// column OR admin_users membership, minus the FR-1.1 partner
+// boundary; A1 — profile_type is user-writable during KYC and
+// is never admin proof). Fetches are complete (no 1,000-row cap — C38). The
 // profiles embed is attached manually (LEFT-join semantics: no
 // salary disbursement is dropped for a missing profile).
 export async function GET(req: Request) {
@@ -16,7 +17,7 @@ export async function GET(req: Request) {
     const caller = await getCallerProfile(req)
     if (!caller) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    if (!isAdminRole(caller.role)) {
+    if (!callerIsAdmin(caller)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
@@ -107,7 +108,7 @@ export async function GET(req: Request) {
     // "Unpaid" tab silently meant "unpaid this month" beside an
     // all-time payments list.
     const periodPays = await prisma.salaryPayment.findMany({
-      where: paymentWindow,
+      where: { ...paymentWindow, status: { not: 'voided' } }, // FR-14.1: a voided payment no longer marks the employee paid
       select: { employee_id: true },
       orderBy: { id: 'asc' },
     })

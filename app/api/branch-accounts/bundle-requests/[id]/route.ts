@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendBundleStatusEmailToManager } from '@/lib/email-service'
 import { prisma } from '@/lib/db'
-import { getCallerProfile, isAdminRole } from '@/lib/server/auth'
+import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 
 // caller via the single role-resolution
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: 'Requisition not found' }, { status: 404 })
     }
 
-    const isAdmin = isAdminRole(profile.role)
+    const isAdmin = callerIsAdmin(profile)
     if (!isAdmin && request.manager_id !== profile.uid && request.branch_id !== profile.branch_id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
@@ -43,7 +43,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const isAdmin = isAdminRole(profile.role)
+    const isAdmin = callerIsAdmin(profile)
 
     // Fetch existing requisition
     const existing = await prisma.branchBundleRequest.findFirst({ where: { id } })

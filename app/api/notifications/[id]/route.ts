@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { getCallerProfile, isAdminRole } from '@/lib/server/auth'
+import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 
 // caller via the single role-resolution
 // function; ownership scoping (non-admins only touch their own
@@ -18,7 +18,7 @@ export async function DELETE(request: Request, context: any) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const isAdmin = isAdminRole(caller.role)
+    const isAdmin = callerIsAdmin(caller)
 
     const where: any = { id }
     if (!isAdmin) where.user_id = caller.id
@@ -52,7 +52,7 @@ export async function PATCH(request: Request, context: any) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const isAdmin = isAdminRole(caller.role)
+    const isAdmin = callerIsAdmin(caller)
 
     const updatePayload: Record<string, any> = {}
     if (typeof body.read === 'boolean') updatePayload.read = body.read

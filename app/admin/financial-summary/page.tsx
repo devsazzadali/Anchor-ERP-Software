@@ -325,7 +325,7 @@ export default function FinancialSummaryPage() {
                 <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                   <ArrowDownRight className="w-24 h-24 text-rose-500" />
                 </div>
-                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-rose-600/80 mb-2">Total Expenses</p>
+                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-rose-600/80 mb-2">Total Expenses — all streams + payouts, selected period</p>
                 <h3 className="text-3xl font-bold font-mono text-rose-600 flex items-center gap-1">
                   <span className="text-xl">৳</span> {totalExpenses.toLocaleString('en-BD')}
                 </h3>

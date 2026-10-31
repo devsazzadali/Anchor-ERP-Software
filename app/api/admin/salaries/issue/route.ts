@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { getCallerProfile, isAdminRole } from '@/lib/server/auth'
+import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { parseMoneyAmount, sumMoney } from '@/lib/money'
 import { dhakaToday } from '@/lib/dhaka-time'
@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic'
 // write path, moved server-side (the fixed copy wrote salary_payments
 // + the branch_cash_expenses cash copy straight from the browser).
 // Rules carried from the fixed copy:
-//  - admin = role column only (A1), same gate as GET /api/admin/salaries;
+//  - admin = the unified callerIsAdmin definition (FR-1.2), same gate as GET /api/admin/salaries;
 //  - the total is RECOMPUTED on the server from the components
 //    (basic + overtime + bonus + commission + tiffin, poisha-exact
 //    via lib/money) — a client-supplied total is never stored;
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
   try {
     const caller = await getCallerProfile(req)
     if (!caller) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    if (!isAdminRole(caller.role)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    if (!callerIsAdmin(caller)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
     const includePartners = new URL(req.url).searchParams.get('include_partners') === '1'
     const profileTypes = includePartners
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
   try {
     const caller = await getCallerProfile(req)
     if (!caller) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    if (!isAdminRole(caller.role)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    if (!callerIsAdmin(caller)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
     const body = await req.json()
     const employeeId = body.employee_id

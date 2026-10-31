@@ -38,6 +38,7 @@ export default function AdminDashboard() {
   const [totalSalaries, setTotalSalaries] = useState(0)
   const [workforceDistribution, setWorkforceDistribution] = useState({ employees: 0, partners: 0, branches: 0 })
   const [taskCompletion, setTaskCompletion] = useState({ completed: 0, pending: 0 })
+  const [noClosingsRecorded, setNoClosingsRecorded] = useState(false)
   const [branchSalesSummary, setBranchSalesSummary] = useState<{
     totalSales: number
     cashSales: number | null
@@ -146,22 +147,19 @@ export default function AdminDashboard() {
             recentSales: ledgerSales.slice(-6).map((l: any) => Number(l.cash_sales || 0))
           })
         } else {
-          // C39: the fallback used to INVENT a 70/30 cash/digital
-          // split of the stored-report total and present it as real.
-          // Stored reports carry totals only — show the total and
-          // mark the split as unavailable instead of fabricating it.
-          const finReports = data.finReports || []
-          if (finReports.length > 0) {
-            const tot = sumMoney(finReports.map((r: any) => r.amount))
-            const bSet = new Set(finReports.map((r: any) => r.branch_id)).size
-            setBranchSalesSummary({
-              totalSales: tot,
-              cashSales: null,
-              digitalSales: null,
-              branchCount: bSet,
-              recentSales: finReports.slice(-6).map((r: any) => Number(r.amount || 0))
-            })
-          }
+          // FR-10/X5: NO stored-snapshot fallback. An empty ledger
+          // means no closings were recorded — the card shows ৳0 and
+          // says exactly that (see the subtext below), instead of
+          // silently presenting stored monthly-report totals as if
+          // they were ledger sales.
+          setBranchSalesSummary({
+            totalSales: 0,
+            cashSales: 0,
+            digitalSales: 0,
+            branchCount: 0,
+            recentSales: []
+          })
+          setNoClosingsRecorded(true)
         }
       } catch (e) {
         console.error('Failed to fetch branch sales telemetry:', e)
@@ -304,8 +302,10 @@ export default function AdminDashboard() {
             <StatsCard
               title="Total Branch Network Sales"
               value={`৳ ${branchSalesSummary.totalSales.toLocaleString('en-BD')}`}
-              subtext={branchSalesSummary.cashSales === null || branchSalesSummary.digitalSales === null
-                ? 'From stored monthly reports — cash/digital split unavailable'
+              subtext={noClosingsRecorded
+                ? 'No closings recorded'
+                : branchSalesSummary.cashSales === null || branchSalesSummary.digitalSales === null
+                ? 'Cash/digital split unavailable'
                 : `Cash: ৳${branchSalesSummary.cashSales.toLocaleString('en-BD')} | Digital: ৳${branchSalesSummary.digitalSales.toLocaleString('en-BD')}`}
               icon={Store}
               sparklineColor="emerald"
@@ -347,9 +347,9 @@ export default function AdminDashboard() {
           </Link>
           <Link href="/admin/payments" className="block">
             <StatsCard
-              title="Active Payout Load"
+              title="Partner Payout Requests"
               value={`৳ ${activePayoutLoad.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
-              subtext="Clearing through gateways"
+              subtext="Pending + processing partner payout requests"
               icon={Wallet}
               sparklineColor="gold"
               sparklineData={telemetryData.map(d => d.payouts)}
@@ -377,7 +377,7 @@ export default function AdminDashboard() {
           </Link>
           <Link href="/admin/branch-expenses" className="block">
             <StatsCard
-              title="Total OpEx (Expenses)"
+              title="Total OpEx — company expenses, all-time"
               value={`৳ ${totalExpenses.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
               subtext="All-time logged company expenses (gross, incl. unpaid portion)"
               icon={Receipt}

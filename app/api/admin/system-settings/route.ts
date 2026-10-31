@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { getCallerProfile, isAdminRole } from '@/lib/server/auth'
+import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 
 // admin gate via the single
 // role-resolution function; settings read/written with Prisma. The
@@ -9,7 +9,7 @@ import { getCallerProfile, isAdminRole } from '@/lib/server/auth'
 
 async function requireAdmin(req: Request) {
   const caller = await getCallerProfile(req)
-  if (!caller || !isAdminRole(caller.role)) return null
+  if (!caller || !callerIsAdmin(caller)) return null
   return caller
 }
 
@@ -23,19 +23,27 @@ export async function GET(req: Request) {
   try {
     const data = await prisma.systemSetting.findMany()
 
-    const settings = (data ?? []).reduce(
-      (acc, curr) => {
-        acc[curr.key] = curr.value
-        return acc
-      },
-      {} as Record<string, string>
-    )
+    // FR-1.4: GET is a key ALLOWLIST, not a denylist. Only the
+    // non-secret keys the settings page actually edits are returned
+    // with values (sender_email, password_reset_mode). EVERY other
+    // key — present or future, secret-bearing or not — returns
+    // only a `<key>_configured` flag, so a secret inserted into
+    // this table can never leak by default.
+    const ALLOWED_VALUE_KEYS = new Set(['sender_email', 'password_reset_mode'])
+    const settings: Record<string, string> = {}
+    for (const row of data ?? []) {
+      if (row.key === 'resend_api_key') continue // handled below
+      if (ALLOWED_VALUE_KEYS.has(row.key)) {
+        settings[row.key] = row.value
+      } else {
+        settings[`${row.key}_configured`] = row.value ? 'true' : 'false'
+      }
+    }
 
     // The Resend API key is a secret and is NEVER returned by this API
     // (it previously came back in full to any admin session). It lives
     // in the server environment now; the UI only needs to know whether
     // one is configured. Any legacy plaintext row is also withheld.
-    delete settings.resend_api_key
     settings.resend_api_key_configured = process.env.RESEND_API_KEY ? 'true' : 'false'
 
     return NextResponse.json({ settings })

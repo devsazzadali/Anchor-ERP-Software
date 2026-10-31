@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { dhakaToday, dhakaMonthWindow, addDays } from '@/lib/dhaka-time'
 import { sumMoney } from '@/lib/money'
 import { prisma } from '@/lib/db'
-import { getCallerProfile, isAdminRole } from '@/lib/server/auth'
+import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { branchStreamAmount, branchCashExpenseStream } from '@/lib/expense-streams'
 
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
     if (!caller) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     const profile = caller
 
-    const isAdmin = isAdminRole(profile.role)
+    const isAdmin = callerIsAdmin(profile)
     const isManager = profile.is_branch_manager === true
 
     // Partners previously counted as admin-equivalent here and could

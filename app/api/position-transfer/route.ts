@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 // BUG-R06 FIX: Use shared email-service instead of inline Resend instantiation
 import { sendPositionChangeToUser } from '@/lib/email-service'
 import { prisma } from '@/lib/db'
-import { getCallerProfile, isAdminRole } from '@/lib/server/auth'
+import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 
 // admin gate via the single
 // role-resolution function; transfer record + profile update +
@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     const caller = await getCallerProfile(request)
     if (!caller) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    if (!isAdminRole(caller.role)) {
+    if (!callerIsAdmin(caller)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 

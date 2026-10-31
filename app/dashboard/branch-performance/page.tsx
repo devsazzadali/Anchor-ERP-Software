@@ -196,6 +196,8 @@ export default function PartnerBranchPerformancePage() {
             </span>
             <h1 className="text-xl font-extrabold tracking-tight text-slate-900 font-serif">Branch Performance Reports</h1>
             <p className="text-[11px] text-slate-500 mt-0.5">Monthly sales, profit, and loss for all branches.</p>
+            {/* FR-10/X5: source label — these are the STORED monthly snapshots (synced by the live monthly engine), not a live recomputation. */}
+            <p className="text-[10px] text-slate-400 mt-0.5 italic">Source: stored monthly snapshots (auto-synced from live ledgers by the monthly performance engine).</p>
             </div>
           </div>
           <div className="flex items-center gap-2">

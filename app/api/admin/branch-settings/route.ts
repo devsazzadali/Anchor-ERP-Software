@@ -181,6 +181,17 @@ const PART_B_EDIT_FIELDS: Record<string, string[]> = {
   utility_meters: ['payable_to'],
   developer_payment_methods: [],
 }
+// FR-14.6: the core registry fields are editable too — most
+// importantly rent_amount: the settings UI never sent it and the
+// PATCH never accepted it, so every existing rent account sat at
+// rent_amount = 0 ("rent not set") with NO way to set the real
+// contractual rent short of delete + recreate. Meter numbers had
+// the same trap (a wrong meter number could never be corrected).
+const FR14_EDIT_FIELDS: Record<string, string[]> = {
+  house_rent_accounts: ['bank_name', 'account_name', 'account_number', 'routing_number', 'rent_amount'],
+  utility_meters: ['meter_number', 'account_number', 'meter_type'],
+  developer_payment_methods: [],
+}
 export async function PATCH(req: NextRequest) {
   try {
     const caller = await getCallerProfile(req)
@@ -194,11 +205,20 @@ export async function PATCH(req: NextRequest) {
     if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
 
     const body = await req.json().catch(() => ({} as any))
-    const editKeys = (PART_B_EDIT_FIELDS[kind] || []).filter((k) => body && k in body)
+    const editKeys = [...(PART_B_EDIT_FIELDS[kind] || []), ...(FR14_EDIT_FIELDS[kind] || [])].filter((k) => body && k in body)
     if (editKeys.length > 0) {
       const data: Record<string, unknown> = {}
       for (const k of editKeys) {
         const v = body[k]
+        if (k === 'rent_amount') {
+          // Money field: blank/null clears to NULL (="not set");
+          // anything else must parse as a non-negative amount.
+          if (v === null || v === undefined || String(v).trim() === '') { data[k] = null; continue }
+          const rent = parseMoneyAmount(v)
+          if (rent === null) return NextResponse.json({ error: 'Invalid rent amount.' }, { status: 400 })
+          data[k] = rent
+          continue
+        }
         data[k] = v === null || v === undefined || String(v).trim() === '' ? null : String(v).trim()
       }
       if (kind === 'house_rent_accounts') {

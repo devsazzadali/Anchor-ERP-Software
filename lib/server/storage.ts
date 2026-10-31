@@ -52,19 +52,116 @@ export type BucketName = (typeof BUCKETS)[number]
 
 /** Who may READ an object: 'public' | 'authenticated' | 'owner-or-admin'. */
 export const BUCKET_READ_ACCESS: Record<string, 'public' | 'authenticated' | 'owner-or-admin'> = {
-  // Deposit slips were public URLs in the old system; every page
-  // that renders them sits behind login, so requiring a session
-  // changes nothing visible and stops public enumeration.
-  'branch-deposits': 'authenticated',
-  'expense-invoices': 'authenticated',
   invoices: 'authenticated',
   // KYC documents were effectively exposed through long-lived signed
   // URLs in the old system; in the app they are owner-or-admin ONLY
   // (the one deliberate privacy tightening).
   kyc: 'owner-or-admin',
   'kyc-documents': 'owner-or-admin',
-  payment_proofs: 'authenticated',
-  salaries: 'authenticated',
+  // FR-1.8 (audit G6): the money-document buckets are owner-or-admin
+  // too — no longer merely "any authenticated caller". Ownership
+  // for these buckets is resolved via the OWNING RECORD (see
+  // RECORD_OWNED_BUCKETS below), not just the path.
+  'branch-deposits': 'owner-or-admin',
+  'expense-invoices': 'owner-or-admin',
+  payment_proofs: 'owner-or-admin',
+  salaries: 'owner-or-admin',
+}
+
+/**
+ * FR-1.8 — buckets whose read ownership is resolved via the owning
+ * database record (the files route does the lookup; this set is the
+ * single registry of which buckets work that way):
+ *  - salaries:        the salary payment's employee
+ *                     (salary_payments.payment_proof_url)
+ *  - payment_proofs:  the salary payment's employee
+ *                     (salary_payments.payment_proof_url) or the
+ *                     payout request's user
+ *                     (payment_requests.payment_screenshot_url)
+ *  - branch-deposits: the deposit's uploader (manager_id) or a
+ *                     branch manager of the deposit's branch
+ *                     (branch_bank_deposits.slip_attachment_url /
+ *                     bank_statement_url)
+ *  - expense-invoices: the expense request's employee
+ *                     (employee_expense_requests.invoice_url) or
+ *                     the branch expense's creator/manager
+ *                     (branch_cash_expenses.receipt_url)
+ * For all four, an object path containing the caller's own id as a
+ * segment (the server-generated upload layout, FR-1.8) also proves
+ * ownership. When ownership cannot be resolved for a non-admin
+ * caller, the files route fails closed (404).
+ * kyc / kyc-documents keep the original path-segment owner rule.
+ */
+export const RECORD_OWNED_BUCKETS = new Set([
+  'salaries',
+  'payment_proofs',
+  'branch-deposits',
+  'expense-invoices',
+])
+
+/**
+ * FR-1.8 — per-bucket upload allowlists (extension + MIME + size).
+ * Every bucket in this app carries images or PDF documents only;
+ * anything else is rejected at the upload route. 10 MB per file.
+ */
+const IMAGE_EXTS = ['jpg', 'jpeg', 'png', 'webp', 'gif'] as const
+const DOC_EXTS = [...IMAGE_EXTS, 'pdf'] as const
+export const MIME_BY_EXT: Record<string, string> = {
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  webp: 'image/webp',
+  gif: 'image/gif',
+  pdf: 'application/pdf',
+}
+export const EXT_BY_MIME: Record<string, string> = {
+  'image/jpeg': 'jpg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+  'image/gif': 'gif',
+  'application/pdf': 'pdf',
+}
+export const BUCKET_UPLOAD_RULES: Record<
+  string,
+  { extensions: readonly string[]; maxBytes: number }
+> = {
+  'branch-deposits': { extensions: DOC_EXTS, maxBytes: 10 * 1024 * 1024 },
+  'expense-invoices': { extensions: DOC_EXTS, maxBytes: 10 * 1024 * 1024 },
+  invoices: { extensions: DOC_EXTS, maxBytes: 10 * 1024 * 1024 },
+  kyc: { extensions: DOC_EXTS, maxBytes: 10 * 1024 * 1024 },
+  'kyc-documents': { extensions: DOC_EXTS, maxBytes: 10 * 1024 * 1024 },
+  payment_proofs: { extensions: DOC_EXTS, maxBytes: 10 * 1024 * 1024 },
+  salaries: { extensions: DOC_EXTS, maxBytes: 10 * 1024 * 1024 },
+}
+
+/**
+ * Validate an upload against the bucket's allowlist. Returns the
+ * canonical extension to store under, or an error message. The
+ * extension is derived from the declared MIME type when it is a
+ * known document type (server-side truth wins over the caller's
+ * filename); otherwise the filename extension must be allowlisted.
+ */
+export function validateUpload(
+  bucket: string,
+  fileName: string | undefined,
+  mimeType: string | undefined,
+  size: number
+): { ext: string } | { error: string } {
+  const rules = BUCKET_UPLOAD_RULES[bucket]
+  if (!rules) return { error: 'Unknown bucket' }
+  if (size <= 0) return { error: 'Empty file' }
+  if (size > rules.maxBytes) return { error: 'File too large' }
+  const mime = (mimeType || '').split(';')[0].trim().toLowerCase()
+  let ext: string | null = null
+  if (mime && EXT_BY_MIME[mime]) {
+    ext = EXT_BY_MIME[mime]
+  } else if (!mime || mime === 'application/octet-stream') {
+    ext = (fileName?.split('.').pop() || '').toLowerCase().replace(/[^a-z0-9]/g, '') || null
+  } else {
+    return { error: 'File type not allowed' }
+  }
+  if (!ext || !rules.extensions.includes(ext)) return { error: 'File type not allowed' }
+  return { ext }
 }
 
 export function isKnownBucket(bucket: string): boolean {
@@ -151,6 +248,71 @@ export async function putObject(
   const fp = objectFilePath(bucket, objectPath)
   await fs.mkdir(path.dirname(fp), { recursive: true })
   await fs.writeFile(fp, data)
+}
+
+/** True when an object already exists under the exact key. */
+export async function objectExists(bucket: string, objectPath: string): Promise<boolean> {
+  if (storageDriver() === 'vercel-blob') {
+    const token = requireBlobToken()
+    const { head } = await import('@vercel/blob')
+    try {
+      const meta = await head(blobPathname(bucket, objectPath), { token })
+      return !!meta
+    } catch {
+      return false
+    }
+  }
+  try {
+    await fs.access(objectFilePath(bucket, objectPath))
+    return true
+  } catch {
+    return false
+  }
+}
+
+/** Thrown by putObjectExclusive when the key is already taken. */
+export class ObjectAlreadyExistsError extends Error {
+  constructor(bucket: string, objectPath: string) {
+    super(`Object already exists: ${bucket}/${objectPath}`)
+    this.name = 'ObjectAlreadyExistsError'
+  }
+}
+
+/**
+ * FR-1.8: write ONLY when the key is unused — new uploads must
+ * never silently overwrite an existing object (the old putObject
+ * behaviour). Local driver uses the exclusive-create flag; the
+ * blob driver checks existence first and disallows overwrite.
+ */
+export async function putObjectExclusive(
+  bucket: string,
+  objectPath: string,
+  data: Buffer,
+  contentType?: string
+): Promise<void> {
+  if (storageDriver() === 'vercel-blob') {
+    if (await objectExists(bucket, objectPath)) {
+      throw new ObjectAlreadyExistsError(bucket, objectPath)
+    }
+    const token = requireBlobToken()
+    const { put } = await import('@vercel/blob')
+    await put(blobPathname(bucket, objectPath), data, {
+      access: 'private',
+      token,
+      addRandomSuffix: false,
+      allowOverwrite: false,
+      ...(contentType ? { contentType } : {}),
+    })
+    return
+  }
+  const fp = objectFilePath(bucket, objectPath)
+  await fs.mkdir(path.dirname(fp), { recursive: true })
+  try {
+    await fs.writeFile(fp, data, { flag: 'wx' })
+  } catch (err: any) {
+    if (err && err.code === 'EEXIST') throw new ObjectAlreadyExistsError(bucket, objectPath)
+    throw err
+  }
 }
 
 export async function getObject(bucket: string, objectPath: string): Promise<Buffer | null> {

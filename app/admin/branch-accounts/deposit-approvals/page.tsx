@@ -21,6 +21,7 @@ const fmt = (n: number) => '৳' + Number(n ?? 0).toLocaleString('en-BD', { mini
 export default function DepositApprovalsPage() {
   const router = useRouter()
   const [deposits, setDeposits] = useState<any[]>([])
+  const [totalsSummary, setTotalsSummary] = useState<{ approved_record_total: number; credited_total: number } | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
@@ -73,6 +74,8 @@ export default function DepositApprovalsPage() {
     if (res.ok) {
       const all = json.deposits || []
       setDeposits(all)
+      // FR-10/X1: server-computed record-total vs credited-total pair.
+      setTotalsSummary(json.summary || null)
     } else {
       setError(json.error)
     }
@@ -305,7 +308,7 @@ export default function DepositApprovalsPage() {
         summaryData: [
           { label: 'Total Submissions', value: filteredDeposits.length.toString() },
           { label: 'Total Submitted Value', value: `${totalAmount.toLocaleString('en-BD')} BDT` },
-          { label: 'Total Approved Value', value: `${approvedAmount.toLocaleString('en-BD')} BDT` },
+          { label: 'Total Approved Value (deposit records)', value: `${approvedAmount.toLocaleString('en-BD')} BDT` },
           { label: 'Pending Reviews', value: `${pendingCount} Submissions` },
         ],
         filename: `Deposit_Approvals_${new Date().toISOString().slice(0, 10)}.pdf`,
@@ -482,6 +485,13 @@ export default function DepositApprovalsPage() {
           <div className="p-4 rounded-3xl border border-emerald-500/20 bg-emerald-500/5">
             <p className="text-[9px] uppercase tracking-widest text-emerald-600/80 font-bold mb-1">Approved Deposits</p>
             <p className="text-xl sm:text-2xl font-bold font-serif text-emerald-600">{approvedCount}</p>
+            {/* FR-10/X1: record total vs banked total, stated distinctly */}
+            {totalsSummary && (
+              <p className="text-[10px] text-slate-500 mt-1 leading-snug">
+                Records: <span className="font-bold text-slate-700">{fmt(totalsSummary.approved_record_total)}</span>
+                {' · '}Credited to ledgers: <span className="font-bold text-slate-700">{fmt(totalsSummary.credited_total)}</span>
+              </p>
+            )}
           </div>
           <div className="p-4 rounded-3xl border border-slate-900/10 bg-slate-900/[0.04]">
             <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold mb-1">Total Recorded Submissions</p>

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { sendBundleRequestEmailToAdmins } from '@/lib/email-service'
 import { bundleTotal, bundleValueFor } from '@/lib/bundles'
 import { prisma } from '@/lib/db'
-import { getCallerProfile, isAdminRole } from '@/lib/server/auth'
+import { getCallerProfile, callerIsAdmin, isPartnerAccount } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 
 // the route's local getCallerProfile is
@@ -19,8 +19,13 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const isAdmin = isAdminRole(profile.role)
-    const isManager = profile.is_branch_manager || profile.role === 'branch_manager'
+    const isAdmin = callerIsAdmin(profile)
+    // FR-1.9: manager test = the resolver's is_branch_manager only
+    // (it already merges the profile flag, profile_type
+    // 'branch_manager' and active assignments). The old extra
+    // `role === 'branch_manager'` accepted a role value the system
+    // never assigns.
+    const isManager = profile.is_branch_manager
 
     if (!isAdmin && !isManager) {
       return NextResponse.json({ error: 'Access restricted to Branch Managers and Admins' }, { status: 403 })
@@ -66,8 +71,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const isAdmin = isAdminRole(profile.role)
-    const isManager = profile.is_branch_manager || profile.role === 'branch_manager'
+    const isAdmin = callerIsAdmin(profile)
+    // FR-1.9: manager test = the resolver's is_branch_manager only
+    // (it already merges the profile flag, profile_type
+    // 'branch_manager' and active assignments). The old extra
+    // `role === 'branch_manager'` accepted a role value the system
+    // never assigns.
+    const isManager = profile.is_branch_manager
 
     if (!isManager && !isAdmin) {
       return NextResponse.json({ error: 'Access restricted to Branch Managers and Admins' }, { status: 403 })
@@ -179,12 +189,20 @@ export async function POST(req: NextRequest) {
       console.warn('[POST /api/branch-accounts/bundle-requests] Task auto-creation warning:', taskEx)
     }
 
-    // 4. Send email + in-app notifications to admins
+    // 4. Send email + in-app notifications to admins.
+    // FR-1.1 residue: partner accounts (profile_type 'partner' with no
+    // admin_users row) are excluded via the resolver's shared predicate.
     try {
-      const admins = await prisma.profile.findMany({
+      const adminCandidates = await prisma.profile.findMany({
         where: { role: { in: ['admin', 'super_admin'] } },
-        select: { id: true },
+        select: { id: true, profile_type: true },
       })
+      const adminUserIds = new Set(
+        (await prisma.adminUser.findMany({ select: { id: true } })).map((a) => a.id)
+      )
+      const admins = adminCandidates.filter(
+        (p) => !isPartnerAccount(p.profile_type, adminUserIds.has(p.id))
+      )
 
       if (admins.length > 0) {
         await prisma.notification.createMany({

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { getCallerProfile, isAdminRole } from '@/lib/server/auth'
+import { getCallerProfile, callerIsAdmin, isPartnerAccount } from '@/lib/server/auth'
 
 // caller via the single role-resolution
 // function; the service-role client is gone — notifications are
@@ -12,7 +12,7 @@ export async function POST(request: Request) {
   if (!caller) {
     return NextResponse.json({ error: 'Unauthorized: Authentication required' }, { status: 401 })
   }
-  const isAdmin = isAdminRole(caller.role)
+  const isAdmin = callerIsAdmin(caller)
   // A7: NOTHING in the app calls this route — the broadcast path let
   // ANY authenticated user push arbitrary "admin" notifications
   // (spoofing). The route is admin-only now, both paths.
@@ -47,11 +47,20 @@ export async function POST(request: Request) {
         read: false,
       })
     } else {
-      // No target_user_id → broadcast to all admins (e.g. for expense/payout submissions)
-      const admins = await prisma.profile.findMany({
+      // No target_user_id → broadcast to all admins (e.g. for expense/payout submissions).
+      // FR-1.1 residue: partner accounts (profile_type 'partner' with no
+      // admin_users row) are not admins — apply the resolver's shared
+      // predicate, exactly as getAdminEmails does.
+      const adminCandidates = await prisma.profile.findMany({
         where: { role: { in: ['admin', 'super_admin'] } },
-        select: { id: true },
+        select: { id: true, profile_type: true },
       })
+      const adminUserIds = new Set(
+        (await prisma.adminUser.findMany({ select: { id: true } })).map((a) => a.id)
+      )
+      const admins = adminCandidates.filter(
+        (p) => !isPartnerAccount(p.profile_type, adminUserIds.has(p.id))
+      )
 
       if (admins.length === 0) {
         return NextResponse.json({ message: 'No admins found to notify' }, { status: 200 })

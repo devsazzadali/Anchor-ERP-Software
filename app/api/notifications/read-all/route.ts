@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { getCallerProfile, isAdminRole } from '@/lib/server/auth'
+import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 
 // caller via the single role-resolution
 // function. Admin scope = own + broadcast (user_id NULL)
@@ -13,7 +13,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const isAdmin = isAdminRole(caller.role)
+    const isAdmin = callerIsAdmin(caller)
 
     const where: any = { read: false }
     if (isAdmin) {

@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic'
 import React, { useEffect, useState, useCallback } from 'react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Users, Landmark, MapPin, Copy, CreditCard, Check, X, ShieldCheck, UserX, UserCheck, UserCircle, Search, Image as ImageIcon, FileText, Download, CheckSquare, Square, Calendar, Building2 } from 'lucide-react'
+import { Users, Landmark, MapPin, Copy, CreditCard, Check, X, Pencil, ShieldCheck, UserX, UserCheck, UserCircle, Search, Image as ImageIcon, FileText, Download, CheckSquare, Square, Calendar, Building2 } from 'lucide-react'
 import * as XLSX from 'xlsx'
 import { generatePdf } from '@/lib/pdf-generator'
 import IssueSalaryModal from '../salaries/IssueSalaryModal'
@@ -233,6 +233,33 @@ export default function AdminUsersDirectory() {
       setTimeout(() => setFeedback(null), 3000)
     } catch (err: any) {
       setFeedback({ type: 'error', message: err.message || 'Failed to create position.' })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  // FR-14.5: rename a position (the registry previously offered
+  // create + delete only).
+  const handleRenamePosition = async (id: string, currentName: string) => {
+    const name = prompt(`Rename position "${currentName}" to:`, currentName)
+    if (!name || !name.trim() || name.trim() === currentName) return
+    setIsSubmitting(true)
+    setFeedback(null)
+    try {
+      const res = await fetch('/api/admin/positions', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, name: name.trim() }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || 'Failed to rename position.')
+      }
+      setFeedback({ type: 'success', message: 'Position renamed successfully!' })
+      fetchPositions()
+      setTimeout(() => setFeedback(null), 3000)
+    } catch (err: any) {
+      setFeedback({ type: 'error', message: err.message || 'Failed to rename position.' })
     } finally {
       setIsSubmitting(false)
     }
@@ -1327,13 +1354,23 @@ export default function AdminUsersDirectory() {
                   positions.map((p) => (
                     <div key={p.id} className="flex justify-between items-center bg-slate-900/[0.04] border border-slate-900/5 px-2.5 py-1.5 rounded-lg text-[11px] group hover:border-slate-900/10 transition-all">
                       <span className="font-semibold text-slate-900">{p.name}</span>
-                      <button
-                        type="button"
-                        onClick={() => handleDeletePosition(p.id, p.name)}
-                        className="text-rose-600 hover:text-rose-700 opacity-0 group-hover:opacity-100 transition-opacity p-2.5 cursor-pointer"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
+                      <span className="flex items-center">
+                        <button
+                          type="button"
+                          title="Rename position"
+                          onClick={() => handleRenamePosition(p.id, p.name)}
+                          className="text-slate-400 hover:text-[#15803d] opacity-0 group-hover:opacity-100 transition-opacity p-2.5 cursor-pointer"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeletePosition(p.id, p.name)}
+                          className="text-rose-600 hover:text-rose-700 opacity-0 group-hover:opacity-100 transition-opacity p-2.5 cursor-pointer"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </span>
                     </div>
                   ))
                 )}

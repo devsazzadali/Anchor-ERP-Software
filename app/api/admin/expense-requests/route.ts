@@ -198,9 +198,22 @@ export async function PATCH(req: NextRequest) {
     // ── Edit / approve / reject ───────────────────────────────────
     const existing = await prisma.employeeExpenseRequest.findFirst({
       where: { id },
-      select: { id: true, amount: true, paid_amount: true },
+      select: { id: true, amount: true, paid_amount: true, status: true },
     })
     if (!existing) return NextResponse.json({ error: 'Request not found' }, { status: 404 })
+
+    // FR-14.2 (law E3): a generic edit may NOT move a request into
+    // 'paid' — settlement must run the transactional pay flow above
+    // so the payment BOOKS (branch cash + ledger). The old verbatim
+    // status copy let a request be marked paid with nothing booked
+    // (the OD-5 integrity hole). A settled (paid) request's money
+    // fields are likewise immutable here.
+    if (body.status === 'paid') {
+      return NextResponse.json({ error: 'Use the Pay action to settle this request — payment must book the expense.' }, { status: 400 })
+    }
+    if (existing.status === 'paid' && ('amount' in body || 'paid_amount' in body || 'status' in body)) {
+      return NextResponse.json({ error: 'This request is already settled. Its amount and status can no longer be edited.' }, { status: 400 })
+    }
 
     const patch: Record<string, unknown> = {}
     // Part B: routing_number (new nullable column) is writable here
@@ -208,7 +221,9 @@ export async function PATCH(req: NextRequest) {
     for (const key of ['title', 'description', 'status', 'trx_id', 'admin_notes', 'routing_number'] as const) {
       if (key in body) patch[key] = body[key]
     }
-    if ('paid_at' in body) patch.paid_at = body.paid_at ? new Date(body.paid_at) : null
+    // FR-14.2: paid_at is owned by the pay flow and is deliberately
+    // NOT copied from the body — a generic edit may not stamp a
+    // payment date onto an unpaid request.
 
     let amount = Number(existing.amount)
     let paid = Number(existing.paid_amount || 0)
@@ -232,10 +247,29 @@ export async function PATCH(req: NextRequest) {
       patch.due_amount = roundMoney(amount - paid)
     }
 
+    // FR-14.2: an amount edit on an APPROVED request voids the
+    // approval — the request returns to 'pending' for re-approval,
+    // with an audit row (old → new). Approving a number nobody
+    // re-checked is how wrong amounts get paid.
+    let amountEditAudit: { oldAmount: number; newAmount: number } | null = null
+    if ('amount' in body && existing.status === 'approved' && patch.amount !== undefined && Number(patch.amount) !== Number(existing.amount)) {
+      patch.status = 'pending'
+      amountEditAudit = { oldAmount: Number(existing.amount), newAmount: Number(patch.amount) }
+    }
+
     if (Object.keys(patch).length === 0) {
       return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 })
     }
     const data = await prisma.employeeExpenseRequest.update({ where: { id }, data: patch as any })
+    if (amountEditAudit) {
+      await prisma.activityLog.create({
+        data: {
+          user_id: caller.id,
+          action: 'EXPENSE_REQUEST_AMOUNT_EDIT',
+          details: { request_id: id, old_amount: amountEditAudit.oldAmount, new_amount: amountEditAudit.newAmount, status_reset: 'pending', route: 'admin' },
+        },
+      }).catch((e: any) => console.error('[expense-requests PATCH] audit write failed:', e.message))
+    }
     return NextResponse.json({ request: toPlain(data) })
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })

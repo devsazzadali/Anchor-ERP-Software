@@ -81,12 +81,13 @@ export async function GET(req: NextRequest) {
             bank_deposits_out: true, ledger_date: true,
           },
         }),
-        // Salaries: the fixed page filtered payment_date (timestamptz)
-        // with the bare date bounds — replicated as the same UTC
-        // instants PostgREST compared against.
+        // Salaries: payment_date is timestamptz, so it uses the
+        // identical Dhaka tsWindow as payouts and company expenses
+        // below (FR-5/X2) — the bare date bounds dropped the whole
+        // last day of the window (lte = midnight at its start).
         allBranches
           ? prisma.salaryPayment.findMany({
-              where: { payment_date: { gte: startDt, lte: endDt } },
+              where: { payment_date: tsWindow, status: { not: 'voided' } }, // FR-14.1: voided payments never count
               select: { amount: true, payment_date: true },
             })
           : Promise.resolve([]),

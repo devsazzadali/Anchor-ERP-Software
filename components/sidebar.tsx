@@ -62,6 +62,9 @@ const partnerNavigation = [
   { name: 'Partner Dashboard',  icon: LayoutDashboard, href: '/dashboard'                    },
   { name: 'Profile Settings',   icon: User,            href: '/dashboard/settings'            },
   { name: 'Expense Requests',   icon: Wallet,          href: '/dashboard/expense-requests'    },
+  // FR-13: the partner expense-issuance workflow (1,819-line page)
+  // existed but was unreachable from navigation — linked, not deleted.
+  { name: 'Branch Expenses',    icon: Receipt,         href: '/dashboard/branch-expenses'      },
   { name: 'Branch Chalans',     icon: Package,         href: '/dashboard/branch-chalans'      },
   { name: 'Branch Performance', icon: TrendingUp,      href: '/dashboard/branch-performance'  },
   { name: 'Salary Ledger',      icon: Receipt,         href: '/dashboard/salaries'            },

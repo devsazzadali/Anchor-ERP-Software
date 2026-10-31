@@ -118,7 +118,9 @@ export default function AdminSalariesLedger() {
 
   // Summary Metrics
   const summaryStats = useMemo(() => {
-    const totalPaidAmount = salaries.reduce((sum, s) => sum + Number(s.amount), 0)
+    // FR-14.1: voided payments never count toward paid totals.
+    const activeSalaries = salaries.filter(s => s.status !== 'voided')
+    const totalPaidAmount = activeSalaries.reduce((sum, s) => sum + Number(s.amount), 0)
     const totalUnpaidAmount = unpaidEmployees.reduce((sum, u) => sum + Number(u.salary || 0), 0)
 
     return {
@@ -127,7 +129,7 @@ export default function AdminSalariesLedger() {
       // twice. (Note: totalUnpaidAmount is Σ CURRENT profile salary
       // of unpaid staff — no historical salary is stored, so it is
       // labelled as such on the card.)
-      countPaid: new Set(salaries.map(s => s.employee_id)).size,
+      countPaid: new Set(activeSalaries.map(s => s.employee_id)).size,
       countUnpaid: unpaidEmployees.length,
       totalPaidAmount,
       totalUnpaidAmount
@@ -252,6 +254,27 @@ export default function AdminSalariesLedger() {
     const workbook = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(workbook, worksheet, 'SalariesData')
     XLSX.writeFile(workbook, `master_salary_export_${new Date().toISOString().slice(0,10)}.xlsx`)
+  }
+
+  // FR-14.1: void a payment (server reverses its branch-cash
+  // mirror and excludes it from every total). Correction = void,
+  // then issue a fresh payment.
+  const handleVoidSalary = async (s: any) => {
+    const reason = prompt(`Void this payment of ${Number(s.amount).toLocaleString()} BDT? The payment will stop counting everywhere and its cash mirror will be reversed. You can then reissue a corrected payment.\n\nReason (optional):`, '')
+    if (reason === null) return
+    try {
+      const res = await fetch(`/api/admin/salary-payments/${s.id}/void`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason }),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(json.error || 'Failed to void payment')
+      setSelectedSalary(null)
+      fetchData()
+    } catch (e: any) {
+      alert(e.message || 'Failed to void payment')
+    }
   }
 
   const handleExportSingleSalaryPdf = async (s: any) => {
@@ -530,9 +553,15 @@ export default function AdminSalariesLedger() {
                         <span className="text-[10px] text-slate-500 uppercase tracking-wider block">{salary.profiles?.branch || 'HQ'}</span>
                       </div>
                     </div>
-                    <div className="px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-600 text-[10px] font-bold border border-emerald-500/20">
-                      Paid
-                    </div>
+                    {salary.status === 'voided' ? (
+                      <div className="px-2 py-1 rounded-md bg-rose-500/10 text-rose-600 text-[10px] font-bold border border-rose-500/20">
+                        Voided
+                      </div>
+                    ) : (
+                      <div className="px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-600 text-[10px] font-bold border border-emerald-500/20">
+                        Paid
+                      </div>
+                    )}
                   </div>
 
                   <div className="my-4">
@@ -689,7 +718,7 @@ export default function AdminSalariesLedger() {
                 </div>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-slate-900/5">
+              <div className="mt-6 pt-4 border-t border-slate-900/5 space-y-2">
                 <button
                   type="button"
                   onClick={() => handleExportSingleSalaryPdf(selectedSalary)}
@@ -698,6 +727,21 @@ export default function AdminSalariesLedger() {
                   <Download className="w-4 h-4" />
                   Export Voucher (PDF)
                 </button>
+                {/* FR-14.1: void + reissue is the ONLY correction path
+                    for an issued payment (never edit/delete). */}
+                {selectedSalary.status === 'voided' ? (
+                  <p className="w-full py-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-600 text-xs font-bold uppercase tracking-wider text-center">
+                    This payment has been VOIDED
+                  </p>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => handleVoidSalary(selectedSalary)}
+                    className="w-full py-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-600 text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    Void Payment (then reissue corrected)
+                  </button>
+                )}
               </div>
             </motion.div>
           </motion.div>

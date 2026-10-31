@@ -21,7 +21,7 @@ export async function GET(req: Request) {
         orderBy: { created_at: 'desc' },
       }),
       prisma.salaryPayment.findMany({
-        where: { employee_id: caller.id },
+        where: { employee_id: caller.id, status: { not: 'voided' } }, // FR-14.1
         orderBy: { payment_date: 'desc' },
       }),
     ])

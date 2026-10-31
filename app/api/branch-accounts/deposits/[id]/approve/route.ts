@@ -143,7 +143,11 @@ export async function POST(
             managerEmail: mgrProfile.email,
             managerName: mgrProfile.full_name || deposit.manager_name || 'Branch Manager',
             branchName: deposit.branch_name || 'Branch',
-            depositDate: toPlain(deposit).deposit_date,
+            // FR-6 #18 (type-level only): toPlain() renders
+            // deposit_date as a 'YYYY-MM-DD' string at runtime
+            // (DATE_ONLY_FIELDS); typed through the plain-row shape
+            // to match the email parameter's string type.
+            depositDate: (toPlain(deposit) as unknown as { deposit_date: string }).deposit_date,
             amount: Number(deposit.amount),
             status: action === 'approve' ? 'approved' : 'rejected',
             rejectionReason: rejection_reason || null,

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { sendBranchChangeToUser } from '@/lib/email-service'
 import { prisma } from '@/lib/db'
-import { getCallerProfile, isAdminRole } from '@/lib/server/auth'
+import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 
 // admin gate via the single
 // role-resolution function; transfer record + profile update +
@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     const caller = await getCallerProfile(request)
     if (!caller) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    if (!isAdminRole(caller.role)) {
+    if (!callerIsAdmin(caller)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
@@ -75,7 +75,12 @@ export async function POST(request: Request) {
             user_id: userId,
             old_branch_id: oldBranchId || null,
             old_branch_name: oldBranchName,
-            new_branch_id: finalBranchId,
+            // FR-6 #19 (type-level only): branch_transfers.new_branch_id
+            // is NOT NULL in both the Prisma schema and the DB, so the
+            // payload field is typed to the schema's nullability. No
+            // runtime change — the head-office case (finalBranchId
+            // null) behaves exactly as before.
+            new_branch_id: finalBranchId as string,
             new_branch_name: newBranchName,
             join_date: new Date(joinDate),
             note: note || '',

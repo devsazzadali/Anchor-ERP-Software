@@ -501,7 +501,7 @@ export default function BranchFinancialReportsPage() {
           { label: 'Total Gross Sales Revenue', value: `${inspectBranch.totalSales.toLocaleString('en-BD')} BDT` },
           { label: 'Pure Cash Sales', value: `${inspectBranch.cashSales.toLocaleString('en-BD')} BDT` },
           { label: 'Digital Collections (MFS & Card)', value: `${inspectBranch.digitalSales.toLocaleString('en-BD')} BDT` },
-          { label: 'Operating Cash Expenses', value: `${inspectBranch.totalExpenses.toLocaleString('en-BD')} BDT` },
+          { label: 'Branch Operating Expenses', value: `${inspectBranch.totalExpenses.toLocaleString('en-BD')} BDT` },
           { label: 'Approved Bank Deposits', value: `${inspectBranch.approvedDeposits.toLocaleString('en-BD')} BDT` },
           { label: 'Net Drawer Cash Retained', value: `${inspectBranch.netCash.toLocaleString('en-BD')} BDT` },
           { label: 'Days Closed / Tracked', value: `${inspectBranch.daysClosed} / ${inspectBranch.daysTracked} Days` }
@@ -556,7 +556,7 @@ export default function BranchFinancialReportsPage() {
             summaryData: [
               { label: 'Branches In Scope', value: computedTotals.branchesCount.toString() },
               { label: 'Gross Sales Revenue', value: `${computedTotals.totalSales.toLocaleString('en-BD')} BDT` },
-              { label: 'Operating Expenses', value: `${computedTotals.expenses.toLocaleString('en-BD')} BDT` },
+              { label: 'Branch Operating Expenses', value: `${computedTotals.expenses.toLocaleString('en-BD')} BDT` },
               { label: 'Approved Bank Deposits', value: `${computedTotals.approvedDeposits.toLocaleString('en-BD')} BDT` },
               { label: 'Net Cash Retained', value: `${computedTotals.netCash.toLocaleString('en-BD')} BDT` },
               { label: 'Top Performer', value: topBranch ? `${topBranch.branchName} (${fmt(topBranch.totalSales)})` : 'N/A' },
@@ -1012,7 +1012,7 @@ export default function BranchFinancialReportsPage() {
                   <Coins className="w-5 h-5 text-rose-600" />
                   <span className="text-[9px] font-bold text-rose-600/80 uppercase tracking-widest">Operating</span>
                 </div>
-                <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Operating Cash Expenses</p>
+                <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Branch Operating Expenses</p>
                 <p className="text-xl sm:text-2xl font-bold font-serif text-rose-600">{fmt(computedTotals.expenses)}</p>
                 <p className="text-[10px] text-slate-500 mt-1">
                   Verified receipts & store maintenance
@@ -1108,7 +1108,7 @@ export default function BranchFinancialReportsPage() {
                 <table className="w-full text-xs">
                   <thead>
                     <tr className="border-b border-slate-900/10 bg-slate-900/[0.04]">
-                      {['#', 'Branch Name', 'Cash Sales', 'Digital Sales', 'Total Revenue', 'Operating Expenses', 'Approved Deposits', 'Net Cash Retained', 'Closings', 'Action'].map((h, i) => (
+                      {['#', 'Branch Name', 'Cash Sales', 'Digital Sales', 'Total Revenue', 'Branch Operating Expenses', 'Approved Deposits', 'Net Cash Retained', 'Closings', 'Action'].map((h, i) => (
                         <th
                           key={h}
                           className={`p-3.5 text-[9px] uppercase tracking-widest text-slate-500 font-semibold whitespace-nowrap ${

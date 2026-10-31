@@ -24,7 +24,7 @@ export async function GET(req: Request) {
     const [requests, profiles, transfers] = await Promise.all([
       prisma.paymentRequest.findMany({ orderBy: { created_at: 'desc' } }),
       prisma.profile.findMany({ select: { id: true, full_name: true, role: true, profile_type: true } }),
-      prisma.salaryPayment.findMany({ orderBy: { payment_date: 'desc' } }),
+      prisma.salaryPayment.findMany({ where: { status: { not: 'voided' } }, orderBy: { payment_date: 'desc' } }), // FR-14.1
     ])
 
     const profileById = new Map(profiles.map((p) => [p.id, p]))

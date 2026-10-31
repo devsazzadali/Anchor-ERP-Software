@@ -5,6 +5,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Shield, Clock, ChevronRight, XCircle, ArrowRight, RefreshCw, CheckCircle2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import KycSignOutButton from '@/components/KycSignOutButton'
 
 // status comes from /api/kyc/status
 // (session-resolved — KYC users are not yet approved, so the
@@ -62,21 +63,15 @@ export default function KycPendingPage() {
     return () => clearInterval(interval)
   }, [checkStatus])
 
-  const handleSignOut = async () => {
-    try {
-      localStorage.removeItem('aura_session')
-      document.cookie = 'demo_admin=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;'
-      document.cookie = 'aura_role=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;'
-      await fetch('/api/auth/logout', { method: 'POST' })
-    } catch (e) {
-      console.error(e)
-    } finally {
-      router.push('/')
-    }
-  }
+  // FR-12: sign-out on this page is the SHARED KycSignOutButton
+  // (rendered below in every state, including 'approved', which
+  // previously had none). The page's own weaker handler — it never
+  // cleared anchor_auth_cache and never router.refresh()'d — is
+  // removed so there is exactly one sign-out behaviour.
 
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans relative overflow-hidden flex justify-center items-center p-6" suppressHydrationWarning={true}>
+      <KycSignOutButton />
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#1ca34c]/5 rounded-full filter blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[55%] h-[55%] bg-[#1ca34c]/5 rounded-full filter blur-[150px] pointer-events-none" />
 
@@ -103,13 +98,7 @@ export default function KycPendingPage() {
                 <p className="text-sm text-slate-500 mb-8 leading-relaxed">
                   Your KYC dossier has been securely encrypted and submitted. Our compliance team is currently reviewing your profile.
                 </p>
-                <button
-                  onClick={handleSignOut}
-                  className="w-full relative group overflow-hidden rounded-xl border border-slate-900/10 hover:border-[#1ca34c]/50 bg-slate-900/[0.04] hover:bg-slate-900/[0.04] transition-all p-4 flex items-center justify-center gap-2"
-                >
-                  <span className="text-xs font-semibold tracking-wider text-slate-900">Sign In / Sign Up Other Account</span>
-                  <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-[#15803d] transition-colors" />
-                </button>
+                <p className="text-[11px] text-slate-400">To use a different account, sign out from the top-right corner.</p>
               </motion.div>
             )}
 
@@ -129,13 +118,6 @@ export default function KycPendingPage() {
                   >
                     <span className="text-xs font-semibold tracking-wider text-[#15803d]">Submit KYC Request Again</span>
                     <ArrowRight className="w-4 h-4 text-[#15803d] group-hover:translate-x-1 transition-transform" />
-                  </button>
-                  <button
-                    onClick={handleSignOut}
-                    className="w-full relative group overflow-hidden rounded-xl border border-slate-900/10 hover:border-slate-900/20 bg-slate-900/[0.04] hover:bg-slate-900/[0.04] transition-all p-4 flex items-center justify-center gap-2"
-                  >
-                    <span className="text-xs font-semibold tracking-wider text-slate-900">Sign In / Sign Up Again</span>
-                    <ChevronRight className="w-4 h-4 text-slate-500 group-hover:translate-x-1 transition-transform" />
                   </button>
                 </div>
               </motion.div>

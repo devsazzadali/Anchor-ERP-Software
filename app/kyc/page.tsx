@@ -7,7 +7,7 @@ import { useForm, UseFormRegisterReturn } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { kycSchema } from '@/lib/validators'
 import { Shield, Upload, FileText, Check, ShieldAlert, MapPin, CreditCard } from 'lucide-react'
-import { uploadFile } from '@/lib/files-client'
+import { uploadFile as uploadToStorage } from '@/lib/files-client'
 import { useRouter } from 'next/navigation'
 import KycSignOutButton from '@/components/KycSignOutButton'
 
@@ -125,7 +125,7 @@ export default function KycPage() {
     // the 'kyc' bucket is NEVER public — files are
     // served only through authenticated server routes, and the
     // stored value is the canonical file URL.
-    const { url } = await uploadFile('kyc', file, filePath)
+    const { url } = await uploadToStorage('kyc', file, filePath)
     return url
   }
 

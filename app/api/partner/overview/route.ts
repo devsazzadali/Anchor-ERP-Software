@@ -18,7 +18,14 @@ export async function GET(req: Request) {
     }
 
     const [expenseRequests, performanceReports] = await Promise.all([
+      // FR-9: the partner's OWN expense requests only. The previous
+      // company-wide return fed every employee's payout totals into
+      // any partner's dashboard stats. Performance reports below
+      // stay company-wide — branch network performance is a
+      // partner's legitimate view (FR-2b fixed its stale values at
+      // the source).
       prisma.employeeExpenseRequest.findMany({
+        where: { employee_id: caller.id },
         select: { amount: true, status: true, branch_id: true },
       }),
       prisma.branchPerformanceReport.findMany({

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '@/lib/db'
-import { getCallerProfile, isAdminRole } from '@/lib/server/auth'
+import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { hashPassword } from '@/lib/server/passwords'
 import { toPlain } from '@/lib/server/respond'
 
@@ -9,12 +9,13 @@ import { toPlain } from '@/lib/server/respond'
 // work on the auth_users table. Creating a
 // user inserts the auth row (bcrypt password_hash) AND the profile
 // row in one transaction (the old handle_new_user trigger + profile
-// update, made atomic). Admin gate = role column only.
+// update, made atomic). Admin gate = the unified callerIsAdmin
+// definition (FR-1.2).
 
 async function requireAdmin(req: Request) {
   const caller = await getCallerProfile(req)
   if (!caller) return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) }
-  if (!isAdminRole(caller.role)) {
+  if (!callerIsAdmin(caller)) {
     return { error: NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 }) }
   }
   return { caller }
@@ -71,9 +72,40 @@ export async function GET(req: Request) {
 
     // Fetch all auth users + all profiles, merge (auth wins for
     // email/created_at), exactly like the original.
+    // FR-1.3: the profile fetch is an explicit ALLOWLIST — exactly
+    // the fields the User Directory page renders/uses (list,
+    // detail, exports, edit forms). Sensitive columns are never
+    // selected, so they can never leak: security_answer,
+    // security_question, bank_info, account, face_descriptor and
+    // the other biometric/KYC columns stay in the database.
+    // (Consequence, deliberate: the page's bank-details export
+    // column now renders empty — bank_info no longer leaves the
+    // server through this route.)
     const [authUsers, profiles] = await Promise.all([
       prisma.authUser.findMany({ select: { id: true, email: true, created_at: true } }),
-      prisma.profile.findMany(),
+      prisma.profile.findMany({
+        select: {
+          id: true,
+          full_name: true,
+          email: true,
+          phone_number: true,
+          phone: true,
+          employee_id: true,
+          address: true,
+          branch: true,
+          branch_id: true,
+          position: true,
+          position_id: true,
+          role: true,
+          profile_type: true,
+          verification_status: true,
+          is_branch_manager: true,
+          is_banned: true,
+          salary: true,
+          created_at: true,
+          last_login: true,
+        },
+      }),
     ])
     const authById = new Map(authUsers.map((u) => [u.id, u]))
 

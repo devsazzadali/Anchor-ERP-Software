@@ -135,12 +135,40 @@ export async function PATCH(req: Request, context: any) {
         data.paid_amount = paid
         data.due_amount = Math.max(0, Math.round((amount - paid) * 100) / 100)
       }
+      // FR-14.2: a settled request's money fields are immutable here.
+      if (existing.status === 'paid' && ('amount' in body || 'paid_amount' in body || 'status' in body)) {
+        return NextResponse.json({ error: 'This request is already settled. Its amount and status can no longer be edited.' }, { status: 400 })
+      }
+      // FR-14.2: an amount edit on an APPROVED request voids the
+      // approval (back to 'pending' for re-approval) + audit row.
+      let approvalVoided = false
+      if ('amount' in body && existing.status === 'approved' && data.amount !== undefined && Number(data.amount) !== Number(existing.amount)) {
+        data.status = 'pending'
+        approvalVoided = true
+        await prisma.activityLog.create({
+          data: {
+            user_id: caller.id,
+            action: 'EXPENSE_REQUEST_AMOUNT_EDIT',
+            details: { request_id: id, old_amount: Number(existing.amount), new_amount: Number(data.amount), status_reset: 'pending', route: 'dashboard' },
+          },
+        }).catch((e: any) => console.error('[expense-requests/[id] PATCH] audit write failed:', e.message))
+      }
       if ('status' in body) {
         if (!['pending', 'approved', 'rejected', 'paid'].includes(body.status)) {
           return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
         }
-        data.status = body.status
-        data.paid_at = body.status === 'paid' ? (existing.paid_at ?? new Date()) : null
+        // FR-14.2 (law E3): the generic edit may NOT move a request
+        // into 'paid' — settlement runs the transactional pay flow
+        // above so the payment books. The old code flipped status +
+        // stamped paid_at with nothing booked (the OD-5 hole).
+        if (body.status === 'paid') {
+          return NextResponse.json({ error: 'Use the Pay action to settle this request — payment must book the expense.' }, { status: 400 })
+        }
+        // A same-payload status may not undo the re-approval reset.
+        if (!approvalVoided) {
+          data.status = body.status
+          data.paid_at = null
+        }
       }
       if ('trx_id' in body) data.trx_id = body.trx_id ? String(body.trx_id).trim() || null : null
       if ('admin_notes' in body) data.admin_notes = body.admin_notes ? String(body.admin_notes).trim() || null : null

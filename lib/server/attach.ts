@@ -51,7 +51,7 @@ export async function attachDepositBranch<T extends { branch_id: string }>(
 /** Attach `ledger_heads: {id, code_number, name, ledger_type}` to expense rows. */
 export async function attachExpenseLedgerHead<T extends { ledger_head_id?: string | null }>(
   rows: T[]
-): Promise<(T & { ledger_heads: { id: string; code_number: string | null; name: string; ledger_type: string | null } | null })[]> {
+): Promise<(T & { ledger_heads: { id: string; code_number: number | null; name: string; ledger_type: string | null } | null })[]> {
   const headIds = [...new Set(rows.map((r) => r.ledger_head_id).filter(Boolean))] as string[]
   const heads = headIds.length
     ? await prisma.ledgerHead.findMany({

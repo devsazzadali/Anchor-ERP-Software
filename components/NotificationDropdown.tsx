@@ -188,7 +188,14 @@ export function NotificationDropdown() {
         if (!branchQuery || ['branch', 'unassigned', 'unassigned branch', 'general'].includes(branchQuery.toLowerCase())) {
           branchQuery = 'unassigned';
         }
-        targetUrl = '/admin/branch-expenses?status=pending&branch=' + encodeURIComponent(branchQuery);
+        // FR-11: expense-REQUEST notifications belong on the
+        // expense-requests page (the approver's queue), which reads
+        // ?status and ?branch — the old target /admin/branch-expenses
+        // reads neither parameter, so approvers landed on an
+        // unfiltered ledger page. (Fix Round 2's F7 left this as an
+        // owner routing decision; the owner's "fix ALL problems"
+        // order for this round supersedes it.)
+        targetUrl = '/admin/expense-requests?status=pending&branch=' + encodeURIComponent(branchQuery);
       } else if (type === 'payout' || title.includes('payout') || message.includes('payout')) {
         const reqMatch = message.match(/\[req_id:([^\]]+)\]/i);
         const userMatch = message.match(/\[user_id:([^\]]+)\]/i);

@@ -29,10 +29,11 @@ export default function ExpenseSettingsPage() {
   const [showDevModal, setShowDevModal] = useState(false)
 
   // Forms
-  const [rentForm, setRentForm] = useState({ branch_id: '', bank_name: '', account_name: '', account_number: '', routing_number: '', bank_branch: '', mobile_banking_provider: '', mobile_banking_number: '' })
+  const [rentForm, setRentForm] = useState({ branch_id: '', bank_name: '', account_name: '', account_number: '', routing_number: '', bank_branch: '', mobile_banking_provider: '', mobile_banking_number: '', rent_amount: '' })
   const [meterForm, setMeterForm] = useState({ branch_id: '', meter_number: '', account_number: '', meter_type: 'Electricity', payable_to: '' })
-  // Part B: edit mode for existing registry rows — writes ONLY the
-  // new nullable account-detail fields via PATCH (see API route).
+  // Edit mode for existing registry rows — PATCH writes the
+  // account-detail fields AND (FR-14.6) the core fields incl.
+  // rent_amount / meter_number (see API route).
   const [editingRentId, setEditingRentId] = useState<string | null>(null)
   const [editingMeterId, setEditingMeterId] = useState<string | null>(null)
   const [devForm, setDevForm] = useState({ method_type: 'Bank', details: '' })
@@ -77,11 +78,16 @@ export default function ExpenseSettingsPage() {
     setError(null)
     try {
       if (editingRentId) {
-        // Part B edit path: PATCH writes only the new detail fields.
+        // Edit path (Part B + FR-14.6): PATCH writes the detail fields plus the core account fields and rent_amount.
         const res = await fetch(`/api/admin/branch-settings?kind=house_rent_accounts&id=${editingRentId}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            bank_name: rentForm.bank_name.trim(),
+            account_name: rentForm.account_name.trim(),
+            account_number: rentForm.account_number.trim(),
+            routing_number: rentForm.routing_number.trim() || null,
+            rent_amount: rentForm.rent_amount.trim() === '' ? null : rentForm.rent_amount.trim(),
             bank_branch: rentForm.bank_branch.trim() || null,
             mobile_banking_provider: rentForm.mobile_banking_provider.trim() || null,
             mobile_banking_number: rentForm.mobile_banking_number.trim() || null,
@@ -99,6 +105,9 @@ export default function ExpenseSettingsPage() {
         if (rentForm.routing_number && rentForm.routing_number.trim()) {
           payload.routing_number = rentForm.routing_number.trim()
         }
+        if (rentForm.rent_amount && rentForm.rent_amount.trim()) {
+          payload.rent_amount = rentForm.rent_amount.trim()
+        }
         for (const k of ['bank_branch', 'mobile_banking_provider', 'mobile_banking_number'] as const) {
           if (rentForm[k] && rentForm[k].trim()) payload[k] = rentForm[k].trim()
         }
@@ -106,7 +115,7 @@ export default function ExpenseSettingsPage() {
       }
       setShowRentModal(false)
       setEditingRentId(null)
-      setRentForm({ branch_id: '', bank_name: '', account_name: '', account_number: '', routing_number: '', bank_branch: '', mobile_banking_provider: '', mobile_banking_number: '' })
+      setRentForm({ branch_id: '', bank_name: '', account_name: '', account_number: '', routing_number: '', bank_branch: '', mobile_banking_provider: '', mobile_banking_number: '', rent_amount: '' })
       fetchData()
     } catch (err: any) {
       setError(err.message)
@@ -126,6 +135,7 @@ export default function ExpenseSettingsPage() {
       bank_branch: account.bank_branch || '',
       mobile_banking_provider: account.mobile_banking_provider || '',
       mobile_banking_number: account.mobile_banking_number || '',
+      rent_amount: account.rent_amount != null ? String(account.rent_amount) : '',
     })
     setError(null)
     setShowRentModal(true)
@@ -137,11 +147,11 @@ export default function ExpenseSettingsPage() {
     setError(null)
     try {
       if (editingMeterId) {
-        // Part B edit path: PATCH writes only the new payable_to field.
+        // Edit path (Part B + FR-14.6): PATCH writes payable_to plus the core meter fields.
         const res = await fetch(`/api/admin/branch-settings?kind=utility_meters&id=${editingMeterId}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ payable_to: meterForm.payable_to.trim() || null }),
+          body: JSON.stringify({ meter_number: meterForm.meter_number.trim(), account_number: meterForm.account_number.trim() || null, meter_type: meterForm.meter_type, payable_to: meterForm.payable_to.trim() || null }),
         })
         const json = await res.json().catch(() => ({}))
         if (!res.ok) throw new Error(json.error || 'Failed to save')
@@ -254,7 +264,7 @@ export default function ExpenseSettingsPage() {
             {activeTab === 'rent' && (
               <div className="space-y-4">
                 <div className="flex justify-end">
-                  <button onClick={() => { setEditingRentId(null); setRentForm({ branch_id: '', bank_name: '', account_name: '', account_number: '', routing_number: '', bank_branch: '', mobile_banking_provider: '', mobile_banking_number: '' }); setShowRentModal(true) }} className="bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 hover:bg-[#1ca34c]/20 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors">
+                  <button onClick={() => { setEditingRentId(null); setRentForm({ branch_id: '', bank_name: '', account_name: '', account_number: '', routing_number: '', bank_branch: '', mobile_banking_provider: '', mobile_banking_number: '', rent_amount: '' }); setShowRentModal(true) }} className="bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 hover:bg-[#1ca34c]/20 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors">
                     <Plus className="w-4 h-4" /> Add Rent Account
                   </button>
                 </div>
@@ -398,6 +408,10 @@ export default function ExpenseSettingsPage() {
                 <div>
                   <label className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 block">Account Number *</label>
                   <input required type="text" value={rentForm.account_number} onChange={e => setRentForm({ ...rentForm, account_number: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" placeholder="e.g. 101.101.0000" />
+                </div>
+                <div>
+                  <label className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 block">Monthly Rent Amount (BDT)</label>
+                  <input type="number" min="0" step="0.01" value={rentForm.rent_amount} onChange={e => setRentForm({ ...rentForm, rent_amount: e.target.value })} className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-4 py-2.5 text-sm text-slate-900 focus:outline-none focus:border-[#1ca34c]/50" placeholder="e.g. 55000 — leave blank if not set" />
                 </div>
                 <div>
                   <label className="text-[10px] uppercase font-bold text-slate-500 mb-1.5 block">Routing Number (Optional)</label>

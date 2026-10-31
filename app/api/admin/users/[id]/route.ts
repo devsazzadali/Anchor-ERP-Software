@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { getCallerProfile, isAdminRole } from '@/lib/server/auth'
+import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { hashPassword } from '@/lib/server/passwords'
 
 // auth.admin.updateUserById/deleteUser
@@ -11,7 +11,7 @@ import { hashPassword } from '@/lib/server/passwords'
 async function requireAdmin(req: Request) {
   const caller = await getCallerProfile(req)
   if (!caller) return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }), caller: null }
-  if (!isAdminRole(caller.role)) {
+  if (!callerIsAdmin(caller)) {
     return {
       error: NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 }),
       caller: null,

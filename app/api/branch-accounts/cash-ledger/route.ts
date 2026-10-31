@@ -4,7 +4,7 @@ import { parseDailyBreakdown } from '@/lib/branch-deposit-utils'
 import { dhakaToday } from '@/lib/dhaka-time'
 import { parseMoneyAmount } from '@/lib/money'
 import { prisma } from '@/lib/db'
-import { getCallerProfile, isAdminRole } from '@/lib/server/auth'
+import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { attachLedgerRelations } from '@/lib/server/attach'
 import {
@@ -242,7 +242,7 @@ export async function GET(req: NextRequest) {
     const profile = await getCallerProfile(req)
     if (!profile) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const isAdmin = isAdminRole(profile.role)
+    const isAdmin = callerIsAdmin(profile)
     const isManager = profile.is_branch_manager === true
     if (!isAdmin && !isManager) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
@@ -312,7 +312,13 @@ export async function GET(req: NextRequest) {
             // fell through and added the FULL deposit amount on
             // deposit_date even when a breakdown existed.
             pendingDepositsAmount += Number(breakdown[date] || 0)
-          } else if (toPlain(row).deposit_date === date) {
+          } else if ((toPlain(row) as unknown as { deposit_date: string }).deposit_date === date) {
+            // FR-6 #17 (type-level only): toPlain() formats
+            // deposit_date (a DATE_ONLY_FIELDS member) to a
+            // 'YYYY-MM-DD' string at runtime — probe-proven
+            // (fr3456_probe17) — but toPlain<T> is typed as identity,
+            // so the comparison is typed through the plain-row shape.
+            // No behaviour change.
             pendingDepositsAmount += Number(row.amount || 0)
           }
         }
@@ -352,7 +358,7 @@ export async function POST(req: NextRequest) {
     const profile = await getCallerProfile(req)
     if (!profile) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const isAdmin = isAdminRole(profile.role)
+    const isAdmin = callerIsAdmin(profile)
     const isManager = profile.is_branch_manager === true
     if (!isAdmin && !isManager) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
@@ -569,7 +575,7 @@ export async function PATCH(req: NextRequest) {
     const profile = await getCallerProfile(req)
     if (!profile) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const isAdmin = isAdminRole(profile.role)
+    const isAdmin = callerIsAdmin(profile)
     const isManager = profile.is_branch_manager === true
     if (!isAdmin && !isManager) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
@@ -764,15 +770,36 @@ export async function PATCH(req: NextRequest) {
     // (this previously had NO admin check at all; Part D).
     if (action === 'reopen_day') {
       if (!isAdmin) return NextResponse.json({ error: 'Admin only' }, { status: 403 })
+      // FR-14.7: a reopen REQUIRES a reason — un-settling a closed
+      // day without a stated reason is how closings quietly change.
+      // The reason is stored on the row (difference_notes, appended)
+      // and in the branch audit trail.
+      const reason = String(body.reason || '').trim()
+      if (!reason) {
+        return NextResponse.json({ error: 'A reason is required to reopen a closed day.' }, { status: 400 })
+      }
+      const reopenNote = `Reopened by ${profile.full_name || 'Admin'}: ${reason}`
       const reopened = await prisma.branchCashLedger.update({
         where: { id: existing.id },
         data: {
           is_closed: false,
           closed_by: null,
           closed_at: null,
+          difference_notes: existing.difference_notes ? `${existing.difference_notes} | ${reopenNote}` : reopenNote,
           updated_at: new Date(),
         },
       })
+      await prisma.branchAuditTrail.create({
+        data: {
+          branch_id: existing.branch_id,
+          table_name: 'branch_cash_ledger',
+          record_id: reopened.id,
+          action: 'reopen_day',
+          performed_by: profile.uid,
+          performed_by_name: profile.full_name,
+          new_value: { reason },
+        },
+      }).catch((e: any) => console.error('[cash-ledger PATCH] reopen audit failed:', e.message))
       const [withRelations] = await attachLedgerRelations([reopened])
       const [plainLedger] = await withOpeningChainFlags([toPlain(withRelations)])
       return NextResponse.json({ success: true, ledger: plainLedger })
@@ -879,7 +906,7 @@ export async function DELETE(req: NextRequest) {
     const profile = await getCallerProfile(req)
     if (!profile) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const isAdmin = isAdminRole(profile.role)
+    const isAdmin = callerIsAdmin(profile)
     if (!isAdmin) return NextResponse.json({ error: 'Forbidden — Admin only' }, { status: 403 })
 
     const { searchParams } = new URL(req.url)

@@ -1,7 +1,7 @@
 'use client'
 
 export const dynamic = 'force-dynamic'
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   BarChart3, ChevronLeft, RefreshCw, AlertTriangle,
@@ -39,14 +39,35 @@ export default function AdminReconciliationPage() {
     return true
   }, [router])
 
+  const [isDataLoading, setIsDataLoading] = useState(false)
+  const fetchSeqRef = useRef(0)
+  const abortRef = useRef<AbortController | null>(null)
+
   const fetchData = useCallback(async () => {
+    // FR-0b: sequence token + abort. Overlapping range fetches (the
+    // auto-fetch on every date-state change, Apply, Refresh) used to
+    // resolve in arbitrary order and the last RESOLVER overwrote state
+    // unconditionally, so the page could display one range's figures
+    // under another range's labels. Only the latest request may now
+    // set state; the previous request is aborted outright.
+    const seq = ++fetchSeqRef.current
+    abortRef.current?.abort()
+    const controller = new AbortController()
+    abortRef.current = controller
+    setIsDataLoading(true)
     try {
-      const res = await fetch(`/api/branch-accounts/reconciliation?from=${fromDate}&to=${toDate}`)
+      const res = await fetch(`/api/branch-accounts/reconciliation?from=${fromDate}&to=${toDate}`, { signal: controller.signal })
       const json = await res.json()
+      if (seq !== fetchSeqRef.current) return
       if (!res.ok) throw new Error(json.error)
       setData(json)
       setError(null)
-    } catch (e: any) { setError(e.message) }
+    } catch (e: any) {
+      if (e?.name === 'AbortError' || seq !== fetchSeqRef.current) return
+      setError(e.message)
+    } finally {
+      if (seq === fetchSeqRef.current) setIsDataLoading(false)
+    }
   }, [fromDate, toDate])
 
   const init = useCallback(async () => {
@@ -61,6 +82,7 @@ export default function AdminReconciliationPage() {
   const handleRefresh = async () => { setIsRefreshing(true); await fetchData(); setIsRefreshing(false) }
 
   const summary: any[] = data?.summary || []
+  const depositDrift: any[] = data?.deposit_drift || []
   const totalCashCollected   = summary.reduce((s, b) => s + Number(b.net_cash_collected || 0), 0)
   const totalApproved        = summary.reduce((s, b) => s + Number(b.total_approved || 0), 0)
   const totalPending         = summary.reduce((s, b) => s + Number(b.total_pending  || 0), 0)
@@ -287,7 +309,22 @@ export default function AdminReconciliationPage() {
           </div>
         )}
 
-        {/* Global totals */}
+        {/* Global totals — FR-0b: skeleton-gated while a range fetch is
+            in flight, so a headline figure from a previous range can
+            never be read under the new range's labels. The headline is
+            single-sourced: it is only ever the reduce over the current
+            response's summary.net_cash_collected. */}
+        {isDataLoading ? (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8" aria-busy="true">
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="p-5 rounded-3xl bg-slate-900/[0.04] border border-slate-900/5 animate-pulse">
+                <div className="h-5 w-5 rounded bg-slate-900/10 mb-2" />
+                <div className="h-2 w-20 rounded bg-slate-900/10 mb-2" />
+                <div className="h-7 w-24 rounded bg-slate-900/10" />
+              </div>
+            ))}
+          </div>
+        ) : (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div className="p-5 rounded-3xl bg-blue-500/10 border border-blue-500/20">
             <Banknote className="w-5 h-5 text-blue-600 mb-2" />
@@ -314,6 +351,58 @@ export default function AdminReconciliationPage() {
             <p className="text-2xl font-bold font-serif text-slate-900">{fmt(totalPending)}</p>
           </div>
         </div>
+        )}
+
+        {/* Deposit Drift (FR-0) — stored ledger bank_deposits_out vs the
+            allocated contribution of approved deposits, per branch/day.
+            The section always renders: an empty list shows an explicit
+            "No deposit drift" line so absence is provable. */}
+        <div className="rounded-3xl border border-slate-900/5 bg-slate-900/[0.04] overflow-hidden mb-6">
+          <div className="p-5 border-b border-slate-900/5 flex items-center justify-between">
+            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold">Deposit Drift</p>
+            <span className="text-[10px] text-slate-500 font-medium">Allocated deposits vs stored ledger amounts</span>
+          </div>
+          {isDataLoading ? (
+            <div className="p-5 animate-pulse"><div className="h-3 w-48 rounded bg-slate-900/10" /></div>
+          ) : depositDrift.length === 0 ? (
+            <p className="p-5 text-xs text-slate-500">No deposit drift</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-slate-900/5">
+                    {['Branch', 'Date', 'Allocated', 'Stored in Ledger', 'Drift'].map(h => (
+                      <th key={h} className="text-left p-4 text-[9px] uppercase tracking-widest text-slate-500 font-semibold whitespace-nowrap">{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {depositDrift.map((d: any) => {
+                    const drift = Number(d.drift || 0)
+                    return (
+                      <tr key={`${d.branch_id}-${d.ledger_date}`} className="border-b border-slate-900/[0.08] hover:bg-slate-900/[0.04] transition-colors">
+                        <td className="p-4">
+                          <div className="flex items-center gap-2">
+                            <Building2 className="w-3.5 h-3.5 text-slate-500" />
+                            <span className="text-slate-900 font-semibold">{d.branch_name}</span>
+                          </div>
+                        </td>
+                        <td className="p-4 text-slate-600 whitespace-nowrap">{d.ledger_date}</td>
+                        <td className="p-4 text-slate-900 font-semibold">{fmt(d.allocated)}</td>
+                        <td className="p-4 text-slate-900 font-semibold">{fmt(d.stored_bank_deposits_out)}</td>
+                        <td className="p-4">
+                          <span className={`font-bold ${drift < 0 ? 'text-rose-600' : 'text-amber-600'}`}>
+                            {drift < 0 ? `-${fmt(Math.abs(drift))}` : fmt(drift)}
+                          </span>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
 
         {/* Branch-wise reconciliation table */}
         <div className="rounded-3xl border border-slate-900/5 bg-slate-900/[0.04] overflow-hidden mb-6">
@@ -332,7 +421,7 @@ export default function AdminReconciliationPage() {
               </thead>
               <tbody>
                 {summary.map((b: any) => {
-                  const variance = Number(b.unbanked_cash_variance ?? Math.max(0, Number(b.net_cash_collected || 0) - Number(b.total_approved || 0)))
+                  const variance = Number(b.unbanked_cash_variance || 0)
                   const hasPending = Number(b.pending_count || 0) > 0
 
                   return (
@@ -344,7 +433,7 @@ export default function AdminReconciliationPage() {
                         </div>
                       </td>
                       <td className="p-4">
-                        <span className="text-slate-900 font-semibold">{fmt(b.net_cash_collected ?? b.total_cash_sales)}</span>
+                        <span className="text-slate-900 font-semibold">{fmt(b.net_cash_collected)}</span>
                         {Number(b.total_cash_expenses) > 0 && (
                           <p className="text-[10px] text-slate-500 mt-0.5">Exp: -{fmt(b.total_cash_expenses)}</p>
                         )}
@@ -378,6 +467,7 @@ export default function AdminReconciliationPage() {
                         )}
                       </td>
                       <td className="p-4">
+                        <div className="flex flex-col items-start gap-1">
                         {hasPending ? (
                           <span className="inline-flex items-center gap-1 text-[9px] font-bold text-amber-600 uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20">
                             ⏳ Pending Review
@@ -391,6 +481,12 @@ export default function AdminReconciliationPage() {
                             ✓ Balanced
                           </span>
                         )}
+                        {(Number(b.deposit_drift || 0) !== 0 || Number(b.deposit_drift_days || 0) > 0) && (
+                          <span className={`inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${Number(b.deposit_drift || 0) < 0 ? 'text-rose-600 bg-rose-500/10 border-rose-500/20' : 'text-amber-600 bg-amber-500/10 border-amber-500/20'}`}>
+                            Deposit drift {Number(b.deposit_drift || 0) < 0 ? `-${fmt(Math.abs(Number(b.deposit_drift)))}` : fmt(b.deposit_drift)} ({b.deposit_drift_days} day{Number(b.deposit_drift_days) === 1 ? '' : 's'})
+                          </span>
+                        )}
+                        </div>
                       </td>
                     </tr>
                   )

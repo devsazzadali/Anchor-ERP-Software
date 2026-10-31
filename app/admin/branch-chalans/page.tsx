@@ -27,13 +27,25 @@ type ChalanItem = {
   code?: string
   name: string
   quantity: number
-  cost_price: number
-  sale_price: number
+  // FR-8.2: legacy items (23 chalans, 63 items) carry only
+  // unit_price/total_price — cost was never recorded for them.
+  // cost_price is therefore genuinely optional at runtime; readers
+  // must label its absence ("cost not recorded"), never fabricate a
+  // cost from unit_price (which is the SALE price on legacy rows).
+  cost_price?: number
+  sale_price?: number
+  unit_price?: number
   shipping_cost?: number | null
   total_shipping?: number
-  total_cost: number
-  total_sale: number
+  total_cost?: number
+  total_sale?: number
+  total_price?: number
 }
+
+// FR-8.2: a chalan's cost is "recorded" only when at least one item
+// carries a real cost_price.
+const chalanCostRecorded = (c: ProductChalan): boolean =>
+  (c.items || []).some(i => i && i.cost_price !== undefined && i.cost_price !== null)
 
 type ProductChalan = {
   id: string
@@ -63,7 +75,13 @@ export default function AdminBranchChalansPage() {
   const [adminName, setAdminName]       = useState('Admin')
   const [adminId, setAdminId]           = useState('')
   const [branchesLoaded, setBranchesLoaded] = useState(() => !!getCachedData('admin_branches'))
-  const [monthFilter, setMonthFilter]   = useState<string>(() => new Date().toISOString().slice(0, 7))
+  // FR-8: default to All Time. The old default (the current month)
+  // made the landing overview show 0 chalans / "No chalans yet" for
+  // every branch whenever the current month had no dispatches yet —
+  // indistinguishable from an empty system. The 'all' aggregation
+  // itself was always correct (proven over the real payload:
+  // 33 / 84 / ৳2,057,200 = Aug + Sep = DB totals).
+  const [monthFilter, setMonthFilter]   = useState<string>('all')
 
   // URL-driven selected branch
   const branchParam    = searchParams?.get('branch') ?? null
@@ -241,7 +259,7 @@ export default function AdminBranchChalansPage() {
   )
 
   const grandTotalCost = useMemo(() =>
-    computedItems.reduce((s, i) => s + i.total_cost, 0),
+    computedItems.reduce((s, i) => s + (i.total_cost ?? 0), 0),
     [computedItems]
   )
 
@@ -251,7 +269,7 @@ export default function AdminBranchChalansPage() {
   )
 
   const grandTotalSale = useMemo(() =>
-    computedItems.reduce((s, i) => s + i.total_sale, 0),
+    computedItems.reduce((s, i) => s + (i.total_sale ?? 0), 0),
     [computedItems]
   )
 
@@ -300,7 +318,7 @@ export default function AdminBranchChalansPage() {
   )
 
   const grandTotalEditCost = useMemo(() =>
-    computedEditItems.reduce((s, i) => s + i.total_cost, 0),
+    computedEditItems.reduce((s, i) => s + (i.total_cost ?? 0), 0),
     [computedEditItems]
   )
 
@@ -310,7 +328,7 @@ export default function AdminBranchChalansPage() {
   )
 
   const grandTotalEditSale = useMemo(() =>
-    computedEditItems.reduce((s, i) => s + i.total_sale, 0),
+    computedEditItems.reduce((s, i) => s + (i.total_sale ?? 0), 0),
     [computedEditItems]
   )
 
@@ -328,7 +346,7 @@ export default function AdminBranchChalansPage() {
     e.preventDefault()
     if (!editingChalan) return
     if (computedEditItems.length === 0) return setFeedback({ type: 'error', message: 'Add at least one product.' })
-    const invalid = computedEditItems.find(i => i.quantity <= 0 || i.cost_price < 0 || i.sale_price < 0 || (i.shipping_cost != null && i.shipping_cost < 0))
+    const invalid = computedEditItems.find(i => i.quantity <= 0 || (i.cost_price ?? 0) < 0 || (i.sale_price ?? 0) < 0 || (i.shipping_cost != null && i.shipping_cost < 0))
     if (invalid) return setFeedback({ type: 'error', message: `"${invalid.name}" has invalid quantity or price.` })
 
     setIsEditing(true)
@@ -364,7 +382,7 @@ export default function AdminBranchChalansPage() {
     e.preventDefault()
     if (!selectedBranch) return setFeedback({ type: 'error', message: 'No branch selected.' })
     if (computedItems.length === 0) return setFeedback({ type: 'error', message: 'Add at least one product.' })
-    const invalid = computedItems.find(i => i.quantity <= 0 || i.cost_price < 0 || i.sale_price < 0 || (i.shipping_cost != null && i.shipping_cost < 0))
+    const invalid = computedItems.find(i => i.quantity <= 0 || (i.cost_price ?? 0) < 0 || (i.sale_price ?? 0) < 0 || (i.shipping_cost != null && i.shipping_cost < 0))
     if (invalid) return setFeedback({ type: 'error', message: `Product "${invalid.name}" has invalid quantity or price.` })
 
     setIsSubmitting(true)
@@ -430,12 +448,12 @@ export default function AdminBranchChalansPage() {
       idx + 1,
       item.code ? `[${item.code}] ${item.name}` : item.name,
       item.quantity,
-      `${Number(item.cost_price).toLocaleString('en-BD')} BDT`,
-      `${Number(item.sale_price).toLocaleString('en-BD')} BDT`,
+      item.cost_price === undefined || item.cost_price === null ? '—' : `${Number(item.cost_price).toLocaleString('en-BD')} BDT`,
+      `${Number(item.sale_price ?? item.unit_price ?? 0).toLocaleString('en-BD')} BDT`,
       item.shipping_cost === undefined || item.shipping_cost === null ? '—' : `${Number(item.shipping_cost).toLocaleString('en-BD')} BDT`,
-      `${Number(item.total_cost).toLocaleString('en-BD')} BDT`,
+      item.cost_price === undefined || item.cost_price === null ? '—' : `${Number(item.total_cost ?? 0).toLocaleString('en-BD')} BDT`,
       item.total_shipping === undefined || item.total_shipping === null ? '—' : `${Number(item.total_shipping).toLocaleString('en-BD')} BDT`,
-      `${Number(item.total_sale).toLocaleString('en-BD')} BDT`,
+      `${Number(item.total_sale ?? item.total_price ?? 0).toLocaleString('en-BD')} BDT`,
     ])
 
     generatePdf(
@@ -451,7 +469,7 @@ export default function AdminBranchChalansPage() {
         reportRef:   chalan.chalan_ref || chalan.id.slice(0, 8).toUpperCase(),
         summaryData: [
           { label: 'Total Line Items',   value: chalan.items.length.toString() },
-          { label: 'Total Cost Value',   value: `${Number(chalan.total_cost).toLocaleString('en-BD')} BDT` },
+          { label: 'Total Cost Value',   value: chalanCostRecorded(chalan) ? `${Number(chalan.total_cost).toLocaleString('en-BD')} BDT` : 'Cost not recorded' },
           { label: 'Total Retail Value', value: `${Number(chalan.total_amount).toLocaleString('en-BD')} BDT` },
         ],
         notes: chalan.notes,
@@ -1046,22 +1064,22 @@ export default function AdminBranchChalansPage() {
                         <span className="text-sm font-bold text-emerald-600 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-lg">{Number(item.quantity).toLocaleString('en-BD')}</span>
                       </div>
                       <div className="px-3 py-3 text-right text-xs text-slate-600">
-                        ৳{Number(item.cost_price).toLocaleString('en-BD')}
+                        {item.cost_price === undefined || item.cost_price === null ? '—' : `৳${Number(item.cost_price).toLocaleString('en-BD')}`}
                       </div>
                       <div className="px-3 py-3 text-right text-xs text-[#15803d] font-semibold">
-                        ৳{Number(item.sale_price).toLocaleString('en-BD')}
+                        ৳{Number(item.sale_price ?? item.unit_price ?? 0).toLocaleString('en-BD')}
                       </div>
                       <div className="px-3 py-3 text-right text-xs text-slate-600">
                         {item.shipping_cost === undefined || item.shipping_cost === null ? '—' : `৳${Number(item.shipping_cost).toLocaleString('en-BD')}`}
                       </div>
                       <div className="px-3 py-3 text-right text-xs text-slate-500">
-                        ৳{Number(item.total_cost).toLocaleString('en-BD')}
+                        {item.cost_price === undefined || item.cost_price === null ? '—' : `৳${Number(item.total_cost ?? 0).toLocaleString('en-BD')}`}
                       </div>
                       <div className="px-3 py-3 text-right text-xs text-slate-500">
                         {item.total_shipping === undefined || item.total_shipping === null ? '—' : `৳${Number(item.total_shipping).toLocaleString('en-BD')}`}
                       </div>
                       <div className="px-3 py-3 text-right text-xs font-bold text-[#15803d]">
-                        ৳{Number(item.total_sale).toLocaleString('en-BD')}
+                        ৳{Number(item.total_sale ?? item.total_price ?? 0).toLocaleString('en-BD')}
                       </div>
                     </div>
                   ))}
@@ -1072,7 +1090,11 @@ export default function AdminBranchChalansPage() {
                   <div className="p-4 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
                     <div>
                       <p className="text-[9px] text-slate-500 uppercase tracking-wider">Total Cost Value</p>
-                      <p className="text-lg font-bold text-slate-900 mt-0.5">৳ {Number(viewingChalan.total_cost).toLocaleString('en-BD')}</p>
+                      {chalanCostRecorded(viewingChalan) ? (
+                        <p className="text-lg font-bold text-slate-900 mt-0.5">৳ {Number(viewingChalan.total_cost).toLocaleString('en-BD')}</p>
+                      ) : (
+                        <p className="text-sm font-bold text-slate-500 mt-0.5">Cost not recorded</p>
+                      )}
                     </div>
                     <Banknote className="w-5 h-5 text-slate-600" />
                   </div>

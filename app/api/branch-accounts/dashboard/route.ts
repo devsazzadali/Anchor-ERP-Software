@@ -3,7 +3,8 @@ import { dhakaToday, currentDhakaMonthWindow } from '@/lib/dhaka-time'
 import { sumMoney } from '@/lib/money'
 import { prisma } from '@/lib/db'
 import { LEDGER_DEPOSITS_DEFINITION } from '@/lib/deposit-figures'
-import { getCallerProfile, isAdminRole } from '@/lib/server/auth'
+import { branchStreamAmount } from '@/lib/expense-streams'
+import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { getBranchAccountsSummary } from '@/lib/server/summary'
 
@@ -22,7 +23,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const isAdmin = isAdminRole(profile.role)
+    const isAdmin = callerIsAdmin(profile)
     const isManager = profile.is_branch_manager === true
 
     if (!isAdmin && !isManager) {
@@ -54,8 +55,9 @@ export async function GET(req: NextRequest) {
 
       // Fetch today's ledger, this month's PENDING deposits (a
       // deposits-table concept — money awaiting approval, not a
-      // deposits total), and monthly ledgers in parallel.
-      const [ledgerRaw, depositsRaw, monthlyLedgersRaw] = await Promise.all([
+      // deposits total), monthly ledgers, and this month's branch
+      // cash expense rows in parallel.
+      const [ledgerRaw, depositsRaw, monthlyLedgersRaw, monthExpensesRaw] = await Promise.all([
         prisma.branchCashLedger.findFirst({ where: { branch_id: branchId, ledger_date: todayDt } }),
         prisma.branchBankDeposit.findMany({
           where: {
@@ -69,11 +71,16 @@ export async function GET(req: NextRequest) {
         prisma.branchCashLedger.findMany({
           where: { branch_id: branchId, ledger_date: { gte: monthStartDt, lt: monthEndDt } },
         }),
+        prisma.branchCashExpense.findMany({
+          where: { branch_id: branchId, expense_date: { gte: monthStartDt, lt: monthEndDt } },
+          select: { amount: true, salary_payment_id: true, expense_request_id: true, ledger_head_id: true, expense_date: true },
+        }),
       ])
 
       const ledger: any = toPlain(ledgerRaw)
       const deposits: any[] = toPlain(depositsRaw)
       const monthlyLedgers: any[] = toPlain(monthlyLedgersRaw)
+      const monthExpenses: any[] = toPlain(monthExpensesRaw)
 
       const pendingDeposits = sumMoney(deposits.map((d) => d.amount))
       const pendingCount = deposits.length
@@ -90,7 +97,16 @@ export async function GET(req: NextRequest) {
       const monthlyCashSales = sumMoney(monthlyLedgers.map((r) => r.cash_sales))
       const monthlyDigitalSales = sumMoney(monthlyLedgers.flatMap((r) => [r.bkash_sales, r.nagad_sales, r.rocket_sales, r.card_sales, r.bank_transfer_sales]))
       const monthlyOtherCashIn = sumMoney(monthlyLedgers.map((r) => r.other_cash_in))
-      const monthlyExpenses = sumMoney(monthlyLedgers.map((r) => r.cash_expenses))
+      // FR-10/X4: expenses are RECOMPUTED from the branch cash
+      // expense rows through the one stream rule (branchStreamAmount)
+      // — the same computation the Account Overview and the financial
+      // summary use — instead of the stored ledger cash_expenses sum.
+      // On synced data the two are identical; if a ledger sync is
+      // ever missed, this surface still shows the true figure.
+      const monthlyExpenses = sumMoney(monthExpenses.map((r) => branchStreamAmount(r)))
+      const todayExpensesRecomputed = sumMoney(
+        monthExpenses.filter((r) => String(r.expense_date).slice(0, 10) === today).map((r) => branchStreamAmount(r))
+      )
       const monthlyTotalSales = monthlyCashSales + monthlyDigitalSales
       const monthlyNetCashInflow = monthlyCashSales + monthlyOtherCashIn - monthlyExpenses - approvedDeposits
       // B12: monthly figures include days not yet closed/verified.
@@ -112,7 +128,8 @@ export async function GET(req: NextRequest) {
           cardSales: ledger?.card_sales ?? 0,
           bankTransferSales: ledger?.bank_transfer_sales ?? 0,
           otherCashIn: ledger?.other_cash_in ?? 0,
-          cashExpenses: ledger?.cash_expenses ?? 0,
+          // FR-10/X4: today's expenses from the same recomputation.
+          cashExpenses: todayExpensesRecomputed,
           bankDepositsOut: ledger?.bank_deposits_out ?? 0,
           expectedClosingCash: ledger?.expected_closing_cash ?? 0,
           actualCash: ledger?.actual_cash ?? null,
@@ -139,7 +156,7 @@ export async function GET(req: NextRequest) {
     // Admin: all-branch summary, pending approvals, today's ledgers
     // and monthly deposits in parallel. The summary view is rebuilt
     // in code (lib/server/summary.ts — batch-1 fixed definition).
-    const [summary, pendingApprovals, todayLedgersRaw, allMonthlyDepositsRaw, monthlyLedgersAllRaw] = await Promise.all([
+    const [summary, pendingApprovals, todayLedgersRaw, allMonthlyDepositsRaw, monthlyLedgersAllRaw, todayExpensesRaw] = await Promise.all([
       getBranchAccountsSummary(),
       prisma.branchBankDeposit.count({
         where: { status: { in: ['submitted', 'pending_approval'] }, ...notReversed },
@@ -162,6 +179,12 @@ export async function GET(req: NextRequest) {
         where: { ledger_date: { gte: monthStartDt, lt: monthEndDt } },
         select: { bank_deposits_out: true },
       }),
+      // FR-10/X4: today's branch cash expense rows (all branches)
+      // for the recomputed expense figure below.
+      prisma.branchCashExpense.findMany({
+        where: { expense_date: todayDt },
+        select: { amount: true, salary_payment_id: true, expense_request_id: true, ledger_head_id: true },
+      }),
     ])
 
     const todayLedgers: any[] = toPlain(todayLedgersRaw)
@@ -175,7 +198,10 @@ export async function GET(req: NextRequest) {
     const todayCardSales = todayLedgers.reduce((s, r) => s + Number(r.card_sales ?? 0), 0)
     const todayBankTransferSales = todayLedgers.reduce((s, r) => s + Number(r.bank_transfer_sales ?? 0), 0)
     const todayOtherCashIn = todayLedgers.reduce((s, r) => s + Number(r.other_cash_in ?? 0), 0)
-    const todayExpenses = todayLedgers.reduce((s, r) => s + Number(r.cash_expenses ?? 0), 0)
+    // FR-10/X4: today's expenses recomputed from the expense rows
+    // via branchStreamAmount (same rule as the manager view and the
+    // Account Overview), not the stored ledger cash_expenses sum.
+    const todayExpenses = sumMoney((toPlain(todayExpensesRaw) as any[]).map((r) => branchStreamAmount(r)))
     const todayDepositsOut = todayLedgers.reduce((s, r) => s + Number(r.bank_deposits_out ?? 0), 0)
     // B14: the cross-branch difference is only meaningful for branches
     // that actually COUNTED cash today. The old code summed actual

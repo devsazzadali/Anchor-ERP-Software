@@ -43,7 +43,14 @@ export async function GET(req: NextRequest) {
     // filter in the query — the JS aggregation below applies one
     // consistent rule everywhere: reversed === true is out, anything
     // else (false or NULL) is in.
-    const [branches, depositsData, ledgerRows, expenseRows, depositAllocRows] = await Promise.all([
+    // Positional correspondence is load-bearing: query 4 is the
+    // all-time approved-deposit set (depositAllocRows, the drift
+    // source) and query 5 is the windowed expense set (expenseRows).
+    // FR-0b: these two were destructured in the opposite order, so
+    // net_cash_collected subtracted all-time approved deposits as if
+    // they were cash expenses and the drift check received expense
+    // rows (allocated = 0 on every day).
+    const [branches, depositsData, ledgerRows, depositAllocRows, expenseRows] = await Promise.all([
       prisma.branch.findMany({
         where: scopedBranchId ? { id: scopedBranchId } : {},
         select: { id: true, name: true },

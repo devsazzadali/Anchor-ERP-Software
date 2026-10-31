@@ -127,21 +127,34 @@ export default function IssueUtilityBillModal({ isOpen, onClose, onSuccess, ledg
         ? `${year}-${String(monthIdx + 1).padStart(2, '0')}-01`
         : undefined
 
-      const res = await fetch('/api/branch-accounts/expenses', {
+      const payload = {
+        branch_id: branchId,
+        ledger_head_id: preselectedLedgerHeadId,
+        amount: amount,
+        expense_date: expenseDate,
+        description: description,
+        recipient_account: recipientAccount,
+        billing_month: month || null,
+        billing_year: year ? Number(year) : null,
+      }
+      const postBill = (p: any) => fetch('/api/branch-accounts/expenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          branch_id: branchId,
-          ledger_head_id: preselectedLedgerHeadId,
-          amount: amount,
-          expense_date: expenseDate,
-          description: description,
-          recipient_account: recipientAccount,
-          billing_month: month || null,
-          billing_year: year ? Number(year) : null,
-        }),
+        body: JSON.stringify(p),
       })
-      const json = await res.json()
+      let res = await postBill(payload)
+      let json = await res.json()
+      // FR-7: the API refuses a second bill for the same branch +
+      // head + billing month (409, duplicate) — warn and require an
+      // explicit confirmation before recording another one.
+      if (res.status === 409 && json.duplicate) {
+        if (!window.confirm(`${json.error}\n\nRecord another bill for this month anyway?`)) {
+          setIsSubmitting(false)
+          return
+        }
+        res = await postBill({ ...payload, confirm_duplicate: true })
+        json = await res.json()
+      }
       if (!res.ok) throw new Error(json.error || 'Failed to issue utility bill')
 
       onSuccess()

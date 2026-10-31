@@ -33,7 +33,7 @@ export default function AdminTasks() {
   const [isLoading, setIsLoading] = useState(false)
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const [adminName, setAdminName] = useState('Operational Manager')
-  const [adminId, setAdminId] = useState('demo-admin-001')
+  const [adminId, setAdminId] = useState('') // FR-13: no fake 'demo-admin-001' placeholder identity — the real id lands from /api/auth/me on load.
 
   useEffect(() => {
     // SEC-06 FIX: Fetch admin identity from verified session, not from localStorage.

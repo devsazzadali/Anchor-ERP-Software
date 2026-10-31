@@ -20,7 +20,7 @@ export async function GET(req: Request) {
     }
 
     const [salaries, payouts, profiles] = await Promise.all([
-      prisma.salaryPayment.findMany({
+      prisma.salaryPayment.findMany({ where: { status: { not: 'voided' } }, // FR-14.1
         select: {
           id: true, amount: true, payment_date: true, transaction_id: true,
           payment_proof_url: true, notes: true, base_salary_at_time: true,

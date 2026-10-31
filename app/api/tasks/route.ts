@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { sendTaskAssignmentToUser } from '@/lib/email-service'
 import { prisma } from '@/lib/db'
-import { getCallerProfile, isAdminRole } from '@/lib/server/auth'
+import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 
 // caller via the single role-resolution
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   const caller = await getCallerProfile(req)
   if (!caller) return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
 
-  if (!isAdminRole(caller.role)) {
+  if (!callerIsAdmin(caller)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
@@ -97,7 +97,7 @@ export async function GET(req: NextRequest) {
   if (!caller) return NextResponse.json({ error: 'Unauthenticated' }, { status: 401 })
 
   // admin: full list with assignments
-  if (isAdminRole(caller.role)) {
+  if (callerIsAdmin(caller)) {
     try {
       const tasks = await prisma.task.findMany({
         select: { id: true, title: true, description: true, status: true, created_at: true },

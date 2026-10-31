@@ -85,7 +85,7 @@ export default function AdminExpenses() {
 
   // Admin info
   const [adminName, setAdminName] = useState('Operational Manager')
-  const [adminId, setAdminId] = useState('demo-admin-001')
+  const [adminId, setAdminId] = useState('') // FR-13: no fake 'demo-admin-001' placeholder identity — the real id lands from /api/auth/me on load.
 
   useEffect(() => {
     const initAuth = async () => {
@@ -375,6 +375,7 @@ export default function AdminExpenses() {
       [q('Print Date:'),     q(printDate)].join(','),
       [q('Prepared By:'),    q(adminName)].join(','),
       [q('Total Records:'),  q(sel.length)].join(','),
+      [q('Note:'), q('Shared (all-branches) rows are allocated equally across branches in branch views; due = total - paid.')].join(','),
       '',
     ]
     const headers = [q('Purpose'), q('Branch'), q('Total (BDT)'), q('Paid (BDT)'), q('Due (BDT)'), q('Log Date'), q('Logged By')]
@@ -429,7 +430,8 @@ export default function AdminExpenses() {
         { key: 'BRANCH / SCOPE:', value: branchLabel },
         { key: 'DATE RANGE:', value: getExportDateRange() },
         { key: 'PREPARED BY:', value: adminName },
-        { key: 'TOTAL RECORDS:', value: `${sel.length} entries` }
+        { key: 'TOTAL RECORDS:', value: `${sel.length} entries` },
+        { key: 'NOTE:', value: 'Shared (all-branches) rows are allocated equally across branches in branch views; due = total - paid.' }
       ],
       totals: ['', 'GRAND TOTAL', '', totalAmt, paidAmt, dueAmt, '', ''],
       filename: `Anchor_Expenses_${branchLabel.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.xlsx`
@@ -464,6 +466,7 @@ export default function AdminExpenses() {
         { label: 'Total Paid',   value: `${paidAmt.toLocaleString()} BDT`  },
         { label: 'Total Due',    value: `${dueAmt.toLocaleString()} BDT`   },
       ],
+      notes: 'Shared (all-branches) rows are allocated equally across branches in branch views; due = total - paid.',
       filename: `Anchor_Expenses_${branchLabel.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.pdf`
     })
   }
@@ -552,7 +555,7 @@ export default function AdminExpenses() {
             <>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
               <StatsCard
-                title="Total Spent"
+                title="Total Spent — company expenses, selected period"
                 value={`৳${(branchStats.all?.total || 0).toLocaleString()}`}
                 subtext={`Across ${1 + branches.length} branch${branches.length !== 0 ? 'es' : ''}`}
                 icon={Wallet}
@@ -794,6 +797,8 @@ export default function AdminExpenses() {
             })()}
 
             {/* Table Card */}
+            {/* FR-10/X6: the shared-row allocation rule, stated where the figures are read */}
+            <p className="text-[10px] text-slate-400 italic mb-3">Note: shared (all-branches) expenses are allocated equally across branches in branch views; due is always shown as total − paid.</p>
             {(dateFrom || dateTo) && (
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-[10px] bg-[#1ca34c]/20 text-[#15803d] border border-[#1ca34c]/30 px-3 py-1.5 rounded-lg font-bold tracking-wider flex items-center gap-2">

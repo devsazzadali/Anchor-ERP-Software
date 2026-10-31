@@ -139,10 +139,11 @@ export default function UserDashboard() {
   useEffect(() => {
     if (userId) {
       fetchTransactions()
-      // BUG-023 FIX: Fetch partner expenses scoped to THIS user's branch profile
-      // Previously fetched ALL expense requests across all users (data privacy violation)
+      // Partner overview: /api/partner/overview returns the partner's
+      // OWN expense requests only (FR-9 — personal payout details of
+      // other employees are never partner-visible) plus company-wide
+      // branch performance reports (a partner's legitimate view).
       if (profileType === 'partner') {
-        // BUG-023 FIX UPDATED: Partners are company-wide — fetch ALL branch expense requests
         fetch('/api/partner/overview')
           .then(res => res.ok ? res.json() : null)
           .then((overview: any) => {
@@ -426,6 +427,8 @@ export default function UserDashboard() {
                 <h3 className="text-sm font-bold text-slate-900 font-serif flex items-center gap-2">
                   <TrendingUp className="w-4 h-4 text-emerald-600" /> Branch Performance Summary
                 </h3>
+                {/* FR-10/X5: source label — stored monthly snapshots, not a live recomputation */}
+                <p className="text-[10px] text-slate-400 italic">Source: stored monthly snapshots (auto-synced from live ledgers).</p>
               </div>
               <span className="text-[9px] px-2 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 font-bold uppercase tracking-wider">View Only</span>
             </div>

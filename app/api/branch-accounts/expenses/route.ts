@@ -2,14 +2,19 @@ import { NextRequest, NextResponse } from 'next/server'
 import { parseMoneyAmount, roundMoney } from '@/lib/money'
 import { dhakaToday } from '@/lib/dhaka-time'
 import { prisma } from '@/lib/db'
-import { getCallerProfile, isAdminRole } from '@/lib/server/auth'
+import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { attachExpenseLedgerHead } from '@/lib/server/attach'
 import { syncExpenseToLedger } from '@/lib/server/ledger-sync'
 
 // auth via the single role-resolution
-// function (lib/server/auth.ts) — NEVER trusts branch_id from the
-// client for managers; this route is admin-only as before. Ledger
+// function (lib/server/auth.ts). FR-1.6 CONTRACT: this route is
+// ADMIN-ONLY (the unified callerIsAdmin gate) for every method —
+// the caller census found ONLY admin surfaces consuming it (the
+// admin Ledger Heads page + the issue modals). An earlier version
+// of this comment promised manager own-branch access that never
+// existed in the handlers; that promise is removed — managers use
+// their own branch surfaces, not this route. Ledger
 // movement on create/edit/delete is owned by
 // lib/server/ledger-sync.ts (the sync_expense_to_cash_ledger
 // trigger's replacement), inside the same transaction as the expense
@@ -78,7 +83,7 @@ const EXPENSE_COLUMNS = {
 // Query params:
 //   from, to           — expense_date range (YYYY-MM-DD)
 //   month              — YYYY-MM (half-open interval, takes precedence over from/to for date)
-//   branch_id          — admin only; managers always use their own branch
+//   branch_id          — optional filter (admin callers only; the route is admin-only)
 //   ledger_head_id     — filter by Ledger Head UUID
 // ─────────────────────────────────────────────────────────────────────────────
 export async function GET(req: NextRequest) {
@@ -86,7 +91,7 @@ export async function GET(req: NextRequest) {
     const profile = await getCallerProfile(req)
     if (!profile) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const isAdmin = isAdminRole(profile.role)
+    const isAdmin = callerIsAdmin(profile)
     if (!isAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
     const { searchParams } = new URL(req.url)
@@ -158,7 +163,7 @@ export async function POST(req: NextRequest) {
     const profile = await getCallerProfile(req)
     if (!profile) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const isAdmin = isAdminRole(profile.role)
+    const isAdmin = callerIsAdmin(profile)
     if (!isAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
     const body = await req.json()
@@ -233,6 +238,56 @@ export async function POST(req: NextRequest) {
       select: { name: true },
     })
 
+    // FR-7: utility-bill guards (bills carry a structured billing
+    // period). (1) Duplicate guard: a second bill for the same
+    // branch + ledger head + billing month is rejected 409 unless
+    // the caller explicitly confirms (confirm_duplicate) — Rangpur
+    // electricity was historically billed twice in one month
+    // (৳6,000 + ৳10,000) with no period to separate them.
+    // (2) Meter validation: when the recipient cites "Meter: X",
+    // X must be an ACTIVE meter of this branch — restricted to the
+    // bill's type (from the head name) when the registry has meters
+    // of that type (SOTIBARI's electricity bill historically cited
+    // its Internet meter's number). No active registry → no block.
+    if (billing_month && billing_year) {
+      const existing = await prisma.branchCashExpense.findFirst({
+        where: {
+          branch_id: branchId,
+          ledger_head_id: resolvedLedgerHeadId,
+          billing_month,
+          billing_year: Number(billing_year),
+        },
+        select: { id: true, amount: true },
+      })
+      if (existing && body.confirm_duplicate !== true) {
+        return NextResponse.json({
+          error: `A ${resolvedCategory} bill for this branch is already recorded for ${billing_month} ${billing_year} (৳${Number(existing.amount).toLocaleString('en-BD')}). Resubmit with confirm_duplicate to record another.`,
+          duplicate: true,
+        }, { status: 409 })
+      }
+      const meterCite = /Meter:\s*([^,]+)/.exec(String(body.recipient_account || ''))
+      if (meterCite) {
+        const cited = meterCite[1].trim()
+        const activeMeters = await prisma.utilityMeter.findMany({
+          where: { branch_id: branchId, is_active: true },
+          select: { meter_number: true, meter_type: true },
+        })
+        if (activeMeters.length > 0) {
+          const typeWord = ['Electricity', 'Internet', 'Water', 'Gas'].find((t) =>
+            resolvedCategory.toLowerCase().includes(t.toLowerCase()))
+          const typed = typeWord
+            ? activeMeters.filter((m) => (m.meter_type || '').toLowerCase() === typeWord.toLowerCase())
+            : []
+          const pool = typed.length > 0 ? typed : activeMeters
+          if (!pool.some((m) => m.meter_number === cited)) {
+            return NextResponse.json({
+              error: `Meter number "${cited}" is not an active ${typeWord || ''} meter for this branch.`.replace('  ', ' '),
+            }, { status: 400 })
+          }
+        }
+      }
+    }
+
     const expenseDateStr: string = expense_date || dhakaToday()
     const insertPayload: Record<string, any> = {
       branch_id: branchId,
@@ -305,7 +360,7 @@ export async function PATCH(req: NextRequest) {
     const profile = await getCallerProfile(req)
     if (!profile) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const isAdmin = isAdminRole(profile.role)
+    const isAdmin = callerIsAdmin(profile)
     if (!isAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
     const { searchParams } = new URL(req.url)
@@ -443,15 +498,14 @@ export async function PATCH(req: NextRequest) {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DELETE /api/branch-accounts/expenses?id=<uuid>
-// Manager: own branch expenses only. Admin: any expense.
-// (As in the old route, the handler enforces admin-only.)
+// Admin only (FR-1.6 contract — see the file header).
 // ─────────────────────────────────────────────────────────────────────────────
 export async function DELETE(req: NextRequest) {
   try {
     const profile = await getCallerProfile(req)
     if (!profile) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-    const isAdmin = isAdminRole(profile.role)
+    const isAdmin = callerIsAdmin(profile)
     if (!isAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
     const { searchParams } = new URL(req.url)

@@ -15,6 +15,10 @@ interface AuthState {
   isBranchManager: boolean;
   /** UUID of the branch this manager is assigned to (null otherwise) */
   branchId: string | null;
+  /** FR-1.1: true for a partner ACCOUNT (profile_type 'partner'
+   *  with no admin_users row) — such an account is never admin,
+   *  even when its role column says 'admin'. From /api/auth/me. */
+  isPartner: boolean;
 }
 
 interface AuthContextProps extends AuthState {
@@ -31,6 +35,7 @@ const AuthContext = createContext<AuthContextProps>({
   isAuthenticated: false,
   isBranchManager: false,
   branchId: null,
+  isPartner: false,
   loading: true,
   refresh: async () => {},
 });
@@ -74,6 +79,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(cached?.isAuthenticated ?? false);
   const [isBranchManager, setIsBranchManager] = useState<boolean>((cached as any)?.isBranchManager ?? false);
   const [branchId, setBranchId] = useState<string | null>((cached as any)?.branchId ?? null);
+  const [isPartner, setIsPartner] = useState<boolean>((cached as any)?.isPartner ?? false);
   // If we have cached state, skip loading so sidebar appears immediately
   const [loading, setLoading] = useState<boolean>(!cached);
 
@@ -91,11 +97,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setProfileType('');
         setVerificationStatus('');
         setIsAuthenticated(false);
+        setIsPartner(false);
         clearCachedAuth();
         return;
       }
 
-      const { profile: data } = await res.json();
+      const meJson = await res.json();
+      const data = meJson?.profile;
 
       if (!data) {
         console.error('Error loading profile: no profile for session user');
@@ -111,6 +119,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         isAuthenticated: true,
         isBranchManager: data.is_branch_manager ?? false,
         branchId: data.branch_id ?? null,
+        isPartner: meJson?.is_partner === true,
       };
 
       setRole(newState.role);
@@ -119,6 +128,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setIsAuthenticated(newState.isAuthenticated);
       setIsBranchManager(newState.isBranchManager);
       setBranchId(newState.branchId);
+      setIsPartner(newState.isPartner);
       setCachedAuth(newState);
     } catch (e) {
       console.error('Unexpected error in loadProfile:', e);
@@ -150,6 +160,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setIsAuthenticated(false);
           setIsBranchManager(false);
           setBranchId(null);
+          setIsPartner(false);
           setLoading(false);
         } else {
           loadProfile();
@@ -168,7 +179,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ role, profileType, verificationStatus, isAuthenticated, isBranchManager, branchId, loading, refresh }}>
+    <AuthContext.Provider value={{ role, profileType, verificationStatus, isAuthenticated, isBranchManager, branchId, isPartner, loading, refresh }}>
       {children}
     </AuthContext.Provider>
   );

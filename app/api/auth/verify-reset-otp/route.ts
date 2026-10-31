@@ -43,6 +43,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'OTP has expired. Please request a new one.' }, { status: 401 })
     }
 
+    // FR-6 #20: no code on file (otp_code cleared/never issued) is a
+    // 400, never a digest comparison against null.
+    if (requestRecord.otp_code == null) {
+      return NextResponse.json({ error: 'No OTP code on file for this request. Please start over.' }, { status: 400 })
+    }
+
     // Check OTP (digest comparison — lib/otp-hash.ts)
     if (!(await verifyOtpCode(requestRecord.otp_code, otpCode))) {
       const newAttempts = currentAttempts + 1

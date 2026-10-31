@@ -16,7 +16,7 @@ import {
   getAdminEmails,
 } from '@/lib/email-service'
 import { prisma } from '@/lib/db'
-import { getCallerProfile, isAdminRole } from '@/lib/server/auth'
+import { getCallerProfile, callerIsAdmin, isPartnerAccount } from '@/lib/server/auth'
 
 // caller via the app session; helper
 // lookups (user email by id, admin notifications) via Prisma. The
@@ -46,12 +46,21 @@ async function createUserNotification(userId: string | undefined, title: string,
   }
 }
 
-// Helper to create an in-app notification securely for all admins via backend
+// Helper to create an in-app notification securely for all admins via backend.
+// FR-1.1 residue: partner accounts (profile_type 'partner' with no
+// admin_users row) are excluded via the resolver's shared predicate,
+// exactly as getAdminEmails does.
 async function createAdminNotification(title: string, message: string, type: string) {
-  const admins = await prisma.profile.findMany({
+  const adminCandidates = await prisma.profile.findMany({
     where: { role: { in: ['admin', 'super_admin'] } },
-    select: { id: true },
+    select: { id: true, profile_type: true },
   })
+  const adminUserIds = new Set(
+    (await prisma.adminUser.findMany({ select: { id: true } })).map((a) => a.id)
+  )
+  const admins = adminCandidates.filter(
+    (p) => !isPartnerAccount(p.profile_type, adminUserIds.has(p.id))
+  )
   if (!admins || admins.length === 0) return
   const notificationsToInsert = admins.map((a) => ({
     user_id: a.id,
@@ -92,7 +101,7 @@ export async function POST(request: Request) {
 
     const adminActions = ['KYC_APPROVED', 'TASK_ASSIGNED', 'PAYOUT_COMPLETED', 'BRANCH_CHANGED', 'SALARY_PAID', 'VALUE_TRANSFER_COMPLETED', 'SALARY_UPDATED', 'EXPENSE_STATUS_UPDATED']
     if (adminActions.includes(action)) {
-      if (!isAdminRole(user.role)) {
+      if (!callerIsAdmin(user)) {
         return NextResponse.json({ error: 'Forbidden: Admin role required' }, { status: 403 })
       }
     }

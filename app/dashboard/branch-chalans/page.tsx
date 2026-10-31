@@ -322,7 +322,13 @@ export default function PartnerBranchChalansPage() {
         code: i.code ?? '',
         name: i.name,
         quantity: String(i.quantity),
-        cost_price: String(i.cost_price ?? i.unit_price ?? ''),
+        // FR-8.2: cost_price is NEVER prefilled from unit_price —
+        // for legacy items unit_price is the SALE price; treating it
+        // as cost fabricates a cost basis that was never recorded.
+        // The cost field stays empty ("cost not recorded") until an
+        // admin types a real cost. sale_price keeps the fallback:
+        // legacy sale totals reconcile exactly on unit_price.
+        cost_price: String(i.cost_price ?? ''),
         sale_price: String(i.sale_price ?? i.unit_price ?? ''),
         shipping_cost: String(i.shipping_cost ?? ''),
       }))
@@ -371,7 +377,7 @@ export default function PartnerBranchChalansPage() {
       idx + 1,
       item.code ? `[${item.code}] ${item.name}` : item.name,
       item.quantity,
-      `${Number(item.cost_price ?? item.unit_price ?? 0).toLocaleString('en-BD')} BDT`,
+      item.cost_price === undefined || item.cost_price === null ? 'Cost not recorded' : `${Number(item.cost_price).toLocaleString('en-BD')} BDT`,
       `${Number(item.sale_price ?? item.unit_price ?? 0).toLocaleString('en-BD')} BDT`,
       item.shipping_cost === undefined || item.shipping_cost === null ? '—' : `${Number(item.shipping_cost).toLocaleString('en-BD')} BDT`,
       `${Number(item.total_sale ?? item.total_price ?? 0).toLocaleString('en-BD')} BDT`,
@@ -390,7 +396,7 @@ export default function PartnerBranchChalansPage() {
         reportRef:   chalan.chalan_ref || chalan.id.slice(0, 8).toUpperCase(),
         summaryData: [
           { label: 'Total Line Items',   value: chalan.items.length.toString() },
-          { label: 'Total Dispatch Cost', value: `${Number(chalan.total_cost || 0).toLocaleString('en-BD')} BDT` },
+          { label: 'Total Dispatch Cost', value: (chalan.items || []).some((i: any) => i && i.cost_price !== undefined && i.cost_price !== null) ? `${Number(chalan.total_cost || 0).toLocaleString('en-BD')} BDT` : 'Cost not recorded' },
           { label: 'Total Expected Revenue', value: `${Number(chalan.total_amount).toLocaleString('en-BD')} BDT` },
         ],
         notes: chalan.notes,

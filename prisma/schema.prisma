@@ -351,6 +351,10 @@ model CompanyExpense {
   purpose         String
   // DDL also defines `amount`; backup rows expose total/paid/due only.
   // Kept optional — see notes (conflict C-01).
+  // FR-15/A§2-9: `amount` is LEGACY and UNUSED — it is NULL/0 on
+  // 167/167 live rows. The money lives in total_amount (Σ = the
+  // company total); every reader uses total_amount. Do not read or
+  // write `amount` for company expenses.
   amount          Decimal? @default(0) @db.Decimal(15, 2)
   total_amount    Decimal  @default(0) @db.Decimal(15, 2)
   paid_amount     Decimal  @default(0) @db.Decimal(15, 2)
@@ -698,6 +702,13 @@ model SalaryPayment {
   branch_id           String?   @db.Uuid
   account             String?
   notes               String?
+  // FR-14.1: payment lifecycle — 'paid' | 'voided'. Added via
+  // targeted DDL (ADD COLUMN IF NOT EXISTS ... DEFAULT 'paid'),
+  // NOT a full db push. Voiding is the ONLY correction path for an
+  // issued payment (law E3): it reverses the branch-cash mirror
+  // through the ledger sync and every money reader excludes
+  // status='voided'. The row itself is never deleted or edited.
+  status              String    @default("paid")
   payment_date        DateTime  @default(now()) @db.Timestamptz(6)
   created_at          DateTime  @default(now()) @db.Timestamptz(6)
 

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { sessionTokenFromRequest, verifySessionToken } from '@/lib/server/session'
+import { isPartnerAccount } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 
 // GET /api/auth/me — identity surface for the client (AuthContext
@@ -8,7 +9,8 @@ import { toPlain } from '@/lib/server/respond'
 // caller resolution: it returns the session user's profile as-is
 // (including verification_status / is_banned) so the UI can gate
 // and route; enforcement lives on the data routes themselves
-// (lib/server/auth.ts, A4).
+// (lib/server/auth.ts, A4). FR-1.3: the security_answer digest is
+// stripped even here — no client consumer needs it.
 export async function GET(req: Request) {
   try {
     const userId = await verifySessionToken(sessionTokenFromRequest(req))
@@ -22,14 +24,23 @@ export async function GET(req: Request) {
     if (!authUser) return NextResponse.json({ user: null, profile: null }, { status: 401 })
 
     // Admin = role column OR admin_users membership (A1) — the same
-    // definition the proxy gate and the data routes use.
+    // definition the proxy gate and the data routes use, WITH the
+    // FR-1.1 partner boundary: a partner account (profile_type
+    // 'partner', no admin_users row) is NOT admin even when its
+    // role column says 'admin'. isPartnerAccount is the resolver's
+    // shared predicate (lib/server/auth.ts).
+    const is_partner = profile ? isPartnerAccount(profile.profile_type, !!adminRow) : false
     const is_admin =
-      profile?.role === 'admin' || profile?.role === 'super_admin' || !!adminRow
+      !is_partner &&
+      (profile?.role === 'admin' || profile?.role === 'super_admin' || !!adminRow)
+
+    const { security_answer: _stripped, ...safeProfile } = (profile ?? {}) as any
 
     return NextResponse.json({
       user: { id: authUser.id, email: authUser.email },
-      profile: profile ? toPlain(profile) : null,
+      profile: profile ? toPlain(safeProfile) : null,
       is_admin,
+      is_partner,
     })
   } catch (err: any) {
     console.error('[GET /api/auth/me] Error:', err)

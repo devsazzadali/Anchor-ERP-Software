@@ -29,7 +29,7 @@ function isPublicRoute(pathname: string): boolean {
 
 
 export default function SidebarWrapper() {
-  const { role, profileType, verificationStatus, loading, refresh, isBranchManager } = useAuth();
+  const { role, profileType, verificationStatus, loading, refresh, isBranchManager, isPartner: isPartnerAccountFlag } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -90,8 +90,12 @@ export default function SidebarWrapper() {
   }
 
   // ✅ 3. ADMIN BYPASS - Check this BEFORE loading check
-  // Admins don't need verification, show sidebar even if loading
-  if (role === 'admin' || role === 'super_admin') {
+  // Admins don't need verification, show sidebar even if loading.
+  // FR-1.1: a partner ACCOUNT (isPartner from /api/auth/me — partner
+  // type with no admin_users row) never takes this bypass, even
+  // when its role column says 'admin'; it falls through to the
+  // partner navigation below.
+  if ((role === 'admin' || role === 'super_admin') && !isPartnerAccountFlag) {
     return (
       <>
         <SidebarClient onLogout={handleLogout} forcedRole={role as 'admin' | 'super_admin'} />

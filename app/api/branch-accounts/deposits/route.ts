@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendDepositSubmissionEmailToAdmins } from '@/lib/email-service'
 import { parseDailyBreakdown, cleanDepositNotes } from '@/lib/branch-deposit-utils'
-import { parseMoneyAmount, validateBreakdown } from '@/lib/money'
+import { parseMoneyAmount, validateBreakdown, sumMoney } from '@/lib/money'
 import { prisma } from '@/lib/db'
 import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { attachDepositBranch } from '@/lib/server/attach'
-import { syncDepositToLedger } from '@/lib/server/ledger-sync'
+import { syncDepositToLedger, computeDepositDrift } from '@/lib/server/ledger-sync'
 import {
   DEPOSIT_BLOCKING_STATUSES,
   depositOverlapMessage,
@@ -128,7 +128,36 @@ export async function GET(req: NextRequest) {
       }
     })
 
-    return NextResponse.json({ deposits: enriched })
+    // FR-10/X1: two distinct totals finance kept conflating —
+    // the approved deposit RECORD total vs the total actually
+    // CREDITED to branch ledgers (bank_deposits_out). Computed over
+    // the caller's full visible scope (ignoring this request's
+    // date/status filters) with the shared drift computation:
+    // credited = record total + Σ shortfall drift (a day can never
+    // credit more than its records hold). On the 2026-10-31 data:
+    // records ৳449,000 vs credited ৳437,373 — the ৳11,627 gap is
+    // the SOTIBARI 2026-09-10 drift shown on Reconciliation.
+    const scopeWhere: any = {}
+    if (branchId) scopeWhere.branch_id = branchId
+    const [scopeDeposits, scopeLedger] = await Promise.all([
+      prisma.branchBankDeposit.findMany({
+        where: { ...scopeWhere, status: 'approved', is_reversed: false },
+        select: { id: true, branch_id: true, amount: true, deposit_date: true, daily_breakdown: true, status: true },
+      }),
+      prisma.branchCashLedger.findMany({
+        where: scopeWhere,
+        select: { branch_id: true, ledger_date: true, bank_deposits_out: true },
+      }),
+    ])
+    const approvedRecordTotal = sumMoney(scopeDeposits.map((d) => Number(d.amount)))
+    const driftRows = computeDepositDrift(scopeDeposits as any, scopeLedger as any, { from: '2000-01-01', to: '2999-12-31' })
+    const shortfall = driftRows.reduce((s, d) => s + Math.min(Number(d.drift) || 0, 0), 0)
+    const summary = {
+      approved_record_total: approvedRecordTotal,
+      credited_total: Math.round((approvedRecordTotal + shortfall) * 100) / 100,
+    }
+
+    return NextResponse.json({ deposits: enriched, summary })
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }

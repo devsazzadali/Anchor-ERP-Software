@@ -36,7 +36,7 @@ export async function GET(req: Request) {
         orderBy: { id: 'asc' },
       }),
       prisma.companyExpense.findMany({ select: { total_amount: true, created_at: true }, orderBy: { id: 'asc' } }),
-      prisma.salaryPayment.findMany({ select: { amount: true, payment_date: true }, orderBy: { id: 'asc' } }),
+      prisma.salaryPayment.findMany({ where: { status: { not: 'voided' } }, select: { amount: true, payment_date: true }, orderBy: { id: 'asc' } }), // FR-14.1
       prisma.branchCashLedger.findMany({
         select: {
           cash_sales: true, bkash_sales: true, nagad_sales: true, rocket_sales: true,
@@ -52,15 +52,15 @@ export async function GET(req: Request) {
       prisma.activityLog.findMany({ orderBy: { created_at: 'desc' }, take: 10 }),
     ])
 
-    // branch_financial_reports fallback is only needed when the ledger
-    // is empty — fetch lazily to mirror the page's original flow.
-    let finReports: any[] = []
-    if (ledgerSales.length === 0) {
-      finReports = await prisma.branchFinancialReport.findMany({
-        select: { amount: true, branch_id: true },
-        orderBy: { id: 'asc' },
-      })
-    }
+    // FR-10/X5: the branch_financial_reports FALLBACK IS REMOVED.
+    // When the ledger had no rows, this route silently substituted
+    // stored financial-report totals as the dashboard's sales source
+    // — same headline, different provenance, no signal. The sales
+    // figure now comes from the ledger ONLY; an empty ledger yields
+    // an empty sales set and the page shows ৳0 with a "no closings
+    // recorded" note. (Field kept in the response, always empty,
+    // so older page builds degrade to zero rather than stale data.)
+    const finReports: any[] = []
 
     // Attach profile full_name embeds (profiles:user_id(full_name)).
     const fraudUserIds = [...new Set(fraudRows.map((r) => r.user_id).filter(Boolean))]

@@ -736,6 +736,10 @@ export default function PayoutManagement() {
                         <div className="flex justify-between items-start w-full">
                           <div>
                             <h4 className="text-xs font-bold text-slate-900 group-hover:text-[#15803d] transition-colors">{req.invoiceTitle}</h4>
+                            {/* FR-10/X9: this queue merges two money sources — label the source in-row */}
+                            <span className={`inline-block mt-1 px-1.5 py-px rounded text-[8px] font-bold uppercase tracking-wider ${req.is_value_transfer ? 'bg-blue-500/10 text-blue-700 border border-blue-500/20' : 'bg-emerald-500/10 text-emerald-700 border border-emerald-500/20'}`}>
+                              {req.is_value_transfer ? 'Salary payment' : 'Payout request'}
+                            </span>
                             <p className="text-[10px] text-slate-500 mt-1">{req.userName} ({req.userEmail})</p>
                           </div>
                           <span className={`px-2.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider ${statusColors}`}>

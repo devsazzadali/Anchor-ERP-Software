@@ -100,6 +100,13 @@ export default function HouseRentPage() {
                 const isPaid = !!status && rentDue > 0 && paidTotal >= rentDue
                 const isPartial = !!status && paidTotal > 0 && paidTotal < rentDue
                 const isUnpaid = !!status && paidTotal === 0
+                // FR-7: with no contractual rent_amount set, no
+                // paid/unpaid verdict is reachable — the card must
+                // say so (a setup state) instead of claiming "No
+                // payment recorded" / "UNPAID". Stamped payments, when
+                // they exist, are shown as recorded amounts.
+                const rentNotSet = rentDue <= 0
+                const recordedTotal = status ? Number(status.amount) : 0
                 return (
                 <div key={acc.id} className="p-6 border border-slate-900/10 rounded-3xl bg-slate-900/[0.04] hover:bg-slate-900/[0.04] hover:border-[#1ca34c]/30 transition-all group">
                   <div className="flex items-center justify-between mb-4">
@@ -144,7 +151,17 @@ export default function HouseRentPage() {
                   {/* Current Month Status */}
                   <div className="pt-2">
                     <span className="text-[9px] text-slate-600 uppercase tracking-wider block mb-1.5">This Month Status</span>
-                    {!status ? (
+                    {rentNotSet ? (
+                      status ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold bg-sky-500/10 text-sky-600 border border-sky-500/20">
+                          Recorded ৳{recordedTotal.toLocaleString('en-BD')} — rent amount not set for this branch
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-700">
+                          Rent amount not set for this branch
+                        </span>
+                      )
+                    ) : !status ? (
                       <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-700">
                         — No payment recorded
                       </span>

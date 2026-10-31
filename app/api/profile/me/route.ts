@@ -4,7 +4,10 @@ import { getCallerProfile } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 
 // /api/profile/me — the signed-in user's OWN profile.
-// GET: own profile row (same payload as /api/auth/me's profile).
+// GET: own profile row (same payload as /api/auth/me's profile),
+// FR-1.3: minus the security_answer digest, which no client
+// consumer needs (the settings page uses has_security_answer
+// from /api/me/profile).
 // PATCH: self-update with the A1 column whitelist — only the
 // self-service fields the settings pages edit. Role-bearing columns
 // (role, profile_type, is_branch_manager, branch_id,
@@ -23,7 +26,10 @@ export async function GET(req: Request) {
     const profile = await prisma.profile.findUnique({ where: { id: caller.id } })
     if (!profile) return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
 
-    return NextResponse.json({ profile: toPlain(profile) })
+    const { security_answer, ...rest } = profile as any
+    return NextResponse.json({
+      profile: toPlain({ ...rest, has_security_answer: !!security_answer }),
+    })
   } catch (err: any) {
     console.error('[GET /api/profile/me] Error:', err)
     return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 500 })
@@ -43,7 +49,10 @@ export async function PATCH(req: Request) {
     }
 
     const profile = await prisma.profile.update({ where: { id: caller.id }, data })
-    return NextResponse.json({ profile: toPlain(profile) })
+    const { security_answer, ...rest } = profile as any
+    return NextResponse.json({
+      profile: toPlain({ ...rest, has_security_answer: !!security_answer }),
+    })
   } catch (err: any) {
     console.error('[PATCH /api/profile/me] Error:', err)
     return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 })
