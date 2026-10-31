@@ -8,6 +8,7 @@ import { getCallerProfile, isAdminRole } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { attachLedgerRelations } from '@/lib/server/attach'
 import { cashDifferencePatch } from '@/lib/server/ledger-sync'
+import { branchStreamAmount } from '@/lib/expense-streams'
 
 // this route's legacy queries (anon +
 // service-role) are now Prisma queries via the single role-resolution
@@ -297,7 +298,11 @@ export async function POST(req: NextRequest) {
         }),
         prisma.branchCashExpense.findMany({
           where: { branch_id: branchId, expense_date: new Date(`${date}T00:00:00.000Z`) },
-          select: { amount: true },
+          // Stream links selected so the snapshot counts ONLY the
+          // branch stream (owner's account-overview rule): ledger-head
+          // rows and salary copies recorded against this branch/day
+          // are not drawer expenses.
+          select: { amount: true, salary_payment_id: true, expense_request_id: true, ledger_head_id: true },
         }),
       ])
       const bDepositsOut = depRows.reduce((s: number, d: any) => {
@@ -305,7 +310,7 @@ export async function POST(req: NextRequest) {
         if (breakdown) return s + Number(breakdown[date] || 0)
         return toPlain(d).deposit_date === date ? s + Number(d.amount || 0) : s
       }, 0)
-      const cExpenses = expRows.reduce((s: number, e: any) => s + Number(e.amount || 0), 0)
+      const cExpenses = expRows.reduce((s: number, e: any) => s + branchStreamAmount(e), 0)
 
       const insertPayload: any = {
         branch_id: branchId,

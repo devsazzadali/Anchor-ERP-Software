@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db'
 import { getCallerProfile } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { attachDepositBranch } from '@/lib/server/attach'
+import { branchStreamAmount } from '@/lib/expense-streams'
 
 // GET /api/branch-accounts/reconciliation?from=YYYY-MM-DD&to=YYYY-MM-DD
 // Admin only — Returns branch-wise reconciliation summary
@@ -63,7 +64,11 @@ export async function GET(req: NextRequest) {
       }),
       prisma.branchCashExpense.findMany({
         where: { expense_date: { gte: fromDate, lte: toDate } },
-        select: { branch_id: true, amount: true },
+        // Stream links selected: only BRANCH-stream rows are drawer
+        // expenses (owner's account-overview rule) — ledger-head rows
+        // and salary copies recorded against a branch never enter
+        // total_cash_expenses or net_cash_collected here.
+        select: { branch_id: true, amount: true, salary_payment_id: true, expense_request_id: true, ledger_head_id: true },
         orderBy: { id: 'asc' },
       }),
     ])
@@ -83,7 +88,11 @@ export async function GET(req: NextRequest) {
       // any existed, else the ledger column), so identical reality
       // reported differently across branches. The ledger column is
       // still compared and any drift is exposed, not hidden.
-      const total_cash_expenses = sumMoney(branchExpenses.map((e) => Number(e.amount)))
+      // Stream rule (2026-10-31): of those rows, only the BRANCH
+      // stream counts — branchStreamAmount zeroes ledger-head rows
+      // and salary copies, matching what the ledger sync maintains in
+      // the column, so drift stays a true integrity signal.
+      const total_cash_expenses = sumMoney(branchExpenses.map((e) => branchStreamAmount(e as any)))
       const expense_drift = sumMoney([sumMoney(branchLedgers.map((l) => (l.cash_expenses != null ? Number(l.cash_expenses) : null))), -total_cash_expenses])
 
       // B30: signed. A branch whose expenses exceed collections is

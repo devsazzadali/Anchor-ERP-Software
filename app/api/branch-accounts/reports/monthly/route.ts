@@ -4,6 +4,7 @@ import { sumMoney } from '@/lib/money'
 import { prisma } from '@/lib/db'
 import { getCallerProfile, isAdminRole } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
+import { branchStreamAmount, branchCashExpenseStream } from '@/lib/expense-streams'
 
 // GET /api/branch-accounts/reports/monthly?year=2026&month=9&branch_id=xxx
 // Automatically aggregates verified daily cash ledgers, bank deposits, and expenses.
@@ -85,6 +86,9 @@ export async function GET(req: NextRequest) {
         select: {
           id: true, branch_id: true, expense_date: true, amount: true, category: true,
           description: true, receipt_url: true,
+          // Stream links: this report's expense figures are BRANCH
+          // stream only (owner's account-overview rule).
+          salary_payment_id: true, expense_request_id: true, ledger_head_id: true,
         },
         orderBy: { id: 'asc' },
       }),
@@ -145,7 +149,13 @@ export async function GET(req: NextRequest) {
       // drifted UP won and the drift itself was hidden. Now the rows
       // are the total, and any disagreement is reported as expenseDrift
       // so it can be investigated instead of papered over.
-      const expSum = sumMoney(bExpenses.map((r) => r.amount))
+      // Stream rule (2026-10-31): the rows counted are the BRANCH
+      // stream only — ledger-head rows (rent, bills) and salary
+      // copies recorded against the branch are not branch operating
+      // expenses (B36's note below has always claimed exactly this;
+      // the sum now matches it). Drift compares like with like: the
+      // ledger column is maintained from the same stream.
+      const expSum = sumMoney(bExpenses.map((r) => branchStreamAmount(r as any)))
       const ledgerExpSum = sumMoney(bLedger.map((r) => r.cash_expenses))
       const totalExpenses = expSum
       const expenseDrift = sumMoney([ledgerExpSum, -expSum])
@@ -323,7 +333,10 @@ export async function GET(req: NextRequest) {
       },
       branches: branchSummaries,
       deposits: depositRows ?? [],
-      expenses: expenseRows ?? [],
+      // The itemised list is the branch-stream register for the month
+      // (the same rows the totals count) — head/salary rows live in
+      // their own stream presentations, not in the branch report.
+      expenses: (expenseRows ?? []).filter((e) => branchCashExpenseStream(e as any) === 'branch'),
       dailyLedger: ledgerRows ?? [],
     })
   } catch (err: any) {

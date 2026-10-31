@@ -29,8 +29,18 @@
  * exactly what the expense itself added (same reasoning as B25 —
  * documented deviation from sync_expense_trigger_fix.sql, behaviour
  * differs only when the ledger was already inconsistent).
+ *
+ * Expense STREAM rule (owner's account-overview rule, 2026-10-31):
+ * the ledger's cash_expenses is the branch's DRAWER figure, so only
+ * the BRANCH stream of a branch_cash_expenses row may move it —
+ * branchStreamAmount() (lib/expense-streams) is the contribution:
+ * full amount for branch-stream rows, 0 for ledger-head rows and
+ * salary copies. A rent or salary row recorded against the branch
+ * therefore never drains the drawer figure; it is counted under its
+ * ledger head / from salary_payments instead.
  */
 import { Prisma } from '@prisma/client'
+import { branchStreamAmount } from '../expense-streams'
 
 type Tx = Prisma.TransactionClient
 
@@ -47,6 +57,12 @@ export interface ExpenseSyncShape {
   branch_id: string
   amount: number | Prisma.Decimal
   expense_date: Date | string
+  // Stream links (lib/expense-streams classification). Optional for
+  // hand-built shapes; a row described without them is treated as a
+  // plain branch-cash expense — the historical shape of this sync.
+  salary_payment_id?: string | null
+  expense_request_id?: string | null
+  ledger_head_id?: string | null
 }
 
 function dateKey(d: Date | string): string {
@@ -232,7 +248,10 @@ export async function syncDepositToLedger(
 
 /**
  * Move an expense's ledger contribution from `oldRow` to `newRow`
- * (branch and/or date and/or amount may all change).
+ * (branch and/or date and/or amount may all change). The contribution
+ * is the row's BRANCH-stream amount (see the stream rule above): an
+ * UPDATE that reclassifies a row (e.g. a ledger head is stamped on
+ * it) moves its money OUT of the drawer figure, and vice versa.
  */
 export async function syncExpenseToLedger(
   tx: Tx,
@@ -240,9 +259,9 @@ export async function syncExpenseToLedger(
   newRow: ExpenseSyncShape | null
 ) {
   if (oldRow) {
-    await adjustLedger(tx, oldRow.branch_id, dateKey(oldRow.expense_date), -num(oldRow.amount), 'cash_expenses')
+    await adjustLedger(tx, oldRow.branch_id, dateKey(oldRow.expense_date), -branchStreamAmount(oldRow as any), 'cash_expenses')
   }
   if (newRow) {
-    await adjustLedger(tx, newRow.branch_id, dateKey(newRow.expense_date), num(newRow.amount), 'cash_expenses')
+    await adjustLedger(tx, newRow.branch_id, dateKey(newRow.expense_date), branchStreamAmount(newRow as any), 'cash_expenses')
   }
 }

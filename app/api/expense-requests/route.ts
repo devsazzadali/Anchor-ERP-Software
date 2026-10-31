@@ -111,6 +111,12 @@ export async function POST(req: Request) {
           branch_id: expense.branch_id,
           amount: roundMoney(amount),
           expense_date: expense.expense_date,
+          // The link is what makes this row branch-stream by rule b —
+          // pass it explicitly so the sync sees the same row the DB
+          // holds (the created expense above carries it too).
+          expense_request_id: request.id,
+          salary_payment_id: null,
+          ledger_head_id: null,
         })
       }
 

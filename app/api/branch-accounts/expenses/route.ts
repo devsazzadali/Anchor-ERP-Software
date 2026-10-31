@@ -320,6 +320,13 @@ export async function PATCH(req: NextRequest) {
       select: {
         id: true, branch_id: true, manager_id: true, category: true, ledger_head_id: true,
         amount: true, paid_amount: true, due_amount: true, expense_date: true,
+        // Stream links (expense round completion, 2026-10-31): the
+        // ledger sync now moves only a row's BRANCH-stream amount, so
+        // the OLD row shape it is handed must carry the links that
+        // classify it — without them an expense-request row stamped
+        // with a head (or a salary copy) would be misclassified and
+        // its old drawer contribution never removed.
+        salary_payment_id: true, expense_request_id: true,
       },
     })
 
@@ -453,7 +460,13 @@ export async function DELETE(req: NextRequest) {
 
     const expense = await prisma.branchCashExpense.findFirst({
       where: { id },
-      select: { id: true, branch_id: true, manager_id: true, description: true, amount: true, expense_date: true },
+      select: {
+        id: true, branch_id: true, manager_id: true, description: true, amount: true, expense_date: true,
+        // Stream links — see the PATCH select above: the delete's
+        // ledger reversal must remove exactly what the row's stream
+        // contributed when it was created.
+        ledger_head_id: true, salary_payment_id: true, expense_request_id: true,
+      },
     })
 
     if (!expense) return NextResponse.json({ error: 'Expense not found' }, { status: 404 })

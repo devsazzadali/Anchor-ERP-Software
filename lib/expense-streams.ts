@@ -86,6 +86,39 @@ export interface NamedRef {
   name: string
 }
 
+/**
+ * The stream ONE branch_cash_expenses row belongs to — the single-row
+ * form of the classification documented at the top of this file:
+ *   'salary-copy' — rule a: the cash copy of a salary payment; counted
+ *                   once from salary_payments in the ledger-head
+ *                   stream, never as a branch expense.
+ *   'branch'      — rules b + d: an expense request settled out of
+ *                   branch cash, or plain branch-cash spending. This
+ *                   is the ONLY stream the branch accounts (Account
+ *                   Overview, daily closing, drawer math) may count —
+ *                   the owner's account-overview rule (2026-10-31).
+ *   'ledger-head' — rule c: a recurring cost issued under a ledger
+ *                   head (rent, bills…), counted under its head.
+ */
+export type BranchCashExpenseStream = 'branch' | 'ledger-head' | 'salary-copy'
+
+export function branchCashExpenseStream(row: BranchCashExpenseRow): BranchCashExpenseStream {
+  if (row.salary_payment_id) return 'salary-copy'
+  if (row.expense_request_id || !row.ledger_head_id) return 'branch'
+  return 'ledger-head'
+}
+
+/**
+ * How much of a branch_cash_expenses row counts toward the BRANCH
+ * stream (and therefore toward the branch cash ledger): the full
+ * amount for branch-stream rows, 0 for ledger-head rows and salary
+ * copies. Every branch-accounts aggregation and the ledger sync go
+ * through this one function so the rule cannot drift between pages.
+ */
+export function branchStreamAmount(row: BranchCashExpenseRow): number {
+  return branchCashExpenseStream(row) === 'branch' ? Number(row.amount ?? 0) : 0
+}
+
 export interface ExpenseStreams {
   branch: {
     total: number
@@ -142,14 +175,15 @@ export function classifyExpenseStreams(input: {
 
   for (const row of input.branchCashExpenses) {
     const amount = Number(row.amount ?? 0)
-    if (row.salary_payment_id) {
+    const stream = branchCashExpenseStream(row)
+    if (stream === 'salary-copy') {
       // Rule a — the cash copy of a salary payment. Counted once via
       // salary_payments (stream 3); NEVER here.
       excludedAmounts.push(amount)
       excludedCount++
       continue
     }
-    if (row.expense_request_id || !row.ledger_head_id) {
+    if (stream === 'branch') {
       // Rules b + d — branch stream.
       const key = row.branch_id || '__unassigned__'
       const cur = perBranchMap.get(key) || {
@@ -163,7 +197,7 @@ export function classifyExpenseStreams(input: {
       perBranchMap.set(key, cur)
     } else {
       // Rule c — ledger-head stream.
-      addToHead(row.ledger_head_id, headNameOf(row), amount)
+      addToHead(row.ledger_head_id as string, headNameOf(row), amount)
     }
   }
 
