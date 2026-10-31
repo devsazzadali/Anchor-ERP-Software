@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db'
 import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { syncDepositToLedger } from '@/lib/server/ledger-sync'
+import { depositOverlapMessage, findDepositSalesOverlap } from '@/lib/server/deposit-overlap'
 
 // POST /api/branch-accounts/deposits/[id]/approve
 // Admin only — Approve or Reject a submitted deposit
@@ -48,6 +49,26 @@ export async function POST(
 
     if (action === 'reject' && !rejection_reason) {
       return NextResponse.json({ error: 'rejection_reason is required when rejecting' }, { status: 400 })
+    }
+
+    // Closing fix §D5 #2 (approve path): approval is the moment this
+    // deposit's money enters the ledger, so it is re-checked here even
+    // if it was clean at create — another live claim (approved /
+    // submitted / pending) for the same branch over the same sales
+    // days blocks the approval. Rejection is never blocked.
+    if (action === 'approve') {
+      const overlap = await findDepositSalesOverlap(prisma, {
+        branchId: deposit.branch_id,
+        salesFromDate: deposit.sales_from_date,
+        salesToDate: deposit.sales_to_date,
+        excludeId: id,
+      })
+      if (overlap) {
+        return NextResponse.json(
+          { error: depositOverlapMessage(overlap, deposit.sales_from_date as any, deposit.sales_to_date as any) },
+          { status: 400 }
+        )
+      }
     }
 
     const adminName = caller.full_name || 'Admin'

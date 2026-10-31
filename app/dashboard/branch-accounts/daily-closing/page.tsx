@@ -52,6 +52,16 @@ export default function DailyClosingPage() {
   const [closingCash, setClosingCash] = useState('')
   const [differenceNotes, setDifferenceNotes] = useState('')
 
+  // Opening carry-forward for the selected date, as derived by the
+  // server (previous recorded day's counted cash, falling back to its
+  // expected closing — closing diagnosis §D5 #3). The form pre-fills
+  // THIS value; the old code pre-filled the previous day's khuchra
+  // float, which kept resetting Rangpur's openings. Typing a different
+  // opening is an override: it needs openingOverrideNote and the row
+  // is flagged as a chain break.
+  const [derivedOpening, setDerivedOpening] = useState<number | null>(null)
+  const [openingOverrideNote, setOpeningOverrideNote] = useState('')
+
   // Digital collections states
   const [bkashSales, setBkashSales] = useState('')
   const [nagadSales, setNagadSales] = useState('')
@@ -91,7 +101,9 @@ export default function DailyClosingPage() {
 
   const applyLedgerData = useCallback((led: any) => {
     setLedger(led)
+    setOpeningOverrideNote('')
     if (led) {
+      setDerivedOpening(led.opening_derived_cash !== undefined && led.opening_derived_cash !== null ? Number(led.opening_derived_cash) : null)
       const floatVal = (led.khuchra_amount !== undefined && led.khuchra_amount !== null) ? led.khuchra_amount : (led.opening_cash ?? '')
       setKhuchraAmount(floatVal !== undefined && floatVal !== null ? String(floatVal) : '')
       setClosingCash(led.actual_cash !== undefined && led.actual_cash !== null ? String(led.actual_cash) : '')
@@ -104,6 +116,7 @@ export default function DailyClosingPage() {
       setCashSales(led.cash_sales !== undefined && led.cash_sales !== null && led.cash_sales > 0 ? String(led.cash_sales) : '')
       if (led.branch?.name) setBranchName(led.branch.name)
     } else {
+      setDerivedOpening(null)
       setKhuchraAmount('')
       setClosingCash('')
       setDifferenceNotes('')
@@ -122,6 +135,12 @@ export default function DailyClosingPage() {
       const json = await fetchWithCache(cacheKey, `/api/branch-accounts/cash-ledger?date=${selectedDate}`, 45000)
       const led = json?.ledger?.[0] || null
       applyLedgerData(led)
+      // For a day with no row yet, the server reports the derived
+      // carry-forward opening alongside the (empty) ledger — the
+      // pre-fill effect below shows exactly that value.
+      if (!led && json?.derived_opening_cash !== undefined && json?.derived_opening_cash !== null) {
+        setDerivedOpening(Number(json.derived_opening_cash))
+      }
       setError(null)
       return led
     } catch (e: any) {
@@ -154,25 +173,37 @@ export default function DailyClosingPage() {
       applyLedgerData(cachedLedger.ledger[0])
       setIsLoading(false)
     }
-    Promise.all([fetchLedger(), fetchHistory()]).then(([led, history]) => {
-      // Auto-populate khuchra from previous closing if available
-      if (!led && history && history.length > 0) {
-        const pastLedgers = history.filter((h: any) => h.ledger_date < selectedDate && (h.khuchra_amount !== null || h.actual_cash !== null))
-        if (pastLedgers.length > 0) {
-          const prev = pastLedgers[0]
-          const prevFloat = (prev.khuchra_amount !== undefined && prev.khuchra_amount !== null) ? prev.khuchra_amount : (prev.opening_cash ?? '')
-          if (prevFloat !== '') setKhuchraAmount(String(prevFloat))
-        }
-      }
+    Promise.all([fetchLedger(), fetchHistory()]).then(() => {
       setIsLoading(false)
     })
   }, [isAuthorized, selectedDate, fetchLedger, fetchHistory, applyLedgerData])
+
+  // Pre-fill the opening with the server-derived carry-forward when
+  // it (re)loads for a day that has no ledger row yet — yesterday's
+  // counted closing, never the previous day's khuchra float.
+  useEffect(() => {
+    if (!ledger && derivedOpening !== null) {
+      setKhuchraAmount(String(derivedOpening))
+    }
+  }, [derivedOpening, selectedDate, ledger])
 
   const handleCloseDay = async (e: React.FormEvent) => {
     e.preventDefault()
     const closingNum = Number(closingCash)
     if (closingCash === '' || isNaN(closingNum) || closingNum < 0) {
       setError('Please enter a valid Closing Cash amount (৳)')
+      return
+    }
+
+    // Opening override guard: a typed opening that differs from the
+    // carry-forward is a chain break — the server requires a note
+    // when it CREATES the day's row (no ledger row exists yet), so
+    // ask for it here first. Editing an existing row is unchanged.
+    const typedOpening = khuchraAmount !== '' ? Number(khuchraAmount) : null
+    const isOpeningOverride = !ledger && derivedOpening !== null && typedOpening !== null &&
+      Math.round(typedOpening * 100) !== Math.round(derivedOpening * 100)
+    if (isOpeningOverride && openingOverrideNote.trim() === '') {
+      setError('Opening cash differs from the previous day\'s carry-forward — add an opening override note below explaining why.')
       return
     }
 
@@ -201,6 +232,7 @@ export default function DailyClosingPage() {
           action: 'close_day',
           ledger_date: selectedDate,
           khuchra_amount: khuchraNum,
+          opening_override_note: isOpeningOverride ? openingOverrideNote.trim() : undefined,
           actual_cash: closingNum,
           cash_sales: finalCashSales,
           other_cash_in: otherNum,
@@ -317,6 +349,11 @@ export default function DailyClosingPage() {
 
   // Live Calculations
   const currentKhuchraNum = Number(khuchraAmount !== '' ? khuchraAmount : (ledger?.opening_cash ?? ledger?.khuchra_amount ?? 0))
+  // On a day with no ledger row yet, a typed opening that differs
+  // from the server-derived carry-forward is an override (note
+  // required; the created row is flagged as a chain break).
+  const openingDiffersFromCarryForward = !ledger && derivedOpening !== null && khuchraAmount !== '' &&
+    Math.round(Number(khuchraAmount) * 100) !== Math.round(derivedOpening * 100)
   const currentClosingNum = Number(closingCash || 0)
   const currentExpenses = Number(ledger?.cash_expenses || 0)
   const currentBankDeposits = Number(ledger?.bank_deposits_out || 0)
@@ -534,6 +571,11 @@ export default function DailyClosingPage() {
                   <span className="text-slate-500">1. Opening Cash / Khuchra Float (ড্রয়ারে খুচরা টাকা)</span>
                   <span className="font-semibold text-slate-900">{fmt(ledger.opening_cash ?? ledger.khuchra_amount ?? 0)}</span>
                 </div>
+                {ledger.opening_chain_break && (
+                  <div className="py-1.5 px-2 rounded bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-700">
+                    ⚠ Chain break: this opening differs from the previous day's carry-forward ({fmt(ledger.opening_derived_cash)}) — it was recorded as an override.
+                  </div>
+                )}
                 <div className="flex justify-between py-1.5 border-b border-slate-900/[0.08] text-xs">
                   <span className="text-slate-500">2. (+) Physical Cash Sales (সারাদিনের ক্যাশ বিক্রি)</span>
                   <span className="font-semibold text-emerald-600">+{fmt(ledger.cash_sales)}</span>
@@ -676,6 +718,29 @@ export default function DailyClosingPage() {
                 <p className="text-[9px] text-slate-500 mt-1">
                   নগদ বিক্রির টাকার বাইরে ড্রয়ারে যে ভাংতি/খুচরা টাকা রক্ষিত থাকে তা এখানে দিন।
                 </p>
+                {derivedOpening !== null && (
+                  <p className="text-[9px] text-[#15803d] mt-1 font-semibold">
+                    Opening carry-forward from the previous recorded day: {fmt(derivedOpening)} — yesterday's counted closing cash.
+                  </p>
+                )}
+                {openingDiffersFromCarryForward && (
+                  <div className="mt-2">
+                    <label className="block text-[10px] uppercase tracking-widest text-amber-600 font-semibold mb-1.5">
+                      Opening Override Note <span className="text-amber-600">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={openingOverrideNote}
+                      onChange={e => setOpeningOverrideNote(e.target.value)}
+                      placeholder="Why does today's opening differ from yesterday's closing?"
+                      className="w-full px-3 py-2.5 rounded-xl bg-slate-900/[0.04] border border-amber-500/30 text-slate-900 text-xs placeholder-slate-400 focus:outline-none focus:border-amber-500/50 transition-colors"
+                      required
+                    />
+                    <p className="text-[9px] text-amber-600 mt-1">
+                      This opening will be recorded as an override and flagged as a chain break.
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Digital Collections Grid */}
@@ -994,6 +1059,11 @@ export default function DailyClosingPage() {
                       </td>
                       <td className="p-3.5 font-medium text-slate-600 whitespace-nowrap">
                         {fmt(item.khuchra_amount ?? item.opening_cash ?? 0)}
+                        {item.opening_chain_break && (
+                          <span className="ml-1.5 text-[9px] font-bold text-amber-600" title={`Carry-forward from the previous day was ${fmt(item.opening_derived_cash)}`}>
+                            ⚠ chain break
+                          </span>
+                        )}
                       </td>
                       <td className="p-3.5 font-medium text-emerald-600 whitespace-nowrap">
                         {fmt(item.cash_sales)}

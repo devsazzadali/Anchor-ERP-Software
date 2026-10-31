@@ -6,6 +6,7 @@ import { getCallerProfile } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { attachDepositBranch } from '@/lib/server/attach'
 import { branchStreamAmount } from '@/lib/expense-streams'
+import { computeDepositDrift } from '@/lib/server/ledger-sync'
 
 // GET /api/branch-accounts/reconciliation?from=YYYY-MM-DD&to=YYYY-MM-DD
 // Admin only — Returns branch-wise reconciliation summary
@@ -42,7 +43,7 @@ export async function GET(req: NextRequest) {
     // filter in the query — the JS aggregation below applies one
     // consistent rule everywhere: reversed === true is out, anything
     // else (false or NULL) is in.
-    const [branches, depositsData, ledgerRows, expenseRows] = await Promise.all([
+    const [branches, depositsData, ledgerRows, expenseRows, depositAllocRows] = await Promise.all([
       prisma.branch.findMany({
         where: scopedBranchId ? { id: scopedBranchId } : {},
         select: { id: true, name: true },
@@ -57,8 +58,27 @@ export async function GET(req: NextRequest) {
         where: { ledger_date: { gte: fromDate, lte: toDate } },
         select: {
           branch_id: true, ledger_date: true, opening_cash: true, cash_sales: true,
-          other_cash_in: true, cash_expenses: true, actual_cash: true,
+          other_cash_in: true, cash_expenses: true, bank_deposits_out: true, actual_cash: true,
           expected_closing_cash: true, is_closed: true,
+        },
+        orderBy: { id: 'asc' },
+      }),
+      // Deposit-drift source (closing fix §D5 #4): EVERY approved
+      // deposit for the scope, with no deposit_date window — a
+      // deposit banked outside the window can still allocate slices
+      // (legacy model) or a lump (new model) INSIDE it, and the drift
+      // check must see the whole allocation to compare it against
+      // the ledger rows in the window. Notes are selected because
+      // they carry the lump-model marker that decides which model
+      // actually applied to each deposit.
+      prisma.branchBankDeposit.findMany({
+        where: {
+          status: 'approved',
+          ...(scopedBranchId ? { branch_id: scopedBranchId } : {}),
+        },
+        select: {
+          branch_id: true, amount: true, status: true, is_reversed: true,
+          deposit_date: true, daily_breakdown: true, notes: true,
         },
         orderBy: { id: 'asc' },
       }),
@@ -72,6 +92,19 @@ export async function GET(req: NextRequest) {
         orderBy: { id: 'asc' },
       }),
     ])
+
+    // Deposit drift (closing fix §D5 #4): per branch/day, the ledger's
+    // stored bank_deposits_out vs the allocated contribution of the
+    // approved deposits under the model that actually applied to each
+    // (see lib/server/ledger-sync.computeDepositDrift). Non-zero drift
+    // is REPORTED, never repaired here — repairing a drifted day is a
+    // data decision for the owner.
+    const branchNameById = new Map((branches || []).map((b) => [b.id, b.name]))
+    const depositDrift = computeDepositDrift(
+      depositAllocRows as any,
+      ledgerRows as any,
+      { from, to }
+    ).map((d) => ({ ...d, branch_name: branchNameById.get(d.branch_id) || 'Branch' }))
 
     const summary = (branches || []).map((b) => {
       const branchDeposits = depositsData.filter((d) => d.branch_id === b.id && d.is_reversed !== true)
@@ -120,6 +153,8 @@ export async function GET(req: NextRequest) {
         audit_status = 'balanced'
       }
 
+      const branchDrift = depositDrift.filter((d) => d.branch_id === b.id)
+
       return {
         branch_id: b.id,
         branch_name: b.name,
@@ -127,6 +162,10 @@ export async function GET(req: NextRequest) {
         total_other_cash_in,
         total_cash_expenses,
         expense_drift,
+        // Deposit analogue of expense_drift (§D5 #4): signed total
+        // (stored − allocated) and the number of drifted days.
+        deposit_drift: sumMoney(branchDrift.map((d) => d.drift)),
+        deposit_drift_days: branchDrift.length,
         net_cash_collected,
         total_erp_deposits: total_approved,
         total_approved,
@@ -165,6 +204,9 @@ export async function GET(req: NextRequest) {
       to,
       summary: summary ?? [],
       deposits,
+      // Per branch/day deposit drift (non-zero days only), same
+      // window as the rest of this response. See computeDepositDrift.
+      deposit_drift: depositDrift,
     })
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })

@@ -7,6 +7,11 @@ import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { attachDepositBranch } from '@/lib/server/attach'
 import { syncDepositToLedger } from '@/lib/server/ledger-sync'
+import {
+  DEPOSIT_BLOCKING_STATUSES,
+  depositOverlapMessage,
+  findDepositSalesOverlap,
+} from '@/lib/server/deposit-overlap'
 
 // legacy queries replaced by Prisma via
 // the single role-resolution function. Admin status comes ONLY from
@@ -201,6 +206,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         error: `A bank deposit for ${deposit_date} has already been recorded (৳${Number(existingDeposit.amount).toLocaleString()} — Status: ${existingDeposit.status}). Only one deposit is permitted per date.`,
       }, { status: 400 })
+    }
+
+    // Closing fix §D5 #2: the sales window must not overlap another
+    // live claim (approved / submitted / pending) for this branch —
+    // two deposits claiming the same sales days subtract the same
+    // cash from the drawer twice. Rejected deposits do not block.
+    const overlap = await findDepositSalesOverlap(prisma, {
+      branchId,
+      salesFromDate: sales_from_date,
+      salesToDate: sales_to_date,
+    })
+    if (overlap) {
+      return NextResponse.json(
+        { error: depositOverlapMessage(overlap, sales_from_date, sales_to_date) },
+        { status: 400 }
+      )
     }
 
     const isSubmitted = status === 'submitted' || !!slip_attachment_url
@@ -415,6 +436,40 @@ export async function PATCH(req: NextRequest) {
     for (const f of dateFields) {
       if (typeof updateData[f] === 'string') {
         updateData[f] = new Date(`${updateData[f]}T00:00:00.000Z`)
+      }
+    }
+
+    // Closing fix §D5 #2 (edit path): when this write submits /
+    // resubmits the deposit, moves its sales window, or changes its
+    // status, the RESULTING live claim must not overlap another live
+    // claim for the branch (excluding itself). Unrelated edits (slip
+    // upload on an already-submitted deposit, notes, …) are not
+    // re-checked here — approval re-checks every claim anyway.
+    const resultingStatus = updateData.status !== undefined ? updateData.status : deposit.status
+    const touchesClaim =
+      action === 'submit' ||
+      action === 'resubmit' ||
+      updateData.sales_from_date !== undefined ||
+      updateData.sales_to_date !== undefined ||
+      updateData.status !== undefined
+    if (touchesClaim && DEPOSIT_BLOCKING_STATUSES.includes(resultingStatus)) {
+      const overlap = await findDepositSalesOverlap(prisma, {
+        branchId: deposit.branch_id,
+        salesFromDate: updateData.sales_from_date ?? deposit.sales_from_date,
+        salesToDate: updateData.sales_to_date ?? deposit.sales_to_date,
+        excludeId: id,
+      })
+      if (overlap) {
+        return NextResponse.json(
+          {
+            error: depositOverlapMessage(
+              overlap,
+              updateData.sales_from_date ?? deposit.sales_from_date,
+              updateData.sales_to_date ?? deposit.sales_to_date
+            ),
+          },
+          { status: 400 }
+        )
       }
     }
 

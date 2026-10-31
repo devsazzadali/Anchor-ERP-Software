@@ -33,6 +33,10 @@ export default function DepositApprovalsPage() {
   const [filter, setFilter] = useState<'submitted' | 'all'>('submitted')
   const [search, setSearch] = useState('')
   const [confirmApproveId, setConfirmApproveId] = useState<string | null>(null)
+  // Deposit reversal (§D5 #6): admin-only, deliberate — a note is
+  // mandatory and the ledger contribution is backed out server-side.
+  const [reverseId, setReverseId] = useState<string | null>(null)
+  const [reversalNote, setReversalNote] = useState('')
 
   // Edit deposit state (Admin can edit any deposit, including approved)
   const [editDepositId, setEditDepositId] = useState<string | null>(null)
@@ -131,6 +135,34 @@ export default function DepositApprovalsPage() {
       setSuccess('Deposit rejected. Branch manager has been notified.')
       setRejectId(null)
       setRejectReason('')
+      setModalDeposit(null)
+      await fetchDeposits()
+      setTimeout(() => setSuccess(null), 4000)
+    } catch (e: any) {
+      setError(e.message)
+    } finally {
+      setActionId(null)
+    }
+  }
+
+  const handleReverse = async (id: string) => {
+    if (!reversalNote.trim()) {
+      setError('A reversal note is required — reversal is a deliberate, recorded action')
+      return
+    }
+    setActionId(id)
+    setError(null)
+    try {
+      const res = await fetch(`/api/branch-accounts/deposits/${id}/reverse`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reversal_note: reversalNote.trim() }),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error)
+      setSuccess('Deposit reversed. Its amount was backed out of the cash ledger (bank_deposits_out).')
+      setReverseId(null)
+      setReversalNote('')
       setModalDeposit(null)
       await fetchDeposits()
       setTimeout(() => setSuccess(null), 4000)
@@ -674,13 +706,22 @@ export default function DepositApprovalsPage() {
                       )}
 
                       {/* Processed Status Badges */}
-                      {dep.status === 'approved' && (
+                      {dep.status === 'approved' && !dep.is_reversed && (
                         <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-xs flex items-center gap-2">
                           <CheckCircle className="w-4 h-4 shrink-0" />
                           <span>
                             Approved by {dep.reviewed_by_name || 'Admin'} ·{' '}
                             {dep.reviewed_at ? new Date(dep.reviewed_at).toLocaleDateString('en-GB') : ''}
                           </span>
+                        </div>
+                      )}
+                      {dep.is_reversed && (
+                        <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 text-xs">
+                          <p className="font-semibold mb-1 flex items-center gap-1.5">
+                            <XCircle className="w-3.5 h-3.5" /> Reversed — backed out of the cash ledger
+                            {dep.reversed_at ? ` · ${new Date(dep.reversed_at).toLocaleDateString('en-GB')}` : ''}
+                          </p>
+                          {dep.reversal_note && <p className="text-rose-700 text-[11px]">{dep.reversal_note}</p>}
                         </div>
                       )}
                       {dep.status === 'rejected' && (
@@ -815,6 +856,42 @@ export default function DepositApprovalsPage() {
                         </button>
                         <button
                           onClick={() => { setRejectId(null); setRejectReason('') }}
+                          className="px-4 py-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 text-slate-500 text-xs hover:text-slate-900 transition-all cursor-pointer"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Reversal Inline Form (§D5 #6 — deliberate admin action, note mandatory) */}
+                  {reverseId === dep.id && (
+                    <div className="px-5 pb-4 border-t border-slate-900/5 pt-4 bg-rose-500/[0.02]">
+                      <p className="text-xs text-rose-600 font-semibold mb-2 flex items-center gap-1.5">
+                        <AlertTriangle className="w-3.5 h-3.5" /> Reverse this approved deposit? Its full amount will be backed out of the cash ledger (bank_deposits_out) and the manager notified. Reversal Note (Mandatory) *
+                      </p>
+                      <textarea
+                        value={reversalNote}
+                        onChange={e => setReversalNote(e.target.value)}
+                        rows={2}
+                        placeholder="Why is this deposit being reversed? (recorded in the audit trail)"
+                        className="w-full bg-slate-900/[0.04] border border-rose-500/30 rounded-xl px-3 py-2.5 text-slate-900 text-xs placeholder-slate-600 focus:outline-none focus:border-rose-500/50 resize-none mb-3"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleReverse(dep.id)}
+                          disabled={!!actionId || !reversalNote.trim()}
+                          className="flex-1 py-2.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs uppercase tracking-wider transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-rose-500/10"
+                        >
+                          {actionId === dep.id ? (
+                            <div className="w-3.5 h-3.5 border-2 border-slate-200 border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <XCircle className="w-3.5 h-3.5" />
+                          )}
+                          Confirm Reversal
+                        </button>
+                        <button
+                          onClick={() => { setReverseId(null); setReversalNote('') }}
                           className="px-4 py-2.5 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 text-slate-500 text-xs hover:text-slate-900 transition-all cursor-pointer"
                         >
                           Cancel
@@ -966,7 +1043,7 @@ export default function DepositApprovalsPage() {
                   )}
 
                   {/* Action Buttons Bar - Available for all deposits (Admin can edit any deposit, including approved) */}
-                  {rejectId !== dep.id && editDepositId !== dep.id && (
+                  {rejectId !== dep.id && editDepositId !== dep.id && reverseId !== dep.id && (
                     <div className="px-5 py-4 border-t border-slate-900/5 bg-slate-900/[0.04] flex flex-col sm:flex-row gap-3 items-center justify-between">
                       {/* Left Side: Inspect Slip and Edit Deposit */}
                       <div className="flex gap-2 w-full sm:w-auto">
@@ -1035,10 +1112,25 @@ export default function DepositApprovalsPage() {
                             </button>
                           </div>
                         )
+                      ) : dep.status === 'approved' && dep.is_reversed ? (
+                        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 text-xs font-semibold">
+                          <XCircle className="w-4 h-4" />
+                          <span>Reversed{dep.reversal_note ? `: ${dep.reversal_note}` : ''}</span>
+                        </div>
                       ) : dep.status === 'approved' ? (
-                        <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-xs font-semibold">
-                          <CheckCircle className="w-4 h-4" />
-                          <span>Approved {dep.reviewed_by_name ? `by ${dep.reviewed_by_name}` : ''} {dep.reviewed_at ? `on ${new Date(dep.reviewed_at).toLocaleDateString('en-GB')}` : ''}</span>
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-xs font-semibold">
+                            <CheckCircle className="w-4 h-4" />
+                            <span>Approved {dep.reviewed_by_name ? `by ${dep.reviewed_by_name}` : ''} {dep.reviewed_at ? `on ${new Date(dep.reviewed_at).toLocaleDateString('en-GB')}` : ''}</span>
+                          </div>
+                          <button
+                            onClick={() => { setReverseId(dep.id); setRejectId(null); setConfirmApproveId(null) }}
+                            disabled={!!actionId}
+                            className="px-4 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 text-rose-600 font-bold text-xs uppercase tracking-wider transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+                            title="Reverse this approved deposit and back its amount out of the cash ledger"
+                          >
+                            <XCircle className="w-3.5 h-3.5" /> Reverse Deposit
+                          </button>
                         </div>
                       ) : (
                         <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-600 text-xs font-semibold">

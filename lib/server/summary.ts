@@ -2,8 +2,11 @@
  * branch_accounts_summary — the summary view, rebuilt in code.
  * This implements the fixed definition:
  *  - today's figures from the ledger row of the Asia/Dhaka date;
- *  - monthly deposit aggregates over the half-open Dhaka month
- *    window [month start, next month start);
+ *  - monthly APPROVED deposits are the single ledger figure
+ *    (§D5 #5): Σ branch_cash_ledger.bank_deposits_out over the
+ *    half-open Dhaka month window [month start, next month start);
+ *    monthly PENDING deposits remain a deposits-table aggregate
+ *    (money awaiting approval — not a deposits total);
  *  - pending totals EXCLUDE reversed deposits (the B8 fix);
  *  - manager = the branch's ACTIVE assignment's profile.
  * Output keys are the view's column names, unchanged.
@@ -36,7 +39,7 @@ export async function getBranchAccountsSummary(): Promise<BranchAccountsSummaryR
   const monthStartDt = new Date(`${monthStart}T00:00:00.000Z`)
   const monthEndDt = new Date(`${monthEnd}T00:00:00.000Z`)
 
-  const [branches, assignments, todayLedgers, monthDeposits] = await Promise.all([
+  const [branches, assignments, todayLedgers, monthDeposits, monthLedgers] = await Promise.all([
     prisma.branch.findMany({ select: { id: true, name: true } }),
     prisma.branchManagerAssignment.findMany({
       where: { is_active: true },
@@ -53,6 +56,10 @@ export async function getBranchAccountsSummary(): Promise<BranchAccountsSummaryR
     prisma.branchBankDeposit.findMany({
       where: { deposit_date: { gte: monthStartDt, lt: monthEndDt } },
       select: { branch_id: true, amount: true, status: true, is_reversed: true },
+    }),
+    prisma.branchCashLedger.findMany({
+      where: { ledger_date: { gte: monthStartDt, lt: monthEndDt } },
+      select: { branch_id: true, bank_deposits_out: true },
     }),
   ])
 
@@ -71,9 +78,13 @@ export async function getBranchAccountsSummary(): Promise<BranchAccountsSummaryR
     const managerId = managerByBranch.get(b.id) ?? null
     const l = ledgerByBranch.get(b.id)
     const deps = monthDeposits.filter((d) => d.branch_id === b.id)
-    const approved = deps.filter((d) => d.status === 'approved' && d.is_reversed !== true)
     const pending = deps.filter(
       (d) => ['submitted', 'pending_approval'].includes(d.status) && d.is_reversed !== true
+    )
+    // §D5 #5: approved deposits = the ledger figure for this branch
+    // and month, NOT the deposits-table lump by deposit_date.
+    const approvedTotal = sumMoney(
+      monthLedgers.filter((l) => l.branch_id === b.id).map((l) => Number(l.bank_deposits_out ?? 0))
     )
     return {
       branch_id: b.id,
@@ -87,7 +98,7 @@ export async function getBranchAccountsSummary(): Promise<BranchAccountsSummaryR
       cash_difference: l ? Number(l.cash_difference ?? 0) : 0,
       difference_status: l?.difference_status ?? null,
       today_closed: l ? l.is_closed ?? null : null,
-      monthly_approved_deposits: sumMoney(approved.map((d) => Number(d.amount))),
+      monthly_approved_deposits: approvedTotal,
       monthly_pending_deposits: sumMoney(pending.map((d) => Number(d.amount))),
       pending_deposit_count: pending.length,
     }

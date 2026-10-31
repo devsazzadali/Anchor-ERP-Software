@@ -38,6 +38,10 @@ export default function FinancialSummaryPage() {
 
   // Data states
   const [deposits, setDeposits] = useState<any[]>([])
+  // §D5 #5: the route's labelled deposit figures — `deposits` above
+  // is the single LEDGER figure; this carries the different
+  // banked-by-deposit_date cut and the gap, for display only.
+  const [depositFigures, setDepositFigures] = useState<any>(null)
   const [salesLedgers, setSalesLedgers] = useState<any[]>([])
   // Expense model (owner, 2026-10-31): the three expense streams are
   // kept as SEPARATE raw sources and classified by
@@ -74,6 +78,7 @@ export default function FinancialSummaryPage() {
       setBranches(bData)
       setLedgerHeads(lData)
       setDeposits(json.deposits || [])
+      setDepositFigures(json.depositFigures || null)
       setSalesLedgers(json.salesLedgers || [])
       // Branch cash expenses WITH their link columns. C20's rule —
       // a row that is the cash copy of a salary payment must never be
@@ -124,6 +129,10 @@ export default function FinancialSummaryPage() {
   // now total sales from the daily ledgers; deposits are reported
   // separately as the transfer figure they are.
   const totalIncome = sumMoney(salesLedgers.flatMap(l => [l.cash_sales, l.bkash_sales, l.nagad_sales, l.rocket_sales, l.card_sales, l.bank_transfer_sales]))
+  // §D5 #5: `deposits` from the route is the single LEDGER figure
+  // (Σ branch_cash_ledger.bank_deposits_out over the ledger days in
+  // the selected window) — the same figure the branch-accounts
+  // header and the branch dashboard show for the same window.
   const totalDeposits = sumMoney(deposits.map(d => d.amount))
 
   // The owner's three expense streams (branch cash / company /
@@ -298,7 +307,16 @@ export default function FinancialSummaryPage() {
                   <span className="text-xl">৳</span> {totalIncome.toLocaleString('en-BD')}
                 </h3>
                 <p className="text-xs text-emerald-500/60 mt-3 font-semibold">
-                  Cash + digital sales from daily ledgers · Bank deposits (transfers, not income): ৳{totalDeposits.toLocaleString('en-BD')}
+                  Cash + digital sales from daily ledgers · Deposits — ledger figure (transfers, not income): ৳{totalDeposits.toLocaleString('en-BD')}
+                  <span className="block mt-1 font-normal">
+                    Definition: Σ bank_deposits_out on ledger days {dateRange.startDate} → {dateRange.endDate} — the single deposits definition used on every surface.
+                  </span>
+                  {depositFigures?.bankedByDepositDate && (
+                    <span className="block mt-1 font-normal">
+                      Different cut (not the deposits total): banked by deposit date — Σ approved, not-reversed deposits-table amounts attributed to deposit_date, same window: ৳{Number(depositFigures.bankedByDepositDate.total || 0).toLocaleString('en-BD')}
+                      {' · '}Gap vs ledger: ৳{Number(depositFigures.gapBankedMinusLedger || 0).toLocaleString('en-BD')} (different day attribution, plus any amount recorded in the deposits table that never reached the ledger — the gap is shown, not absorbed).
+                    </span>
+                  )}
                 </p>
               </div>
 

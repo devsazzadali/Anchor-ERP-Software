@@ -91,5 +91,7 @@ export function cleanDepositNotes(notes: string | null | undefined): string {
   return notes
     .replace(/\[DAILY_BREAKDOWN:\s*\{[\s\S]*?\}\]\s*/g, '')
     .replace(/\[KHUCHRA_AMOUNT:\s*[\d.]+\]\s*/g, '')
+    // Internal ledger-sync marker (lib/server/ledger-sync.ts) — never display.
+    .replace(/\[LEDGER_MODEL:[^\]]*\]\s*/g, '')
     .trim();
 }

@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db'
 import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { dhakaRangeUtcWindow } from '@/lib/dhaka-time'
+import { LEDGER_DEPOSITS_DEFINITION, BANKED_BY_DEPOSIT_DATE_LABEL } from '@/lib/deposit-figures'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,7 +11,15 @@ export const dynamic = 'force-dynamic'
 // Summary. The page keeps the owner's three-stream classification
 // in the browser (lib/expense-streams — the single classifier);
 // this route only fetches, with EXACTLY the fixed page's filters:
-//  - deposits: approved + not reversed, deposit_date in [start, end]
+//  - deposits: THE single deposits definition (§D5 #5) — the
+//    LEDGER figure, Σ branch_cash_ledger.bank_deposits_out over the
+//    ledger days in [start, end], returned in `deposits` as one
+//    {amount, ledger_date, branch_id} entry per ledger day so the
+//    page's sum IS the ledger figure. The deposits table's own cut
+//    (approved + not reversed, attributed to deposit_date) is a
+//    DIFFERENT number; it is returned separately as
+//    `bankedDeposits` + `depositFigures` so the gap between the
+//    two cuts stays visible and labelled instead of being absorbed
 //    (B39: deposits are transfers, reported separately — the page
 //    never counts them as income);
 //  - branch cash expenses WITH the C20 link columns
@@ -47,10 +56,12 @@ export async function GET(req: NextRequest) {
     const { startIso: rangeStartIso, endIso: rangeEndIso } = dhakaRangeUtcWindow(startDate, endDate)
     const tsWindow = { gte: new Date(rangeStartIso), lt: new Date(rangeEndIso) }
 
-    const [branches, ledgerHeads, deposits, cashExpenses, salesLedgers, salaries, payouts, companyExpenses] =
+    const [branches, ledgerHeads, bankedDeposits, cashExpenses, salesLedgers, salaries, payouts, companyExpenses] =
       await Promise.all([
         prisma.branch.findMany({ select: { id: true, name: true }, orderBy: { name: 'asc' } }),
         prisma.ledgerHead.findMany({ select: { id: true, name: true }, orderBy: { name: 'asc' } }),
+        // The deposits-table cut (labelled secondary figure only —
+        // see the header comment and `depositFigures` below).
         prisma.branchBankDeposit.findMany({
           where: { status: 'approved', is_reversed: false, deposit_date: dateWindow, ...branchFilter },
           select: { amount: true, status: true, is_reversed: true, deposit_date: true, branch_id: true },
@@ -67,6 +78,7 @@ export async function GET(req: NextRequest) {
           select: {
             cash_sales: true, bkash_sales: true, nagad_sales: true, rocket_sales: true,
             card_sales: true, bank_transfer_sales: true, branch_id: true,
+            bank_deposits_out: true, ledger_date: true,
           },
         }),
         // Salaries: the fixed page filtered payment_date (timestamptz)
@@ -92,10 +104,37 @@ export async function GET(req: NextRequest) {
           : Promise.resolve([]),
       ])
 
+    // §D5 #5: `deposits` is the LEDGER figure — one entry per ledger
+    // day in the window carrying that day's bank_deposits_out, so
+    // Σ deposits.amount === Σ branch_cash_ledger.bank_deposits_out
+    // for exactly this window, the same figure the branch-accounts
+    // header and the branch dashboard show for the same window.
+    const ledgerDeposits = (toPlain(salesLedgers) || [])
+      .filter((l: any) => Number(l.bank_deposits_out || 0) !== 0)
+      .map((l: any) => ({ amount: l.bank_deposits_out, ledger_date: l.ledger_date, branch_id: l.branch_id }))
+    const ledgerDepositsTotal = ledgerDeposits.reduce((s: number, d: any) => s + Number(d.amount || 0), 0)
+    const bankedTotal = (toPlain(bankedDeposits) || []).reduce((s: number, d: any) => s + Number(d.amount || 0), 0)
+
     return NextResponse.json({
       branches: toPlain(branches) || [],
       ledgerHeads: toPlain(ledgerHeads) || [],
-      deposits: toPlain(deposits) || [],
+      deposits: ledgerDeposits,
+      bankedDeposits: toPlain(bankedDeposits) || [],
+      // The two cuts, labelled, with the gap kept visible: the
+      // banked-by-deposit_date total attributes each deposit to its
+      // deposit_date and counts amounts even when a slice never
+      // reached the ledger, so it can differ from the ledger figure
+      // for the same window. The gap is disclosed, never absorbed.
+      depositFigures: {
+        definition: LEDGER_DEPOSITS_DEFINITION,
+        window: { start: startDate, end: endDate },
+        ledgerTotal: ledgerDepositsTotal,
+        bankedByDepositDate: {
+          label: BANKED_BY_DEPOSIT_DATE_LABEL,
+          total: bankedTotal,
+        },
+        gapBankedMinusLedger: bankedTotal - ledgerDepositsTotal,
+      },
       cashExpenses: toPlain(cashExpenses) || [],
       salesLedgers: toPlain(salesLedgers) || [],
       salaries: toPlain(salaries) || [],

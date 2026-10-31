@@ -7,7 +7,12 @@ import { prisma } from '@/lib/db'
 import { getCallerProfile, isAdminRole } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { attachLedgerRelations } from '@/lib/server/attach'
-import { cashDifferencePatch } from '@/lib/server/ledger-sync'
+import {
+  cashDifferencePatch,
+  depositDistributionMap,
+  depositLedgerModelOf,
+  depositLumpDistributionMap,
+} from '@/lib/server/ledger-sync'
 import { branchStreamAmount } from '@/lib/expense-streams'
 
 // this route's legacy queries (anon +
@@ -17,6 +22,154 @@ import { branchStreamAmount } from '@/lib/expense-streams'
 // through toPlain() so Decimals/dates render exactly as PostgREST
 // rendered them. Prisma has no 1,000-row cap, so the B26/B44
 // "complete range" guarantee holds by construction.
+
+// ── Opening cash: ONE carry-forward rule for every created row ──────
+// (closing diagnosis §D5 #3 — previously POST-create, PATCH-create and
+// the closing UI each derived the opening differently, and Rangpur's
+// chain broke 27 times in 38 transitions.)
+//
+//   opening_cash = the previous recorded day's actual_cash (the
+//   physical count) for the same branch; if that day has not been
+//   counted/closed yet (actual_cash is null), fall back to its
+//   expected_closing_cash. "Previous recorded day" — not the previous
+//   calendar day — matching how the chain is audited.
+//
+//   First day: a branch with no previous recorded day has nothing to
+//   carry forward, so the supplied value IS the opening (0 when none
+//   is supplied). That is the only case where a supplied opening is
+//   accepted without comparison.
+//
+//   Override: when a previous day exists and the supplied opening
+//   differs from the derived carry-forward, the caller must explain
+//   why in opening_override_note — otherwise the create is rejected.
+//   The override note is kept on the branch audit trail at create
+//   (both POST and PATCH); the row itself is flagged in API responses
+//   with opening_chain_break (see withOpeningChainFlags) so manager
+//   and admin views can show it.
+type PreviousLedgerDay = {
+  ledger_date: unknown
+  actual_cash: unknown
+  expected_closing_cash: unknown
+}
+
+const moneyEquals = (a: number, b: number) =>
+  Math.round(a * 100) === Math.round(b * 100)
+
+/** The carry-forward value implied by a previous day's row, or null
+ *  when there is no previous day (the first-day case). */
+function derivedOpeningCash(previous: PreviousLedgerDay | null): number | null {
+  if (!previous) return null
+  if (previous.actual_cash !== null && previous.actual_cash !== undefined) {
+    return Number(previous.actual_cash)
+  }
+  return Number(previous.expected_closing_cash || 0)
+}
+
+async function findPreviousLedgerDay(branchId: string, date: string) {
+  return prisma.branchCashLedger.findFirst({
+    where: { branch_id: branchId, ledger_date: { lt: new Date(`${date}T00:00:00.000Z`) } },
+    orderBy: { ledger_date: 'desc' },
+    select: { ledger_date: true, actual_cash: true, expected_closing_cash: true },
+  })
+}
+
+type ResolvedOpening =
+  | { openingCash: number; derivedOpening: number | null; isOverride: boolean }
+  | { error: string }
+
+/** Decide a created row's opening from the single rule above. */
+function resolveCreateOpening({
+  previous,
+  supplied,
+  overrideNote,
+}: {
+  previous: PreviousLedgerDay | null
+  supplied: number | undefined
+  overrideNote: unknown
+}): ResolvedOpening {
+  const derivedOpening = derivedOpeningCash(previous)
+
+  // First recorded day for the branch: the supplied value (or 0)
+  // is the opening — there is no chain to break yet.
+  if (derivedOpening === null) {
+    return { openingCash: supplied ?? 0, derivedOpening, isOverride: false }
+  }
+
+  // No opening supplied: the carry-forward applies.
+  if (supplied === undefined) {
+    return { openingCash: derivedOpening, derivedOpening, isOverride: false }
+  }
+
+  // Supplied opening matches the carry-forward: not an override.
+  if (moneyEquals(supplied, derivedOpening)) {
+    return { openingCash: derivedOpening, derivedOpening, isOverride: false }
+  }
+
+  // A differing opening is a deliberate chain break: it needs a note.
+  const note = typeof overrideNote === 'string' ? overrideNote.trim() : ''
+  if (!note) {
+    return {
+      error:
+        `opening_cash differs from the previous day's carry-forward (৳${derivedOpening}). ` +
+        'Provide opening_override_note explaining the override, or use the carry-forward value.',
+    }
+  }
+  return { openingCash: supplied, derivedOpening, isOverride: true }
+}
+
+/** The derived flag block for one row, given its carry-forward. */
+function openingChainFields(openingCash: unknown, derivedOpening: number | null) {
+  return {
+    opening_derived_cash: derivedOpening,
+    opening_chain_break:
+      derivedOpening !== null &&
+      openingCash !== null &&
+      openingCash !== undefined &&
+      !moneyEquals(Number(openingCash), derivedOpening),
+  }
+}
+
+/**
+ * Attach the chain-break flag to plain (toPlain-ed) ledger rows:
+ * opening_derived_cash = the carry-forward the single rule derives
+ * for that row's date, opening_chain_break = the recorded opening
+ * differs from it. Derived per branch from the stored rows
+ * themselves — historical openings are reported exactly as recorded,
+ * never rewritten. Extra fields only; stored fields pass through.
+ */
+async function withOpeningChainFlags<T extends Record<string, any>>(rows: T[]): Promise<T[]> {
+  if (rows.length === 0) return rows
+
+  const branchIds = [...new Set(rows.map((r) => r.branch_id).filter(Boolean))]
+  const derivedByBranchDate = new Map<string, number | null>()
+  for (const branchId of branchIds) {
+    const maxDate = rows
+      .filter((r) => r.branch_id === branchId)
+      .reduce((max, r) => (String(r.ledger_date) > max ? String(r.ledger_date) : max), '')
+    const sequence = await prisma.branchCashLedger.findMany({
+      where: {
+        branch_id: branchId,
+        ledger_date: { lte: new Date(`${maxDate}T00:00:00.000Z`) },
+      },
+      orderBy: { ledger_date: 'asc' },
+      select: { ledger_date: true, actual_cash: true, expected_closing_cash: true },
+    })
+    let previous: PreviousLedgerDay | null = null
+    for (const row of sequence) {
+      const dateKey = toPlain(row).ledger_date
+      derivedByBranchDate.set(`${branchId}|${dateKey}`, derivedOpeningCash(previous))
+      previous = row as PreviousLedgerDay
+    }
+  }
+
+  return rows.map((row) => ({
+    ...row,
+    ...openingChainFields(
+      row.opening_cash,
+      derivedByBranchDate.get(`${row.branch_id}|${row.ledger_date}`) ?? null,
+    ),
+  }))
+}
 
 async function notifyAdminsOfDailyClosing({
   ledger,
@@ -171,7 +324,22 @@ export async function GET(req: NextRequest) {
       }))
     }
 
-    return NextResponse.json({ ledger: toPlain(ledgerResult) })
+    const plainLedger = await withOpeningChainFlags(toPlain(ledgerResult))
+
+    // Single-date view of a day with no row yet: also report the
+    // server-derived carry-forward opening for that date, so the
+    // closing form pre-fills yesterday's count — never the old
+    // khuchra float (diagnosis §D1 2.2 path d).
+    let derivedOpening: Record<string, unknown> = {}
+    if (date && branchId) {
+      const previous = await findPreviousLedgerDay(branchId, date)
+      derivedOpening = {
+        derived_opening_cash: derivedOpeningCash(previous as PreviousLedgerDay | null),
+        derived_opening_from_date: previous ? toPlain(previous).ledger_date : null,
+      }
+    }
+
+    return NextResponse.json({ ledger: plainLedger, ...derivedOpening })
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
@@ -199,6 +367,7 @@ export async function POST(req: NextRequest) {
       bank_transfer_sales,
       other_cash_in,
       khuchra_amount,
+      opening_override_note,
       actual_cash,
       difference_notes,
       is_closed,
@@ -269,17 +438,21 @@ export async function POST(req: NextRequest) {
         })
       }
     } else {
-      let opCash = Number(khuchra_amount || 0)
-      if (khuchra_amount === undefined) {
-        const prev = await prisma.branchCashLedger.findFirst({
-          where: { branch_id: branchId, ledger_date: { lt: new Date(`${date}T00:00:00.000Z`) } },
-          orderBy: { ledger_date: 'desc' },
-          select: { actual_cash: true, expected_closing_cash: true },
-        })
-        if (prev) {
-          opCash = Number(prev.actual_cash !== null ? prev.actual_cash : prev.expected_closing_cash || 0)
-        }
+      // One opening-cash rule for created rows (see the helper block
+      // at the top of this file): the previous recorded day's counted
+      // cash, falling back to its expected closing when uncounted;
+      // the supplied value only on a branch's first recorded day, or
+      // as a noted override.
+      const previous = await findPreviousLedgerDay(branchId, date)
+      const resolved = resolveCreateOpening({
+        previous: previous as PreviousLedgerDay | null,
+        supplied: khuchra_amount === undefined ? undefined : Number(khuchra_amount),
+        overrideNote: opening_override_note,
+      })
+      if ('error' in resolved) {
+        return NextResponse.json({ error: resolved.error }, { status: 400 })
       }
+      const opCash = resolved.openingCash
 
       const cSales = Number(cash_sales || 0)
       const oIn = Number(other_cash_in || 0)
@@ -291,10 +464,14 @@ export async function POST(req: NextRequest) {
       // banked from deposits created on other dates. (The deposit sync
       // service maintains bank_deposits_out afterwards; this is the
       // creation-time snapshot.)
+      // Closing-fix §D5 #1 alignment: the snapshot uses the SAME
+      // per-deposit drawer model as the sync — deposits stamped
+      // [LEDGER_MODEL:lump] count in full on deposit_date only;
+      // pre-fix deposits count by the slices actually applied.
       const [depRows, expRows] = await Promise.all([
         prisma.branchBankDeposit.findMany({
           where: { branch_id: branchId, status: 'approved', is_reversed: false },
-          select: { amount: true, deposit_date: true, daily_breakdown: true },
+          select: { amount: true, deposit_date: true, daily_breakdown: true, notes: true },
         }),
         prisma.branchCashExpense.findMany({
           where: { branch_id: branchId, expense_date: new Date(`${date}T00:00:00.000Z`) },
@@ -306,9 +483,18 @@ export async function POST(req: NextRequest) {
         }),
       ])
       const bDepositsOut = depRows.reduce((s: number, d: any) => {
-        const breakdown = parseDailyBreakdown(toPlain(d))
-        if (breakdown) return s + Number(breakdown[date] || 0)
-        return toPlain(d).deposit_date === date ? s + Number(d.amount || 0) : s
+        const plain = toPlain(d)
+        const amount = Number(plain.amount || 0)
+        const map =
+          depositLedgerModelOf(plain) === 'lump'
+            ? depositLumpDistributionMap(amount, plain.deposit_date)
+            : depositDistributionMap(
+                amount,
+                plain.deposit_date,
+                parseDailyBreakdown(plain) ?? plain.daily_breakdown,
+                false
+              )
+        return s + (map.get(date) ?? 0)
       }, 0)
       const cExpenses = expRows.reduce((s: number, e: any) => s + branchStreamAmount(e), 0)
 
@@ -347,10 +533,31 @@ export async function POST(req: NextRequest) {
       }
 
       result = await prisma.branchCashLedger.create({ data: insertPayload })
+
+      if (resolved.isOverride) {
+        // Same audit-trail note as PATCH-create (see there): the
+        // ledger schema has no override-note column, and none is added.
+        await prisma.branchAuditTrail.create({
+          data: {
+            branch_id: branchId,
+            table_name: 'branch_cash_ledger',
+            record_id: result.id,
+            action: 'create',
+            performed_by: profile.uid,
+            performed_by_name: profile.full_name,
+            new_value: {
+              opening_cash: resolved.openingCash,
+              opening_derived_cash: resolved.derivedOpening,
+            },
+            notes: `Opening cash override on create for ${date}: recorded ৳${resolved.openingCash} instead of the carry-forward ৳${resolved.derivedOpening}. Note: ${String(opening_override_note).trim()}`,
+          },
+        })
+      }
     }
 
     const [withRelations] = await attachLedgerRelations([result])
-    return NextResponse.json({ success: true, ledger: toPlain(withRelations) })
+    const [plainLedger] = await withOpeningChainFlags([toPlain(withRelations)])
+    return NextResponse.json({ success: true, ledger: plainLedger })
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
@@ -372,6 +579,7 @@ export async function PATCH(req: NextRequest) {
       action, // 'set_khuchra_amount' | 'close_day' | 'reopen_day' | 'admin_edit'
       ledger_date,
       khuchra_amount,
+      opening_override_note,
       cash_sales,
       bkash_sales,
       nagad_sales,
@@ -408,16 +616,49 @@ export async function PATCH(req: NextRequest) {
         })
 
     if (!existing) {
-      // Create initial ledger row for this date
+      // Create the initial ledger row for this date — with the SAME
+      // opening-cash rule as POST create (see the helper block at the
+      // top of this file). The old bare create silently opened at the
+      // supplied value or 0, with no previous-day lookup at all: four
+      // of Rangpur's historical chain breaks are 0-openings created
+      // exactly this way.
+      const previous = branchId ? await findPreviousLedgerDay(branchId, date) : null
+      const resolved = resolveCreateOpening({
+        previous: previous as PreviousLedgerDay | null,
+        supplied: khuchra_amount === undefined ? undefined : Number(khuchra_amount),
+        overrideNote: opening_override_note,
+      })
+      if ('error' in resolved) {
+        return NextResponse.json({ error: resolved.error }, { status: 400 })
+      }
       existing = await prisma.branchCashLedger.create({
         data: {
           branch_id: branchId,
           ledger_date: new Date(`${date}T00:00:00.000Z`),
-          khuchra_amount: Number(khuchra_amount ?? 0),
-          opening_cash: Number(khuchra_amount ?? 0),
+          khuchra_amount: resolved.openingCash,
+          opening_cash: resolved.openingCash,
           updated_at: new Date(),
         },
       })
+      if (resolved.isOverride) {
+        // The override note lives on the audit trail — the ledger
+        // schema has no note column of its own, and none is added.
+        await prisma.branchAuditTrail.create({
+          data: {
+            branch_id: branchId,
+            table_name: 'branch_cash_ledger',
+            record_id: existing.id,
+            action: 'update',
+            performed_by: profile.uid,
+            performed_by_name: profile.full_name,
+            new_value: {
+              opening_cash: resolved.openingCash,
+              opening_derived_cash: resolved.derivedOpening,
+            },
+            notes: `Opening cash override on create for ${date}: recorded ৳${resolved.openingCash} instead of the carry-forward ৳${resolved.derivedOpening}. Note: ${String(opening_override_note).trim()}`,
+          },
+        })
+      }
     }
 
     // Branch-ownership check (Part D): the row above may have been
@@ -466,10 +707,12 @@ export async function PATCH(req: NextRequest) {
           data: { actual_cash: Number(finalActual), ...patch, updated_at: new Date() },
         })
         const [withRelations] = await attachLedgerRelations([finalData])
-        return NextResponse.json({ success: true, ledger: toPlain(withRelations) })
+        const [plainLedger] = await withOpeningChainFlags([toPlain(withRelations)])
+        return NextResponse.json({ success: true, ledger: plainLedger })
       }
 
-      return NextResponse.json({ success: true, ledger: toPlain(refreshed) })
+      const [plainRefreshed] = await withOpeningChainFlags([toPlain(refreshed)])
+      return NextResponse.json({ success: true, ledger: plainRefreshed })
     }
 
     // Handle Action: Setting Opening Cash
@@ -512,7 +755,8 @@ export async function PATCH(req: NextRequest) {
       })
 
       const [withRelations] = await attachLedgerRelations([updated])
-      return NextResponse.json({ success: true, ledger: toPlain(withRelations) })
+      const [plainLedger] = await withOpeningChainFlags([toPlain(withRelations)])
+      return NextResponse.json({ success: true, ledger: plainLedger })
     }
 
     // Handle Action: Reopen Day (kept for API compatibility)
@@ -530,7 +774,8 @@ export async function PATCH(req: NextRequest) {
         },
       })
       const [withRelations] = await attachLedgerRelations([reopened])
-      return NextResponse.json({ success: true, ledger: toPlain(withRelations) })
+      const [plainLedger] = await withOpeningChainFlags([toPlain(withRelations)])
+      return NextResponse.json({ success: true, ledger: plainLedger })
     }
 
     // Handle Action: Daily Closing / Update Closing (actual_cash provided)
@@ -621,7 +866,8 @@ export async function PATCH(req: NextRequest) {
     const [withRelations] = await attachLedgerRelations([data])
     await notifyAdminsOfDailyClosing({ ledger: toPlain(withRelations), profile })
 
-    return NextResponse.json({ success: true, ledger: toPlain(withRelations) })
+    const [plainLedger] = await withOpeningChainFlags([toPlain(withRelations)])
+    return NextResponse.json({ success: true, ledger: plainLedger })
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }

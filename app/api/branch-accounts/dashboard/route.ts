@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { dhakaToday, currentDhakaMonthWindow } from '@/lib/dhaka-time'
 import { sumMoney } from '@/lib/money'
-import { parseDailyBreakdown } from '@/lib/branch-deposit-utils'
 import { prisma } from '@/lib/db'
+import { LEDGER_DEPOSITS_DEFINITION } from '@/lib/deposit-figures'
 import { getCallerProfile, isAdminRole } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { getBranchAccountsSummary } from '@/lib/server/summary'
@@ -52,23 +52,19 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: 'No branch assigned to this manager' }, { status: 400 })
       }
 
-      // Fetch today's ledger, deposits, and monthly ledgers in parallel
+      // Fetch today's ledger, this month's PENDING deposits (a
+      // deposits-table concept — money awaiting approval, not a
+      // deposits total), and monthly ledgers in parallel.
       const [ledgerRaw, depositsRaw, monthlyLedgersRaw] = await Promise.all([
         prisma.branchCashLedger.findFirst({ where: { branch_id: branchId, ledger_date: todayDt } }),
         prisma.branchBankDeposit.findMany({
           where: {
             branch_id: branchId,
-            AND: [
-              {
-                OR: [
-                  { deposit_date: { gte: monthStartDt, lt: monthEndDt } },
-                  { sales_from_date: { lt: monthEndDt }, sales_to_date: { gte: monthStartDt } },
-                ],
-              },
-              notReversed,
-            ],
+            deposit_date: { gte: monthStartDt, lt: monthEndDt },
+            status: { in: ['submitted', 'pending_approval'] },
+            ...notReversed,
           },
-          select: { amount: true, status: true, deposit_date: true, daily_breakdown: true, notes: true },
+          select: { amount: true, status: true, deposit_date: true },
         }),
         prisma.branchCashLedger.findMany({
           where: { branch_id: branchId, ledger_date: { gte: monthStartDt, lt: monthEndDt } },
@@ -79,35 +75,24 @@ export async function GET(req: NextRequest) {
       const deposits: any[] = toPlain(depositsRaw)
       const monthlyLedgers: any[] = toPlain(monthlyLedgersRaw)
 
-      const inMonth = (dateStr: string) => dateStr >= monthStart && dateStr < monthEndExclusive
-      const madeThisMonth = deposits.filter((d) => inMonth(d.deposit_date))
-      const approvedDeposits = sumMoney(madeThisMonth.filter((d) => d.status === 'approved').map((d) => d.amount))
-      const pendingDeposits = sumMoney(madeThisMonth.filter((d) => ['submitted', 'pending_approval'].includes(d.status)).map((d) => d.amount))
-      const pendingCount = madeThisMonth.filter((d) => ['submitted', 'pending_approval'].includes(d.status)).length
+      const pendingDeposits = sumMoney(deposits.map((d) => d.amount))
+      const pendingCount = deposits.length
 
-      // B13: netCashInflow compares against THIS month's sales, so the
-      // deposits subtracted must be the ones belonging to this month's
-      // SALES — breakdown slices falling inside the window (a deposit
-      // banked next month for this month's last days still counts
-      // here; its deposit-month headline figure is approvedDeposits).
-      const approvedDepositsForSalesMonth = sumMoney(
-        deposits
-          .filter((d) => d.status === 'approved')
-          .map((d) => {
-            const breakdown = parseDailyBreakdown(d)
-            if (breakdown) {
-              return sumMoney(Object.entries(breakdown).filter(([date]) => inMonth(date)).map(([, amt]) => amt))
-            }
-            return inMonth(d.deposit_date) ? Number(d.amount) : 0
-          })
-      )
+      // §D5 #5 (supersedes the old B13 dual definition): there is
+      // ONE deposits figure — the LEDGER figure, Σ bank_deposits_out
+      // over this month's ledger days. The response used to carry
+      // two differently-defined "approved deposits" numbers (lump
+      // by deposit_date as the headline, breakdown slices inside
+      // netCashInflow); both are now this same ledger sum, so the
+      // headline and the net-inflow subtraction can never diverge.
+      const approvedDeposits = sumMoney(monthlyLedgers.map((r) => r.bank_deposits_out))
 
       const monthlyCashSales = sumMoney(monthlyLedgers.map((r) => r.cash_sales))
       const monthlyDigitalSales = sumMoney(monthlyLedgers.flatMap((r) => [r.bkash_sales, r.nagad_sales, r.rocket_sales, r.card_sales, r.bank_transfer_sales]))
       const monthlyOtherCashIn = sumMoney(monthlyLedgers.map((r) => r.other_cash_in))
       const monthlyExpenses = sumMoney(monthlyLedgers.map((r) => r.cash_expenses))
       const monthlyTotalSales = monthlyCashSales + monthlyDigitalSales
-      const monthlyNetCashInflow = monthlyCashSales + monthlyOtherCashIn - monthlyExpenses - approvedDepositsForSalesMonth
+      const monthlyNetCashInflow = monthlyCashSales + monthlyOtherCashIn - monthlyExpenses - approvedDeposits
       // B12: monthly figures include days not yet closed/verified.
       // Surface how many so the UI can mark the totals provisional
       // instead of presenting them as final.
@@ -137,6 +122,8 @@ export async function GET(req: NextRequest) {
         },
         monthly: {
           approvedDeposits,
+          depositsDefinition: LEDGER_DEPOSITS_DEFINITION,
+          depositsWindow: { start: monthStart, endExclusive: monthEndExclusive },
           pendingDeposits,
           pendingCount,
           totalSales: monthlyTotalSales,
@@ -152,20 +139,34 @@ export async function GET(req: NextRequest) {
     // Admin: all-branch summary, pending approvals, today's ledgers
     // and monthly deposits in parallel. The summary view is rebuilt
     // in code (lib/server/summary.ts — batch-1 fixed definition).
-    const [summary, pendingApprovals, todayLedgersRaw, allMonthlyDepositsRaw] = await Promise.all([
+    const [summary, pendingApprovals, todayLedgersRaw, allMonthlyDepositsRaw, monthlyLedgersAllRaw] = await Promise.all([
       getBranchAccountsSummary(),
       prisma.branchBankDeposit.count({
         where: { status: { in: ['submitted', 'pending_approval'] }, ...notReversed },
       }),
       prisma.branchCashLedger.findMany({ where: { ledger_date: todayDt } }),
+      // Pending sums only — a deposits-table concept (money awaiting
+      // approval), not the deposits total.
       prisma.branchBankDeposit.findMany({
-        where: { deposit_date: { gte: monthStartDt, lt: monthEndDt }, ...notReversed },
+        where: {
+          deposit_date: { gte: monthStartDt, lt: monthEndDt },
+          status: { in: ['submitted', 'pending_approval'] },
+          ...notReversed,
+        },
         select: { amount: true, status: true },
+      }),
+      // §D5 #5: the admin monthly deposits figure is the same single
+      // LEDGER figure as the manager's — Σ bank_deposits_out over
+      // this month's ledger days, all branches.
+      prisma.branchCashLedger.findMany({
+        where: { ledger_date: { gte: monthStartDt, lt: monthEndDt } },
+        select: { bank_deposits_out: true },
       }),
     ])
 
     const todayLedgers: any[] = toPlain(todayLedgersRaw)
     const allMonthlyDeposits: any[] = toPlain(allMonthlyDepositsRaw)
+    const monthlyLedgersAll: any[] = toPlain(monthlyLedgersAllRaw)
 
     const todayCashSales = todayLedgers.reduce((s, r) => s + Number(r.cash_sales ?? 0), 0)
     const todayBkashSales = todayLedgers.reduce((s, r) => s + Number(r.bkash_sales ?? 0), 0)
@@ -186,12 +187,10 @@ export async function GET(req: NextRequest) {
     const todayActualCash = countedToday.reduce((s, r) => s + Number(r.actual_cash ?? 0), 0)
     const todayDifference = countedToday.length > 0 ? todayActualCash - todayExpClosing : null
 
-    const adminApprovedDeposits = allMonthlyDeposits
-      .filter((d: any) => d.status === 'approved')
-      .reduce((s: number, d: any) => s + Number(d.amount), 0)
+    const adminApprovedDeposits = monthlyLedgersAll
+      .reduce((s: number, r: any) => s + Number(r.bank_deposits_out ?? 0), 0)
 
     const adminPendingDeposits = allMonthlyDeposits
-      .filter((d: any) => ['submitted', 'pending_approval'].includes(d.status))
       .reduce((s: number, d: any) => s + Number(d.amount), 0)
 
     return NextResponse.json({
@@ -220,6 +219,8 @@ export async function GET(req: NextRequest) {
       },
       monthly: {
         approvedDeposits: adminApprovedDeposits,
+        depositsDefinition: LEDGER_DEPOSITS_DEFINITION,
+        depositsWindow: { start: monthStart, endExclusive: monthEndExclusive },
         pendingDeposits: adminPendingDeposits,
         pendingCount: pendingApprovals ?? 0,
       },

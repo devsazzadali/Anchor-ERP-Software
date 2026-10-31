@@ -215,7 +215,7 @@ export default function BranchAccountsDashboard() {
           <StatCard
             title="Bank Deposits (ব্যাংকে জমা)"
             value={fmt(today.bankDepositsOut || 0)}
-            sub="Remitted to bank"
+            sub="Ledger bank_deposits_out · today"
             icon={Building2}
             color="blue"
           />
@@ -250,7 +250,7 @@ export default function BranchAccountsDashboard() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <StatCard title="MTD Total Gross Sales" value={fmt(monthly.totalSales || 0)}  icon={TrendingUp}  color="gold"   sub={`Cash: ${fmt(monthly.cashSales || 0)}`} />
-          <StatCard title="Approved Deposits"     value={fmt(monthly.approvedDeposits)} icon={CheckCircle} color="green"  sub="Banked MTD" />
+          <StatCard title="Deposits (Ledger)"     value={fmt(monthly.approvedDeposits)} icon={CheckCircle} color="green"  sub="Σ ledger bank_deposits_out · this month (Dhaka) — the single deposits definition" />
           <StatCard title="Pending Approval"      value={fmt(monthly.pendingDeposits)}  icon={Clock}       color="blue"   sub={`${monthly.pendingCount || 0} pending`} />
           <StatCard title="Net Drawer Cash"       value={fmt(monthly.netCashInflow || monthly.netCash || 0)} icon={Wallet} color="purple" sub="Cash retained MTD" />
         </div>

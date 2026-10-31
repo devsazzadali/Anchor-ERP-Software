@@ -481,6 +481,12 @@ export default function AdminBranchAccountsPage() {
 
       const numFmt = (val: any) => Number(val || 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 
+      // D8 fix (§D5 #5): the row builder emits TWELVE values —
+      // cash_expenses sits between Total Sales and Bank Deposits —
+      // so the header list must name all twelve, in the same order
+      // (matching the Excel/CSV exporters below). With eleven
+      // headers the PDF shifted every column after Total Sales by
+      // one and printed expenses under "Bank Deposits".
       const columns = [
         'Branch',
         'Date',
@@ -489,6 +495,7 @@ export default function AdminBranchAccountsPage() {
         'Cash Sales (BDT)',
         'Digital MFS (BDT)',
         'Total Sales (BDT)',
+        'Cash Expenses (BDT)',
         'Bank Deposits (BDT)',
         'Closing Cash (BDT)',
         'Difference (BDT)',
@@ -533,12 +540,12 @@ export default function AdminBranchAccountsPage() {
           { label: 'Total Gross Sales Revenue', value: `${metrics.totalGrossSales.toLocaleString()} BDT` },
           { label: 'Total Pure Cash Sales', value: `${metrics.totalCashSales.toLocaleString()} BDT` },
           { label: 'Total Digital Collections (MFS & Card)', value: `${metrics.totalDigitalCollections.toLocaleString()} BDT` },
-          { label: 'Total Bank Deposits Handled', value: `${metrics.totalBankDeposits.toLocaleString()} BDT` },
+          { label: 'Total Bank Deposits — Ledger Figure (Σ bank_deposits_out, exported window)', value: `${metrics.totalBankDeposits.toLocaleString()} BDT` },
           { label: 'Total Counted Drawer Cash', value: `${metrics.totalClosingCash.toLocaleString()} BDT` },
           { label: 'Drawer Shortages Encountered', value: `${metrics.shortageCount} days (-${metrics.totalShortageAmount.toLocaleString()} BDT)` },
         ],
         filename: `Branch_Daily_Closing_Statement_${activeBranchName.replace(/\s+/g, '_')}.pdf`,
-        notes: 'Official Anchor Fashion ERP Audit. Total Sales Revenue = Pure Cash Sales + Digital Collections. Bank deposits represent company account transfers deducted from drawer cash.'
+        notes: `Official Anchor Fashion ERP Audit. Total Sales Revenue = Pure Cash Sales + Digital Collections. Bank deposits represent company account transfers deducted from drawer cash. Deposits definition (single, §D5 #5): Σ branch_cash_ledger.bank_deposits_out over the ledger days in the exported window (${dateLabel}) — the same ledger figure shown in this page's header, the financial summary and the branch dashboard for the same window.`
       })
     } catch (e: any) {
       setError(e.message || 'Failed to export statement')
@@ -802,7 +809,10 @@ export default function AdminBranchAccountsPage() {
             </div>
             <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Bank Deposits Handled (ব্যাংকে জমা)</p>
             <p className="text-xl md:text-2xl font-bold font-serif text-blue-600">{fmt(metrics.totalBankDeposits)}</p>
-            <p className="text-[10px] text-slate-500 mt-1">Deducted from drawer cash to bank</p>
+            <p className="text-[10px] text-slate-500 mt-1">
+              Deposits — ledger figure: Σ bank_deposits_out on ledger days in the selected window
+              ({fromDate && toDate ? `${fromDate} → ${toDate}` : 'all ledger days'}). The single deposits definition on every surface.
+            </p>
           </div>
 
           <div className="p-5 rounded-3xl border border-[#1ca34c]/20 bg-[#1ca34c]/5">
