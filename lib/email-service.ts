@@ -82,7 +82,7 @@ export async function sendPremiumEmail({
 }
 
 /**
- * Generates the light executive receipt email wrapper matching banking standards.
+ * Generates the dark-mode executive receipt email wrapper matching banking standards.
  */
 function getPremiumReceiptEmailHtml({
   greeting,
@@ -119,8 +119,8 @@ function getPremiumReceiptEmailHtml({
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>${boxTitle}</title>
     </head>
-    <body style="margin: 0; padding: 0; background-color: #f4f5f7; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #17181c;">
-      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f4f5f7; min-height: 100vh; padding: 40px 15px;">
+    <body style="margin: 0; padding: 0; background-color: #0f1115; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #ffffff;">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #0f1115; min-height: 100vh; padding: 40px 15px;">
         <tr>
           <td align="center">
             <table role="presentation" width="100%" style="max-width: 560px; text-align: left;" cellspacing="0" cellpadding="0" border="0">
@@ -128,10 +128,10 @@ function getPremiumReceiptEmailHtml({
               <!-- Greeting & Main Sentence -->
               <tr>
                 <td style="padding-bottom: 24px;">
-                  <h1 style="margin: 0 0 16px 0; font-size: 22px; font-weight: 700; color: #17181c; letter-spacing: -0.5px;">${greeting}</h1>
-                  <p style="margin: 0; font-size: 16px; line-height: 1.6; color: #475569;">
-                    Your transaction of <strong style="color: #17181c; font-weight: 700;">${amountFormatted}</strong> with Transaction ID 
-                    <span style="display: inline-block; background-color: #e2e8f0; color: #17181c; font-family: monospace; font-size: 14px; font-weight: 600; padding: 2px 8px; border-radius: 4px; border: 1px solid #cbd5e1;">${transactionId}</span> 
+                  <h1 style="margin: 0 0 16px 0; font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px;">${greeting}</h1>
+                  <p style="margin: 0; font-size: 16px; line-height: 1.6; color: #cbd5e1;">
+                    Your transaction of <strong style="color: #ffffff; font-weight: 700;">${amountFormatted}</strong> with Transaction ID 
+                    <span style="display: inline-block; background-color: #1e222d; color: #f8fafc; font-family: monospace; font-size: 14px; font-weight: 600; padding: 2px 8px; border-radius: 4px; border: 1px solid #334155;">${transactionId}</span> 
                     has been successfully processed.
                   </p>
                 </td>
@@ -140,23 +140,23 @@ function getPremiumReceiptEmailHtml({
               <!-- Receipt Box -->
               <tr>
                 <td>
-                  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(15,23,42,0.08);">
+                  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #161922; border: 1px solid #282d3c; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
                     
                     <!-- Box Header Bar -->
                     <tr>
-                      <td style="padding: 20px 24px; background-color: #ffffff; border-bottom: 1px solid #e2e8f0;">
+                      <td style="padding: 20px 24px; background-color: #161922; border-bottom: 1px solid #232836;">
                         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                           <tr>
                             <td width="36" valign="middle">
-                              <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); border-radius: 8px; text-align: center; line-height: 32px; color: #ffffff; font-weight: bold; font-size: 16px;">
+                              <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); border-radius: 8px; text-align: center; line-height: 32px; color: #ffffff; font-weight: bold; font-size: 16px;">
                                 &#8801;
                               </div>
                             </td>
                             <td valign="middle" style="padding-left: 12px;">
-                              <span style="font-size: 17px; font-weight: 700; color: #17181c;">${boxTitle}</span>
+                              <span style="font-size: 17px; font-weight: 700; color: #ffffff;">${boxTitle}</span>
                             </td>
                             <td align="right" valign="middle">
-                              <span style="display: inline-block; background-color: #dcfce7; border: 1px solid #4ade80; color: #15803d; font-size: 13px; font-weight: 600; padding: 4px 12px; border-radius: 20px;">
+                              <span style="display: inline-block; background-color: #064e3b; border: 1px solid #059669; color: #34d399; font-size: 13px; font-weight: 600; padding: 4px 12px; border-radius: 20px;">
                                 ${statusBadge}
                               </span>
                             </td>
@@ -171,44 +171,44 @@ function getPremiumReceiptEmailHtml({
                         
                         <!-- FROM ACCOUNT -->
                         <div style="margin-bottom: 22px;">
-                          <div style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px;">FROM ACCOUNT</div>
-                          <div style="font-size: 15px; font-weight: 600; color: #17181c;">${fromAccount}</div>
+                          <div style="font-size: 11px; font-weight: 700; color: #8492a6; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px;">FROM ACCOUNT</div>
+                          <div style="font-size: 15px; font-weight: 600; color: #f8fafc;">${fromAccount}</div>
                         </div>
 
                         <!-- TO ACCOUNT -->
                         <div style="margin-bottom: 22px;">
-                          <div style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px;">TO ACCOUNT</div>
-                          <div style="font-size: 15px; font-weight: 600; color: #17181c; line-height: 1.4;">${toAccount}</div>
+                          <div style="font-size: 11px; font-weight: 700; color: #8492a6; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px;">TO ACCOUNT</div>
+                          <div style="font-size: 15px; font-weight: 600; color: #f8fafc; line-height: 1.4;">${toAccount}</div>
                         </div>
 
                         <!-- TRANSACTION ID -->
                         <div style="margin-bottom: 22px;">
-                          <div style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px;">TRANSACTION ID</div>
-                          <div style="font-size: 15px; font-weight: 600; color: #17181c; font-family: monospace;">${transactionId}</div>
+                          <div style="font-size: 11px; font-weight: 700; color: #8492a6; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px;">TRANSACTION ID</div>
+                          <div style="font-size: 15px; font-weight: 600; color: #ffffff; font-family: monospace;">${transactionId}</div>
                         </div>
 
                         <!-- AMOUNT -->
                         <div style="margin-bottom: 22px;">
-                          <div style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px;">AMOUNT</div>
-                          <div style="font-size: 16px; font-weight: 700; color: #0369a1;">${amountValue}</div>
+                          <div style="font-size: 11px; font-weight: 700; color: #8492a6; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px;">AMOUNT</div>
+                          <div style="font-size: 16px; font-weight: 700; color: #38bdf8;">${amountValue}</div>
                         </div>
 
                         <!-- TRANSACTION TYPE -->
                         <div style="margin-bottom: 22px;">
-                          <div style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px;">TRANSACTION TYPE</div>
-                          <div style="font-size: 15px; font-weight: 600; color: #334155;">${transactionType}</div>
+                          <div style="font-size: 11px; font-weight: 700; color: #8492a6; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px;">TRANSACTION TYPE</div>
+                          <div style="font-size: 15px; font-weight: 600; color: #e2e8f0;">${transactionType}</div>
                         </div>
 
                         <!-- PAYMENT METHOD -->
                         <div style="margin-bottom: 22px;">
-                          <div style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px;">DISBURSEMENT METHOD</div>
-                          <div style="font-size: 15px; font-weight: 600; color: #334155;">${paymentMethod}</div>
+                          <div style="font-size: 11px; font-weight: 700; color: #8492a6; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px;">DISBURSEMENT METHOD</div>
+                          <div style="font-size: 15px; font-weight: 600; color: #e2e8f0;">${paymentMethod}</div>
                         </div>
 
                         <!-- DATE & TIME -->
                         <div>
-                          <div style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px;">DATE &amp; TIME</div>
-                          <div style="font-size: 15px; font-weight: 600; color: #334155;">${dateTime}</div>
+                          <div style="font-size: 11px; font-weight: 700; color: #8492a6; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px;">DATE &amp; TIME</div>
+                          <div style="font-size: 15px; font-weight: 600; color: #e2e8f0;">${dateTime}</div>
                         </div>
 
                       </td>
@@ -221,8 +221,8 @@ function getPremiumReceiptEmailHtml({
               <!-- Footer Warning & Helpline Note -->
               <tr>
                 <td style="padding-top: 24px; text-align: center;">
-                  <p style="margin: 0 0 12px 0; font-size: 14px; color: #64748b; line-height: 1.6;">
-                    If this transaction was not processed by you, please immediately contact our <a href="${helplineUrl}" style="color: #dc2626; text-decoration: underline; font-weight: 600;">helpline</a>.
+                  <p style="margin: 0 0 12px 0; font-size: 14px; color: #94a3b8; line-height: 1.6;">
+                    If this transaction was not processed by you, please immediately contact our <a href="${helplineUrl}" style="color: #ef4444; text-decoration: underline; font-weight: 600;">helpline</a>.
                   </p>
                   <p style="margin: 0 0 24px 0; font-size: 13px; color: #64748b;">
                     📎 An official PDF statement &amp; receipt is attached to this email for your accounting records.
@@ -246,10 +246,10 @@ function getPremiumReceiptEmailHtml({
  * Helper to build uniform data rows for notifications
  */
 function buildDataRow(label: string, value: string, isHighlighted = false, color?: string) {
-  const textColor = color || (isHighlighted ? '#0369a1' : '#17181c');
+  const textColor = color || (isHighlighted ? '#38bdf8' : '#f8fafc');
   return `
     <div style="margin-bottom: 22px;">
-      <div style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px;">${label}</div>
+      <div style="font-size: 11px; font-weight: 700; color: #8492a6; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px;">${label}</div>
       <div style="font-size: ${isHighlighted ? '18px' : '15px'}; font-weight: ${isHighlighted ? '700' : '600'}; color: ${textColor};">${value}</div>
     </div>
   `;
@@ -272,7 +272,7 @@ function bdTime(date?: Date | string | null): string {
 }
 
 /**
- * Generates the premium light notification HTML wrapper.
+ * Generates the premium dark-mode notification HTML wrapper.
  */
 function getPremiumNotificationHtml({
   title,
@@ -281,9 +281,9 @@ function getPremiumNotificationHtml({
   boxTitle,
   boxIcon = '&#8801;',
   badgeText = 'Notice',
-  badgeColor = '#0369a1',
-  badgeBg = '#e0f2fe',
-  badgeBorder = '#7dd3fc',
+  badgeColor = '#38bdf8',
+  badgeBg = '#0c4a6e',
+  badgeBorder = '#0284c7',
   contentHtml,
   footerNote = 'This is an automated notification. Please do not reply directly to this email.'
 }: {
@@ -307,8 +307,8 @@ function getPremiumNotificationHtml({
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>${title}</title>
     </head>
-    <body style="margin: 0; padding: 0; background-color: #f4f5f7; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #17181c;">
-      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f4f5f7; min-height: 100vh; padding: 40px 15px;">
+    <body style="margin: 0; padding: 0; background-color: #0f1115; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #ffffff;">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #0f1115; min-height: 100vh; padding: 40px 15px;">
         <tr>
           <td align="center">
             <table role="presentation" width="100%" style="max-width: 560px; text-align: left;" cellspacing="0" cellpadding="0" border="0">
@@ -316,8 +316,8 @@ function getPremiumNotificationHtml({
               <!-- Greeting & Main Sentence -->
               <tr>
                 <td style="padding-bottom: 24px;">
-                  <h1 style="margin: 0 0 16px 0; font-size: 22px; font-weight: 700; color: #17181c; letter-spacing: -0.5px;">${greeting}</h1>
-                  <p style="margin: 0; font-size: 16px; line-height: 1.6; color: #475569;">
+                  <h1 style="margin: 0 0 16px 0; font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px;">${greeting}</h1>
+                  <p style="margin: 0; font-size: 16px; line-height: 1.6; color: #cbd5e1;">
                     ${introText}
                   </p>
                 </td>
@@ -326,20 +326,20 @@ function getPremiumNotificationHtml({
               <!-- Receipt Box -->
               <tr>
                 <td>
-                  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(15,23,42,0.08);">
+                  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #161922; border: 1px solid #282d3c; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
                     
                     <!-- Box Header Bar -->
                     <tr>
-                      <td style="padding: 20px 24px; background-color: #ffffff; border-bottom: 1px solid #e2e8f0;">
+                      <td style="padding: 20px 24px; background-color: #161922; border-bottom: 1px solid #232836;">
                         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                           <tr>
                             <td width="36" valign="middle">
-                              <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); border-radius: 8px; text-align: center; line-height: 32px; color: #ffffff; font-weight: bold; font-size: 16px;">
+                              <div style="width: 32px; height: 32px; background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); border-radius: 8px; text-align: center; line-height: 32px; color: #ffffff; font-weight: bold; font-size: 16px;">
                                 ${boxIcon}
                               </div>
                             </td>
                             <td valign="middle" style="padding-left: 12px;">
-                              <span style="font-size: 17px; font-weight: 700; color: #17181c;">${boxTitle}</span>
+                              <span style="font-size: 17px; font-weight: 700; color: #ffffff;">${boxTitle}</span>
                             </td>
                             <td align="right" valign="middle">
                               <span style="display: inline-block; background-color: ${badgeBg}; border: 1px solid ${badgeBorder}; color: ${badgeColor}; font-size: 13px; font-weight: 600; padding: 4px 12px; border-radius: 20px;">
@@ -353,7 +353,7 @@ function getPremiumNotificationHtml({
 
                     <!-- Box Body Content -->
                     <tr>
-                      <td style="padding: 28px 24px; color: #334155; font-size: 15px; line-height: 1.6;">
+                      <td style="padding: 28px 24px; color: #e2e8f0; font-size: 15px; line-height: 1.6;">
                         ${contentHtml}
                       </td>
                     </tr>
@@ -365,7 +365,7 @@ function getPremiumNotificationHtml({
               <!-- Footer Note -->
               <tr>
                 <td style="padding-top: 24px; text-align: center;">
-                  <p style="margin: 0 0 12px 0; font-size: 14px; color: #64748b; line-height: 1.6;">
+                  <p style="margin: 0 0 12px 0; font-size: 14px; color: #94a3b8; line-height: 1.6;">
                     ${footerNote}
                   </p>
                   <p style="margin: 0; font-size: 12px; color: #475569;">
@@ -393,7 +393,7 @@ export async function sendLoginNotification(userEmail: string, userName: string,
     boxTitle: 'Login Session Details',
     boxIcon: '🔒',
     badgeText: 'Security Alert',
-    badgeBg: '#fee2e2', badgeBorder: '#fca5a5', badgeColor: '#b91c1c',
+    badgeBg: '#450a0a', badgeBorder: '#7f1d1d', badgeColor: '#f87171',
     contentHtml: `
       ${buildDataRow('Date & Time', bdTime())}
       ${buildDataRow('IP Address', ipAddress)}
@@ -412,7 +412,7 @@ export async function sendKycSubmissionToAdmins(adminEmails: string[], partnerNa
     boxTitle: 'KYC Request Details',
     boxIcon: '📄',
     badgeText: 'Action Required',
-    badgeBg: '#fef3c7', badgeBorder: '#f59e0b', badgeColor: '#8a6d1f',
+    badgeBg: '#422006', badgeBorder: '#713f12', badgeColor: '#facc15',
     contentHtml: `
       ${buildDataRow('Partner Name', partnerName)}
       ${buildDataRow('Submission Date', bdTime())}
@@ -431,9 +431,9 @@ export async function sendKycApprovalToUser(userEmail: string, userName: string)
     boxTitle: 'Account Status Update',
     boxIcon: '✅',
     badgeText: 'Approved',
-    badgeBg: '#dcfce7', badgeBorder: '#4ade80', badgeColor: '#15803d',
+    badgeBg: '#064e3b', badgeBorder: '#059669', badgeColor: '#34d399',
     contentHtml: `
-      <div style="margin-bottom: 22px; font-size: 15px; color: #334155; line-height: 1.6;">
+      <div style="margin-bottom: 22px; font-size: 15px; color: #e2e8f0; line-height: 1.6;">
         Your profile is now fully verified. You have been granted complete access to the partner dashboard, enabling you to request payouts, receive tasks, and utilize all platform features.
       </div>
       ${buildDataRow('Approval Date', new Date().toLocaleDateString())}
@@ -452,7 +452,7 @@ export async function sendTaskAssignmentToUser(userEmail: string, userName: stri
     boxTitle: 'Task Details',
     boxIcon: '📋',
     badgeText: 'Assigned',
-    badgeBg: '#dbeafe', badgeBorder: '#93c5fd', badgeColor: '#1d4ed8',
+    badgeBg: '#1e3a8a', badgeBorder: '#1d4ed8', badgeColor: '#60a5fa',
     contentHtml: `
       ${buildDataRow('Task Title', taskTitle, true)}
       ${buildDataRow('Due Date', new Date(dueDate).toLocaleDateString())}
@@ -471,7 +471,7 @@ export async function sendTaskCompletionToAdmins(adminEmails: string[], userName
     boxTitle: 'Completion Summary',
     boxIcon: '☑️',
     badgeText: 'Review Required',
-    badgeBg: '#fef3c7', badgeBorder: '#f59e0b', badgeColor: '#8a6d1f',
+    badgeBg: '#422006', badgeBorder: '#713f12', badgeColor: '#facc15',
     contentHtml: `
       ${buildDataRow('Task Title', taskTitle)}
       ${buildDataRow('Assigned Partner', userName)}
@@ -490,7 +490,7 @@ export async function sendPayoutRequestToAdmins(adminEmails: string[], partnerNa
     boxTitle: 'Payout Request Details',
     boxIcon: '💰',
     badgeText: 'Action Required',
-    badgeBg: '#fef3c7', badgeBorder: '#f59e0b', badgeColor: '#8a6d1f',
+    badgeBg: '#422006', badgeBorder: '#713f12', badgeColor: '#facc15',
     contentHtml: `
       ${buildDataRow('Requesting Partner', partnerName)}
       ${buildDataRow('Requested Amount', `${amount.toFixed(2)} ${currency}`, true)}
@@ -514,7 +514,7 @@ export async function sendPayoutCompletedToUser(userEmail: string, userName: str
     boxTitle: 'Payout Transaction Details',
     statusBadge: '✓ Success',
     fromAccount: 'Anchor Fashion ERP Disbursement Ledger',
-    toAccount: `${methodStr}<br/><span style="color:#64748b; font-size:13px;">${userName}</span>`,
+    toAccount: `${methodStr}<br/><span style="color:#94a3b8; font-size:13px;">${userName}</span>`,
     amountValue: amountStr,
     transactionType: extra?.invoiceTitle || 'Partner Earnings Payout',
     paymentMethod: methodStr,
@@ -577,7 +577,7 @@ export async function sendBranchChangeToUser(userEmail: string, userName: string
     boxTitle: 'Allocation Details',
     boxIcon: '🏢',
     badgeText: 'Updated',
-    badgeBg: '#dbeafe', badgeBorder: '#93c5fd', badgeColor: '#1d4ed8',
+    badgeBg: '#1e3a8a', badgeBorder: '#1d4ed8', badgeColor: '#60a5fa',
     contentHtml: `
       ${buildDataRow('New Branch Allocation', newBranch, true)}
       ${buildDataRow('Effective Date', new Date().toLocaleDateString())}
@@ -601,7 +601,7 @@ export async function sendSalaryPaidToUser(userEmail: string, userName: string, 
     boxTitle: 'Salary Received Receipt',
     statusBadge: '✓ Salary Received',
     fromAccount: 'Anchor Fashion ERP Payroll Ledger',
-    toAccount: `${methodStr}<br/><span style="color:#64748b; font-size:13px;">${userName}</span>`,
+    toAccount: `${methodStr}<br/><span style="color:#94a3b8; font-size:13px;">${userName}</span>`,
     amountValue: amountStr,
     transactionType: `Monthly Salary - ${month}`,
     paymentMethod: `${methodStr} (${branchStr})`,
@@ -677,7 +677,7 @@ export async function sendValueTransferToUser(userEmail: string, userName: strin
     boxTitle: 'Value Transfer Receipt',
     statusBadge: '✓ Value Transfer',
     fromAccount: 'Anchor Fashion ERP Ledger',
-    toAccount: `${methodStr}<br/><span style="color:#64748b; font-size:13px;">${userName}</span>`,
+    toAccount: `${methodStr}<br/><span style="color:#94a3b8; font-size:13px;">${userName}</span>`,
     amountValue: amountStr,
     transactionType: `Partner Value Transfer`,
     paymentMethod: `${methodStr} (${branchStr})`,
@@ -738,7 +738,7 @@ export async function sendSalaryUpdatedToUser(userEmail: string, userName: strin
     boxTitle: 'Compensation Details',
     boxIcon: '📈',
     badgeText: 'Revised',
-    badgeBg: '#dcfce7', badgeBorder: '#4ade80', badgeColor: '#15803d',
+    badgeBg: '#064e3b', badgeBorder: '#059669', badgeColor: '#34d399',
     contentHtml: `
       ${buildDataRow('Revised Basic Salary', `${newSalary.toLocaleString('en-US', { minimumFractionDigits: 2 })} ${currency}`, true)}
       ${buildDataRow('Effective Date', new Date().toLocaleDateString())}
@@ -756,13 +756,13 @@ export async function sendPasswordResetOTP(userEmail: string, userName: string, 
     boxTitle: 'One-Time Password (OTP)',
     boxIcon: '🔑',
     badgeText: 'Secure',
-    badgeBg: '#dbeafe', badgeBorder: '#93c5fd', badgeColor: '#1d4ed8',
+    badgeBg: '#1e3a8a', badgeBorder: '#1d4ed8', badgeColor: '#60a5fa',
     contentHtml: `
       <div style="text-align: center; margin: 32px 0;">
-        <div style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px;">AUTHORIZATION CODE</div>
-        <div style="font-size: 38px; font-weight: 800; letter-spacing: 12px; color: #0369a1; font-family: monospace;">${otpCode}</div>
+        <div style="font-size: 11px; font-weight: 700; color: #8492a6; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px;">AUTHORIZATION CODE</div>
+        <div style="font-size: 38px; font-weight: 800; letter-spacing: 12px; color: #38bdf8; font-family: monospace;">${otpCode}</div>
       </div>
-      <div style="margin-bottom: 10px; font-size: 14px; color: #64748b; text-align: center;">
+      <div style="margin-bottom: 10px; font-size: 14px; color: #94a3b8; text-align: center;">
         This secure code is valid for exactly <strong>10 minutes</strong>.
       </div>
     `,
@@ -779,13 +779,13 @@ export async function sendRegistrationOTP(userEmail: string, userName: string, o
     boxTitle: 'Verification Code',
     boxIcon: '🛡️',
     badgeText: 'Action Required',
-    badgeBg: '#fef3c7', badgeBorder: '#f59e0b', badgeColor: '#8a6d1f',
+    badgeBg: '#422006', badgeBorder: '#713f12', badgeColor: '#facc15',
     contentHtml: `
       <div style="text-align: center; margin: 32px 0;">
-        <div style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px;">AUTHORIZATION CODE</div>
-        <div style="font-size: 38px; font-weight: 800; letter-spacing: 12px; color: #0369a1; font-family: monospace;">${otpCode}</div>
+        <div style="font-size: 11px; font-weight: 700; color: #8492a6; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px;">AUTHORIZATION CODE</div>
+        <div style="font-size: 38px; font-weight: 800; letter-spacing: 12px; color: #38bdf8; font-family: monospace;">${otpCode}</div>
       </div>
-      <div style="margin-bottom: 10px; font-size: 14px; color: #64748b; text-align: center;">
+      <div style="margin-bottom: 10px; font-size: 14px; color: #94a3b8; text-align: center;">
         This secure code is valid for exactly <strong>10 minutes</strong>.
       </div>
     `,
@@ -802,13 +802,13 @@ export async function send2FAOTP(userEmail: string, userName: string, otpCode: s
     boxTitle: 'Authentication Code',
     boxIcon: '🛡️',
     badgeText: 'High Security',
-    badgeBg: '#fee2e2', badgeBorder: '#fca5a5', badgeColor: '#b91c1c',
+    badgeBg: '#450a0a', badgeBorder: '#7f1d1d', badgeColor: '#f87171',
     contentHtml: `
       <div style="text-align: center; margin: 32px 0;">
-        <div style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px;">AUTHORIZATION CODE</div>
-        <div style="font-size: 38px; font-weight: 800; letter-spacing: 12px; color: #0369a1; font-family: monospace;">${otpCode}</div>
+        <div style="font-size: 11px; font-weight: 700; color: #8492a6; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px;">AUTHORIZATION CODE</div>
+        <div style="font-size: 38px; font-weight: 800; letter-spacing: 12px; color: #38bdf8; font-family: monospace;">${otpCode}</div>
       </div>
-      <div style="margin-bottom: 10px; font-size: 14px; color: #64748b; text-align: center;">
+      <div style="margin-bottom: 10px; font-size: 14px; color: #94a3b8; text-align: center;">
         This secure code expires in <strong>2 minutes</strong>.
       </div>
     `,
@@ -825,7 +825,7 @@ export async function sendExpenseSubmissionToAdmins(adminEmails: string[], userN
     boxTitle: 'Expense Summary',
     boxIcon: '🧾',
     badgeText: 'Review Pending',
-    badgeBg: '#fef3c7', badgeBorder: '#f59e0b', badgeColor: '#8a6d1f',
+    badgeBg: '#422006', badgeBorder: '#713f12', badgeColor: '#facc15',
     contentHtml: `
       ${buildDataRow('Employee Name', userName)}
       ${buildDataRow('Branch / Department', branchName)}
@@ -838,14 +838,14 @@ export async function sendExpenseSubmissionToAdmins(adminEmails: string[], userN
 }
 
 export async function sendExpenseStatusUpdateToUser(userEmail: string, userName: string, title: string, status: string, amount: number, adminNotes?: string | null, trxId?: string | null) {
-  let badgeBg = '#dbeafe';
-  let badgeBorder = '#93c5fd';
-  let badgeColor = '#1d4ed8'; // Blue (Approved)
+  let badgeBg = '#1e3a8a';
+  let badgeBorder = '#1d4ed8';
+  let badgeColor = '#60a5fa'; // Blue (Approved)
   
   if (status === 'paid') {
-    badgeBg = '#dcfce7'; badgeBorder = '#4ade80'; badgeColor = '#15803d'; // Green (Paid)
+    badgeBg = '#064e3b'; badgeBorder = '#059669'; badgeColor = '#34d399'; // Green (Paid)
   } else if (status === 'rejected') {
-    badgeBg = '#fee2e2'; badgeBorder = '#fca5a5'; badgeColor = '#b91c1c'; // Red (Rejected)
+    badgeBg = '#450a0a'; badgeBorder = '#7f1d1d'; badgeColor = '#f87171'; // Red (Rejected)
   }
 
   const html = getPremiumNotificationHtml({
@@ -905,7 +905,7 @@ export async function sendPositionChangeToUser(
     boxTitle: 'Role Designation Update',
     boxIcon: '👔',
     badgeText: 'Official Notice',
-    badgeBg: '#dbeafe', badgeBorder: '#93c5fd', badgeColor: '#1d4ed8',
+    badgeBg: '#1e3a8a', badgeBorder: '#1d4ed8', badgeColor: '#60a5fa',
     contentHtml: `
       ${buildDataRow('Previous Designation', oldPosition)}
       ${buildDataRow('New Designation', newPosition, true)}
@@ -956,7 +956,7 @@ export async function getAdminEmails(): Promise<string[]> {
 }
 
 /**
- * Sends a rich executive light notification email to all admins
+ * Sends a rich executive dark-mode notification email to all admins
  * when a Branch Manager submits a bank deposit, complete with deposit slip image.
  */
 export async function sendDepositSubmissionEmailToAdmins({
@@ -1012,17 +1012,17 @@ export async function sendDepositSubmissionEmailToAdmins({
     : depositDate;
 
   const slipImageSection = slipAttachmentUrl ? `
-    <div style="margin-top: 24px; padding: 18px; background-color: #f4f5f7; border: 1px solid #e2e8f0; border-radius: 10px;">
-      <div style="font-size: 11px; font-weight: 700; color: #8a6d1f; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px;">
+    <div style="margin-top: 24px; padding: 18px; background-color: #0b0d13; border: 1px solid #282d3c; border-radius: 10px;">
+      <div style="font-size: 11px; font-weight: 700; color: #d4af37; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px;">
         📸 BANK DEPOSIT SLIP / BOOK PHOTO
       </div>
-      <div style="text-align: center; background-color: #17181c; border-radius: 8px; overflow: hidden; padding: 8px; border: 1px solid #e2e8f0;">
+      <div style="text-align: center; background-color: #000000; border-radius: 8px; overflow: hidden; padding: 8px; border: 1px solid #1e222d;">
         <a href="${slipAttachmentUrl}" target="_blank" style="text-decoration: none;">
           <img src="${slipAttachmentUrl}" alt="Bank Deposit Slip" style="max-width: 100%; max-height: 380px; object-fit: contain; border-radius: 6px; display: block; margin: 0 auto;" />
         </a>
       </div>
       <div style="text-align: center; margin-top: 12px;">
-        <a href="${slipAttachmentUrl}" target="_blank" style="display: inline-block; background-color: #e2e8f0; color: #0369a1; font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 6px; border: 1px solid #cbd5e1; text-decoration: none;">
+        <a href="${slipAttachmentUrl}" target="_blank" style="display: inline-block; background-color: #1e222d; color: #38bdf8; font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 6px; border: 1px solid #334155; text-decoration: none;">
           🔍 Open Full Resolution Slip Photo
         </a>
       </div>
@@ -1030,9 +1030,9 @@ export async function sendDepositSubmissionEmailToAdmins({
   ` : '';
 
   const statementSection = bankStatementUrl ? `
-    <div style="margin-top: 12px; padding: 12px 16px; background-color: #f4f5f7; border: 1px solid #e2e8f0; border-radius: 8px;">
-      <span style="font-size: 13px; color: #475569;">📄 Supporting Statement: </span>
-      <a href="${bankStatementUrl}" target="_blank" style="color: #0369a1; font-size: 13px; font-weight: 600; text-decoration: underline;">View Bank Statement</a>
+    <div style="margin-top: 12px; padding: 12px 16px; background-color: #0b0d13; border: 1px solid #282d3c; border-radius: 8px;">
+      <span style="font-size: 13px; color: #cbd5e1;">📄 Supporting Statement: </span>
+      <a href="${bankStatementUrl}" target="_blank" style="color: #38bdf8; font-size: 13px; font-weight: 600; text-decoration: underline;">View Bank Statement</a>
     </div>
   ` : '';
 
@@ -1041,20 +1041,20 @@ export async function sendDepositSubmissionEmailToAdmins({
     : [];
 
   const dailyBreakdownSection = breakdownEntries.length > 0 ? `
-    <div style="margin-top: 18px; padding: 14px; background-color: #f4f5f7; border: 1px solid #e2e8f0; border-radius: 8px;">
-      <div style="font-size: 11px; font-weight: 700; color: #8a6d1f; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;">
+    <div style="margin-top: 18px; padding: 14px; background-color: #0b0d13; border: 1px solid #282d3c; border-radius: 8px;">
+      <div style="font-size: 11px; font-weight: 700; color: #d4af37; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;">
         📅 DAILY SALES BREAKDOWN (${breakdownEntries.length} DAYS)
       </div>
       <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="font-size: 13px;">
         ${breakdownEntries.map(([dt, amt]) => `
-          <tr style="border-bottom: 1px solid #e2e8f0;">
-            <td style="padding: 6px 8px; font-family: monospace; color: #475569;">${dt}</td>
-            <td align="right" style="padding: 6px 8px; font-weight: 700; color: #8a6d1f; font-family: monospace;">৳${Number(amt).toLocaleString('en-BD')}</td>
+          <tr style="border-bottom: 1px solid #1e222d;">
+            <td style="padding: 6px 8px; font-family: monospace; color: #cbd5e1;">${dt}</td>
+            <td align="right" style="padding: 6px 8px; font-weight: 700; color: #d4af37; font-family: monospace;">৳${Number(amt).toLocaleString('en-BD')}</td>
           </tr>
         `).join('')}
-        <tr style="border-top: 2px solid #cbd5e1;">
-          <td style="padding: 8px 8px 4px 8px; font-weight: 700; color: #17181c;">Total Aggregated</td>
-          <td align="right" style="padding: 8px 8px 4px 8px; font-weight: 800; color: #8a6d1f; font-size: 14px;">${formattedAmount}</td>
+        <tr style="border-top: 2px solid #334155;">
+          <td style="padding: 8px 8px 4px 8px; font-weight: 700; color: #ffffff;">Total Aggregated</td>
+          <td align="right" style="padding: 8px 8px 4px 8px; font-weight: 800; color: #d4af37; font-size: 14px;">${formattedAmount}</td>
         </tr>
       </table>
     </div>
@@ -1068,8 +1068,8 @@ export async function sendDepositSubmissionEmailToAdmins({
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>New Bank Deposit Submission</title>
     </head>
-    <body style="margin: 0; padding: 0; background-color: #f4f5f7; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #17181c;">
-      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f4f5f7; min-height: 100vh; padding: 35px 15px;">
+    <body style="margin: 0; padding: 0; background-color: #08090c; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #ffffff;">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #08090c; min-height: 100vh; padding: 35px 15px;">
         <tr>
           <td align="center">
             <table role="presentation" width="100%" style="max-width: 580px; text-align: left;" cellspacing="0" cellpadding="0" border="0">
@@ -1077,7 +1077,7 @@ export async function sendDepositSubmissionEmailToAdmins({
               <!-- Brand Header -->
               <tr>
                 <td style="padding-bottom: 20px; text-align: center;">
-                  <div style="font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #8a6d1f; text-transform: uppercase;">
+                  <div style="font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #d4af37; text-transform: uppercase;">
                     ANCHOR FASHION ERP
                   </div>
                   <div style="font-size: 12px; color: #64748b; margin-top: 4px;">
@@ -1089,11 +1089,11 @@ export async function sendDepositSubmissionEmailToAdmins({
               <!-- Greeting & Main Banner -->
               <tr>
                 <td style="padding-bottom: 20px;">
-                  <h1 style="margin: 0 0 10px 0; font-size: 22px; font-weight: 700; color: #17181c; letter-spacing: -0.5px;">
+                  <h1 style="margin: 0 0 10px 0; font-size: 22px; font-weight: 700; color: #ffffff; letter-spacing: -0.5px;">
                     🏦 New Bank Deposit Submitted
                   </h1>
-                  <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #475569;">
-                    Manager <strong style="color: #17181c;">${managerName}</strong> (<span style="color: #8a6d1f; font-weight: 600;">${branchName}</span>) has submitted physical cash sales to the company bank account. Awaiting admin review and approval.
+                  <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #cbd5e1;">
+                    Manager <strong style="color: #f8fafc;">${managerName}</strong> (<span style="color: #d4af37; font-weight: 600;">${branchName}</span>) has submitted physical cash sales to the company bank account. Awaiting admin review and approval.
                   </p>
                 </td>
               </tr>
@@ -1101,23 +1101,23 @@ export async function sendDepositSubmissionEmailToAdmins({
               <!-- Deposit Box Card -->
               <tr>
                 <td>
-                  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden; box-shadow: 0 15px 35px rgba(15,23,42,0.08);">
+                  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #12151d; border: 1px solid #232836; border-radius: 14px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.6);">
                     
                     <!-- Box Header Bar -->
                     <tr>
-                      <td style="padding: 18px 24px; background: linear-gradient(90deg, #f4f5f7 0%, #ffffff 100%); border-bottom: 1px solid #e2e8f0;">
+                      <td style="padding: 18px 24px; background: linear-gradient(90deg, #181c27 0%, #12151d 100%); border-bottom: 1px solid #232836;">
                         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                           <tr>
                             <td width="36" valign="middle">
-                              <div style="width: 34px; height: 34px; background: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%); border-radius: 8px; text-align: center; line-height: 34px; color: #17181c; font-weight: bold; font-size: 17px;">
+                              <div style="width: 34px; height: 34px; background: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%); border-radius: 8px; text-align: center; line-height: 34px; color: #000000; font-weight: bold; font-size: 17px;">
                                 ৳
                               </div>
                             </td>
                             <td valign="middle" style="padding-left: 12px;">
-                              <span style="font-size: 16px; font-weight: 700; color: #17181c;">Bank Deposit Submission</span>
+                              <span style="font-size: 16px; font-weight: 700; color: #ffffff;">Bank Deposit Submission</span>
                             </td>
                             <td align="right" valign="middle">
-                              <span style="display: inline-block; background-color: #fef3c7; border: 1px solid #ca8a04; color: #8a6d1f; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;">
+                              <span style="display: inline-block; background-color: #3b2505; border: 1px solid #ca8a04; color: #fde047; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;">
                                 ⏳ PENDING APPROVAL
                               </span>
                             </td>
@@ -1128,15 +1128,15 @@ export async function sendDepositSubmissionEmailToAdmins({
 
                     <!-- Amount Highlight Box -->
                     <tr>
-                      <td style="padding: 24px 24px 16px 24px; background-color: #f4f5f7; border-bottom: 1px solid #e2e8f0; text-align: center;">
-                        <div style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px;">
+                      <td style="padding: 24px 24px 16px 24px; background-color: #151923; border-bottom: 1px solid #1e222d; text-align: center;">
+                        <div style="font-size: 11px; font-weight: 700; color: #8492a6; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 6px;">
                           TOTAL DEPOSIT AMOUNT
                         </div>
-                        <div style="font-size: 32px; font-weight: 800; color: #8a6d1f; letter-spacing: -0.5px;">
+                        <div style="font-size: 32px; font-weight: 800; color: #d4af37; letter-spacing: -0.5px;">
                           ${formattedAmount}
                         </div>
-                        <div style="font-size: 13px; color: #64748b; margin-top: 6px;">
-                          Deposit Date: <strong style="color: #17181c;">${depositDate}</strong> &bull; Sales Period: <strong style="color: #17181c;">${salesPeriod}</strong>
+                        <div style="font-size: 13px; color: #94a3b8; margin-top: 6px;">
+                          Deposit Date: <strong style="color: #f1f5f9;">${depositDate}</strong> &bull; Sales Period: <strong style="color: #f1f5f9;">${salesPeriod}</strong>
                         </div>
                       </td>
                     </tr>
@@ -1149,47 +1149,47 @@ export async function sendDepositSubmissionEmailToAdmins({
                         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                           <tr>
                             <td width="50%" valign="top" style="padding-right: 12px; padding-bottom: 18px;">
-                              <div style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">BRANCH</div>
-                              <div style="font-size: 14px; font-weight: 600; color: #17181c;">🏬 ${branchName}</div>
+                              <div style="font-size: 11px; font-weight: 700; color: #8492a6; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">BRANCH</div>
+                              <div style="font-size: 14px; font-weight: 600; color: #ffffff;">🏬 ${branchName}</div>
                             </td>
                             <td width="50%" valign="top" style="padding-left: 12px; padding-bottom: 18px;">
-                              <div style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">SUBMITTED BY</div>
-                              <div style="font-size: 14px; font-weight: 600; color: #17181c;">👤 ${managerName}</div>
+                              <div style="font-size: 11px; font-weight: 700; color: #8492a6; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">SUBMITTED BY</div>
+                              <div style="font-size: 14px; font-weight: 600; color: #ffffff;">👤 ${managerName}</div>
                               ${managerEmail ? `<div style="font-size: 12px; color: #64748b;">${managerEmail}</div>` : ''}
                             </td>
                           </tr>
 
                           <tr>
                             <td colspan="2" valign="top" style="padding-bottom: 18px;">
-                              <div style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">DEPOSIT TARGET BANK &amp; ACCOUNT</div>
-                              <div style="font-size: 14px; font-weight: 600; color: #17181c;">${bankAccountName}</div>
-                              ${bankAccountNumber ? `<div style="font-size: 13px; color: #0369a1; font-family: monospace; margin-top: 2px;">A/C: ${bankAccountNumber}</div>` : ''}
+                              <div style="font-size: 11px; font-weight: 700; color: #8492a6; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">DEPOSIT TARGET BANK &amp; ACCOUNT</div>
+                              <div style="font-size: 14px; font-weight: 600; color: #f8fafc;">${bankAccountName}</div>
+                              ${bankAccountNumber ? `<div style="font-size: 13px; color: #38bdf8; font-family: monospace; margin-top: 2px;">A/C: ${bankAccountNumber}</div>` : ''}
                             </td>
                           </tr>
 
                           <tr>
                             <td width="50%" valign="top" style="padding-right: 12px; padding-bottom: 18px;">
-                              <div style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">DEPOSIT SLIP / BOOK NO</div>
-                              <div style="font-size: 14px; font-weight: 600; color: #17181c; font-family: monospace;">${depositSlipNumber || '—'}</div>
+                              <div style="font-size: 11px; font-weight: 700; color: #8492a6; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">DEPOSIT SLIP / BOOK NO</div>
+                              <div style="font-size: 14px; font-weight: 600; color: #f8fafc; font-family: monospace;">${depositSlipNumber || '—'}</div>
                             </td>
                             <td width="50%" valign="top" style="padding-left: 12px; padding-bottom: 18px;">
-                              <div style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">BANK TRANSACTION / REF ID</div>
-                              <div style="font-size: 14px; font-weight: 600; color: #17181c; font-family: monospace;">${bankTransactionId || '—'}</div>
+                              <div style="font-size: 11px; font-weight: 700; color: #8492a6; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">BANK TRANSACTION / REF ID</div>
+                              <div style="font-size: 14px; font-weight: 600; color: #f8fafc; font-family: monospace;">${bankTransactionId || '—'}</div>
                             </td>
                           </tr>
 
                           <tr>
                             <td colspan="2" valign="top" style="padding-bottom: 18px;">
-                              <div style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">PHYSICALLY DEPOSITED BY</div>
-                              <div style="font-size: 14px; font-weight: 600; color: #17181c;">${depositedByName || managerName}</div>
+                              <div style="font-size: 11px; font-weight: 700; color: #8492a6; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">PHYSICALLY DEPOSITED BY</div>
+                              <div style="font-size: 14px; font-weight: 600; color: #f8fafc;">${depositedByName || managerName}</div>
                             </td>
                           </tr>
 
                           ${notes ? `
                           <tr>
                             <td colspan="2" valign="top" style="padding-bottom: 18px;">
-                              <div style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">MANAGER REMARKS / NOTES</div>
-                              <div style="font-size: 13px; color: #475569; background-color: #f4f5f7; border: 1px solid #e2e8f0; padding: 10px 14px; border-radius: 6px; line-height: 1.5;">${notes}</div>
+                              <div style="font-size: 11px; font-weight: 700; color: #8492a6; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px;">MANAGER REMARKS / NOTES</div>
+                              <div style="font-size: 13px; color: #cbd5e1; background-color: #0b0d13; border: 1px solid #1e222d; padding: 10px 14px; border-radius: 6px; line-height: 1.5;">${notes}</div>
                             </td>
                           </tr>
                           ` : ''}
@@ -1206,7 +1206,7 @@ export async function sendDepositSubmissionEmailToAdmins({
 
                         <!-- Action Button (CTA) -->
                         <div style="margin-top: 28px; text-align: center;">
-                          <a href="${approvalUrl}" style="display: block; background: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%); color: #17181c; text-align: center; padding: 15px 28px; border-radius: 8px; font-size: 15px; font-weight: 800; text-decoration: none; letter-spacing: 0.5px; box-shadow: 0 4px 18px rgba(212, 175, 55, 0.35);">
+                          <a href="${approvalUrl}" style="display: block; background: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%); color: #000000; text-align: center; padding: 15px 28px; border-radius: 8px; font-size: 15px; font-weight: 800; text-decoration: none; letter-spacing: 0.5px; box-shadow: 0 4px 18px rgba(212, 175, 55, 0.35);">
                             👉 Review &amp; Approve Deposit in Admin Panel
                           </a>
                         </div>
@@ -1274,16 +1274,16 @@ export async function sendDepositDecisionEmailToManager({
   const appUrl = baseUrl || process.env.NEXT_PUBLIC_APP_URL || 'https://www.anchorfashion.shop';
   const historyUrl = `${appUrl.replace(/\/$/, '')}/dashboard/branch-accounts/deposit-history`;
 
-  const badgeBg = isApproved ? '#dcfce7' : '#fee2e2';
-  const badgeBorder = isApproved ? '#4ade80' : '#fca5a5';
-  const badgeColor = isApproved ? '#15803d' : '#b91c1c';
+  const badgeBg = isApproved ? '#064e3b' : '#450a0a';
+  const badgeBorder = isApproved ? '#059669' : '#7f1d1d';
+  const badgeColor = isApproved ? '#34d399' : '#f87171';
 
   const html = getPremiumNotificationHtml({
     title: isApproved ? 'Bank Deposit Approved' : 'Bank Deposit Rejected',
     greeting: `Dear ${managerName},`,
     introText: isApproved
-      ? `Your submitted bank deposit of <strong style="color: #17181c;">${formattedAmount}</strong> for <strong style="color: #8a6d1f;">${branchName}</strong> has been officially approved and verified by administration.`
-      : `Your submitted bank deposit of <strong style="color: #17181c;">${formattedAmount}</strong> for <strong style="color: #8a6d1f;">${branchName}</strong> was rejected by administration. Please review the reason below and resubmit if appropriate.`,
+      ? `Your submitted bank deposit of <strong style="color: #ffffff;">${formattedAmount}</strong> for <strong style="color: #d4af37;">${branchName}</strong> has been officially approved and verified by administration.`
+      : `Your submitted bank deposit of <strong style="color: #ffffff;">${formattedAmount}</strong> for <strong style="color: #d4af37;">${branchName}</strong> was rejected by administration. Please review the reason below and resubmit if appropriate.`,
     boxTitle: isApproved ? 'Deposit Approved' : 'Deposit Rejected',
     boxIcon: isApproved ? '✅' : '❌',
     badgeText: isApproved ? 'APPROVED' : 'REJECTED',
@@ -1297,7 +1297,7 @@ export async function sendDepositDecisionEmailToManager({
       ${buildDataRow('Reviewed By', reviewedByName || 'System Administrator')}
       ${!isApproved && rejectionReason ? buildDataRow('Rejection Reason', rejectionReason) : ''}
       <div style="margin-top: 24px; text-align: center;">
-        <a href="${historyUrl}" style="display: inline-block; background-color: #ffffff; color: #17181c; font-size: 13px; font-weight: 600; padding: 10px 20px; border-radius: 6px; border: 1px solid #cbd5e1; text-decoration: none;">
+        <a href="${historyUrl}" style="display: inline-block; background-color: #1e293b; color: #f8fafc; font-size: 13px; font-weight: 600; padding: 10px 20px; border-radius: 6px; border: 1px solid #334155; text-decoration: none;">
           View in Deposit History &rarr;
         </a>
       </div>
@@ -1375,82 +1375,82 @@ export async function sendDailyClosingEmailToAdmins({
   const isShortage = difference < 0;
   const isExcess = difference > 0;
   const diffStatusText = isShortage ? 'SHORTAGE' : isExcess ? 'EXCESS' : 'BALANCED';
-  const diffColor = isShortage ? '#b91c1c' : isExcess ? '#15803d' : '#15803d';
+  const diffColor = isShortage ? '#f87171' : isExcess ? '#34d399' : '#10b981';
 
   const html = getPremiumNotificationHtml({
     title: 'Daily Cash Closing Report',
     greeting: `Hello Administration Team,`,
-    introText: `Branch <strong style="color: #8a6d1f;">${branchName}</strong> has completed the Daily Cash Closing for <strong style="color: #17181c;">${ledgerDate}</strong>.`,
+    introText: `Branch <strong style="color: #d4af37;">${branchName}</strong> has completed the Daily Cash Closing for <strong style="color: #ffffff;">${ledgerDate}</strong>.`,
     boxTitle: 'Daily Financial & Drawer Closing Summary',
     boxIcon: isShortage ? '⚠️' : isExcess ? '💰' : '📊',
     badgeText: diffStatusText,
-    badgeBg: isShortage ? '#fee2e2' : isExcess ? '#dcfce7' : '#dcfce7',
-    badgeBorder: isShortage ? '#fca5a5' : isExcess ? '#4ade80' : '#4ade80',
-    badgeColor: isShortage ? '#b91c1c' : isExcess ? '#15803d' : '#15803d',
+    badgeBg: isShortage ? '#450a0a' : isExcess ? '#064e3b' : '#064e3b',
+    badgeBorder: isShortage ? '#7f1d1d' : isExcess ? '#059669' : '#059669',
+    badgeColor: isShortage ? '#f87171' : isExcess ? '#34d399' : '#34d399',
     contentHtml: `
       ${buildDataRow('Branch & Manager', `${branchName} &bull; ${managerName}`)}
       ${buildDataRow('Closing Date', ledgerDate)}
 
       <!-- 1. Total Daily Sales Section -->
-      <div style="margin-top: 16px; padding: 14px; background-color: #f4f5f7; border: 1px solid #e2e8f0; border-radius: 8px;">
-        <div style="font-size: 11px; font-weight: 700; color: #8a6d1f; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;">
+      <div style="margin-top: 16px; padding: 14px; background-color: #0b0d13; border: 1px solid #282d3c; border-radius: 8px;">
+        <div style="font-size: 11px; font-weight: 700; color: #d4af37; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;">
           🛍️ GROSS SALES REVENUE (মোট বিক্রয়)
         </div>
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="font-size: 13px;">
-          <tr style="border-bottom: 1px solid #e2e8f0;">
-            <td style="padding: 5px 0; color: #475569;">💵 Pure Cash Sales</td>
-            <td align="right" style="padding: 5px 0; font-weight: 600; color: #17181c; font-family: monospace;">${formattedAmount(cashSales)}</td>
+          <tr style="border-bottom: 1px solid #1e222d;">
+            <td style="padding: 5px 0; color: #cbd5e1;">💵 Pure Cash Sales</td>
+            <td align="right" style="padding: 5px 0; font-weight: 600; color: #ffffff; font-family: monospace;">${formattedAmount(cashSales)}</td>
           </tr>
-          <tr style="border-bottom: 1px solid #e2e8f0;">
-            <td style="padding: 5px 0; color: #475569;">📱 Digital / MFS (bKash/Nagad/Card)</td>
-            <td align="right" style="padding: 5px 0; font-weight: 600; color: #0369a1; font-family: monospace;">${formattedAmount(computedDigital)}</td>
+          <tr style="border-bottom: 1px solid #1e222d;">
+            <td style="padding: 5px 0; color: #cbd5e1;">📱 Digital / MFS (bKash/Nagad/Card)</td>
+            <td align="right" style="padding: 5px 0; font-weight: 600; color: #38bdf8; font-family: monospace;">${formattedAmount(computedDigital)}</td>
           </tr>
-          <tr style="border-top: 2px solid #cbd5e1;">
-            <td style="padding: 8px 0 4px 0; font-weight: 700; color: #17181c;">Total Daily Sales</td>
-            <td align="right" style="padding: 8px 0 4px 0; font-weight: 800; color: #8a6d1f; font-size: 15px; font-family: monospace;">${formattedAmount(computedTotalSales)}</td>
+          <tr style="border-top: 2px solid #334155;">
+            <td style="padding: 8px 0 4px 0; font-weight: 700; color: #ffffff;">Total Daily Sales</td>
+            <td align="right" style="padding: 8px 0 4px 0; font-weight: 800; color: #d4af37; font-size: 15px; font-family: monospace;">${formattedAmount(computedTotalSales)}</td>
           </tr>
         </table>
       </div>
 
       <!-- 2. Physical Drawer Cash Reconciliation -->
-      <div style="margin-top: 14px; padding: 14px; background-color: #f4f5f7; border: 1px solid #e2e8f0; border-radius: 8px;">
-        <div style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;">
+      <div style="margin-top: 14px; padding: 14px; background-color: #0b0d13; border: 1px solid #282d3c; border-radius: 8px;">
+        <div style="font-size: 11px; font-weight: 700; color: #94a3b8; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;">
           💼 PHYSICAL DRAWER CASH RECONCILIATION
         </div>
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="font-size: 13px;">
           <tr>
-            <td style="padding: 4px 0; color: #475569;">Opening Drawer Float (সকালের ক্যাশ)</td>
-            <td align="right" style="padding: 4px 0; font-weight: 600; color: #475569; font-family: monospace;">${formattedAmount(openingCash)}</td>
+            <td style="padding: 4px 0; color: #cbd5e1;">Opening Drawer Float (সকালের ক্যাশ)</td>
+            <td align="right" style="padding: 4px 0; font-weight: 600; color: #cbd5e1; font-family: monospace;">${formattedAmount(openingCash)}</td>
           </tr>
           <tr>
-            <td style="padding: 4px 0; color: #475569;">(+) Pure Cash Sales (নগদ বিক্রি)</td>
-            <td align="right" style="padding: 4px 0; font-weight: 600; color: #15803d; font-family: monospace;">+${formattedAmount(cashSales)}</td>
+            <td style="padding: 4px 0; color: #cbd5e1;">(+) Pure Cash Sales (নগদ বিক্রি)</td>
+            <td align="right" style="padding: 4px 0; font-weight: 600; color: #34d399; font-family: monospace;">+${formattedAmount(cashSales)}</td>
           </tr>
           ${otherCashIn > 0 ? `
           <tr>
-            <td style="padding: 4px 0; color: #475569;">(+) Other Cash In</td>
-            <td align="right" style="padding: 4px 0; font-weight: 600; color: #15803d; font-family: monospace;">+${formattedAmount(otherCashIn)}</td>
+            <td style="padding: 4px 0; color: #cbd5e1;">(+) Other Cash In</td>
+            <td align="right" style="padding: 4px 0; font-weight: 600; color: #34d399; font-family: monospace;">+${formattedAmount(otherCashIn)}</td>
           </tr>
           ` : ''}
           ${cashExpenses > 0 ? `
           <tr>
-            <td style="padding: 4px 0; color: #475569;">(-) Drawer Cash Expenses (খরচ)</td>
-            <td align="right" style="padding: 4px 0; font-weight: 600; color: #b91c1c; font-family: monospace;">-${formattedAmount(cashExpenses)}</td>
+            <td style="padding: 4px 0; color: #cbd5e1;">(-) Drawer Cash Expenses (খরচ)</td>
+            <td align="right" style="padding: 4px 0; font-weight: 600; color: #f87171; font-family: monospace;">-${formattedAmount(cashExpenses)}</td>
           </tr>
           ` : ''}
           ${bankDepositsOut > 0 ? `
           <tr>
-            <td style="padding: 4px 0; color: #475569;">(-) Bank Deposits Remitted (ব্যাংক জমা)</td>
-            <td align="right" style="padding: 4px 0; font-weight: 600; color: #0369a1; font-family: monospace;">-${formattedAmount(bankDepositsOut)}</td>
+            <td style="padding: 4px 0; color: #cbd5e1;">(-) Bank Deposits Remitted (ব্যাংক জমা)</td>
+            <td align="right" style="padding: 4px 0; font-weight: 600; color: #38bdf8; font-family: monospace;">-${formattedAmount(bankDepositsOut)}</td>
           </tr>
           ` : ''}
-          <tr style="border-top: 1px dashed #cbd5e1;">
-            <td style="padding: 6px 0; font-weight: 600; color: #64748b;">= Expected Drawer Cash</td>
-            <td align="right" style="padding: 6px 0; font-weight: 700; color: #17181c; font-family: monospace;">${formattedAmount(expectedCash)}</td>
+          <tr style="border-top: 1px dashed #334155;">
+            <td style="padding: 6px 0; font-weight: 600; color: #94a3b8;">= Expected Drawer Cash</td>
+            <td align="right" style="padding: 6px 0; font-weight: 700; color: #f8fafc; font-family: monospace;">${formattedAmount(expectedCash)}</td>
           </tr>
-          <tr style="border-top: 2px solid #cbd5e1;">
-            <td style="padding: 8px 0 4px 0; font-weight: 700; color: #17181c;">Actual Counted Cash (ড্রয়ার ক্যাশ)</td>
-            <td align="right" style="padding: 8px 0 4px 0; font-weight: 800; color: #8a6d1f; font-size: 15px; font-family: monospace;">${formattedAmount(actualCash)}</td>
+          <tr style="border-top: 2px solid #334155;">
+            <td style="padding: 8px 0 4px 0; font-weight: 700; color: #ffffff;">Actual Counted Cash (ড্রয়ার ক্যাশ)</td>
+            <td align="right" style="padding: 8px 0 4px 0; font-weight: 800; color: #d4af37; font-size: 15px; font-family: monospace;">${formattedAmount(actualCash)}</td>
           </tr>
           <tr>
             <td style="padding: 6px 0; font-weight: 700; color: ${diffColor};">Discrepancy / Variance</td>
@@ -1460,9 +1460,9 @@ export async function sendDailyClosingEmailToAdmins({
       </div>
 
       ${differenceNotes ? `
-      <div style="margin-top: 12px; padding: 10px 14px; background-color: #f4f5f7; border: 1px solid #e2e8f0; border-radius: 6px;">
-        <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 2px;">Manager Notes:</div>
-        <div style="font-size: 13px; color: #475569;">${differenceNotes}</div>
+      <div style="margin-top: 12px; padding: 10px 14px; background-color: #0b0d13; border: 1px solid #1e222d; border-radius: 6px;">
+        <div style="font-size: 11px; font-weight: 700; color: #8492a6; text-transform: uppercase; margin-bottom: 2px;">Manager Notes:</div>
+        <div style="font-size: 13px; color: #cbd5e1;">${differenceNotes}</div>
       </div>
       ` : ''}
     `,
@@ -1506,42 +1506,42 @@ export async function sendBundleRequestEmailToAdmins({
   const fmtAmt = (n: number) => `৳${Number(n).toLocaleString('en-BD', { minimumFractionDigits: 0 })}`;
 
   const breakdownRows = [
-    bundle10  > 0 ? `<tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:6px 8px;color:#475569;">৳10 Notes</td><td style="padding:6px 8px;color:#475569;">${bundle10} bundle(s) × 100 pcs</td><td align="right" style="padding:6px 8px;font-weight:700;color:#8a6d1f;font-family:monospace;">${fmtAmt(bundleValueFor(10, bundle10))}</td></tr>` : '',
-    bundle20  > 0 ? `<tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:6px 8px;color:#475569;">৳20 Notes</td><td style="padding:6px 8px;color:#475569;">${bundle20} bundle(s) × 100 pcs</td><td align="right" style="padding:6px 8px;font-weight:700;color:#8a6d1f;font-family:monospace;">${fmtAmt(bundleValueFor(20, bundle20))}</td></tr>` : '',
-    bundle50  > 0 ? `<tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:6px 8px;color:#475569;">৳50 Notes</td><td style="padding:6px 8px;color:#475569;">${bundle50} bundle(s) × 100 pcs</td><td align="right" style="padding:6px 8px;font-weight:700;color:#8a6d1f;font-family:monospace;">${fmtAmt(bundleValueFor(50, bundle50))}</td></tr>` : '',
-    bundle100 > 0 ? `<tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:6px 8px;color:#475569;">৳100 Notes</td><td style="padding:6px 8px;color:#475569;">${bundle100} bundle(s) × 100 pcs</td><td align="right" style="padding:6px 8px;font-weight:700;color:#8a6d1f;font-family:monospace;">${fmtAmt(bundleValueFor(100, bundle100))}</td></tr>` : '',
+    bundle10  > 0 ? `<tr style="border-bottom:1px solid #1e222d;"><td style="padding:6px 8px;color:#cbd5e1;">৳10 Notes</td><td style="padding:6px 8px;color:#cbd5e1;">${bundle10} bundle(s) × 100 pcs</td><td align="right" style="padding:6px 8px;font-weight:700;color:#d4af37;font-family:monospace;">${fmtAmt(bundleValueFor(10, bundle10))}</td></tr>` : '',
+    bundle20  > 0 ? `<tr style="border-bottom:1px solid #1e222d;"><td style="padding:6px 8px;color:#cbd5e1;">৳20 Notes</td><td style="padding:6px 8px;color:#cbd5e1;">${bundle20} bundle(s) × 100 pcs</td><td align="right" style="padding:6px 8px;font-weight:700;color:#d4af37;font-family:monospace;">${fmtAmt(bundleValueFor(20, bundle20))}</td></tr>` : '',
+    bundle50  > 0 ? `<tr style="border-bottom:1px solid #1e222d;"><td style="padding:6px 8px;color:#cbd5e1;">৳50 Notes</td><td style="padding:6px 8px;color:#cbd5e1;">${bundle50} bundle(s) × 100 pcs</td><td align="right" style="padding:6px 8px;font-weight:700;color:#d4af37;font-family:monospace;">${fmtAmt(bundleValueFor(50, bundle50))}</td></tr>` : '',
+    bundle100 > 0 ? `<tr style="border-bottom:1px solid #1e222d;"><td style="padding:6px 8px;color:#cbd5e1;">৳100 Notes</td><td style="padding:6px 8px;color:#cbd5e1;">${bundle100} bundle(s) × 100 pcs</td><td align="right" style="padding:6px 8px;font-weight:700;color:#d4af37;font-family:monospace;">${fmtAmt(bundleValueFor(100, bundle100))}</td></tr>` : '',
   ].filter(Boolean).join('');
 
   const contentHtml = `
     ${buildDataRow('Branch', branchName)}
     ${buildDataRow('Requested By', managerName + (managerEmail ? ` &lt;${managerEmail}&gt;` : ''))}
     ${buildDataRow('Submission Time', bdTime())}
-    ${buildDataRow('Urgency', urgency === 'urgent' ? '🚨 URGENT' : '🟢 Normal', false, urgency === 'urgent' ? '#b91c1c' : '#15803d')}
+    ${buildDataRow('Urgency', urgency === 'urgent' ? '🚨 URGENT' : '🟢 Normal', false, urgency === 'urgent' ? '#f87171' : '#34d399')}
     ${buildDataRow('Total Amount Requested', fmtAmt(totalAmount), true)}
     <div style="margin-top:16px;">
-      <div style="font-size:11px;font-weight:700;color:#64748b;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">NOTE BUNDLE BREAKDOWN</div>
-      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="font-size:13px;border:1px solid #e2e8f0;border-radius:6px;overflow:hidden;">
-        <tr style="background-color:#f4f5f7;"><th style="padding:6px 8px;text-align:left;color:#64748b;font-size:11px;">Denomination</th><th style="padding:6px 8px;text-align:left;color:#64748b;font-size:11px;">Quantity</th><th style="padding:6px 8px;text-align:right;color:#64748b;font-size:11px;">Value</th></tr>
+      <div style="font-size:11px;font-weight:700;color:#8492a6;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">NOTE BUNDLE BREAKDOWN</div>
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="font-size:13px;border:1px solid #1e222d;border-radius:6px;overflow:hidden;">
+        <tr style="background-color:#0b0d13;"><th style="padding:6px 8px;text-align:left;color:#8492a6;font-size:11px;">Denomination</th><th style="padding:6px 8px;text-align:left;color:#8492a6;font-size:11px;">Quantity</th><th style="padding:6px 8px;text-align:right;color:#8492a6;font-size:11px;">Value</th></tr>
         ${breakdownRows}
-        <tr style="border-top:2px solid #cbd5e1;"><td colspan="2" style="padding:8px;font-weight:700;color:#17181c;">Total</td><td align="right" style="padding:8px;font-weight:800;color:#8a6d1f;font-size:14px;">${fmtAmt(totalAmount)}</td></tr>
+        <tr style="border-top:2px solid #334155;"><td colspan="2" style="padding:8px;font-weight:700;color:#ffffff;">Total</td><td align="right" style="padding:8px;font-weight:800;color:#d4af37;font-size:14px;">${fmtAmt(totalAmount)}</td></tr>
       </table>
     </div>
     ${reason ? buildDataRow('Reason / Remarks', reason) : ''}
     <div style="margin-top:24px;text-align:center;">
-      <a href="${reviewUrl}" style="display:inline-block;background:linear-gradient(135deg,#d4af37 0%,#aa7c11 100%);color:#17181c;font-size:14px;font-weight:800;padding:13px 26px;border-radius:8px;text-decoration:none;letter-spacing:0.5px;">👉 Review Request in Admin Panel</a>
+      <a href="${reviewUrl}" style="display:inline-block;background:linear-gradient(135deg,#d4af37 0%,#aa7c11 100%);color:#000000;font-size:14px;font-weight:800;padding:13px 26px;border-radius:8px;text-decoration:none;letter-spacing:0.5px;">👉 Review Request in Admin Panel</a>
     </div>
   `;
 
   const html = getPremiumNotificationHtml({
     title: 'Cash Bundle Requisition Submitted',
     greeting: 'Hello Administration Team,',
-    introText: `Branch Manager <strong style="color:#17181c;">${managerName}</strong> (<span style="color:#8a6d1f;font-weight:600;">${branchName}</span>) has submitted a cash change bundle requisition${urgency === 'urgent' ? ' marked as <strong style="color:#b91c1c;">URGENT</strong>' : ''}.`,
+    introText: `Branch Manager <strong style="color:#f8fafc;">${managerName}</strong> (<span style="color:#d4af37;font-weight:600;">${branchName}</span>) has submitted a cash change bundle requisition${urgency === 'urgent' ? ' marked as <strong style="color:#f87171;">URGENT</strong>' : ''}.`,
     boxTitle: '💵 Cash Bundle Requisition',
     boxIcon: '💵',
     badgeText: urgency === 'urgent' ? '🚨 URGENT' : 'Action Required',
-    badgeBg: urgency === 'urgent' ? '#fee2e2' : '#fef3c7',
-    badgeBorder: urgency === 'urgent' ? '#fca5a5' : '#f59e0b',
-    badgeColor: urgency === 'urgent' ? '#b91c1c' : '#8a6d1f',
+    badgeBg: urgency === 'urgent' ? '#450a0a' : '#422006',
+    badgeBorder: urgency === 'urgent' ? '#7f1d1d' : '#713f12',
+    badgeColor: urgency === 'urgent' ? '#f87171' : '#facc15',
     contentHtml,
     footerNote: 'Please log in to the Admin Panel to process this cash bundle requisition.',
   });
@@ -1580,16 +1580,16 @@ export async function sendBundleStatusEmailToManager({
   const fmtAmt = (n: number) => `৳${Number(n).toLocaleString('en-BD', { minimumFractionDigits: 0 })}`;
 
   const statusConfig: Record<string, { label: string; icon: string; badgeBg: string; badgeBorder: string; badgeColor: string }> = {
-    processing: { label: 'In-Transit / Processing', icon: '🚚', badgeBg: '#dbeafe', badgeBorder: '#93c5fd', badgeColor: '#1d4ed8' },
-    completed:  { label: 'Fulfilled & Completed',   icon: '✅', badgeBg: '#dcfce7', badgeBorder: '#4ade80', badgeColor: '#15803d' },
-    rejected:   { label: 'Request Declined',         icon: '❌', badgeBg: '#fee2e2', badgeBorder: '#fca5a5', badgeColor: '#b91c1c' },
+    processing: { label: 'In-Transit / Processing', icon: '🚚', badgeBg: '#1e3a8a', badgeBorder: '#1d4ed8', badgeColor: '#60a5fa' },
+    completed:  { label: 'Fulfilled & Completed',   icon: '✅', badgeBg: '#064e3b', badgeBorder: '#059669', badgeColor: '#34d399' },
+    rejected:   { label: 'Request Declined',         icon: '❌', badgeBg: '#450a0a', badgeBorder: '#7f1d1d', badgeColor: '#f87171' },
   };
   const cfg = statusConfig[status] || statusConfig.processing;
 
   const html = getPremiumNotificationHtml({
     title: `Bundle Requisition ${cfg.label}`,
     greeting: `Dear ${managerName},`,
-    introText: `Your cash bundle requisition of <strong style="color:#17181c;">${fmtAmt(totalAmount)}</strong> for <strong style="color:#8a6d1f;">${branchName}</strong> has been updated by Head Office.`,
+    introText: `Your cash bundle requisition of <strong style="color:#ffffff;">${fmtAmt(totalAmount)}</strong> for <strong style="color:#d4af37;">${branchName}</strong> has been updated by Head Office.`,
     boxTitle: `${cfg.icon} Bundle Requisition Update`,
     boxIcon: cfg.icon,
     badgeText: cfg.label.toUpperCase(),
@@ -1604,7 +1604,7 @@ export async function sendBundleStatusEmailToManager({
       ${buildDataRow('Update Time', bdTime())}
       ${adminNotes ? buildDataRow('Head Office Note', adminNotes) : ''}
       <div style="margin-top:24px;text-align:center;">
-        <a href="${historyUrl}" style="display:inline-block;background-color:#ffffff;color:#17181c;font-size:13px;font-weight:600;padding:10px 20px;border-radius:6px;border:1px solid #cbd5e1;text-decoration:none;">View My Requisitions &rarr;</a>
+        <a href="${historyUrl}" style="display:inline-block;background-color:#1e293b;color:#f8fafc;font-size:13px;font-weight:600;padding:10px 20px;border-radius:6px;border:1px solid #334155;text-decoration:none;">View My Requisitions &rarr;</a>
       </div>
     `,
     footerNote: status === 'rejected'
