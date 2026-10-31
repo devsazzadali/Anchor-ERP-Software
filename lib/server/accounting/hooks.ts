@@ -18,7 +18,8 @@ import { getPeriodForDate, postEvent, uuidFromString, type Db } from './post'
 import { postForSource, reverseForSource, syncClosingEntry, ACCT } from './events'
 import { recordIfPeriodBlocked } from './exceptions'
 import { toPoishaExact } from './reports'
-import { syncPayableItemForSource } from './payables'
+import { syncPayableItemForSource, ensureProfileParty } from './payables'
+import { syncTaxForSource, reverseTaxForSource, recordSalaryTax } from './tax'
 import { poishaToDecimalString } from './post'
 
 type Caller = Parameters<typeof logAudit>[0]['caller']
@@ -32,6 +33,34 @@ async function auditPost(caller: Caller, entryId: string, sourceTable: string, s
     entityId: entryId,
     newValue: { source_table: sourceTable, source_id: sourceId, event_type: eventType } as any,
   })
+}
+
+/**
+ * A7: bring a chalan's / company expense's VAT state to what the
+ * tax config + source figures demand (post / keep / reverse +
+ * repost). Runs after the base posting hook, in its own fail-soft
+ * block; a period refusal becomes a posting exception keyed to the
+ * tax event. In the dormant state (no rates configured) the sync
+ * computes "not taxable" and writes nothing.
+ */
+async function taxSync(sourceTable: string, sourceId: string, caller?: Caller): Promise<void> {
+  if (sourceTable !== 'product_chalans' && sourceTable !== 'company_expenses') return
+  try {
+    const res = await syncTaxForSource(prisma as Db, sourceTable, sourceId, caller?.id ?? null)
+    if (res.action === 'posted' || res.action === 'reposted') {
+      await logAudit({
+        caller: caller ?? null,
+        action: 'accounts.tax_posted',
+        eventType: 'create',
+        entityTable: 'tax_register_lines',
+        entityId: null,
+        newValue: { source_table: sourceTable, source_id: sourceId, action: res.action } as any,
+      })
+    }
+  } catch (err: any) {
+    await recordIfPeriodBlocked(prisma as Db, err, { source_table: sourceTable, source_id: sourceId })
+    console.error(`[accounts] taxSync ${sourceTable}/${sourceId} failed (fail-soft):`, err?.message || err)
+  }
 }
 
 /** Post the journal entry for a source record (salary, deposit, …). */
@@ -54,6 +83,7 @@ export async function hookPostSource(
     await recordIfPeriodBlocked(prisma as Db, err, { source_table: sourceTable, source_id: sourceId })
     console.error(`[accounts] hookPostSource ${sourceTable}/${sourceId} failed (fail-soft):`, err?.message || err)
   }
+  await taxSync(sourceTable, sourceId, caller)
 }
 
 /** Reverse the journal entry for a source record (void / reversal). */
@@ -76,6 +106,19 @@ export async function hookReverseSource(
     await recordIfPeriodBlocked(prisma as Db, err, { source_table: sourceTable, source_id: sourceId })
     console.error(`[accounts] hookReverseSource ${sourceTable}/${sourceId} failed (fail-soft):`, err?.message || err)
   }
+  // A7: a reversed/voided/deleted source takes its tax postings
+  // with it (contra entries; register lines flip to 'reversed').
+  if (sourceTable === 'salary_payments' || sourceTable === 'product_chalans' || sourceTable === 'company_expenses') {
+    try {
+      await reverseTaxForSource(prisma as Db, sourceTable, sourceId, {
+        entry_date: dhakaToday(),
+        created_by: caller?.id ?? null,
+      })
+    } catch (err: any) {
+      await recordIfPeriodBlocked(prisma as Db, err, { source_table: sourceTable, source_id: sourceId })
+      console.error(`[accounts] tax reversal ${sourceTable}/${sourceId} failed (fail-soft):`, err?.message || err)
+    }
+  }
 }
 
 /**
@@ -85,7 +128,7 @@ export async function hookReverseSource(
  * figures (postForSource's repost-after-reversal logic assigns the
  * suffixed event type). No-op when nothing changed.
  */
-export async function hookResyncSource(
+async function resyncSourceInner(
   sourceTable: string,
   sourceId: string,
   caller?: Caller
@@ -94,7 +137,16 @@ export async function hookResyncSource(
     const { buildInputForResync } = await import('./events')
     const desired = await buildInputForResync(prisma as Db, sourceTable, sourceId)
     const entries = await prisma.journalEntry.findMany({
-      where: { source_table: sourceTable, source_id: sourceId, is_reversal: false },
+      where: {
+        source_table: sourceTable,
+        source_id: sourceId,
+        is_reversal: false,
+        // Accounts A7: the resync owns the BASE entry family only;
+        // tax legs (tax_*) on the same source are synced by
+        // taxSync and must never be mistaken for the active base
+        // entry (they are usually the newest rows on the source).
+        event_type: { not: { startsWith: 'tax_' } },
+      },
       orderBy: { created_at: 'desc' },
     })
     let active: any = null
@@ -179,6 +231,68 @@ export async function hookResyncSource(
  * mirror, and a missed sync surfaces in the register tie-out
  * instead of breaking the operational write.
  */
+/**
+ * A7 wrapper: the base resync above early-returns when the base
+ * entry is unchanged — but a tax-only change (the vat_bearing flag
+ * flipped, a rate took effect) must still sync, so the tax sync
+ * runs unconditionally after the base resync, in its own
+ * fail-soft block.
+ */
+export async function hookResyncSource(
+  sourceTable: string,
+  sourceId: string,
+  caller?: Caller
+): Promise<void> {
+  await resyncSourceInner(sourceTable, sourceId, caller)
+  await taxSync(sourceTable, sourceId, caller)
+}
+
+/**
+ * A7: record the TDS a salary issue withheld (the deduction
+ * itself was applied inside the shared salary service). Writes
+ * the P11 journal leg + register line via tax.ts. Fail-soft; a
+ * period refusal becomes a posting exception.
+ */
+export async function hookTaxSalary(
+  paymentId: string,
+  applied: { base: number; rate_percent: string; amount: number },
+  caller?: Caller
+): Promise<void> {
+  try {
+    const payment = await prisma.salaryPayment.findUnique({ where: { id: paymentId } })
+    if (!payment) return
+    const party = await ensureProfileParty(prisma as Db, payment.employee_id)
+    const res = await recordSalaryTax(
+      prisma as Db,
+      payment,
+      {
+        base_p: toPoishaExact(applied.base),
+        rate_percent: applied.rate_percent,
+        tax_p: toPoishaExact(applied.amount),
+      },
+      party?.id ?? null,
+      caller?.id ?? null
+    )
+    if (res.created) {
+      await logAudit({
+        caller: caller ?? null,
+        action: 'accounts.tax_posted',
+        eventType: 'create',
+        entityTable: 'tax_register_lines',
+        entityId: res.register_id,
+        newValue: { source_table: 'salary_payments', source_id: paymentId, kind: 'tds_salary' } as any,
+      })
+    }
+  } catch (err: any) {
+    await recordIfPeriodBlocked(prisma as Db, err, {
+      source_table: 'salary_payments',
+      source_id: paymentId,
+      event_type: 'tax_tds_salary',
+    })
+    console.error(`[accounts] hookTaxSalary ${paymentId} failed (fail-soft):`, err?.message || err)
+  }
+}
+
 export async function hookSyncPayables(sourceTable: string, sourceId: string): Promise<void> {
   try {
     await syncPayableItemForSource(prisma as Db, sourceTable, sourceId)

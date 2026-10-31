@@ -73,7 +73,7 @@ export default function PayablesPage() {
   const [notice, setNotice] = useState<string | null>(null)
   const [direction, setDirection] = useState<'payable' | 'receivable'>('payable')
   const [settling, setSettling] = useState<Item | null>(null)
-  const [form, setForm] = useState({ amount: '', paid_via: '1005', settlement_date: '', note: '' })
+  const [form, setForm] = useState({ amount: '', paid_via: '1005', settlement_date: '', note: '', tds: false })
   const [history, setHistory] = useState<{ item: Item; rows: Settlement[] } | null>(null)
 
   const load = useCallback(async () => {
@@ -143,10 +143,12 @@ export default function PayablesPage() {
         paid_via: settling.journal_backed ? form.paid_via : null,
         settlement_date: form.settlement_date || null,
         note: form.note || null,
+        tds: settling.journal_backed ? form.tds : false,
       })
       setNotice(
         json.mode === 'journal'
-          ? `Settlement posted to the journal (entry ${String(json.journal_entry_id).slice(0, 8)}…) and the source record updated.`
+          ? `Settlement posted to the journal (entry ${String(json.journal_entry_id).slice(0, 8)}…) and the source record updated.` +
+            (json.tds ? ` TDS withheld ৳${json.tds.amount} at ${json.tds.rate_percent}% — recorded in the VAT & TDS register.` : '')
           : 'External settlement recorded — no journal entry, by design (the source module owns the pay path).'
       )
       setSettling(null)
@@ -331,6 +333,17 @@ export default function PayablesPage() {
               <input value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} className="w-full rounded-lg border border-slate-300 px-3 py-2" placeholder={settling.journal_backed ? '' : 'Who was paid, how, reference'} />
             </label>
           </div>
+          {settling.journal_backed && (
+            <label className="mt-3 flex items-start gap-2 text-sm text-slate-700">
+              <input type="checkbox" checked={form.tds} onChange={(e) => setForm({ ...form, tds: e.target.checked })} className="mt-0.5 h-4 w-4 rounded border-slate-300" />
+              <span>
+                Deduct TDS at source — the rate comes from Accounts → VAT &amp; TDS settings (TDS on payments).
+                The payable settles in full; the paid-from account receives the net and the withheld part is
+                credited to TDS Payable. If TDS is not configured there, the settlement is refused with an
+                explanation and nothing is written.
+              </span>
+            </label>
+          )}
           <div className="flex gap-2 mt-4">
             <button onClick={submitSettlement} className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700">
               Record settlement
@@ -419,7 +432,7 @@ export default function PayablesPage() {
                   <div className="flex flex-wrap gap-1.5">
                     {i.status !== 'settled' && (
                       <button
-                        onClick={() => { setSettling(i); setForm({ amount: i.open_amount, paid_via: '1005', settlement_date: '', note: '' }); setHistory(null) }}
+                        onClick={() => { setSettling(i); setForm({ amount: i.open_amount, paid_via: '1005', settlement_date: '', note: '', tds: false }); setHistory(null) }}
                         className="px-2.5 py-1 rounded-md bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700"
                       >
                         Settle

@@ -46,6 +46,9 @@ type Expense = {
   // cost, 'operating' = regular company expense. Absent on pre-migration
   // rows — expenseKindOf() treats anything not 'setup' as 'operating'.
   expense_kind?: string | null
+  // Accounts A7: the admin's deliberate VAT-bearing flag (input VAT is
+  // recorded only for flagged expenses, and only when configured).
+  vat_bearing?: boolean | null
 }
 
 export default function AdminExpenses() {
@@ -60,6 +63,7 @@ export default function AdminExpenses() {
   const [showAddModal, setShowAddModal] = useState(false)
   const [purpose, setPurpose] = useState('')
   const [expenseKind, setExpenseKind] = useState<ExpenseKind>('operating')
+  const [vatBearing, setVatBearing] = useState(false)
   const [total, setTotal] = useState('')
   const [paid, setPaid] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -76,6 +80,7 @@ export default function AdminExpenses() {
   const [editId, setEditId] = useState<string | null>(null)
   const [editPaid, setEditPaid] = useState('')
   const [editKind, setEditKind] = useState<ExpenseKind>('operating')
+  const [editVat, setEditVat] = useState(false)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [isSelectMode, setIsSelectMode] = useState(false)
   const [showExportDropdown, setShowExportDropdown] = useState(false)
@@ -190,7 +195,8 @@ export default function AdminExpenses() {
       purpose, total_amount: parsedTotal, paid_amount: parsedPaid,
       branch_id: isAll || selectedBranch?.id === 'general' ? null : selectedBranch?.id || null,
       branch_name: branchName, is_all_branches: isAll,
-      expense_kind: expenseKind
+      expense_kind: expenseKind,
+      vat_bearing: vatBearing
     }
 
     try {
@@ -209,7 +215,7 @@ export default function AdminExpenses() {
     } catch (err: any) {
       setFeedback({ type: 'error', message: err.message })
     }
-    setPurpose(''); setExpenseKind('operating'); setTotal(''); setPaid('')
+    setPurpose(''); setExpenseKind('operating'); setVatBearing(false); setTotal(''); setPaid('')
     setShowAddModal(false)
     setIsSubmitting(false)
     setTimeout(() => setFeedback(null), 3000)
@@ -235,9 +241,9 @@ export default function AdminExpenses() {
     await fetch(`/api/admin/company-expenses?id=${editId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ paid_amount: paidNum, expense_kind: editKind }),
+      body: JSON.stringify({ paid_amount: paidNum, expense_kind: editKind, vat_bearing: editVat }),
     })
-    const upd = expenses.map(e => e.id === editId ? { ...e, paid_amount: paidNum, due_amount: dueNum, expense_kind: editKind } : e)
+    const upd = expenses.map(e => e.id === editId ? { ...e, paid_amount: paidNum, due_amount: dueNum, expense_kind: editKind, vat_bearing: editVat } : e)
     setExpenses(upd)
     setEditId(null); setEditPaid('')
   }
@@ -997,6 +1003,9 @@ export default function AdminExpenses() {
                                     ) : (
                                       <span className="inline-flex items-center mt-1 px-1.5 py-px rounded bg-slate-900/[0.04] text-slate-500 border border-slate-900/10 text-[8px] font-bold uppercase tracking-wider">Regular</span>
                                     )}
+                                    {exp.vat_bearing && (
+                                      <span className="inline-flex items-center mt-1 ml-1 px-1.5 py-px rounded bg-amber-500/10 text-amber-700 border border-amber-500/20 text-[8px] font-bold uppercase tracking-wider" title="Flagged VAT-bearing — input VAT is recorded when VAT input is configured in Accounts → VAT & TDS">VAT</span>
+                                    )}
                                   </div>
                                 </div>
                               </td>
@@ -1025,6 +1034,10 @@ export default function AdminExpenses() {
                                     <option value="operating">Regular</option>
                                     <option value="setup">Setup</option>
                                   </select>
+                                  <label className="flex items-center gap-1 text-[10px] text-slate-600" title="VAT-bearing (input VAT claimable)">
+                                    <input type="checkbox" checked={editVat} onChange={e => setEditVat(e.target.checked)} className="w-3.5 h-3.5" />
+                                    VAT
+                                  </label>
                                   <input type="number" step="0.01" value={editPaid} onChange={e => setEditPaid(e.target.value)}
                                     className="w-20 bg-white border border-slate-900/15 rounded-md p-1 text-slate-900 text-xs focus:outline-none" />
                                   <button type="submit" className="text-emerald-600 hover:text-emerald-700 p-2"><Check className="w-3.5 h-3.5" /></button>
@@ -1039,7 +1052,7 @@ export default function AdminExpenses() {
                             <td className="py-3.5 pr-5">
                               {!isEditing && (
                                 <div className="flex items-center justify-end gap-2">
-                                  <button onClick={() => { setEditId(exp.id); setEditPaid(String(exp.paid_amount)); setEditKind(expenseKindOf(exp)) }} className="text-slate-600 hover:text-[#15803d] transition-colors p-2 rounded-md"><Edit className="w-3.5 h-3.5" /></button>
+                                  <button onClick={() => { setEditId(exp.id); setEditPaid(String(exp.paid_amount)); setEditKind(expenseKindOf(exp)); setEditVat(!!exp.vat_bearing) }} className="text-slate-600 hover:text-[#15803d] transition-colors p-2 rounded-md"><Edit className="w-3.5 h-3.5" /></button>
                                   <button onClick={() => handleDelete(exp.id)} className="text-slate-600 hover:text-rose-600 transition-colors p-2 rounded-md"><Trash2 className="w-3.5 h-3.5" /></button>
                                 </div>
                               )}
@@ -1112,6 +1125,13 @@ export default function AdminExpenses() {
                         <span className="block text-[9px] text-slate-500 mt-0.5">AC, lights, furnishing &amp; other opening costs</span>
                       </button>
                     </div>
+                    <label className="mt-2 flex items-start gap-2 text-[11px] text-slate-600 cursor-pointer">
+                      <input type="checkbox" checked={vatBearing} onChange={e => setVatBearing(e.target.checked)} className="mt-0.5 w-3.5 h-3.5" />
+                      <span>
+                        <span className="font-bold text-slate-900">VAT-bearing</span> — input VAT on this purchase is claimable.
+                        Recorded only when VAT input is configured under Accounts → VAT &amp; TDS.
+                      </span>
+                    </label>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">

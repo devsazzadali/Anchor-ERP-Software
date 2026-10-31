@@ -365,6 +365,11 @@ model CompanyExpense {
   // Settled expense-model spec: 'setup' | 'operating' (migration
   // 20261031_expense_model.sql, cutover-only in the source repo).
   expense_kind    String   @default("operating")
+  // Accounts A7: admin-set flag — this expense bears claimable
+  // input VAT. Default false; never auto-assumed. Only flagged
+  // expenses feed the VAT-input register (when VAT_INPUT is
+  // enabled with a rate in tax_settings).
+  vat_bearing     Boolean  @default(false)
   description     String?
   created_by      String?  @db.Uuid
   created_by_name String?
@@ -1552,7 +1557,9 @@ model TaxRegisterLine {
   id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   // 'YYYY-MM'
   period          String
-  // vat_output | vat_input | tds_salary | tds_rent | tds_professional | other
+  // vat_output | vat_input | tds_salary | tds_payment
+  // (blueprint also names tds_rent / tds_professional / other —
+  // A7's TDS on settlements records under tds_payment)
   kind            String
   source_table    String?
   source_id       String?  @db.Uuid
@@ -1560,9 +1567,37 @@ model TaxRegisterLine {
   rate            Decimal  @db.Decimal(7, 4)
   tax_amount      Decimal  @db.Decimal(15, 2)
   counterparty_id String?  @db.Uuid
+  // Accounts A7: the P11 journal entry carrying this line's tax
+  // leg, and the line's lifecycle ('active' | 'reversed'). The
+  // partial UNIQUE index (one ACTIVE line per source+kind) lives
+  // in the A7 DDL script — Prisma cannot express partial indexes.
+  journal_entry_id String? @db.Uuid
+  status          String   @default("active")
   created_at      DateTime @default(now()) @db.Timestamptz(6)
 
   @@map("tax_register_lines")
+}
+
+// Accounts A7 — VAT/TDS configuration, one row per tax type.
+// Ships DISABLED with rate_percent NULL for every type (dormant:
+// no tax is recorded anywhere) until the owner/CA enters real
+// rates + effective dates in Accounts → VAT & TDS. No statutory
+// rate is seeded or hard-coded (blueprint decision D4).
+model TaxSetting {
+  id                 String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  // VAT_OUTPUT | VAT_INPUT | TDS_SALARY | TDS_PAYMENT
+  tax_type           String    @unique
+  label              String
+  rate_percent       Decimal?  @db.Decimal(7, 4)
+  effective_from     DateTime? @db.Date
+  is_enabled         Boolean   @default(false)
+  payable_account_id String?   @db.Uuid
+  offset_account_id  String?   @db.Uuid
+  notes              String?
+  created_at         DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@map("tax_settings")
 }
 
 model Cheque {

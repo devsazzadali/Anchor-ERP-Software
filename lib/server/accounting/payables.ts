@@ -52,6 +52,7 @@ import { isPeriodBlockedError, postEvent, poishaToDecimalString, uuidFromString,
 import { ACCT } from './events'
 import { toPoishaExact, taka } from './reports'
 import { recordPostingException } from './exceptions'
+import { effectiveTax, computeTaxPoisha, registerLineData } from './tax'
 
 export class PayableError extends Error {
   status: number
@@ -702,8 +703,19 @@ export async function settlePayable(
     settlement_date?: string | null
     note?: string | null
     created_by?: string | null
+    /** Accounts A7: withhold the configured TDS_PAYMENT rate from
+     * this settlement (journal-backed class only). The obligation
+     * settles in full — paid-via receives the NET, the withheld
+     * part credits TDS Payable, and a register line is written. */
+    withhold_tds?: boolean
   }
-): Promise<{ settlement_id: string; journal_entry_id: string | null; mode: string; item: any }> {
+): Promise<{
+  settlement_id: string
+  journal_entry_id: string | null
+  mode: string
+  item: any
+  tds: { rate_percent: string; amount: string } | null
+}> {
   const item = await db.payableReceivable.findUnique({ where: { id: input.item_id } })
   if (!item) throw new PayableError(404, 'Register item not found')
   if (item.direction !== 'payable') {
@@ -731,6 +743,28 @@ export async function settlePayable(
     if (paidVia === ACCT.cashBranch && !item.branch_id) {
       throw new PayableError(400, 'Branch cash needs a branch — this item carries none; pay from Head Office or a bank account')
     }
+    // Accounts A7 — TDS withholding on this settlement, only when
+    // the admin asked for it AND the type is configured. A
+    // requested-but-unconfigured deduction refuses BEFORE anything
+    // is written (no silent full payment, no invented rate).
+    let tdsP = 0
+    let tdsRate: string | null = null
+    let tdsPayableCode: string | null = null
+    if (input.withhold_tds) {
+      const cfg = await effectiveTax(db, 'TDS_PAYMENT', date)
+      if (!cfg) {
+        throw new PayableError(
+          400,
+          'TDS deduction was requested, but TDS on payments is not enabled with a rate effective on the settlement date — ' +
+            'configure it under Accounts → VAT & TDS first. Nothing was written.'
+        )
+      }
+      tdsP = computeTaxPoisha(amount_p, cfg.rate_units)
+      if (tdsP <= 0) throw new PayableError(400, 'The configured TDS rate produces a zero deduction on this amount — settle without TDS.')
+      if (tdsP >= amount_p) throw new PayableError(400, 'The configured TDS rate would consume the whole settlement — check the rate in Accounts → VAT & TDS.')
+      tdsRate = cfg.rate_percent
+      tdsPayableCode = cfg.payable_code
+    }
     let entry: { entry_id: string }
     try {
       entry = await postEvent(db, {
@@ -750,9 +784,21 @@ export async function settlePayable(
           {
             account_code: paidVia,
             branch_id: paidVia === ACCT.cashBranch ? item.branch_id : null,
-            credit: amount_p / 100,
-            memo: `Settlement of ${item.description}`,
+            credit: (amount_p - tdsP) / 100,
+            memo:
+              tdsP > 0
+                ? `Settlement of ${item.description} (net of TDS ৳${taka(tdsP)} @ ${tdsRate}%)`
+                : `Settlement of ${item.description}`,
           },
+          ...(tdsP > 0
+            ? [
+                {
+                  account_code: tdsPayableCode!,
+                  credit: tdsP / 100,
+                  memo: `TDS withheld @ ${tdsRate}% — ${item.description}`,
+                },
+              ]
+            : []),
         ],
       })
     } catch (err: any) {
@@ -794,12 +840,41 @@ export async function settlePayable(
           created_by: input.created_by ?? null,
         },
       })
+      if (tdsP > 0) {
+        // Accounts A7: the withholding joins the VAT/TDS register,
+        // linked to this settlement + its journal entry.
+        await tx.taxRegisterLine.create({
+          data: registerLineData({
+            period: date.slice(0, 7),
+            kind: 'tds_payment',
+            source_table: 'payable_settlements',
+            source_id: settlementId,
+            base_p: amount_p,
+            rate_percent: tdsRate!,
+            tax_p: tdsP,
+            counterparty_id: item.counterparty_id ?? null,
+            journal_entry_id: entry.entry_id,
+          }),
+        })
+      }
     })
     const fresh = await syncPayableItemForSource(db, 'company_expenses', item.source_id)
-    return { settlement_id: settlementId, journal_entry_id: entry.entry_id, mode: 'journal', item: fresh }
+    return {
+      settlement_id: settlementId,
+      journal_entry_id: entry.entry_id,
+      mode: 'journal',
+      item: fresh,
+      tds: tdsP > 0 ? { rate_percent: tdsRate!, amount: taka(tdsP) } : null,
+    }
   }
 
   // External settlement — memorandum classes only.
+  if (input.withhold_tds) {
+    throw new PayableError(
+      400,
+      'TDS can only be withheld on a journal settlement — this class settles outside the books, so no tax is recorded for it.'
+    )
+  }
   const note = (input.note ?? '').trim()
   if (note.length < 3) {
     throw new PayableError(
@@ -851,7 +926,7 @@ export async function settlePayable(
     }
   })
   const fresh = await syncPayableItemForSource(db, item.source_table, item.source_id)
-  return { settlement_id: settlementId, journal_entry_id: null, mode: 'external', item: fresh }
+  return { settlement_id: settlementId, journal_entry_id: null, mode: 'external', item: fresh, tds: null }
 }
 
 // ── Counterparty administration ───────────────────────────────────

@@ -26,6 +26,8 @@ export const ACCT = {
   cashInTransit: '1030',
   inventory: '1040',
   accountsPayable: '2000',
+  vatPayable: '2030',
+  tdsPayable: '2040',
   salesRevenue: '4000',
   otherIncome: '4010',
   salaryBasic: '5010',
@@ -441,7 +443,18 @@ export async function reverseForSource(
   opts: { entry_date: string; memo?: string | null; created_by?: string | null }
 ): Promise<PostResult | null> {
   const entries = await db.journalEntry.findMany({
-    where: { source_table: sourceTable, source_id: sourceId, is_reversal: false },
+    where: {
+      source_table: sourceTable,
+      source_id: sourceId,
+      is_reversal: false,
+      // Accounts A7: tax legs (event_type tax_*) are a SEPARATE
+      // family living on the same source record. They are reversed
+      // through the VAT/TDS register (tax.ts reverseTaxForSource),
+      // never by this base path — otherwise reversing a source
+      // would consume its newest tax leg and leave the base entry
+      // standing.
+      event_type: { not: { startsWith: 'tax_' } },
+    },
     orderBy: { created_at: 'desc' },
   })
   for (const e of entries) {

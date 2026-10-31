@@ -40,7 +40,9 @@ import { issueSalaryPayment, SalaryIssueError } from '../salary-issue'
 import { PeriodBlockedError } from './post'
 import { recordPostingException } from './exceptions'
 import { ensureProfileParty } from './payables'
-import { toPoishaExact } from './reports'
+import { toPoishaExact, taka } from './reports'
+import { salaryTdsFor } from './tax'
+import { dhakaToday } from '../../dhaka-time'
 
 export class PayrollError extends Error {
   status: number
@@ -633,6 +635,13 @@ export async function issueRun(db: Db, caller: any, runId: string, req?: Request
       select: { branch_id: true, full_name: true },
     })
     const folded = foldComponents(line)
+    // Accounts A7: when TDS_SALARY is configured, tax is withheld
+    // at issue — computed on the line GROSS (the statutory base)
+    // and passed through the shared service's deduction input;
+    // the service records the register line + P11 journal leg.
+    // Dormant (null) in the shipped state: the issue below is
+    // then byte-identical to A6.
+    const tds = await salaryTdsFor(db, toPoishaExact(line.gross_salary), dhakaToday())
     const breakdown = Array.isArray(line.deduction_breakdown) && line.deduction_breakdown.length
       ? ` (${line.deduction_breakdown.map((d: any) => `${d.label} ৳${d.amount}`).join(', ')})`
       : ''
@@ -640,7 +649,10 @@ export async function issueRun(db: Db, caller: any, runId: string, req?: Request
       `Payroll ${run.month} (run ${runId.slice(0, 8)}): basic ৳${n(line.basic)} + allowances ৳${n(line.allowances)}` +
       ` + OT ৳${n(line.overtime)} + bonus ৳${n(line.bonus)} + commission ৳${n(line.commission)} + tiffin ৳${n(line.tiffin)}` +
       ` = gross ৳${n(line.gross_salary)}; deductions ৳${n(line.deductions)}${breakdown}; net ৳${n(line.net_payable)}.` +
-      ' Allowances/deductions are folded into the payment basic component — the payroll line keeps the full breakdown.'
+      ' Allowances/deductions are folded into the payment basic component — the payroll line keeps the full breakdown.' +
+      (tds
+        ? ` TDS withheld ৳${taka(tds.tax_p)} at ${tds.rate_percent}% on the gross (VAT/TDS register) — net paid ৳${taka(toPoishaExact(line.net_payable) - tds.tax_p)}.`
+        : '')
     try {
       const result = await issueSalaryPayment(caller, {
         employee_id: line.user_id,
@@ -653,6 +665,9 @@ export async function issueRun(db: Db, caller: any, runId: string, req?: Request
         ledger_head_id: head.id,
         notes,
         trx_suffix: line.id.slice(0, 8),
+        ...(tds
+          ? { deductions: [{ label: 'TDS', amount: tds.tax, tax_kind: 'tds_salary', rate_percent: tds.rate_percent }] }
+          : {}),
       }, req)
       await db.payrollSheet.update({
         where: { id: line.id },

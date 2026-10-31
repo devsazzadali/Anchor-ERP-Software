@@ -93,6 +93,7 @@ export async function POST(req: Request) {
         settlement_date: body.settlement_date ?? null,
         note: body.note ?? null,
         created_by: g.caller.id ?? null,
+        withhold_tds: body.tds === true || body.withhold_tds === true,
       })
       await logAudit({
         caller: g.caller,
@@ -109,12 +110,14 @@ export async function POST(req: Request) {
           amount: String(body.amount ?? ''),
           mode: res.mode,
           journal_entry_id: res.journal_entry_id,
+          tds: res.tds ?? null,
         } as any,
       })
       return NextResponse.json({
         settlement_id: res.settlement_id,
         journal_entry_id: res.journal_entry_id,
         mode: res.mode,
+        tds: res.tds ?? null,
         settlements: await listSettlements(db, itemId),
       })
     }

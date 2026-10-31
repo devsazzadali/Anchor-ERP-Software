@@ -72,6 +72,9 @@ export async function POST(req: NextRequest) {
         // (expenseKindOf's rule — a one-time opening cost must be a
         // deliberate mark).
         expense_kind: expenseKindOf(body),
+        // Accounts A7: VAT-input is recorded only when the admin
+        // deliberately flags the expense VAT-bearing.
+        vat_bearing: !!body.vat_bearing,
         created_by: caller.uid,
         created_by_name: caller.full_name,
       },
@@ -80,7 +83,7 @@ export async function POST(req: NextRequest) {
       caller, req, action: 'company_expense.create', eventType: 'create',
       entityTable: 'company_expenses', entityId: data.id,
       branchId: data.branch_id ?? null,
-      fieldChanges: diffFields(null, data as any, ['purpose', 'total_amount', 'paid_amount', 'due_amount', 'expense_kind']),
+      fieldChanges: diffFields(null, data as any, ['purpose', 'total_amount', 'paid_amount', 'due_amount', 'expense_kind', 'vat_bearing']),
     })
     // Accounts A1 (P4): post the company-expense accrual + any
     // initial settlement. Fail-soft.
@@ -126,6 +129,9 @@ export async function PATCH(req: NextRequest) {
     if ('expense_kind' in body) {
       patch.expense_kind = expenseKindOf(body)
     }
+    if ('vat_bearing' in body) {
+      patch.vat_bearing = !!body.vat_bearing
+    }
     if (Object.keys(patch).length === 0) {
       return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 })
     }
@@ -135,7 +141,7 @@ export async function PATCH(req: NextRequest) {
       caller, req, action: 'company_expense.update', eventType: 'update',
       entityTable: 'company_expenses', entityId: id,
       branchId: (data as any).branch_id ?? null,
-      fieldChanges: diffFields(existing as any, data as any, ['paid_amount', 'due_amount', 'expense_kind']),
+      fieldChanges: diffFields(existing as any, data as any, ['paid_amount', 'due_amount', 'expense_kind', 'vat_bearing']),
     })
     // Accounts A1 (P4): a paid_amount change posts a settlement
     // event for the delta (and the base entry if it was missed).

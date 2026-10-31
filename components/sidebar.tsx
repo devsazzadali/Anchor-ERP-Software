@@ -79,6 +79,9 @@ const adminNavigation = [
       // Accounts A6: the monthly payroll cycle (disburses through
       // the one shared salary path).
       { name: 'Payroll', href: '/admin/accounts/payroll' },
+      // Accounts A7: VAT/TDS configuration + register (dormant
+      // until the owner/CA enters rates).
+      { name: 'VAT & TDS', href: '/admin/accounts/tax' },
       // Accounts A2: statements over the journal.
       { name: 'Statements', href: '/admin/accounts/statements' },
       { name: 'Trial Balance', href: '/admin/accounts/statements/trial-balance' },
