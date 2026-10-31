@@ -1124,6 +1124,38 @@ model OtpCode {
   @@map("otp_codes")
 }
 
+// Accounts A6 — the monthly payroll cycle header (blueprint §B.1).
+// Created by targeted DDL (scripts/accounts-a6-ddl.mjs), never a
+// full db push. Status flow: draft → in_review → approved →
+// issued; an unissued run may be voided (mandatory reason). A month
+// is blocked by an issued run that still has live (non-voided)
+// payments — enforced in lib/server/accounting/payroll.ts.
+model PayrollRun {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  // 'YYYY-MM'
+  month            String
+  // draft | in_review | approved | issued | voided
+  status           String    @default("draft")
+  total_gross      Decimal   @default(0) @db.Decimal(15, 2)
+  total_deductions Decimal   @default(0) @db.Decimal(15, 2)
+  total_net        Decimal   @default(0) @db.Decimal(15, 2)
+  notes            String?
+  created_by       String?   @db.Uuid
+  approved_by      String?   @db.Uuid
+  approved_at      DateTime? @db.Timestamptz(6)
+  issued_by        String?   @db.Uuid
+  issued_at        DateTime? @db.Timestamptz(6)
+  voided_by        String?   @db.Uuid
+  voided_at        DateTime? @db.Timestamptz(6)
+  void_reason      String?
+  created_at       DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@index([month])
+  @@index([status])
+  @@map("payroll_runs")
+}
+
 model PayrollSheet {
   id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   user_id            String?  @db.Uuid
@@ -1134,8 +1166,33 @@ model PayrollSheet {
   net_payable        Decimal  @db.Decimal(10, 2)
   status             String?  @default("draft")
   created_at         DateTime? @default(now()) @db.Timestamptz(6)
+  // Accounts A6: run lines REUSE this dormant model (blueprint
+  // §B.1) — the run link, a name/branch snapshot, the component
+  // breakdown the dormant shape never had, the deduction detail,
+  // and the link to the salary payment once the line is issued
+  // through the single salary path. `origin`: 'run' (this run
+  // pays it) | 'existing_payment' (already issued via Issue
+  // Salary; drafted into the run for review only). All added by
+  // targeted DDL (scripts/accounts-a6-ddl.mjs). The legacy
+  // UNIQUE(user_id, month_year) was dropped by the same DDL: it
+  // predates runs and would forbid a second run for the same
+  // employee+month (post-void re-runs, review lines).
+  payroll_run_id     String?  @db.Uuid
+  employee_name      String?
+  branch_id          String?  @db.Uuid
+  basic              Decimal  @default(0) @db.Decimal(15, 2)
+  allowances         Decimal  @default(0) @db.Decimal(15, 2)
+  overtime           Decimal  @default(0) @db.Decimal(15, 2)
+  bonus              Decimal  @default(0) @db.Decimal(15, 2)
+  commission         Decimal  @default(0) @db.Decimal(15, 2)
+  tiffin             Decimal  @default(0) @db.Decimal(15, 2)
+  deduction_breakdown Json?
+  salary_payment_id  String?  @db.Uuid
+  origin             String   @default("run")
 
-  @@unique([user_id, month_year])
+  @@index([payroll_run_id])
+  @@index([salary_payment_id])
+  @@index([user_id, month_year])
   @@map("payroll_sheets")
 }
 

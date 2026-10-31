@@ -5,6 +5,7 @@ import { toPlain } from '@/lib/server/respond'
 import { syncExpenseToLedger } from '@/lib/server/ledger-sync'
 import { logAudit, diffFields } from '@/lib/server/audit'
 import { hookReverseSource } from '@/lib/server/accounting/hooks'
+import { hookPayrollPaymentVoided } from '@/lib/server/accounting/payroll'
 
 // POST /api/admin/salary-payments/[id]/void — FR-14.1.
 //
@@ -96,6 +97,12 @@ export async function POST(req: Request, context: any) {
     // Accounts A1: voiding reverses the salary journal entry
     // (append-only contra). Fail-soft.
     await hookReverseSource('salary_payments', id, caller, 'Salary payment voided')
+
+    // Accounts A6: if this payment was disbursed by a payroll
+    // run, the void reflects back onto its run line (line marked
+    // voided, A5 register mirror reopened, run totals recomputed).
+    // Fail-soft, same pattern as the other hooks.
+    await hookPayrollPaymentVoided(prisma as any, id, caller)
 
     return NextResponse.json({ payment: toPlain(result.payment), mirror_reversed: result.mirrorReversed })
   } catch (err: any) {
