@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
-import { hashPassword } from '@/lib/server/passwords'
+import { hashPassword, validatePasswordPolicy } from '@/lib/server/passwords'
+import { logAudit, diffFields } from '@/lib/server/audit'
 
 // auth.admin.updateUserById/deleteUser
 // become direct auth_users work. An admin-set password replaces
@@ -29,8 +30,16 @@ export async function PUT(req: Request, context: any) {
     const params = await Promise.resolve(context.params)
     const id = params.id
 
+    const beforeProfile = await prisma.profile.findUnique({ where: { id } }).catch(() => null)
+
     // Update password if provided
     if (password) {
+      // S3 (R2 Security Round, Writer B — the only S3 change to this
+      // S1 file): admin-set passwords go through the shared policy.
+      const policy = validatePasswordPolicy(String(password))
+      if (!policy.ok) {
+        return NextResponse.json({ error: policy.error }, { status: 400 })
+      }
       const passwordHash = await hashPassword(password)
       await prisma.authUser.update({
         where: { id },
@@ -47,6 +56,19 @@ export async function PUT(req: Request, context: any) {
     if (Object.keys(updateData).length > 0) {
       await prisma.profile.update({ where: { id }, data: updateData })
     }
+
+    const roleChanged = updateData.role !== undefined || updateData.profile_type !== undefined
+    await logAudit({
+      caller: gate.caller, req,
+      action: password ? 'user.update_with_password_reset' : 'user.update',
+      eventType: roleChanged ? 'role_change' : 'update',
+      entityTable: 'profiles', entityId: id,
+      branchId: (beforeProfile as any)?.branch_id ?? null,
+      fieldChanges: [
+        ...diffFields(beforeProfile as any, { ...(beforeProfile as any), ...updateData }, ['phone_number', 'role', 'profile_type']),
+        ...(password ? [{ field: 'password', old: '[redacted]', new: '[redacted]' }] : []),
+      ],
+    })
 
     return NextResponse.json({ message: 'User updated successfully' })
   } catch (error: any) {
@@ -71,11 +93,20 @@ export async function DELETE(req: Request, context: any) {
       return NextResponse.json({ error: 'You cannot delete your own admin account.' }, { status: 400 })
     }
 
+    const beforeProfile = await prisma.profile.findUnique({ where: { id } }).catch(() => null)
+
     // Deleting the auth user cascades to the profile (the app's FK
     // design mirrors the legacy behaviour).
     await prisma.$transaction(async (tx) => {
       await tx.profile.deleteMany({ where: { id } })
       await tx.authUser.delete({ where: { id } })
+    })
+
+    await logAudit({
+      caller, req, action: 'user.delete', eventType: 'delete',
+      entityTable: 'profiles', entityId: id,
+      branchId: (beforeProfile as any)?.branch_id ?? null,
+      oldValue: beforeProfile ? { email: beforeProfile.email, full_name: beforeProfile.full_name, role: beforeProfile.role } as any : null,
     })
 
     return NextResponse.json({ message: 'User deleted successfully' })

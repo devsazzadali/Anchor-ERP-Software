@@ -3,6 +3,7 @@ import { roundMoney, sumMoney } from '@/lib/money'
 import { prisma } from '@/lib/db'
 import { callerIsAdmin, getCallerProfile } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
+import { logAudit, diffFields } from '@/lib/server/audit'
 
 // Same server-side totals computation as POST /api/chalans
 // (duplicated here so neither route file exports non-handlers).
@@ -60,7 +61,7 @@ export async function PATCH(req: Request, context: any) {
     if (!canWrite(caller)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
     const { id } = await context.params
-    const existing = await prisma.productChalan.findUnique({ where: { id }, select: { id: true } })
+    const existing = await prisma.productChalan.findUnique({ where: { id } })
     if (!existing) return NextResponse.json({ error: 'Chalan not found' }, { status: 404 })
 
     const body = await req.json().catch(() => ({}))
@@ -75,6 +76,11 @@ export async function PATCH(req: Request, context: any) {
         total_cost: computed.totalCost,
         notes: body.notes ? String(body.notes).trim() || null : null,
       },
+    })
+    await logAudit({
+      caller, req, action: 'chalan.update', eventType: 'update',
+      entityTable: 'product_chalans', entityId: id, branchId: updated.branch_id ?? null,
+      fieldChanges: diffFields(existing as any, updated as any, ['total_amount', 'total_cost', 'notes']),
     })
     return NextResponse.json({ chalan: toPlain(updated) })
   } catch (err: any) {

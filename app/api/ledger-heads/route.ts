@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
+import { logAudit, diffFields } from '@/lib/server/audit'
 
 // caller resolution = the single
 // role-resolution function (role OR admin_users — the original
@@ -41,7 +42,8 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ ledger_heads: toPlain(data) || [] })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/ledger-heads/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -96,12 +98,19 @@ export async function POST(req: NextRequest) {
 
     try {
       const data = await prisma.ledgerHead.create({ data: payload })
+      await logAudit({
+        caller, req, action: 'ledger_head.create', eventType: 'create',
+        entityTable: 'ledger_heads', entityId: data.id,
+        fieldChanges: diffFields(null, data as any, ['name', 'code_number', 'ledger_type']),
+      })
       return NextResponse.json({ success: true, ledger_head: toPlain(data) }, { status: 201 })
     } catch (error: any) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      console.error('[api] app/api/ledger-heads/route.ts error:', error)
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/ledger-heads/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -171,12 +180,19 @@ export async function PATCH(req: NextRequest) {
 
     try {
       const data = await prisma.ledgerHead.update({ where: { id }, data: patch })
+      await logAudit({
+        caller, req, action: 'ledger_head.update', eventType: 'update',
+        entityTable: 'ledger_heads', entityId: id,
+        fieldChanges: diffFields(existing as any, data as any, ['name', 'ledger_type', 'is_active', 'code_number']),
+      })
       return NextResponse.json({ success: true, ledger_head: toPlain(data) })
     } catch (error: any) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      console.error('[api] app/api/ledger-heads/route.ts error:', error)
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/ledger-heads/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 

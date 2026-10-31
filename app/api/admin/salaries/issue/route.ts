@@ -5,6 +5,7 @@ import { toPlain } from '@/lib/server/respond'
 import { parseMoneyAmount, sumMoney } from '@/lib/money'
 import { dhakaToday } from '@/lib/dhaka-time'
 import { syncExpenseToLedger } from '@/lib/server/ledger-sync'
+import { logAudit, diffFields } from '@/lib/server/audit'
 
 export const dynamic = 'force-dynamic'
 
@@ -61,7 +62,8 @@ export async function GET(req: NextRequest) {
       ledger_heads: toPlain(heads) || [],
     })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/admin/salaries/issue/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -160,6 +162,13 @@ export async function POST(req: NextRequest) {
       return created
     })
 
+    await logAudit({
+      caller, req, action: 'salary_payment.issue', eventType: 'create',
+      entityTable: 'salary_payments', entityId: payment.id,
+      branchId: body.branch_id || null,
+      fieldChanges: diffFields(null, payment as any, ['amount', 'total_salary', 'employee_id']),
+    })
+
     return NextResponse.json({
       success: true,
       payment: toPlain(payment),
@@ -167,6 +176,7 @@ export async function POST(req: NextRequest) {
       total_salary: totalSalary,
     })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/admin/salaries/issue/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -54,6 +54,7 @@ export async function GET(req: NextRequest) {
     })
     return NextResponse.json({ payments: toPlain(payments) || [] })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/admin/house-rent/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

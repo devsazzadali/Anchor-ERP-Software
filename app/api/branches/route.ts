@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
+import { logAudit, diffFields } from '@/lib/server/audit'
 
 // the shared branch list used by the
 // admin money pages (expenses, branch-expenses, house-rent,
@@ -21,7 +22,8 @@ export async function GET(req: NextRequest) {
     })
     return NextResponse.json({ branches: toPlain(data) || [] })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/branches/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -37,8 +39,14 @@ export async function POST(req: NextRequest) {
     if (!name) return NextResponse.json({ error: 'name is required' }, { status: 400 })
 
     const data = await prisma.branch.create({ data: { name } })
+    await logAudit({
+      caller, req, action: 'branch.create', eventType: 'create',
+      entityTable: 'branches', entityId: data.id, branchId: data.id,
+      fieldChanges: diffFields(null, data as any, ['name']),
+    })
     return NextResponse.json({ branch: toPlain(data) }, { status: 201 })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/branches/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

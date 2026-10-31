@@ -640,6 +640,11 @@ model Profile {
   security_answer               String?
   is_2fa_enabled                Boolean   @default(false)
   is_banned                     Boolean   @default(false)
+  // S2 (R2 Security Round): bumped by admin "revoke all sessions";
+  // session tokens carry the epoch they were minted at and the
+  // resolver rejects mismatches — this is what kills even
+  // pre-registry (legacy) tokens on revoke-all.
+  session_epoch                 Int       @default(0)
   is_branch_manager             Boolean   @default(false)
   last_login                    DateTime? @db.Timestamptz(6)
   // DDL/ALTER-only columns below (attendance migrations; not present in
@@ -721,6 +726,42 @@ model SystemSetting {
   updated_at DateTime @default(now()) @db.Timestamptz(6)
 
   @@map("system_settings")
+}
+
+// S2 (R2 Security Round): the active-session registry. One row per
+// login; the row id is the session token's `jti` claim. The resolver
+// (lib/server/auth.ts) checks revoked_at + idle window per request.
+// Created by targeted DDL (ddl_s2s3.cjs) — no prisma db push.
+model UserSession {
+  id            String    @id @db.Uuid
+  user_id       String    @db.Uuid
+  created_at    DateTime  @default(now()) @db.Timestamptz(6)
+  last_seen_at  DateTime  @default(now()) @db.Timestamptz(6)
+  ip_address    String?
+  user_agent    String?
+  revoked_at    DateTime? @db.Timestamptz(6)
+  revoke_reason String?
+
+  @@index([user_id])
+  @@index([last_seen_at])
+  @@map("user_sessions")
+}
+
+// S3 (R2 Security Round): restart-surviving failure counters for
+// login lockout (buckets 'login_account' / 'login_ip'). Generic on
+// purpose — later writers reuse it for OTP/upload caps via
+// lib/server/rate-limit.ts. Created by targeted DDL (ddl_s2s3.cjs).
+model RateLimitCounter {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  bucket       String
+  key          String
+  count        Int       @default(0)
+  window_start DateTime  @default(now()) @db.Timestamptz(6)
+  locked_until DateTime? @db.Timestamptz(6)
+  updated_at   DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@unique([bucket, key])
+  @@map("rate_limit_counters")
 }
 
 model Task {
@@ -886,17 +927,23 @@ model AttendanceBreak {
 }
 
 model AuditLog {
-  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  actor_id   String?  @db.Uuid
-  actor_role String?
-  action     String
-  table_name String
-  record_id  String   @db.Uuid
-  old_value  Json?
-  new_value  Json?
-  ip_address String?
-  user_agent String?
-  created_at DateTime @default(now()) @db.Timestamptz(6)
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  actor_id      String?  @db.Uuid
+  actor_name    String?
+  actor_role    String?
+  action        String
+  event_type    String?
+  table_name    String
+  entity_table  String?
+  entity_id     String?
+  record_id     String?  @db.Uuid
+  branch_id     String?  @db.Uuid
+  field_changes Json?
+  old_value     Json?
+  new_value     Json?
+  ip_address    String?
+  user_agent    String?
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
 
   @@map("audit_logs")
 }

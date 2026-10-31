@@ -3,6 +3,8 @@ import { sendPasswordResetOTP } from '@/lib/email-service'
 import { hashOtpCode } from '@/lib/otp-hash'
 import { verifySecurityAnswer } from '@/lib/security-answer'
 import { prisma } from '@/lib/db'
+import { isSendCapped } from '@/lib/server/rate-limit'
+import { requestMeta } from '@/lib/server/audit'
 
 // profiles / auth_users / system_settings
 // / password_reset_requests via Prisma. The auth.admin fallbacks
@@ -27,6 +29,12 @@ export async function POST(request: Request) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       if (!emailRegex.test(normalizedEmail)) {
         return NextResponse.json({ error: 'Please enter a valid email address.' }, { status: 400 })
+      }
+
+      // S5 (R2 Security Round) — send cap: max 3 sends / 10 min per
+      // email AND per IP → generic 429 (fail-soft inside isSendCapped).
+      if (await isSendCapped('otp_send_reset', normalizedEmail, requestMeta(request).ip)) {
+        return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 })
       }
 
       // 1. Find user in profiles (case-insensitive)
@@ -126,7 +134,7 @@ export async function POST(request: Request) {
           reqId = newRequest.id
         } catch (insertError: any) {
           console.error('Insert reset request error:', insertError)
-          return NextResponse.json({ error: 'Failed to create OTP request: ' + insertError.message }, { status: 500 })
+          return NextResponse.json({ error: 'Failed to create OTP request.' }, { status: 500 })
         }
       }
 
@@ -291,7 +299,7 @@ export async function POST(request: Request) {
         })
       } catch (insertError: any) {
         console.error('Insert reset request error:', insertError)
-        return NextResponse.json({ error: 'Failed to create OTP request: ' + insertError.message }, { status: 500 })
+        return NextResponse.json({ error: 'Failed to create OTP request.' }, { status: 500 })
       }
 
       const authUser = await prisma.authUser.findFirst({

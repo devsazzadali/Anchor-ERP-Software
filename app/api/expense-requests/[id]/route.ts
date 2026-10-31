@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db'
 import { callerIsAdmin, getCallerProfile } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { syncExpenseToLedger } from '@/lib/server/ledger-sync'
+import { logAudit, diffFields } from '@/lib/server/audit'
 
 // item actions for the dashboard
 // branch-expenses page — approve / reject / pay (the action modal)
@@ -94,6 +95,12 @@ export async function PATCH(req: Request, context: any) {
       if ('error' in result) {
         return NextResponse.json({ error: result.error }, { status: result.status })
       }
+      await logAudit({
+        caller, req, action: 'expense_request.pay', eventType: 'approve',
+        entityTable: 'employee_expense_requests', entityId: id,
+        branchId: existing.branch_id ?? null,
+        fieldChanges: [{ field: 'status', old: existing.status, new: 'paid' }],
+      })
       return NextResponse.json({ request: toPlain(result.request) })
     }
 
@@ -175,6 +182,14 @@ export async function PATCH(req: Request, context: any) {
     }
 
     const updated = await prisma.employeeExpenseRequest.update({ where: { id }, data })
+    await logAudit({
+      caller, req,
+      action: body.action === 'confirm' ? 'expense_request.approve' : body.action === 'reject' ? 'expense_request.reject' : 'expense_request.update',
+      eventType: body.action === 'confirm' ? 'approve' : body.action === 'reject' ? 'reject' : 'update',
+      entityTable: 'employee_expense_requests', entityId: id,
+      branchId: existing.branch_id ?? null,
+      fieldChanges: diffFields(existing as any, updated as any, ['title', 'description', 'status', 'amount', 'paid_amount', 'due_amount', 'trx_id', 'admin_notes']),
+    })
     return NextResponse.json({ request: toPlain(updated) })
   } catch (err: any) {
     console.error('[PATCH /api/expense-requests/[id]] Error:', err)
@@ -189,7 +204,14 @@ export async function DELETE(req: Request, context: any) {
     if (!canWrite(caller)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
     const { id } = await context.params
+    const before = await prisma.employeeExpenseRequest.findUnique({ where: { id } }).catch(() => null)
     await prisma.employeeExpenseRequest.delete({ where: { id } })
+    await logAudit({
+      caller, req, action: 'expense_request.delete', eventType: 'delete',
+      entityTable: 'employee_expense_requests', entityId: id,
+      branchId: (before as any)?.branch_id ?? null,
+      oldValue: before ? { title: before.title, amount: Number(before.amount), status: before.status } as any : null,
+    })
     return NextResponse.json({ success: true })
   } catch (err: any) {
     console.error('[DELETE /api/expense-requests/[id]] Error:', err)

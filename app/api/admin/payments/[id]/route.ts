@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
+import { logAudit, diffFields } from '@/lib/server/audit'
 
 // /api/admin/payments/[id] — admin-only payment_requests mutations
 // from the payouts page.
@@ -52,6 +53,13 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     const updated = await prisma.paymentRequest.update({
       where: { id },
       data: { status: body.status },
+    })
+    await logAudit({
+      caller: gate.caller, req,
+      action: 'payment_request.status_change',
+      eventType: body.status === 'approved' || body.status === 'accepted' ? 'approve' : body.status === 'rejected' ? 'reject' : 'update',
+      entityTable: 'payment_requests', entityId: id,
+      fieldChanges: [{ field: 'status', old: existing.status, new: body.status }],
     })
     return NextResponse.json({ request: toPlain(updated) })
   } catch (err: any) {
@@ -111,6 +119,12 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       return upd
     })
 
+    await logAudit({
+      caller: gate.caller, req, action: 'payment_request.pay', eventType: 'approve',
+      entityTable: 'payment_requests', entityId: id,
+      fieldChanges: [{ field: 'status', old: 'pending', new: 'completed' }],
+      newValue: { transaction_id: body.transaction_id } as any,
+    })
     return NextResponse.json({ request: toPlain(updated) })
   } catch (err: any) {
     const message = err?.message || 'Failed to complete payout'

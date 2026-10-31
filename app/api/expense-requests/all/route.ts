@@ -3,6 +3,7 @@ import { parseMoneyAmount } from '@/lib/money'
 import { prisma } from '@/lib/db'
 import { callerIsAdmin, getCallerProfile } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
+import { logAudit, diffFields } from '@/lib/server/audit'
 
 // the dashboard branch-expenses page
 // (partner surface) — ALL employee expense requests + the branch
@@ -93,6 +94,12 @@ export async function POST(req: Request) {
       },
     })
 
+    await logAudit({
+      caller, req, action: 'expense_request.create', eventType: 'create',
+      entityTable: 'employee_expense_requests', entityId: created.id,
+      branchId: created.branch_id ?? null,
+      fieldChanges: diffFields(null, created as any, ['title', 'amount', 'status', 'paid_amount', 'due_amount']),
+    })
     return NextResponse.json({ request: toPlain(created) }, { status: 201 })
   } catch (err: any) {
     console.error('[POST /api/expense-requests/all] Error:', err)

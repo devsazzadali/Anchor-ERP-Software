@@ -5,6 +5,7 @@ import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { syncDepositToLedger } from '@/lib/server/ledger-sync'
 import { depositOverlapMessage, findDepositSalesOverlap } from '@/lib/server/deposit-overlap'
+import { logAudit, diffFields } from '@/lib/server/audit'
 
 // POST /api/branch-accounts/deposits/[id]/approve
 // Admin only — Approve or Reject a submitted deposit
@@ -116,6 +117,18 @@ export async function POST(
       },
     })
 
+    await logAudit({
+      caller, req,
+      action: action === 'approve' ? 'deposit.approve' : 'deposit.reject',
+      eventType: action === 'approve' ? 'approve' : 'reject',
+      entityTable: 'branch_bank_deposits', entityId: id,
+      branchId: deposit.branch_id,
+      fieldChanges: [
+        { field: 'status', old: deposit.status, new: updated.status },
+        ...(action === 'reject' ? [{ field: 'rejection_reason', old: null, new: rejection_reason || null }] : []),
+      ],
+    })
+
     // Notify the manager via notifications table
     await prisma.notification.create({
       data: {
@@ -165,6 +178,6 @@ export async function POST(
     })
   } catch (err: any) {
     console.error('Deposit approve/reject error:', err)
-    return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

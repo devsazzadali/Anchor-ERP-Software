@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '@/lib/db'
-import { hashPassword } from '@/lib/server/passwords'
+import { hashPassword, validatePasswordPolicy } from '@/lib/server/passwords'
 import {
   REG_VERIFIED_COOKIE,
   clearCookieHeader,
@@ -36,8 +36,13 @@ export async function POST(req: Request) {
       )
     }
 
-    if (String(password).length < 8) {
-      return NextResponse.json({ error: 'Password must be at least 8 characters' }, { status: 400 })
+    // S3 (R2 Security Round): the shared password policy replaces
+    // the old 8-characters-only check (min 10 + mixed classes +
+    // common-password blocklist). Set paths only — login never
+    // applies the policy to existing passwords.
+    const policy = validatePasswordPolicy(String(password))
+    if (!policy.ok) {
+      return NextResponse.json({ error: policy.error }, { status: 400 })
     }
 
     const existing = await prisma.profile.findFirst({

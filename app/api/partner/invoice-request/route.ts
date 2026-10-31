@@ -8,10 +8,20 @@ import { toPlain } from '@/lib/server/respond'
 // on the session-resolved caller (BUG-R01's server-side rule,
 // preserved); invoice_requests via Prisma, own rows only.
 
+// S4 (R2 Security Round): the gate errors carry their HTTP status so
+// the catch blocks stop collapsing unauthenticated (401) and
+// wrong-role (403) into the catch-all 400 (FR-1 model: anonymous ->
+// 401 on everything non-public). Validation errors stay 400.
+function gateError(status: number, message: string) {
+  const e: any = new Error(message)
+  e.status = status
+  return e
+}
+
 async function getPartnerUser(req: Request) {
   const caller = await getCallerProfile(req)
-  if (!caller) throw new Error('Unauthenticated')
-  if (caller.profile_type !== 'partner') throw new Error('Forbidden: not a partner')
+  if (!caller) throw gateError(401, 'Unauthenticated')
+  if (caller.profile_type !== 'partner') throw gateError(403, 'Forbidden: not a partner')
   return { userId: caller.id }
 }
 
@@ -25,7 +35,7 @@ export async function GET(req: Request) {
     })
     return NextResponse.json({ invoiceRequests: toPlain(data) })
   } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 400 })
+    return NextResponse.json({ error: e.message }, { status: e.status ?? 400 })
   }
 }
 
@@ -49,6 +59,6 @@ export async function POST(req: Request) {
     })
     return NextResponse.json({ invoiceRequest: toPlain(created) }, { status: 201 })
   } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 400 })
+    return NextResponse.json({ error: e.message }, { status: e.status ?? 400 })
   }
 }

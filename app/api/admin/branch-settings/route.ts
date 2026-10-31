@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db'
 import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { parseMoneyAmount } from '@/lib/money'
+import { logAudit, diffFields } from '@/lib/server/audit'
 
 export const dynamic = 'force-dynamic'
 
@@ -96,7 +97,8 @@ export async function GET(req: NextRequest) {
       developer_payment_methods: toPlain(devMethods) || [],
     })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/admin/branch-settings/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -163,9 +165,15 @@ export async function POST(req: NextRequest) {
         data: { method_type: fields.method_type, details: fields.details ?? {} },
       })
     }
+    await logAudit({
+      caller, req, action: 'branch_settings.create', eventType: 'settings',
+      entityTable: kind, entityId: data.id, branchId: (data as any).branch_id ?? null,
+      fieldChanges: diffFields(null, data as any, ['bank_name', 'account_name', 'meter_number', 'meter_type', 'method_type', 'rent_amount']),
+    })
     return NextResponse.json({ row: toPlain(data) }, { status: 201 })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/admin/branch-settings/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -226,6 +234,11 @@ export async function PATCH(req: NextRequest) {
       } else if (kind === 'utility_meters') {
         await prisma.utilityMeter.update({ where: { id }, data: data as any })
       }
+      await logAudit({
+        caller, req, action: 'branch_settings.update', eventType: 'settings',
+        entityTable: kind, entityId: id,
+        newValue: { updated_keys: editKeys } as any,
+      })
       return NextResponse.json({ success: true, updated: editKeys })
     }
 
@@ -236,8 +249,14 @@ export async function PATCH(req: NextRequest) {
     } else {
       await prisma.developerPaymentMethod.update({ where: { id }, data: { is_active: false } })
     }
+    await logAudit({
+      caller, req, action: 'branch_settings.deactivate', eventType: 'settings',
+      entityTable: String(kind), entityId: id,
+      fieldChanges: [{ field: 'is_active', old: true, new: false }],
+    })
     return NextResponse.json({ success: true })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/admin/branch-settings/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

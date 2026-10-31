@@ -3,6 +3,7 @@ import { roundMoney, sumMoney } from '@/lib/money'
 import { prisma } from '@/lib/db'
 import { callerIsAdmin, getCallerProfile } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
+import { logAudit, diffFields } from '@/lib/server/audit'
 
 // product chalans for the dashboard
 // branch-chalans page. Reads: any approved caller (the page is
@@ -102,6 +103,11 @@ export async function POST(req: Request) {
         created_by: caller.id,
         created_by_name: caller.full_name,
       },
+    })
+    await logAudit({
+      caller, req, action: 'chalan.create', eventType: 'create',
+      entityTable: 'product_chalans', entityId: created.id, branchId: created.branch_id ?? null,
+      fieldChanges: diffFields(null, created as any, ['branch_name', 'chalan_ref', 'total_amount', 'total_cost']),
     })
     return NextResponse.json({ chalan: toPlain(created) }, { status: 201 })
   } catch (err: any) {

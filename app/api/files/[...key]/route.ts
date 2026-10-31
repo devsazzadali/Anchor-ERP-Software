@@ -9,6 +9,7 @@ import {
   objectUrl,
   safeObjectPath,
 } from '@/lib/server/storage'
+import { logAudit } from '@/lib/server/audit'
 
 // /api/files/<bucket>/<path...> — file storage serving.
 // Reads enforce the bucket privacy map (lib/server/storage.ts):
@@ -195,6 +196,25 @@ export async function GET(req: Request, context: any) {
 
   const data = await getObject(bucket, objectPath)
   if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+
+  // S1: record the download (who took what out, when) — never the
+  // file contents. The caller is re-resolved only for private
+  // buckets; public-bucket downloads log a null actor. Fail-soft.
+  {
+    let dlCaller: any = null
+    if (access !== 'public') {
+      dlCaller = await getCallerProfile(req).catch(() => null)
+      if (!dlCaller) {
+        const sid = await getSessionUserId(req).catch(() => null)
+        if (sid) dlCaller = { id: sid, full_name: null, role: null }
+      }
+    }
+    await logAudit({
+      caller: dlCaller, req, action: 'file.download', eventType: 'download',
+      entityTable: 'files', entityId: `${bucket}/${objectPath}`,
+      newValue: { bucket, path: objectPath, bytes: data.length } as any,
+    })
+  }
 
   return new NextResponse(new Uint8Array(data), {
     status: 200,

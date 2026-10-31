@@ -143,6 +143,7 @@ export async function GET(req: NextRequest) {
       companyExpenses: toPlain(companyExpenses) || [],
     })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/admin/financial-summary/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

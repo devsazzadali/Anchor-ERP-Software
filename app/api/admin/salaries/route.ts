@@ -122,6 +122,6 @@ export async function GET(req: Request) {
     })
   } catch (error: any) {
     console.error('[GET /api/admin/salaries] Error:', error)
-    return NextResponse.json({ error: error?.message || 'Failed to fetch salaries' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -3,8 +3,9 @@
  *
  * legacy JWT sessions do NOT transfer to this app;
  * every user signs in once and receives this cookie instead. The
- * cookie carries `userId.expiresAtUnix.signature` where the signature
- * is HMAC-SHA256 over `userId.expiresAtUnix`, keyed by a server-only
+ * cookie carries `userId.expiresAtUnix.signature` (legacy) or, since
+ * S2, `userId.expiresAtUnix.jti.epoch.signature` (v2), where the
+ * signature is HMAC-SHA256 over the payload, keyed by a server-only
  * secret — the same construction the fix program used for the 2FA
  * cookie (lib/two-factor-cookie.ts). It can only be minted by the
  * app's login route after a successful password verification
@@ -51,27 +52,76 @@ async function hmac(payload: string): Promise<Uint8Array> {
   return new Uint8Array(signature)
 }
 
-/** Mint a session token for a freshly authenticated user. */
-export async function signSessionToken(userId: string, now: Date = new Date()): Promise<string> {
+/**
+ * S2 (R2 Security Round) — token format v2.
+ *
+ * LEGACY payload: `userId.expires` (2 parts) + `.sig`.
+ * V2 payload:     `userId.expires.jti.epoch` (4 parts) + `.sig`,
+ * where `jti` is the user_sessions row id created at login and
+ * `epoch` is the profiles.session_epoch the token was minted at.
+ * The signature is HMAC-SHA256 over the whole payload string in
+ * both formats, compared timing-safe.
+ *
+ * Legacy tokens stay valid until their natural 7-day expiry (the
+ * registry cannot enumerate them — documented transition), BUT the
+ * resolver's epoch check applies to them with epoch = 0, so an
+ * admin "revoke all sessions" (which bumps session_epoch) kills
+ * legacy tokens too.
+ */
+export interface ParsedSessionToken {
+  userId: string
+  /** Unix seconds at which the token expires (absolute 7-day cap). */
+  expires: number
+  /** user_sessions row id; null for legacy tokens. */
+  jti: string | null
+  /** profiles.session_epoch at mint time; 0 for legacy tokens. */
+  epoch: number
+  /** true when the token predates the registry (no jti claim). */
+  legacy: boolean
+}
+
+/** Mint a session token for a freshly authenticated user. Pass
+ *  { jti, epoch } (login route, S2) to mint a v2 registry token;
+ *  called without options it mints the legacy format (register). */
+export async function signSessionToken(
+  userId: string,
+  opts: { jti?: string; epoch?: number; now?: Date } = {}
+): Promise<string> {
+  const now = opts.now ?? new Date()
   const expires = Math.floor(now.getTime() / 1000) + SESSION_TTL_SECONDS
-  const payload = `${userId}.${expires}`
+  const payload =
+    opts.jti != null
+      ? `${userId}.${expires}.${opts.jti}.${opts.epoch ?? 0}`
+      : `${userId}.${expires}`
   return `${payload}.${toBase64Url(await hmac(payload))}`
 }
 
 /**
- * Verify a session token. Returns the user id when the signature is
- * valid and the token has not expired; null otherwise.
+ * Parse + verify a session token (signature timing-safe, expiry
+ * checked). Returns the claims, or null for anything malformed,
+ * forged or expired. Payload shapes: 2 parts = legacy, 4 parts =
+ * v2; anything else is rejected.
  */
-export async function verifySessionToken(token: string | undefined, now: Date = new Date()): Promise<string | null> {
+export async function parseSessionToken(
+  token: string | undefined,
+  now: Date = new Date()
+): Promise<ParsedSessionToken | null> {
   if (!token) return null
   const lastDot = token.lastIndexOf('.')
   if (lastDot <= 0) return null
   const payload = token.slice(0, lastDot)
-  const firstDot = payload.indexOf('.')
-  if (firstDot <= 0) return null
-  const userId = payload.slice(0, firstDot)
-  const expires = Number(payload.slice(firstDot + 1))
+  const parts = payload.split('.')
+  if (parts.length !== 2 && parts.length !== 4) return null
+  const userId = parts[0]
+  const expires = Number(parts[1])
   if (!userId || !Number.isFinite(expires)) return null
+  let jti: string | null = null
+  let epoch = 0
+  if (parts.length === 4) {
+    jti = parts[2] || null
+    epoch = Number(parts[3])
+    if (!jti || !Number.isInteger(epoch) || epoch < 0) return null
+  }
   if (expires < Math.floor(now.getTime() / 1000)) return null
   let presented: Uint8Array
   try {
@@ -83,7 +133,19 @@ export async function verifySessionToken(token: string | undefined, now: Date = 
   if (presented.length !== expected.length) return null
   let diff = 0
   for (let i = 0; i < expected.length; i++) diff |= presented[i] ^ expected[i]
-  return diff === 0 ? userId : null
+  if (diff !== 0) return null
+  return { userId, expires, jti, epoch, legacy: parts.length === 2 }
+}
+
+/**
+ * Verify a session token. Returns the user id when the signature is
+ * valid and the token has not expired; null otherwise. (Signature
+ * unchanged for proxy.ts — registry/epoch enforcement lives in the
+ * resolver, lib/server/auth.ts.)
+ */
+export async function verifySessionToken(token: string | undefined, now: Date = new Date()): Promise<string | null> {
+  const parsed = await parseSessionToken(token, now)
+  return parsed ? parsed.userId : null
 }
 
 /** Read the session cookie value out of a request's Cookie header. */

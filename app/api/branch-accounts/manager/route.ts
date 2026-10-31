@@ -10,18 +10,26 @@ import { toPlain } from '@/lib/server/respond'
 // statements could half-apply (assignment deactivated but profile
 // flag not set); the app makes the whole change atomic.
 
+// S4 (R2 Security Round): split the gate so an unauthenticated caller
+// gets 401 and an authenticated non-admin gets 403 (FR-1 model).
 async function requireAdmin(req: NextRequest) {
   const caller = await getCallerProfile(req)
-  if (!caller || !callerIsAdmin(caller)) return null
-  return caller
+  if (!caller) {
+    return { response: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) }
+  }
+  if (!callerIsAdmin(caller)) {
+    return { response: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) }
+  }
+  return { admin: caller }
 }
 
 // GET /api/branch-accounts/manager
 // List all manager assignments (admin only)
 export async function GET(req: NextRequest) {
   try {
-    const adminUser = await requireAdmin(req)
-    if (!adminUser) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    const gate = await requireAdmin(req)
+    if ('response' in gate) return gate.response
+    const adminUser = gate.admin
 
     const rows = await prisma.branchManagerAssignment.findMany({
       orderBy: { assigned_at: 'desc' },
@@ -53,7 +61,8 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ assignments: toPlain(assignments) })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/branch-accounts/manager/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -61,8 +70,9 @@ export async function GET(req: NextRequest) {
 // Assign an employee as branch manager (admin only)
 export async function POST(req: NextRequest) {
   try {
-    const adminUser = await requireAdmin(req)
-    if (!adminUser) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    const gate = await requireAdmin(req)
+    if ('response' in gate) return gate.response
+    const adminUser = gate.admin
 
     const body = await req.json()
     const { employee_id, branch_id, notes } = body
@@ -153,7 +163,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, assignment: toPlain(result) })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/branch-accounts/manager/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -161,8 +172,9 @@ export async function POST(req: NextRequest) {
 // Remove manager assignment (admin only)
 export async function DELETE(req: NextRequest) {
   try {
-    const adminUser = await requireAdmin(req)
-    if (!adminUser) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    const gate = await requireAdmin(req)
+    if ('response' in gate) return gate.response
+    const adminUser = gate.admin
 
     const { searchParams } = new URL(req.url)
     const employeeId = searchParams.get('employee_id')
@@ -209,6 +221,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/branch-accounts/manager/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

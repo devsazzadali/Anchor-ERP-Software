@@ -14,6 +14,7 @@ import {
   depositLumpDistributionMap,
 } from '@/lib/server/ledger-sync'
 import { branchStreamAmount } from '@/lib/expense-streams'
+import { logAudit, diffFields } from '@/lib/server/audit'
 
 // this route's legacy queries (anon +
 // service-role) are now Prisma queries via the single role-resolution
@@ -347,7 +348,8 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ ledger: plainLedger, ...derivedOpening })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/branch-accounts/cash-ledger/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -565,7 +567,8 @@ export async function POST(req: NextRequest) {
     const [plainLedger] = await withOpeningChainFlags([toPlain(withRelations)])
     return NextResponse.json({ success: true, ledger: plainLedger })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/branch-accounts/cash-ledger/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -694,10 +697,17 @@ export async function PATCH(req: NextRequest) {
       if (difference_notes !== undefined) updateData.difference_notes = difference_notes || null
       if (is_closed !== undefined) updateData.is_closed = !!is_closed
 
+      const beforeAdminEdit = { ...existing }
       // If opening or sales changed, update first to let postgres recalculate expected_closing_cash
       const refreshed = await prisma.branchCashLedger.update({
         where: { id: existing.id },
         data: updateData,
+      })
+
+      await logAudit({
+        caller: profile, req, action: 'cash_ledger.admin_edit', eventType: 'update',
+        entityTable: 'branch_cash_ledger', entityId: existing.id, branchId: existing.branch_id,
+        fieldChanges: diffFields(beforeAdminEdit as any, refreshed as any, ['khuchra_amount', 'opening_cash', 'cash_sales', 'bkash_sales', 'nagad_sales', 'rocket_sales', 'card_sales', 'bank_transfer_sales', 'other_cash_in', 'difference_notes', 'is_closed']),
       })
 
       // If actual_cash provided or changed, recalculate difference.
@@ -800,6 +810,14 @@ export async function PATCH(req: NextRequest) {
           new_value: { reason },
         },
       }).catch((e: any) => console.error('[cash-ledger PATCH] reopen audit failed:', e.message))
+      await logAudit({
+        caller: profile, req, action: 'cash_ledger.reopen_day', eventType: 'update',
+        entityTable: 'branch_cash_ledger', entityId: reopened.id, branchId: existing.branch_id,
+        fieldChanges: [
+          { field: 'is_closed', old: true, new: false },
+          { field: 'reason', old: null, new: reason },
+        ],
+      })
       const [withRelations] = await attachLedgerRelations([reopened])
       const [plainLedger] = await withOpeningChainFlags([toPlain(withRelations)])
       return NextResponse.json({ success: true, ledger: plainLedger })
@@ -896,7 +914,8 @@ export async function PATCH(req: NextRequest) {
     const [plainLedger] = await withOpeningChainFlags([toPlain(withRelations)])
     return NextResponse.json({ success: true, ledger: plainLedger })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/branch-accounts/cash-ledger/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -931,8 +950,15 @@ export async function DELETE(req: NextRequest) {
       },
     })
 
+    await logAudit({
+      caller: profile, req, action: 'cash_ledger.delete', eventType: 'delete',
+      entityTable: 'branch_cash_ledger', entityId: id, branchId: existing.branch_id,
+      oldValue: { ledger_date: toPlain(existing).ledger_date } as any,
+    })
+
     return NextResponse.json({ success: true, message: 'Deleted successfully' })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/branch-accounts/cash-ledger/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -32,6 +32,7 @@ export async function proxy(request: NextRequest) {
   if (userId) {
     let profile: any = null
     let meIsAdmin = false
+    let meRequireAdmin2fa = false
     try {
       const meUrl = new URL('/api/auth/me', request.url)
       // The app server binds 0.0.0.0 (server.js) and Next reports
@@ -51,6 +52,7 @@ export async function proxy(request: NextRequest) {
         const me = await meRes.json()
         profile = me.profile
         meIsAdmin = me.is_admin === true
+        meRequireAdmin2fa = me.require_admin_2fa === true
       }
     } catch {
       profile = null
@@ -89,6 +91,24 @@ export async function proxy(request: NextRequest) {
       if (!has2faCookie) {
         return redirect('/verify-2fa')
       }
+    }
+
+    // S3 (R2 Security Round) — REQUIRE_ADMIN_2FA, ⚠️ DEFAULT OFF.
+    // The flag is the system_settings key 'require_admin_2fa'
+    // (surfaced by /api/auth/me; absent = OFF = zero behaviour
+    // change). Only when the owner turns it ON: an admin without
+    // 2FA enabled is routed to the enrolment surface — the admin
+    // settings page, whose 2FA toggle is the enrolment flow —
+    // before reaching any other /admin/* page. The settings page
+    // itself stays reachable or the admin could never enrol.
+    if (
+      meRequireAdmin2fa &&
+      isAdmin &&
+      !is2faEnabled &&
+      pathname.startsWith('/admin') &&
+      pathname !== '/admin/settings'
+    ) {
+      return redirect('/admin/settings')
     }
 
     // Redirect admins away from user pages

@@ -2,6 +2,12 @@ import { NextResponse } from 'next/server'
 import { sendRegistrationOTP } from '@/lib/email-service'
 import { hashOtpCode } from '@/lib/otp-hash'
 import { prisma } from '@/lib/db'
+import { isSendCapped } from '@/lib/server/rate-limit'
+import { requestMeta } from '@/lib/server/audit'
+
+// S5 (R2 Security Round) — send cap: max 3 sends / 10 min per email
+// AND per IP (DB-backed via rate_limit_counters, survives restarts;
+// fail-soft inside isSendCapped).
 
 // registration_otps via Prisma; the OTP
 // security behaviour is unchanged (CSPRNG code, digest at rest,
@@ -13,6 +19,11 @@ export async function POST(request: Request) {
 
     if (!email || !fullName) {
       return NextResponse.json({ error: 'Email and Name are required' }, { status: 400 })
+    }
+
+    // S5 send cap (3 / 10 min per email + per IP) → generic 429.
+    if (await isSendCapped('otp_send_register', String(email), requestMeta(request).ip)) {
+      return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 })
     }
 
     // 1. Check if user already exists

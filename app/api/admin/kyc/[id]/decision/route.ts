@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
+import { logAudit, diffFields } from '@/lib/server/audit'
 
 // POST /api/admin/kyc/[id]/decision — admin-only KYC decision.
 // Body: { action: 'approve' | 'reject' | 'edit', admin_notes?,
@@ -60,6 +61,15 @@ export async function POST(req: Request, context: any) {
         })
         return reqRow
       })
+      await logAudit({
+        caller, req, action: 'kyc.approve', eventType: 'verification',
+        entityTable: 'verification_requests', entityId: id,
+        fieldChanges: [
+          { field: 'status', old: vr.status, new: 'approved' },
+          { field: 'verification_status', old: 'pending', new: 'approved' },
+          { field: 'role', old: null, new: role },
+        ],
+      })
       return NextResponse.json({ request: toPlain(updated) })
     }
 
@@ -76,6 +86,15 @@ export async function POST(req: Request, context: any) {
           data: { verification_status: 'rejected', rejection_reason: reason },
         })
         return reqRow
+      })
+      await logAudit({
+        caller, req, action: 'kyc.reject', eventType: 'verification',
+        entityTable: 'verification_requests', entityId: id,
+        fieldChanges: [
+          { field: 'status', old: vr.status, new: 'rejected' },
+          { field: 'verification_status', old: 'pending', new: 'rejected' },
+          { field: 'rejection_reason', old: vr.rejection_reason ?? null, new: reason },
+        ],
       })
       return NextResponse.json({ request: toPlain(updated) })
     }
@@ -122,6 +141,11 @@ export async function POST(req: Request, context: any) {
           }
         }
         return reqRow
+      })
+      await logAudit({
+        caller, req, action: 'kyc.edit', eventType: 'update',
+        entityTable: 'verification_requests', entityId: id,
+        fieldChanges: diffFields(vr as any, updated as any, [...fields] as unknown as string[]),
       })
       return NextResponse.json({ request: toPlain(updated) })
     }

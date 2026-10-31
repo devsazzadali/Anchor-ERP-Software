@@ -7,7 +7,7 @@ import {
   Shield, LayoutDashboard, CreditCard, Receipt,
   FileCheck, LogOut, User, Sparkles, Briefcase,
   ListTodo, MapPin, Settings, ShieldAlert, Wallet, Package, TrendingUp,
-  Building2, PiggyBank, Banknote, Calculator, FileText, History, BarChart3, UserCog, ChevronDown,
+  Building2, PiggyBank, Banknote, Calculator, FileText, History, BarChart3, UserCog, ChevronDown, Laptop,
   Calendar, FileOutput, BookMarked
 } from 'lucide-react';
 
@@ -35,6 +35,7 @@ const adminNavigation = [
   { name: 'KYC Verifications',       icon: ShieldAlert,     href: '/admin/kyc'       },
   { name: 'User Settings Panel',     icon: UserCog,         href: '/admin/user-settings' },
   { name: 'Security Audit Log',      icon: Shield,          href: '/admin/audit'     },
+  { name: 'Active Sessions',         icon: Laptop,          href: '/admin/sessions'  },
   { name: 'Ledger Heads',            icon: BookMarked,      href: '/admin/branch-expenses' },
   { name: 'Expense Requests',        icon: Receipt,         href: '/admin/expense-requests' },
   { name: 'General Expenses',        icon: Wallet,          href: '/admin/expenses'  },

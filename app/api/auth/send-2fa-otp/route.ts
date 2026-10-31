@@ -3,6 +3,8 @@ import { send2FAOTP } from '@/lib/email-service'
 import { hashOtpCode } from '@/lib/otp-hash'
 import { prisma } from '@/lib/db'
 import { sessionTokenFromRequest, verifySessionToken } from '@/lib/server/session'
+import { isSendCapped } from '@/lib/server/rate-limit'
+import { requestMeta } from '@/lib/server/audit'
 
 // the caller check that used the
 // The session cookie now verifies this app's own session
@@ -21,6 +23,12 @@ export async function POST(request: Request) {
     const sessionUserId = await verifySessionToken(sessionTokenFromRequest(request))
     if (!sessionUserId || sessionUserId !== userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // S5 (R2 Security Round) — send cap: max 3 sends / 10 min per
+    // email AND per IP → generic 429 (fail-soft inside isSendCapped).
+    if (await isSendCapped('otp_send_2fa', String(email), requestMeta(request).ip)) {
+      return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 })
     }
 
     // 1. Generate OTP securely

@@ -216,6 +216,7 @@ export async function GET(req: NextRequest) {
       deposit_drift: depositDrift,
     })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/branch-accounts/reconciliation/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

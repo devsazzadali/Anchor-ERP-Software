@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { sendPositionChangeToUser } from '@/lib/email-service'
 import { prisma } from '@/lib/db'
 import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
+import { logAudit } from '@/lib/server/audit'
 
 // admin gate via the single
 // role-resolution function; transfer record + profile update +
@@ -103,6 +104,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Failed to record position transfer in database' }, { status: 500 })
     }
 
+    await logAudit({
+      caller, req: request, action: 'user.position_transfer', eventType: 'role_change',
+      entityTable: 'profiles', entityId: userId, branchId: (profile as any).branch_id ?? null,
+      fieldChanges: [{ field: 'position', old: oldPositionName, new: newPositionName }],
+    })
+
     // 8. BUG-R06 FIX: Use shared sendPositionChangeToUser (was inline Resend with hardcoded HTML)
     await sendPositionChangeToUser(
       employeeEmail,
@@ -116,6 +123,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true })
   } catch (err: any) {
     console.error('Position transfer API error:', err)
-    return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

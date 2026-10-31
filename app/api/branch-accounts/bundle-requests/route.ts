@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ requests: toPlain(data) || [] })
   } catch (err: any) {
     console.error('[GET /api/branch-accounts/bundle-requests] Fatal error:', err)
-    return NextResponse.json({ error: err.message || 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -151,7 +151,7 @@ export async function POST(req: NextRequest) {
       })
     } catch (insertErr: any) {
       console.error('[POST /api/branch-accounts/bundle-requests] Insert error:', insertErr)
-      return NextResponse.json({ error: insertErr?.message || 'Failed to record bundle requisition' }, { status: 500 })
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
 
     // 2. Format breakdown text for task
@@ -245,6 +245,6 @@ export async function POST(req: NextRequest) {
     })
   } catch (err: any) {
     console.error('[POST /api/branch-accounts/bundle-requests] Fatal error:', err)
-    return NextResponse.json({ error: err.message || 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -49,6 +49,26 @@ type FraudAlertItem = {
   reason: string
 }
 
+type UnifiedItem = {
+  id: string
+  actor_id: string | null
+  actor_name: string | null
+  actor_role: string | null
+  action: string
+  event_type: string | null
+  entity_table: string | null
+  table_name: string | null
+  entity_id: string | null
+  branch_id: string | null
+  branch_name?: string | null
+  field_changes: { field: string; old: unknown; new: unknown }[] | null
+  ip_address: string | null
+  user_agent: string | null
+  created_at: string
+}
+
+const UNIFIED_EVENT_TYPES = ['auth', 'create', 'update', 'delete', 'approve', 'reject', 'reverse', 'void', 'export', 'download', 'settings', 'role_change', 'verification', 'session']
+
 export default function SecurityAuditLogPage() {
   const [activeTab, setActiveTab] = useState<'activity' | 'branch_trail' | 'threats'>('activity')
   const [activityLogs, setActivityLogs] = useState<ActivityLogItem[]>([])
@@ -59,6 +79,39 @@ export default function SecurityAuditLogPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [actionCategory, setActionCategory] = useState('all')
   const [selectedLogDetails, setSelectedLogDetails] = useState<any | null>(null)
+
+  // S1 unified audit stream (audit_logs) — server-filtered.
+  const [unifiedLogs, setUnifiedLogs] = useState<UnifiedItem[]>([])
+  const [uActor, setUActor] = useState('')
+  const [uFrom, setUFrom] = useState('')
+  const [uTo, setUTo] = useState('')
+  const [uEventType, setUEventType] = useState('')
+  const [uEntity, setUEntity] = useState('')
+  const [uLoading, setULoading] = useState(false)
+
+  const unifiedQuery = (extra: Record<string, string> = {}) => {
+    const q = new URLSearchParams(extra)
+    if (uActor.trim()) q.set('actor', uActor.trim())
+    if (uFrom) q.set('from', uFrom)
+    if (uTo) q.set('to', uTo)
+    if (uEventType) q.set('event_type', uEventType)
+    if (uEntity.trim()) q.set('entity', uEntity.trim())
+    return q.toString()
+  }
+
+  const fetchUnified = async () => {
+    setULoading(true)
+    try {
+      const qs = unifiedQuery()
+      const res = await fetch(`/api/admin/audit${qs ? `?${qs}` : ''}`)
+      const data = await res.json()
+      if (res.ok && data.unified) setUnifiedLogs(data.unified)
+    } catch (err) {
+      console.error('Failed to load unified audit logs:', err)
+    } finally {
+      setULoading(false)
+    }
+  }
 
   // Fetch all audit streams
   // one admin-gated bundle from /api/admin/audit.
@@ -95,6 +148,11 @@ export default function SecurityAuditLogPage() {
       setIsLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchUnified()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     fetchAuditData()
@@ -581,6 +639,87 @@ export default function SecurityAuditLogPage() {
           </div>
         )}
 
+      {/* S1 — Unified Audit Log (audit_logs) */}
+      <div className="mt-8 glass-panel rounded-2xl shadow-xl overflow-hidden border border-slate-900/5">
+        <div className="p-4 border-b border-slate-900/5 bg-slate-900/[0.04] flex flex-col gap-3">
+          <div className="flex flex-wrap justify-between items-center gap-3">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+              Unified Audit Log ({unifiedLogs.length} records)
+            </span>
+            <a
+              href={`/api/admin/audit?${unifiedQuery({ export: 'csv' })}`}
+              className="bg-slate-900/[0.04] hover:bg-slate-900/[0.07] border border-slate-900/10 text-slate-900 font-medium px-3 py-2 rounded-xl text-xs flex items-center gap-2 transition-all cursor-pointer"
+            >
+              <Download className="w-3.5 h-3.5 text-[#15803d]" />
+              <span>Export Unified CSV</span>
+            </a>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <input type="text" placeholder="Actor name or ID" value={uActor} onChange={(e) => setUActor(e.target.value)}
+              className="bg-white border border-slate-900/10 focus:border-[#1ca34c]/40 rounded-xl px-3 py-2 text-xs focus:outline-none w-44" />
+            <input type="date" value={uFrom} onChange={(e) => setUFrom(e.target.value)}
+              className="bg-white border border-slate-900/10 focus:border-[#1ca34c]/40 rounded-xl px-3 py-2 text-xs focus:outline-none" />
+            <input type="date" value={uTo} onChange={(e) => setUTo(e.target.value)}
+              className="bg-white border border-slate-900/10 focus:border-[#1ca34c]/40 rounded-xl px-3 py-2 text-xs focus:outline-none" />
+            <select value={uEventType} onChange={(e) => setUEventType(e.target.value)}
+              className="bg-white border border-slate-900/10 focus:border-[#1ca34c]/40 rounded-xl px-3 py-2 text-xs focus:outline-none cursor-pointer">
+              <option value="">All Event Types</option>
+              {UNIFIED_EVENT_TYPES.map((t) => (<option key={t} value={t}>{t}</option>))}
+            </select>
+            <input type="text" placeholder="Entity table or ID" value={uEntity} onChange={(e) => setUEntity(e.target.value)}
+              className="bg-white border border-slate-900/10 focus:border-[#1ca34c]/40 rounded-xl px-3 py-2 text-xs focus:outline-none w-44" />
+            <button onClick={fetchUnified} disabled={uLoading}
+              className="bg-[#1ca34c] text-white px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer disabled:opacity-50">
+              {uLoading ? 'Loading…' : 'Apply Filters'}
+            </button>
+          </div>
+        </div>
+        <div className="overflow-x-auto w-full">
+          <table className="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr className="border-b border-slate-900/5 text-[9px] uppercase tracking-wider text-slate-500 font-semibold bg-slate-900/[0.04]">
+                <th className="py-3.5 pl-4">Time</th>
+                <th className="py-3.5">Actor</th>
+                <th className="py-3.5">Event / Action</th>
+                <th className="py-3.5">Entity</th>
+                <th className="py-3.5">Branch</th>
+                <th className="py-3.5">IP</th>
+                <th className="py-3.5 pr-4">Field Changes</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-900/[0.08]">
+              {unifiedLogs.map((log) => (
+                <tr key={log.id} className="hover:bg-slate-900/[0.04] transition-colors align-top">
+                  <td className="py-3.5 pl-4 text-slate-500 font-mono text-[11px] whitespace-nowrap">{new Date(log.created_at).toLocaleString()}</td>
+                  <td className="py-3.5 font-semibold text-slate-900">
+                    {log.actor_name || 'System'}
+                    <span className="block text-[10px] font-normal text-slate-500">{log.actor_role || ''}</span>
+                  </td>
+                  <td className="py-3.5">
+                    <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-slate-900/[0.04] text-slate-600 border border-slate-900/10">{log.event_type || '—'}</span>
+                    <span className="block mt-1 font-mono text-[11px] text-slate-600">{log.action}</span>
+                  </td>
+                  <td className="py-3.5 font-mono text-slate-600 text-[11px]">{log.entity_table || log.table_name || ''}<span className="block text-[10px] text-slate-400">{log.entity_id || ''}</span></td>
+                  <td className="py-3.5 text-slate-600">{log.branch_name || (log.branch_id ? log.branch_id.slice(0, 8) + '…' : '—')}</td>
+                  <td className="py-3.5 font-mono text-slate-500 text-[10px] whitespace-nowrap">{log.ip_address || '—'}</td>
+                  <td className="py-3.5 pr-4 text-slate-600">
+                    {Array.isArray(log.field_changes) && log.field_changes.length > 0 ? (
+                      <ul className="space-y-0.5">
+                        {log.field_changes.map((c, i) => (
+                          <li key={i} className="font-mono text-[11px]">{c.field}: {String(c.old ?? '∅')} → {String(c.new ?? '∅')}</li>
+                        ))}
+                      </ul>
+                    ) : (<span className="text-slate-400 italic">—</span>)}
+                  </td>
+                </tr>
+              ))}
+              {unifiedLogs.length === 0 && (
+                <tr><td colSpan={7} className="py-12 text-center text-slate-500 italic text-xs">{uLoading ? 'Loading unified audit records…' : 'No unified audit records match your filters yet.'}</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
       </div>
 
       {/* INSPECT DETAIL MODAL */}

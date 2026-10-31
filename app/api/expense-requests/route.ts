@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db'
 import { getCallerProfile } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { syncExpenseToLedger } from '@/lib/server/ledger-sync'
+import { logAudit, diffFields } from '@/lib/server/audit'
 
 // the dashboard expense-requests page's
 // OWN requests. Identity (employee_id/name, branch) always comes
@@ -126,6 +127,12 @@ export async function POST(req: Request) {
       return request
     })
 
+    await logAudit({
+      caller, req, action: 'expense_request.create', eventType: 'create',
+      entityTable: 'employee_expense_requests', entityId: created.id,
+      branchId: (created as any).branch_id ?? null,
+      fieldChanges: diffFields(null, created as any, ['title', 'amount', 'status']),
+    })
     return NextResponse.json({ request: toPlain(created) }, { status: 201 })
   } catch (err: any) {
     console.error('[POST /api/expense-requests] Error:', err)

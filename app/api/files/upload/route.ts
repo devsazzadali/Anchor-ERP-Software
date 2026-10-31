@@ -8,6 +8,12 @@ import {
   validateUpload,
   ObjectAlreadyExistsError,
 } from '@/lib/server/storage'
+import { checkAndRecordSend } from '@/lib/server/rate-limit'
+
+// S5 (R2 Security Round) — per-user upload cap: 30 uploads / 10 min
+// (DB-backed via rate_limit_counters). Fail-soft: a counter outage
+// logs and the upload proceeds.
+const UPLOAD_CAP = { windowMs: 10 * 60 * 1000, max: 30 }
 
 // POST /api/files/upload — multipart upload into a bucket.
 // Requires a signed-in caller (session cookie). Returns the
@@ -33,7 +39,15 @@ const KYC_BUCKETS = new Set(['kyc', 'kyc-documents'])
 
 export async function POST(req: Request) {
   try {
-    const form = await req.formData()
+    // S5 (R2 Security Round): a body over the framework's 10MB client
+    // body cap arrives truncated and formData() throws — that is an
+    // oversize/malformed refusal (400), not a server error (500).
+    let form: FormData
+    try {
+      form = await req.formData()
+    } catch {
+      return NextResponse.json({ error: 'File too large or malformed upload' }, { status: 400 })
+    }
     const bucket = String(form.get('bucket') || '')
     const file = form.get('file')
 
@@ -49,6 +63,16 @@ export async function POST(req: Request) {
       uploaderId = await getSessionUserId(req)
     }
     if (!uploaderId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+    // S5 per-user upload cap → generic 429.
+    try {
+      const cap = await checkAndRecordSend('file_upload', `user:${uploaderId}`, UPLOAD_CAP)
+      if (!cap.allowed) {
+        return NextResponse.json({ error: 'Upload rate limit exceeded. Please try again later.' }, { status: 429 })
+      }
+    } catch (e) {
+      console.error('[POST /api/files/upload] upload-cap counter error (fail-soft):', e)
+    }
 
     if (!file || typeof (file as any).arrayBuffer !== 'function') {
       return NextResponse.json({ error: 'file is required' }, { status: 400 })

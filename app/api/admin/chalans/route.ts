@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
+import { logAudit, diffFields } from '@/lib/server/audit'
 
 // /api/admin/chalans — admin-only product_chalans management for the
 // admin branch-chalans page.
@@ -79,6 +80,11 @@ export async function POST(req: Request) {
       },
     })
 
+    await logAudit({
+      caller: gate.caller, req, action: 'chalan.create', eventType: 'create',
+      entityTable: 'product_chalans', entityId: chalan.id, branchId: chalan.branch_id ?? null,
+      fieldChanges: diffFields(null, chalan as any, ['branch_name', 'chalan_ref', 'total_amount', 'total_cost']),
+    })
     return NextResponse.json({ chalan: toPlain(chalan) })
   } catch (err: any) {
     console.error('[POST /api/admin/chalans] Error:', err)
@@ -96,6 +102,7 @@ export async function PATCH(req: Request) {
     const items = withShippingTotals(Array.isArray(body.items) ? body.items : [])
     const { total_amount, total_cost } = computeTotals(items)
 
+    const before = await prisma.productChalan.findUnique({ where: { id: body.id } }).catch(() => null)
     const chalan = await prisma.productChalan.update({
       where: { id: body.id },
       data: {
@@ -104,6 +111,11 @@ export async function PATCH(req: Request) {
         total_cost: total_cost as any,
         notes: body.notes ?? null,
       },
+    })
+    await logAudit({
+      caller: gate.caller, req, action: 'chalan.update', eventType: 'update',
+      entityTable: 'product_chalans', entityId: body.id, branchId: chalan.branch_id ?? null,
+      fieldChanges: diffFields(before as any, chalan as any, ['total_amount', 'total_cost', 'notes']),
     })
 
     return NextResponse.json({ chalan: toPlain(chalan) })
@@ -121,7 +133,13 @@ export async function DELETE(req: Request) {
     const { id } = await req.json()
     if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
 
+    const before = await prisma.productChalan.findUnique({ where: { id } }).catch(() => null)
     await prisma.productChalan.delete({ where: { id } })
+    await logAudit({
+      caller: gate.caller, req, action: 'chalan.delete', eventType: 'delete',
+      entityTable: 'product_chalans', entityId: id, branchId: (before as any)?.branch_id ?? null,
+      oldValue: before ? { branch_name: before.branch_name, total_amount: Number(before.total_amount) } as any : null,
+    })
     return NextResponse.json({ success: true })
   } catch (err: any) {
     console.error('[DELETE /api/admin/chalans] Error:', err)

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
+import { logAudit, diffFields } from '@/lib/server/audit'
 
 // /api/admin/branches — admin-only branch registry.
 // GET: all branches (id, name by default; ?full=1 returns full rows).
@@ -46,6 +47,11 @@ export async function POST(req: Request) {
     }
 
     const branch = await prisma.branch.create({ data: { name: String(name).trim() } })
+    await logAudit({
+      caller: gate.caller, req, action: 'branch.create', eventType: 'create',
+      entityTable: 'branches', entityId: branch.id, branchId: branch.id,
+      fieldChanges: diffFields(null, branch as any, ['name']),
+    })
     return NextResponse.json({ branch: toPlain(branch) })
   } catch (err: any) {
     console.error('[POST /api/admin/branches] Error:', err)
@@ -99,6 +105,11 @@ export async function PATCH(req: Request) {
         },
       },
     }).catch((e: any) => console.error('[PATCH /api/admin/branches] audit write failed:', e.message))
+    await logAudit({
+      caller: gate.caller, req, action: 'branch.update', eventType: 'update',
+      entityTable: 'branches', entityId: id, branchId: id,
+      fieldChanges: diffFields(existing as any, branch as any, ['name', 'address', 'phone', 'city', 'manager_id']),
+    })
     return NextResponse.json({ branch: toPlain(branch) })
   } catch (err: any) {
     console.error('[PATCH /api/admin/branches] Error:', err)
@@ -114,7 +125,13 @@ export async function DELETE(req: Request) {
     const { id } = await req.json()
     if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
 
+    const before = await prisma.branch.findUnique({ where: { id } }).catch(() => null)
     await prisma.branch.delete({ where: { id } })
+    await logAudit({
+      caller: gate.caller, req, action: 'branch.delete', eventType: 'delete',
+      entityTable: 'branches', entityId: id, branchId: id,
+      oldValue: before ? { name: before.name } as any : null,
+    })
     return NextResponse.json({ success: true })
   } catch (err: any) {
     console.error('[DELETE /api/admin/branches] Error:', err)

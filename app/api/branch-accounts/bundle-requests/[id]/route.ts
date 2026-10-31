@@ -30,7 +30,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     return NextResponse.json({ request: toPlain(request) })
   } catch (err: any) {
     console.error('[GET /api/branch-accounts/bundle-requests/[id]] Fatal error:', err)
-    return NextResponse.json({ error: err.message || 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -100,7 +100,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       updated = await prisma.branchBundleRequest.update({ where: { id }, data: updatePayload })
     } catch (updateErr: any) {
       console.error('[PATCH /api/branch-accounts/bundle-requests/[id]] Update error:', updateErr)
-      return NextResponse.json({ error: updateErr.message }, { status: 500 })
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
 
     // 1. Sync corresponding task in `tasks` table
@@ -180,6 +180,6 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     })
   } catch (err: any) {
     console.error('[PATCH /api/branch-accounts/bundle-requests/[id]] Fatal error:', err)
-    return NextResponse.json({ error: err.message || 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

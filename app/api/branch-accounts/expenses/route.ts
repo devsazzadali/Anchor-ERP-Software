@@ -6,6 +6,7 @@ import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { attachExpenseLedgerHead } from '@/lib/server/attach'
 import { syncExpenseToLedger } from '@/lib/server/ledger-sync'
+import { logAudit, diffFields } from '@/lib/server/audit'
 
 // auth via the single role-resolution
 // function (lib/server/auth.ts). FR-1.6 CONTRACT: this route is
@@ -143,7 +144,8 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ expenses: toPlain(withHeads) })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/branch-accounts/expenses/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -343,9 +345,16 @@ export async function POST(req: NextRequest) {
       },
     })
 
+    await logAudit({
+      caller: profile, req, action: 'branch_expense.create', eventType: 'create',
+      entityTable: 'branch_cash_expenses', entityId: data.id, branchId: branchId,
+      fieldChanges: diffFields(null, data as any, ['category', 'description', 'amount', 'paid_amount', 'due_amount']),
+    })
+
     return NextResponse.json({ success: true, expense: toPlain(withHead) })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/branch-accounts/expenses/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -469,6 +478,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 })
     }
 
+    const fullBeforeForAudit = await prisma.branchCashExpense.findUnique({ where: { id } }).catch(() => null)
     const data = await prisma.$transaction(async (tx) => {
       const updated = await tx.branchCashExpense.update({ where: { id }, data: patch })
       await syncExpenseToLedger(tx, existing as any, updated as any)
@@ -490,9 +500,16 @@ export async function PATCH(req: NextRequest) {
       },
     })
 
+    await logAudit({
+      caller: profile, req, action: 'branch_expense.update', eventType: 'update',
+      entityTable: 'branch_cash_expenses', entityId: id, branchId: existing.branch_id,
+      fieldChanges: diffFields(fullBeforeForAudit as any, data as any, ['description', 'amount', 'paid_amount', 'due_amount', 'category', 'ledger_head_id', 'notes']),
+    })
+
     return NextResponse.json({ success: true, expense: toPlain(withHead) })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/branch-accounts/expenses/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -542,8 +559,15 @@ export async function DELETE(req: NextRequest) {
       },
     })
 
+    await logAudit({
+      caller: profile, req, action: 'branch_expense.delete', eventType: 'delete',
+      entityTable: 'branch_cash_expenses', entityId: id, branchId: expense.branch_id,
+      oldValue: { description: expense.description, amount: Number(expense.amount) } as any,
+    })
+
     return NextResponse.json({ success: true })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/branch-accounts/expenses/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

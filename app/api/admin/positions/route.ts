@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
+import { logAudit, diffFields } from '@/lib/server/audit'
 
 // /api/admin/positions — admin-only positions management for the
 // admin users page. GET: all positions. POST { name }: create.
@@ -45,6 +46,11 @@ export async function POST(req: Request) {
     const position = await prisma.position.create({
       data: { name: String(body.name).trim() },
     })
+    await logAudit({
+      caller: gate.caller, req, action: 'position.create', eventType: 'create',
+      entityTable: 'positions', entityId: position.id,
+      fieldChanges: diffFields(null, position as any, ['name']),
+    })
     return NextResponse.json({ position: toPlain(position) })
   } catch (err: any) {
     console.error('[POST /api/admin/positions] Error:', err)
@@ -73,6 +79,11 @@ export async function PATCH(req: Request) {
         details: { position_id: body.id, from: existing.name, to: name },
       },
     }).catch((e: any) => console.error('[PATCH /api/admin/positions] audit write failed:', e.message))
+    await logAudit({
+      caller: gate.caller, req, action: 'position.update', eventType: 'update',
+      entityTable: 'positions', entityId: body.id,
+      fieldChanges: diffFields(existing as any, position as any, ['name']),
+    })
     return NextResponse.json({ position: toPlain(position) })
   } catch (err: any) {
     console.error('[PATCH /api/admin/positions] Error:', err)
@@ -89,7 +100,13 @@ export async function DELETE(req: Request) {
     if (!body.id) {
       return NextResponse.json({ error: 'id is required' }, { status: 400 })
     }
+    const before = await prisma.position.findUnique({ where: { id: body.id } }).catch(() => null)
     await prisma.position.delete({ where: { id: body.id } })
+    await logAudit({
+      caller: gate.caller, req, action: 'position.delete', eventType: 'delete',
+      entityTable: 'positions', entityId: body.id,
+      oldValue: before ? { name: before.name } as any : null,
+    })
     return NextResponse.json({ success: true })
   } catch (err: any) {
     console.error('[DELETE /api/admin/positions] Error:', err)

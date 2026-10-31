@@ -340,6 +340,7 @@ export async function GET(req: NextRequest) {
       dailyLedger: ledgerRows ?? [],
     })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/branch-accounts/reports/monthly/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

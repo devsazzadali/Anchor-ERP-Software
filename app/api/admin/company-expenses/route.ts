@@ -4,6 +4,7 @@ import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { parseMoneyAmount, roundMoney } from '@/lib/money'
 import { expenseKindOf } from '@/lib/expense-streams'
+import { logAudit, diffFields } from '@/lib/server/audit'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,7 +31,8 @@ export async function GET(req: NextRequest) {
     })
     return NextResponse.json({ expenses: toPlain(data) || [] })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/admin/company-expenses/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -73,9 +75,16 @@ export async function POST(req: NextRequest) {
         created_by_name: caller.full_name,
       },
     })
+    await logAudit({
+      caller, req, action: 'company_expense.create', eventType: 'create',
+      entityTable: 'company_expenses', entityId: data.id,
+      branchId: data.branch_id ?? null,
+      fieldChanges: diffFields(null, data as any, ['purpose', 'total_amount', 'paid_amount', 'due_amount', 'expense_kind']),
+    })
     return NextResponse.json({ expense: toPlain(data) }, { status: 201 })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/admin/company-expenses/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -94,7 +103,6 @@ export async function PATCH(req: NextRequest) {
 
     const existing = await prisma.companyExpense.findFirst({
       where: { id },
-      select: { id: true, total_amount: true },
     })
     if (!existing) return NextResponse.json({ error: 'Expense not found' }, { status: 404 })
 
@@ -118,9 +126,16 @@ export async function PATCH(req: NextRequest) {
     }
 
     const data = await prisma.companyExpense.update({ where: { id }, data: patch as any })
+    await logAudit({
+      caller, req, action: 'company_expense.update', eventType: 'update',
+      entityTable: 'company_expenses', entityId: id,
+      branchId: (data as any).branch_id ?? null,
+      fieldChanges: diffFields(existing as any, data as any, ['paid_amount', 'due_amount', 'expense_kind']),
+    })
     return NextResponse.json({ expense: toPlain(data) })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/admin/company-expenses/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -135,9 +150,17 @@ export async function DELETE(req: NextRequest) {
     const id = searchParams.get('id')
     if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
 
+    const before = await prisma.companyExpense.findUnique({ where: { id } }).catch(() => null)
     await prisma.companyExpense.delete({ where: { id } })
+    await logAudit({
+      caller, req, action: 'company_expense.delete', eventType: 'delete',
+      entityTable: 'company_expenses', entityId: id,
+      branchId: (before as any)?.branch_id ?? null,
+      oldValue: before ? { purpose: before.purpose, total_amount: Number(before.total_amount) } as any : null,
+    })
     return NextResponse.json({ success: true })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/admin/company-expenses/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-import { hashPassword } from '@/lib/server/passwords'
+import { hashPassword, validatePasswordPolicy } from '@/lib/server/passwords'
+import { logAudit } from '@/lib/server/audit'
 
 // the atomic token consume is an
 // updateMany guarded on status='approved' (count 1 = consumed —
@@ -15,19 +16,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    // BUG-005 FIX: Enforce the same password policy as registration (8 chars + complexity).
-    // Previously this only required 6 characters, allowing weaker reset passwords than sign-up.
-    if (!newPassword || newPassword.length < 8) {
-      return NextResponse.json({ error: 'Password must be at least 8 characters' }, { status: 400 })
-    }
-    const passwordStrength = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/
-    if (!passwordStrength.test(newPassword)) {
-      return NextResponse.json(
-        {
-          error: 'Password must contain uppercase, lowercase, a number, and a special character',
-        },
-        { status: 400 }
-      )
+    // BUG-005 FIX (superseded by S3, R2 Security Round): the shared
+    // password policy (lib/server/passwords.ts validatePasswordPolicy —
+    // min 10 + at least 2 character classes + common-password
+    // blocklist) now governs every set path, this one included.
+    const policy = validatePasswordPolicy(String(newPassword))
+    if (!policy.ok) {
+      return NextResponse.json({ error: policy.error }, { status: 400 })
     }
 
     // Fetch the request
@@ -94,6 +89,20 @@ export async function POST(request: Request) {
       })
       return NextResponse.json({ error: 'Failed to update password. Please try again.' }, { status: 500 })
     }
+
+    // S3: unified audit event for the completed reset (S1 helper).
+    await logAudit({
+      caller: null,
+      req: request,
+      actorId: resetReq.user_id,
+      actorName: null,
+      actorRole: null,
+      action: 'password.reset',
+      eventType: 'auth',
+      entityTable: 'auth_users',
+      entityId: resetReq.user_id,
+      fieldChanges: [{ field: 'password', old: '[redacted]', new: '[redacted]' }],
+    })
 
     return NextResponse.json({ message: 'Password updated successfully' }, { status: 200 })
   } catch (err) {

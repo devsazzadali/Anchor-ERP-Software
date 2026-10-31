@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getCallerProfile } from '@/lib/server/auth'
+import { logAudit } from '@/lib/server/audit'
 import { toPlain } from '@/lib/server/respond'
 
 // the settings page's own profile.
@@ -62,7 +63,30 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: 'No writable fields supplied' }, { status: 400 })
     }
 
+    // S3 (R2 Security Round): audit-log a 2FA toggle (auth class).
+    const before2fa =
+      data.is_2fa_enabled !== undefined
+        ? await prisma.profile
+            .findUnique({ where: { id: caller.id }, select: { is_2fa_enabled: true } })
+            .catch(() => null)
+        : null
+
     const updated = await prisma.profile.update({ where: { id: caller.id }, data })
+
+    if (before2fa && before2fa.is_2fa_enabled !== data.is_2fa_enabled) {
+      await logAudit({
+        caller,
+        req,
+        action: data.is_2fa_enabled ? 'auth.2fa_enable' : 'auth.2fa_disable',
+        eventType: 'auth',
+        entityTable: 'profiles',
+        entityId: caller.id,
+        branchId: caller.branch_id,
+        fieldChanges: [
+          { field: 'is_2fa_enabled', old: before2fa.is_2fa_enabled, new: data.is_2fa_enabled },
+        ],
+      })
+    }
 
     // BUG-A5 FIX: Notify admins about profile update.
     // user_id is null + is_admin_only:true = broadcast to all admins

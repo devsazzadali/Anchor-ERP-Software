@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { parseMoneyAmount } from '@/lib/money'
 import { prisma } from '@/lib/db'
 import { getCallerProfile } from '@/lib/server/auth'
+import { logAudit, diffFields } from '@/lib/server/audit'
 import { toPlain } from '@/lib/server/respond'
 
 // create a payout request (dashboard
@@ -43,6 +44,11 @@ export async function POST(req: Request) {
       },
     })
 
+    await logAudit({
+      caller, req, action: 'payment_request.create', eventType: 'create',
+      entityTable: 'payment_requests', entityId: created.id,
+      fieldChanges: diffFields(null, created as any, ['amount', 'currency', 'payment_method', 'status']),
+    })
     return NextResponse.json({ request: toPlain(created) }, { status: 201 })
   } catch (err: any) {
     console.error('[POST /api/payouts] Error:', err)

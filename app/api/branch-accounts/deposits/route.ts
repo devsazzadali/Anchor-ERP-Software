@@ -12,6 +12,7 @@ import {
   depositOverlapMessage,
   findDepositSalesOverlap,
 } from '@/lib/server/deposit-overlap'
+import { logAudit, diffFields } from '@/lib/server/audit'
 
 // legacy queries replaced by Prisma via
 // the single role-resolution function. Admin status comes ONLY from
@@ -159,7 +160,8 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ deposits: enriched, summary })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/branch-accounts/deposits/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -315,6 +317,12 @@ export async function POST(req: NextRequest) {
       },
     })
 
+    await logAudit({
+      caller: profile, req, action: 'deposit.create', eventType: 'create',
+      entityTable: 'branch_bank_deposits', entityId: data.id, branchId: branchId,
+      fieldChanges: diffFields(null, data as any, ['amount', 'status', 'bank_account_name']),
+    })
+
     const plain = toPlain(data)
     if (finalStatus === 'submitted') {
       const baseUrl = req.nextUrl?.origin || req.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'https://www.anchorfashion.shop'
@@ -329,7 +337,8 @@ export async function POST(req: NextRequest) {
       },
     })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/branch-accounts/deposits/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -529,6 +538,14 @@ export async function PATCH(req: NextRequest) {
       },
     })
 
+    await logAudit({
+      caller: profile, req,
+      action: auditAction === 'update' ? 'deposit.update' : `deposit.${auditAction}`,
+      eventType: 'update',
+      entityTable: 'branch_bank_deposits', entityId: id, branchId: deposit.branch_id,
+      fieldChanges: diffFields(deposit as any, updated as any, ['status', 'amount', 'deposit_date', 'bank_account_name', 'notes']),
+    })
+
     const plain = toPlain(updated)
     if (action === 'submit' || action === 'resubmit') {
       const baseUrl = req.nextUrl?.origin || req.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'https://www.anchorfashion.shop'
@@ -537,6 +554,7 @@ export async function PATCH(req: NextRequest) {
 
     return NextResponse.json({ success: true, deposit: plain })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    console.error('[api] app/api/branch-accounts/deposits/route.ts error:', err)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

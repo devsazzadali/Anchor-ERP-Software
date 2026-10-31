@@ -253,6 +253,6 @@ export async function GET(req: NextRequest) {
     })
   } catch (err: any) {
     console.error('Dashboard API error:', err)
-    return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getCallerProfile } from '@/lib/server/auth'
+import { logAudit } from '@/lib/server/audit'
 import { toPlain } from '@/lib/server/respond'
 
 // /api/profile/me — the signed-in user's OWN profile.
@@ -48,7 +49,31 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: 'No valid fields provided for update' }, { status: 400 })
     }
 
+    // S3 (R2 Security Round): capture the 2FA flag before the write
+    // so a toggle can be audit-logged (auth event class).
+    const before2fa =
+      data.is_2fa_enabled !== undefined
+        ? await prisma.profile
+            .findUnique({ where: { id: caller.id }, select: { is_2fa_enabled: true } })
+            .catch(() => null)
+        : null
+
     const profile = await prisma.profile.update({ where: { id: caller.id }, data })
+
+    if (before2fa && before2fa.is_2fa_enabled !== data.is_2fa_enabled) {
+      await logAudit({
+        caller,
+        req,
+        action: data.is_2fa_enabled ? 'auth.2fa_enable' : 'auth.2fa_disable',
+        eventType: 'auth',
+        entityTable: 'profiles',
+        entityId: caller.id,
+        branchId: caller.branch_id,
+        fieldChanges: [
+          { field: 'is_2fa_enabled', old: before2fa.is_2fa_enabled, new: data.is_2fa_enabled },
+        ],
+      })
+    }
     const { security_answer, ...rest } = profile as any
     return NextResponse.json({
       profile: toPlain({ ...rest, has_security_answer: !!security_answer }),

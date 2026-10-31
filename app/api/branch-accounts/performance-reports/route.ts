@@ -34,6 +34,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ reports: toPlain(reports) })
   } catch (err: any) {
     console.error('[GET /api/branch-accounts/performance-reports] Error:', err)
-    return NextResponse.json({ error: err.message || 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

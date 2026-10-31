@@ -13,7 +13,11 @@ import { toPlain } from '@/lib/server/respond'
 export async function GET(req: NextRequest) {
   try {
     const caller = await getCallerProfile(req)
-    if (!caller || !callerIsAdmin(caller)) {
+    // S4 (R2 Security Round): 401 for unauthenticated, 403 for non-admin (FR-1 model).
+    if (!caller) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    if (!callerIsAdmin(caller)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
@@ -35,6 +39,6 @@ export async function GET(req: NextRequest) {
     })
   } catch (err: any) {
     console.error('[GET /api/branch-accounts/manager/options] Error:', err)
-    return NextResponse.json({ error: err.message || 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { sessionTokenFromRequest, verifySessionToken } from '@/lib/server/session'
 import { toPlain } from '@/lib/server/respond'
+import { logAudit } from '@/lib/server/audit'
 
 // Session-only caller resolution (see /api/kyc/status for why KYC
 // routes cannot use the A4-gated getCallerProfile).
@@ -82,6 +83,12 @@ export async function POST(req: Request) {
       return row
     })
 
+    await logAudit({
+      caller: null, actorId: userId, actorName: profile.full_name ?? null, actorRole: profile.role ?? null,
+      req, action: existing ? 'kyc.resubmit' : 'kyc.submit', eventType: 'verification',
+      entityTable: 'verification_requests', entityId: request.id,
+      fieldChanges: [{ field: 'status', old: existing?.status ?? null, new: 'pending' }],
+    })
     return NextResponse.json({ request: toPlain(request) }, { status: 201 })
   } catch (err: any) {
     console.error('[POST /api/kyc/submit] Error:', err)

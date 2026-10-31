@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db'
 import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { hashPassword } from '@/lib/server/passwords'
 import { toPlain } from '@/lib/server/respond'
+import { logAudit, diffFields } from '@/lib/server/audit'
 
 // admin user management is direct
 // work on the auth_users table. Creating a
@@ -52,6 +53,12 @@ export async function POST(req: Request) {
         },
       })
       return authUser
+    })
+
+    await logAudit({
+      caller: gate.caller, req, action: 'user.create', eventType: 'create',
+      entityTable: 'profiles', entityId: userId,
+      fieldChanges: diffFields(null, { email, full_name, role: role || 'employee', profile_type: profile_type || 'employee' }, ['email', 'full_name', 'role', 'profile_type']),
     })
 
     return NextResponse.json({

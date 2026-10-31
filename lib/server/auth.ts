@@ -23,7 +23,8 @@
  * trigger only half did.
  */
 import { prisma } from '@/lib/db'
-import { sessionTokenFromRequest, verifySessionToken } from './session'
+import { parseSessionToken, sessionTokenFromRequest, verifySessionToken } from './session'
+import { checkSessionRegistry } from './session-registry'
 
 export interface CallerProfile {
   id: string
@@ -126,6 +127,22 @@ export async function getCallerProfile(req: { headers: Headers }): Promise<Calle
       isManager = true
     }
   }
+
+  // S2/S3 (R2 Security Round): session-registry enforcement — THE
+  // enforcement point for revocation, idle timeout and the session
+  // epoch. Epoch applies to legacy tokens too (epoch 0); registry +
+  // idle checks apply to v2 tokens (jti present). Runs after the
+  // role facts above are final (the idle window depends on them)
+  // and before any caller is returned. See lib/server/session-registry.ts.
+  const parsedSession = await parseSessionToken(sessionTokenFromRequest(req))
+  if (!parsedSession || parsedSession.userId !== userId) return null
+  const registryOk = await checkSessionRegistry(userId, parsedSession, {
+    sessionEpoch: (profile as { session_epoch?: number | null }).session_epoch ?? 0,
+    isAdmin,
+    isPartner,
+    isBranchManager: isManager,
+  })
+  if (!registryOk) return null
 
   return {
     id: profile.id,

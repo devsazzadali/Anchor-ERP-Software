@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db'
 import { callerIsAdmin, getCallerProfile } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { syncExpenseToLedger } from '@/lib/server/ledger-sync'
+import { logAudit, diffFields } from '@/lib/server/audit'
 
 // POST /api/admin/salary-payments/[id]/void — FR-14.1.
 //
@@ -78,6 +79,18 @@ export async function POST(req: Request, context: any) {
         },
       },
     }).catch((e: any) => console.error('[salary void] audit write failed:', e.message))
+
+    await logAudit({
+      caller, req, action: 'salary_payment.void', eventType: 'void',
+      entityTable: 'salary_payments', entityId: id,
+      branchId: (payment as any).branch_id ?? null,
+      fieldChanges: [
+        { field: 'status', old: (payment as any).status ?? null, new: 'voided' },
+        { field: 'amount', old: Number(payment.amount), new: Number(payment.amount) },
+        { field: 'reason', old: null, new: reason || null },
+        { field: 'mirror_reversed', old: null, new: result.mirrorReversed },
+      ],
+    })
 
     return NextResponse.json({ payment: toPlain(result.payment), mirror_reversed: result.mirrorReversed })
   } catch (err: any) {

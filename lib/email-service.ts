@@ -1638,3 +1638,38 @@ export async function sendBundleStatusEmailToManager({
     html,
   });
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// S3 ADDITION (R2 Security Round, Writer B) — the ONLY change to this
+// file in S2/S3: one new exported function appended at the end. No
+// existing template, colour or function was altered (R0 parity is
+// byte-proven). Sends the admin alert when a login lockout trips
+// (5 failed attempts → 15-minute lock, lib/server/rate-limit.ts).
+// Fail-soft by construction: sendPremiumEmail already returns
+// { success: false } when the Resend key / sender email are missing,
+// and the login route wraps the call in try/catch.
+// ─────────────────────────────────────────────────────────────────────────────
+export async function sendAccountLockoutAlertToAdmins(
+  adminEmails: string[],
+  lockedEmail: string,
+  ipAddress: string,
+  lockedUntilIso: string
+) {
+  const html = getPremiumNotificationHtml({
+    title: 'Account Lockout Alert - Anchor ERP',
+    greeting: 'Dear Administrator,',
+    introText: 'Repeated failed login attempts have triggered an automatic temporary lockout. The account (or source IP) is locked for 15 minutes; the sign-in response shown to the caller stays generic and does not reveal the lock.',
+    boxTitle: 'Lockout Details',
+    boxIcon: '🔒',
+    badgeText: 'Security Alert',
+    badgeBg: '#450a0a', badgeBorder: '#7f1d1d', badgeColor: '#f87171',
+    contentHtml: `
+      ${buildDataRow('Date & Time', bdTime())}
+      ${buildDataRow('Account Email', lockedEmail)}
+      ${buildDataRow('Source IP', ipAddress)}
+      ${buildDataRow('Locked Until', lockedUntilIso)}
+    `,
+    footerNote: 'If this was the account owner mistyping their password, no action is needed — the lock expires automatically. If you do not recognize this activity, review the account in the admin panel.',
+  });
+  return sendPremiumEmail({ to: adminEmails, subject: 'Security Alert: Login Lockout Triggered - Anchor ERP', html });
+}

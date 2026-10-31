@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { callerIsAdmin, getCallerProfile } from '@/lib/server/auth'
+import { logAudit } from '@/lib/server/audit'
 import { toPlain } from '@/lib/server/respond'
 
 // POST /api/payouts/complete replaces
@@ -78,12 +79,17 @@ export async function POST(req: Request) {
       return { request: updated, transaction }
     })
 
+    await logAudit({
+      caller, req, action: 'payment_request.pay', eventType: 'approve',
+      entityTable: 'payment_requests', entityId: (result.request as any).id,
+      fieldChanges: [{ field: 'status', old: 'pending', new: 'completed' }],
+    })
     return NextResponse.json({ request: toPlain(result.request), transaction: toPlain(result.transaction) })
   } catch (err: any) {
     const message = err?.message || 'Internal Server Error'
     const status =
       message === 'Payment request not found' ? 404 : message === 'Payment request is already completed' ? 400 : 500
     if (status === 500) console.error('[POST /api/payouts/complete] Error:', err)
-    return NextResponse.json({ error: message }, { status })
+    return NextResponse.json({ error: status === 500 ? 'Internal Server Error' : message }, { status })
   }
 }

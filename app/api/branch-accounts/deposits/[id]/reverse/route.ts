@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db'
 import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { syncDepositToLedger, depositDistributionMap } from '@/lib/server/ledger-sync'
+import { logAudit } from '@/lib/server/audit'
 
 // POST /api/branch-accounts/deposits/[id]/reverse
 // Admin only — REVERSE an approved deposit (§D5 #6).
@@ -162,6 +163,17 @@ export async function POST(
       },
     })
 
+    await logAudit({
+      caller, req, action: 'deposit.reverse', eventType: 'reverse',
+      entityTable: 'branch_bank_deposits', entityId: id,
+      branchId: deposit.branch_id,
+      fieldChanges: [
+        { field: 'is_reversed', old: false, new: true },
+        { field: 'status', old: deposit.status, new: updated.status },
+        { field: 'reversal_note', old: null, new: reversalNote },
+      ],
+    })
+
     // Notify the manager — same pattern as approve/reject.
     if (deposit.manager_id) {
       await prisma.notification.create({
@@ -182,6 +194,6 @@ export async function POST(
     })
   } catch (err: any) {
     console.error('Deposit reverse error:', err)
-    return NextResponse.json({ error: err.message || 'Internal Server Error' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
