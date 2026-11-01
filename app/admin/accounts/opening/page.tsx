@@ -18,7 +18,7 @@ type PositionLine = {
   source_note: string | null; detail: any
 }
 type Position = {
-  id: string; label: string; status: string; as_of: string; computed_at: string
+  id: string; label: string; status: string; origin: string; as_of: string; computed_at: string
   confirmed_by: string | null; confirmed_at: string | null; notes: string | null
   lines: PositionLine[]
 }
@@ -82,9 +82,11 @@ export default function OpeningPositionPage() {
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Confirmation failed')
       setNotice(
-        json.opening_entry
-          ? `Opening position confirmed — opening journal entry posted (${json.opening_entry.entry_id.slice(0, 8)}…).`
-          : 'Opening position confirmed.'
+        json.mode === 'acknowledgement'
+          ? 'Opening position confirmed as an acknowledgement — no journal entry was posted, because these figures are already in the journal from the backfill.'
+          : json.opening_entry
+            ? `Opening position confirmed — opening journal entry posted (${json.opening_entry.entry_id.slice(0, 8)}…).`
+            : 'Opening position confirmed.'
       )
       setConfirmArmed(null)
       await load()
@@ -138,6 +140,13 @@ export default function OpeningPositionPage() {
             )}
           </div>
 
+          {p.status === 'confirmed' && p.origin === 'backfill' && (
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 mb-4 text-sm text-emerald-800">
+              Confirmed as an <strong>acknowledgement</strong> — no opening journal entry was posted for this
+              position, because its figures were already in the journal from the backfill of the existing records.
+            </div>
+          )}
+
           <div className="rounded-xl border border-slate-100 overflow-x-auto">
             <table className="w-full text-sm min-w-[640px]">
               <thead>
@@ -174,16 +183,30 @@ export default function OpeningPositionPage() {
 
           {p.status === 'draft' && p.id === latest?.id && (
             <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
-              <p className="text-sm text-slate-700 mb-3">
-                <strong>Owner action:</strong> confirm this position only after checking the bank candidates against the real
-                bank statements and the branch cash against the physical drawers. Confirming posts the opening journal entry
-                (P12, dated the cutover — the 1st of the month after this position's as-of month) and is recorded in the audit log.
-                Incomplete history (uncosted chalans, the SOTIBARI deposit drift) stays flagged — it is NOT absorbed into these figures.
-              </p>
+              {p.origin === 'backfill' ? (
+                <p className="text-sm text-slate-700 mb-3">
+                  <strong>Owner action — acknowledgement only:</strong> this position summarises history that is
+                  ALREADY posted in the journal (the full backfill of the existing records). Confirming it records
+                  that you have checked these figures and marks the position confirmed — it posts{' '}
+                  <strong>NO journal entry</strong>, so nothing is counted twice. Confirm only after checking the
+                  bank candidates against the real bank statements and the branch cash against the physical
+                  drawers. The confirmation is recorded in the audit log. Incomplete history (uncosted chalans,
+                  the SOTIBARI deposit drift) stays flagged — it is NOT absorbed into these figures.
+                </p>
+              ) : (
+                <p className="text-sm text-slate-700 mb-3">
+                  <strong>Owner action:</strong> confirm this position only after checking the bank candidates against the real
+                  bank statements and the branch cash against the physical drawers. Confirming posts the opening journal entry
+                  (P12, dated the cutover — the 1st of the month after this position's as-of month) and is recorded in the audit log.
+                  Incomplete history (uncosted chalans, the SOTIBARI deposit drift) stays flagged — it is NOT absorbed into these figures.
+                </p>
+              )}
               {confirmArmed === p.id ? (
                 <div className="flex flex-wrap gap-2">
                   <button disabled={busy === p.id} onClick={() => confirm(p.id)} className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 disabled:opacity-50">
-                    Yes — confirm this opening position
+                    {p.origin === 'backfill'
+                      ? 'Yes — confirm as acknowledgement (no journal entry)'
+                      : 'Yes — confirm this opening position'}
                   </button>
                   <button onClick={() => setConfirmArmed(null)} className="px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700">Cancel</button>
                 </div>

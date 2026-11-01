@@ -1635,6 +1635,14 @@ model OpeningPosition {
   as_of_date   DateTime  @db.Date
   // draft | confirmed
   status       String    @default("draft")
+  // Provenance (owner OPTION 1, 2026-11-01): 'cutover' = the
+  // position's history is NOT in the journal — confirming posts
+  // the P12 opening entry (A3). 'backfill' = the position
+  // summarises history ALREADY posted by the A1 backfill —
+  // confirming is an acknowledgement only and posts NOTHING.
+  // Stamped by storeOpeningPosition from journal coverage; the
+  // DB default keeps direct-created rows on the A3 behaviour.
+  origin       String    @default("cutover")
   computed_at  DateTime  @default(now()) @db.Timestamptz(6)
   confirmed_by String?   @db.Uuid
   confirmed_at DateTime? @db.Timestamptz(6)

@@ -3,19 +3,23 @@ import { prisma } from '@/lib/db'
 import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { logAudit, diffFields } from '@/lib/server/audit'
 import { storeOpeningPosition } from '@/lib/server/accounting/opening'
-import { confirmOpeningPosition } from '@/lib/server/accounting/openingPost'
+import { confirmOpeningPosition, isOpeningConfirmRefusedError } from '@/lib/server/accounting/openingPost'
 import { isPeriodBlockedError } from '@/lib/server/accounting/post'
 
 // /api/accounts/opening — the opening position (Accounts A1).
 // GET: all computed positions (latest first) with lines.
 // POST {action:'recompute'}: compute + store a NEW draft from the
 //   current data (previous drafts are kept).
-// POST {action:'confirm', id}: the OWNER's confirmation — A3
-//   completes the P12 flow: confirming ALSO posts the opening
-//   journal entry through the engine (openingPost.ts) and only
-//   then flips the position to confirmed; both steps are audited.
-//   If the entry cannot post (e.g. its cutover period is locked)
-//   the position stays DRAFT and the route answers 409.
+// POST {action:'confirm', id}: the OWNER's confirmation. The mode
+//   is the POSITION's provenance (stored origin), never a request
+//   flag: a 'cutover' position posts the P12 opening journal entry
+//   through the engine (A3) and only then flips to confirmed; a
+//   'backfill' position — one summarising history already posted
+//   by the A1 backfill — confirms as an ACKNOWLEDGEMENT ONLY
+//   (owner OPTION 1): status flip + stamps, zero journal writes,
+//   so nothing double-counts. Both modes are audited. If a posting
+//   confirm cannot post (e.g. its cutover period is locked) the
+//   position stays DRAFT and the route answers 409.
 export const dynamic = 'force-dynamic'
 
 async function gate(req: Request) {
@@ -43,6 +47,7 @@ export async function GET(req: Request) {
         id: p.id,
         label: p.label,
         status: p.status,
+        origin: p.origin,
         as_of: p.as_of_date.toISOString().slice(0, 10),
         computed_at: p.computed_at.toISOString(),
         confirmed_by: p.confirmed_by,
@@ -99,6 +104,9 @@ export async function POST(req: Request) {
       try {
         result = await confirmOpeningPosition(prisma as any, id, g.caller.id)
       } catch (err: any) {
+        if (isOpeningConfirmRefusedError(err)) {
+          return NextResponse.json({ error: err.message }, { status: 409 })
+        }
         if (isPeriodBlockedError(err)) {
           return NextResponse.json(
             { error: `Opening entry refused: period ${err.month} is ${err.status}. Reopen it (break-glass) or re-compute the position for a later cutover.` },
@@ -116,11 +124,18 @@ export async function POST(req: Request) {
         entityTable: 'opening_positions',
         entityId: id,
         fieldChanges: diffFields(before as any, updated as any, ['status']),
-        newValue: { opening_entry_id: result.entry_id, entry_created: result.entry_created } as any,
+        newValue: {
+          mode: result.mode,
+          opening_entry_id: result.entry_id,
+          entry_created: result.entry_created,
+        } as any,
       })
       return NextResponse.json({
         position: { id, status: 'confirmed' },
-        opening_entry: { entry_id: result.entry_id, created: result.entry_created },
+        mode: result.mode,
+        opening_entry: result.entry_id
+          ? { entry_id: result.entry_id, created: result.entry_created }
+          : null,
       })
     }
 

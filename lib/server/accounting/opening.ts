@@ -194,11 +194,24 @@ export async function computeOpeningPosition(db: Db): Promise<OpeningComputation
 /** Compute + store a new DRAFT position (prior drafts are kept). */
 export async function storeOpeningPosition(db: Db): Promise<{ position_id: string; computation: OpeningComputation }> {
   const computation = await computeOpeningPosition(db)
+  // Provenance stamp (owner OPTION 1): if the journal ALREADY
+  // carries posted entries dated on or before this position's
+  // as-of date, the position summarises posted history — origin
+  // 'backfill', and its confirm is an acknowledgement only. On a
+  // fresh cutover (empty journal) the position is the journal's
+  // starting point — origin 'cutover', and its confirm posts the
+  // P12 entry. Derived from the data, never chosen by a caller.
+  const asOfDate = new Date(`${computation.as_of}T00:00:00Z`)
+  const postedCovering = await db.journalEntry.count({
+    where: { status: 'posted', entry_date: { lte: asOfDate } },
+  })
+  const origin = postedCovering > 0 ? 'backfill' : 'cutover'
   const position = await db.openingPosition.create({
     data: {
       label: `Opening position — computed ${computation.as_of} (DRAFT)`,
-      as_of_date: new Date(`${computation.as_of}T00:00:00Z`),
+      as_of_date: asOfDate,
       status: 'draft',
+      origin,
       notes: computation.flags.map((f) => `[${f.code}] ${f.text}`).join('\n'),
     },
   })
