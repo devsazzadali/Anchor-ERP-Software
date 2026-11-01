@@ -3,6 +3,7 @@
 export const dynamic = 'force-dynamic'
 import React, { useCallback, useEffect, useState } from 'react'
 import { CalendarClock, RefreshCw, CheckCircle2, AlertTriangle, Lock, LockOpen, CalendarCheck2, Flag } from 'lucide-react'
+import { PageHead } from '../ui'
 
 // Accounts A3 — Periods & fiscal years. Data: GET /api/accounts/periods
 // (fiscal years + periods + pre-close checklist). Actions POST to the
@@ -89,20 +90,15 @@ export default function AccountsPeriodsPage() {
 
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-            <CalendarClock className="w-6 h-6 text-emerald-600" /> Accounts — Periods &amp; Fiscal Years
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Close a month to stop new postings landing in it; lock it to make that final. Reopening is break-glass:
-            it needs a written reason and is audit-logged. Closing a fiscal year carries its result to Retained Earnings.
-          </p>
-        </div>
+      <PageHead icon={<CalendarClock className="w-6 h-6 text-emerald-600" />} title="Month Open / Close" bangla="কোন মাসের হিসাব বন্ধ বা খোলা" tech="Accounting Periods & Fiscal Years">
         <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
         </button>
-      </div>
+      </PageHead>
+      <p className="text-sm text-slate-500 -mt-4 mb-6">
+        Close a month to stop new postings landing in it; lock it to make that final. Reopening is break-glass:
+        it needs a written reason and is audit-logged. Closing a fiscal year carries its result to Retained Earnings.
+      </p>
 
       {error && <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 mb-4 text-sm text-rose-700">{error}</div>}
       {notice && <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 mb-4 text-sm text-emerald-800">{notice}</div>}

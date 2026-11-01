@@ -336,6 +336,38 @@ html, body {
     margin: 0 !important;
     page-break-inside: avoid;
   }
+  /* Accounts simplification: Accounts pages print their content with
+     the official theme (PrintHeader/PrintFooter in
+     app/admin/accounts/ui.tsx). #pdf-print-area above belongs to the
+     PDF Generator page only; Accounts pages wrap their content in
+     .accounts-print-area instead. Visibility rules mirror the
+     #pdf-print-area treatment so the app chrome stays off the page. */
+  .accounts-print-area,
+  .accounts-print-area * {
+    visibility: visible;
+  }
+  .accounts-print-area {
+    display: block !important;
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 10mm 12mm !important;
+    background: #fff !important;
+  }
+  .accounts-print-header {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .accounts-print-footer {
+    display: block !important;
+    position: fixed;
+    bottom: 6mm;
+    left: 12mm;
+    right: 12mm;
+    visibility: visible;
+  }
   @page {
     size: A4 portrait;
     margin: 0;

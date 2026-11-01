@@ -3,7 +3,8 @@
 export const dynamic = 'force-dynamic'
 import React, { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Wallet, RefreshCw, Plus, AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { Wallet, RefreshCw, Plus, AlertTriangle, CheckCircle2, Printer, Download } from 'lucide-react'
+import { PageHead, PrintHeader, PrintFooter, downloadPdf, bdt } from '../ui'
 
 // Accounts A6 — Payroll runs. Data: GET /api/accounts/payroll.
 // A run drafts the month's already-issued payments for review and
@@ -85,22 +86,44 @@ export default function PayrollRunsPage() {
     }
   }
 
+  const exportPdf = () =>
+    void downloadPdf({
+      title: 'Salary Accounts',
+      subtitle: 'Payroll',
+      columns: ['Month', 'Status', 'Gross', 'Deductions', 'Net'],
+      rows: (runs ?? []).map((r) => [
+        r.month,
+        r.status.replace('_', ' '),
+        bdt(r.total_gross),
+        bdt(r.total_deductions),
+        bdt(r.total_net),
+      ]),
+      summary: [{ label: 'Payroll Runs', value: String(runs?.length ?? 0) }],
+      filename: 'salary-accounts.pdf',
+    })
+
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-            <Wallet className="w-6 h-6 text-emerald-600" /> Payroll
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            The monthly salary cycle — draft a run, review, approve, then disburse through the same
-            Issue Salary path the modal uses. One money path, journal-posted automatically.
-          </p>
+      <PageHead icon={<Wallet className="w-6 h-6 text-emerald-600" />} title="Salary Accounts" bangla="বেতনের হিসাব এক জায়গায়" tech="Payroll">
+        <div className="flex flex-wrap gap-2">
+          <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
+          </button>
+          <button onClick={() => window.print()} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+            <Printer className="w-4 h-4" /> Print
+          </button>
+          <button onClick={exportPdf} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+            <Download className="w-4 h-4" /> PDF
+          </button>
         </div>
-        <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
-          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-        </button>
-      </div>
+      </PageHead>
+      <p className="text-sm text-slate-500 -mt-4 mb-6">
+        The monthly salary cycle — draft a run, review, approve, then disburse through the same
+        Issue Salary path the modal uses. One money path, journal-posted automatically.
+      </p>
+
+      <div className="accounts-print-area">
+      <PrintHeader title="Salary Accounts" subtitle="Payroll" />
 
       {settingsCount === 0 && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 mb-6 text-sm text-amber-800 flex gap-2">
@@ -209,6 +232,8 @@ export default function PayrollRunsPage() {
           </table>
         </div>
       )}
+      <PrintFooter />
+      </div>
     </div>
   )
 }

@@ -3,6 +3,7 @@
 export const dynamic = 'force-dynamic'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Users, RefreshCw, Pencil, CheckCircle2, AlertTriangle, Trash2 } from 'lucide-react'
+import { PageHead } from '../ui'
 
 // Accounts A5 — Counterparties. Data: GET /api/accounts/parties.
 // The register is DERIVED from existing records (salary
@@ -89,16 +90,7 @@ export default function PartiesPage() {
 
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-            <Users className="w-6 h-6 text-emerald-600" /> Accounts — Counterparties
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Everyone the business owes or is owed by — derived from the existing records (staff, partners,
-            landlords), never re-entered. Payees the source records do not name stay honestly unrecorded.
-          </p>
-        </div>
+      <PageHead icon={<Users className="w-6 h-6 text-emerald-600" />} title="People & Companies" bangla="যাদের সাথে লেনদেন হয়" tech="Counterparties">
         <div className="flex gap-2">
           <button
             onClick={() => act({ action: 'sync' }, 'Counterparties re-derived from the source records.')}
@@ -110,7 +102,11 @@ export default function PartiesPage() {
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
           </button>
         </div>
-      </div>
+      </PageHead>
+      <p className="text-sm text-slate-500 -mt-4 mb-6">
+        Everyone the business owes or is owed by — derived from the existing records (staff, partners,
+        landlords), never re-entered. Payees the source records do not name stay honestly unrecorded.
+      </p>
 
       {error && <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 mb-4 text-sm text-rose-700">{error}</div>}
       {notice && (

@@ -3,7 +3,8 @@
 export const dynamic = 'force-dynamic'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { Wallet, RefreshCw, Plus, Trash2, Pencil, Landmark, AlertTriangle, Send, CheckCheck, Play, Ban } from 'lucide-react'
+import { Wallet, RefreshCw, Plus, Trash2, Pencil, Landmark, AlertTriangle, Send, CheckCheck, Play, Ban, Download } from 'lucide-react'
+import { PageHead, downloadPdf, bdt } from '../../ui'
 import PaymentAccountCard, { type PaymentAccountField } from '@/components/PaymentAccountCard'
 import { salaryAccountFields } from '@/app/admin/salaries/IssueSalaryModal'
 
@@ -216,6 +217,30 @@ export default function PayrollRunDetailPage({ params }: { params: Promise<{ id:
     }
   }
 
+  const exportPdf = () =>
+    void downloadPdf({
+      title: 'Salary Accounts',
+      subtitle: run ? `Payroll run - ${run.month}` : 'Payroll run detail',
+      columns: ['Employee', 'Basic', 'Gross', 'Deductions', 'Net'],
+      rows: lines
+        .filter((l) => l.origin === 'run')
+        .map((l) => [
+          l.employee_name || l.employee?.full_name || '-',
+          bdt(l.basic),
+          bdt(l.gross_salary),
+          bdt(l.deductions ?? 0),
+          bdt(l.net_payable),
+        ]),
+      summary: run
+        ? [
+            { label: 'Total Gross', value: bdt(run.total_gross) },
+            { label: 'Total Deductions', value: bdt(run.total_deductions) },
+            { label: 'Total Net', value: bdt(run.total_net) },
+          ]
+        : [],
+      filename: 'salary-run.pdf',
+    })
+
   const runLines = lines.filter((l) => l.origin === 'run')
   const reviewLines = lines.filter((l) => l.origin === 'existing_payment')
   const isDraft = run?.status === 'draft'
@@ -237,29 +262,33 @@ export default function PayrollRunDetailPage({ params }: { params: Promise<{ id:
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
       <Link href="/admin/accounts/payroll" className="text-sm font-semibold text-emerald-700 hover:underline">← Payroll runs</Link>
-      <div className="flex flex-wrap items-center justify-between gap-4 mt-3 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-            <Wallet className="w-6 h-6 text-emerald-600" /> Payroll — {run?.month ?? '…'}
-          </h1>
-          {run && (
-            <p className="text-sm text-slate-500 mt-1">
-              Status{' '}
-              <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${STATUS_STYLE[run.status] || ''}`}>
-                {run.status.replace('_', ' ')}
-              </span>{' '}
-              · accounting period: {run.period_status ?? 'not seeded'}
-              {run.blocking && ' · this run holds the month (live payments)'}
-            </p>
-          )}
-          {run?.status === 'voided' && run.void_reason && (
-            <p className="text-sm text-rose-700 mt-1">Voided: {run.void_reason}</p>
-          )}
-          {run?.notes && <p className="text-sm text-slate-500 mt-1">{run.notes}</p>}
-        </div>
-        <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
-          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-        </button>
+      <div className="mt-3">
+        <PageHead icon={<Wallet className="w-6 h-6 text-emerald-600" />} title={`Salary Accounts — ${run?.month ?? '…'}`} bangla="বেতনের হিসাব এক জায়গায়" tech="Payroll run detail">
+          <div className="flex flex-wrap gap-2">
+            <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
+            </button>
+            <button onClick={exportPdf} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+              <Download className="w-4 h-4" /> PDF
+            </button>
+          </div>
+        </PageHead>
+      </div>
+      <div className="-mt-4 mb-6">
+        {run && (
+          <p className="text-sm text-slate-500">
+            Status{' '}
+            <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${STATUS_STYLE[run.status] || ''}`}>
+              {run.status.replace('_', ' ')}
+            </span>{' '}
+            · accounting period: {run.period_status ?? 'not seeded'}
+            {run.blocking && ' · this run holds the month (live payments)'}
+          </p>
+        )}
+        {run?.status === 'voided' && run.void_reason && (
+          <p className="text-sm text-rose-700 mt-1">Voided: {run.void_reason}</p>
+        )}
+        {run?.notes && <p className="text-sm text-slate-500 mt-1">{run.notes}</p>}
       </div>
 
       {error && <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 mb-4 text-sm text-rose-700">{error}</div>}

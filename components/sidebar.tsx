@@ -65,38 +65,38 @@ const adminNavigation = [
     href: '#',
     divider: true,
     subItems: [
-      { name: 'Overview', href: '/admin/accounts' },
+      { name: 'Accounts at a Glance', href: '/admin/accounts' },
       // Accounts A9: the exceptions inbox — blocked postings with
       // a workflow + every derived data signal. The badge shows
       // the live open-item count (fetched below, admin nav only).
-      { name: 'Exceptions', href: '/admin/accounts/exceptions' },
-      { name: 'Chart of Accounts', href: '/admin/accounts/chart' },
-      { name: 'Journal', href: '/admin/accounts/journal' },
-      { name: 'Opening Position', href: '/admin/accounts/opening' },
+      { name: 'Needs Attention', href: '/admin/accounts/exceptions' },
+      { name: 'Money Categories', href: '/admin/accounts/chart' },
+      { name: 'All Entries', href: '/admin/accounts/journal' },
+      { name: 'Starting Figures', href: '/admin/accounts/opening' },
       // Accounts A3: period close & lock, FY rollover.
-      { name: 'Periods', href: '/admin/accounts/periods' },
+      { name: 'Month Open / Close', href: '/admin/accounts/periods' },
       // Accounts A4: bank accounts, statement import + reconciliation.
-      { name: 'Bank Reconciliation', href: '/admin/accounts/bank' },
+      { name: 'Match with Bank', href: '/admin/accounts/bank' },
       // Accounts A5: counterparties + payables/receivables register with ageing.
-      { name: 'Counterparties', href: '/admin/accounts/parties' },
-      { name: 'Payables & Ageing', href: '/admin/accounts/payables' },
+      { name: 'People & Companies', href: '/admin/accounts/parties' },
+      { name: 'To Pay', href: '/admin/accounts/payables' },
       // Accounts A6: the monthly payroll cycle (disburses through
       // the one shared salary path).
-      { name: 'Payroll', href: '/admin/accounts/payroll' },
+      { name: 'Salary Accounts', href: '/admin/accounts/payroll' },
       // Accounts A7: VAT/TDS configuration + register (dormant
       // until the owner/CA enters rates).
-      { name: 'VAT & TDS', href: '/admin/accounts/tax' },
+      { name: 'VAT & Tax', href: '/admin/accounts/tax' },
       // Accounts A8: cheque register — issued/received lifecycle,
       // clearing posts through the journal; PDC due list.
       { name: 'Cheques', href: '/admin/accounts/cheques' },
       // Accounts A2: statements over the journal.
       { name: 'Statements', href: '/admin/accounts/statements' },
-      { name: 'Trial Balance', href: '/admin/accounts/statements/trial-balance' },
-      { name: 'Profit & Loss', href: '/admin/accounts/statements/pl' },
-      { name: 'Balance Sheet', href: '/admin/accounts/statements/balance-sheet' },
+      { name: 'Books Check', href: '/admin/accounts/statements/trial-balance' },
+      { name: 'Profit & Loss (লাভ-ক্ষতি)', href: '/admin/accounts/statements/pl' },
+      { name: 'What We Own & Owe', href: '/admin/accounts/statements/balance-sheet' },
       // Accounts A10: one-click auditor package (ZIP/JSON) built
       // from the same services as every screen above.
-      { name: 'Auditor Package', href: '/admin/accounts/auditor' },
+      { name: 'Auditor Report', href: '/admin/accounts/auditor' },
     ]
   },
   { name: 'System Settings',         icon: Settings,        href: '/admin/settings', divider: true },

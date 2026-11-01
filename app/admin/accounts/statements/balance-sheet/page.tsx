@@ -3,8 +3,9 @@
 export const dynamic = 'force-dynamic'
 import React, { Suspense, useCallback, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Landmark, RefreshCw, CheckCircle2, AlertTriangle } from 'lucide-react'
-import { ExportButtons, stmtUrl, taka, takaSigned, type StmtMeta } from '../ui'
+import { Landmark, RefreshCw, CheckCircle2, AlertTriangle, FileText } from 'lucide-react'
+import { ExportButtons, stmtUrl, takaSigned, type StmtMeta } from '../ui'
+import { PageHead, PrintHeader, PrintFooter, downloadPdf, taka, bdt } from '../../ui'
 
 // Accounts A2 — Balance sheet as of a date: cumulative journal
 // position (assets / liabilities / equity + the accumulated P&L
@@ -81,22 +82,49 @@ function BalanceSheetInner() {
 
   const periodEnd = (month: string) => meta?.periods.find((p) => p.month === month)?.end
 
+  const handlePdf = () => {
+    if (!stmt) return
+    void downloadPdf({
+      title: 'What We Own & Owe',
+      subtitle: 'Balance Sheet',
+      dateRange: asOf ? `As of ${asOf}` : undefined,
+      columns: ['Type', 'Account', 'Amount (BDT)'],
+      rows: [
+        ...stmt.assets.map((r) => ['Asset', `${r.code} · ${r.name}`, r.amount] as (string | number)[]),
+        ...stmt.liabilities.map((r) => ['Liability', `${r.code} · ${r.name}`, r.amount] as (string | number)[]),
+        ...stmt.equity.map((r) => ['Equity', `${r.code} · ${r.name}`, r.amount] as (string | number)[]),
+        ['Equity', 'Accumulated result', stmt.current_result] as (string | number)[],
+      ],
+      summary: [
+        { label: 'Total Assets', value: bdt(stmt.total_assets) },
+        { label: 'Total Liabilities', value: bdt(stmt.total_liabilities) },
+        { label: 'Total Equity', value: bdt(stmt.total_equity) },
+        { label: 'Accumulated Result', value: bdt(stmt.current_result) },
+        { label: 'Total Liabilities + Equity', value: bdt(stmt.total_liabilities_equity) },
+      ],
+      filename: 'what-we-own-and-owe.pdf',
+    })
+  }
+
   return (
-    <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-            <Landmark className="w-6 h-6 text-emerald-600" /> Balance Sheet
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">Cumulative journal position as of a date — posted entries only.</p>
-        </div>
+    <div className="p-6 lg:p-10 max-w-7xl mx-auto accounts-print-area">
+      <PrintHeader title="What We Own & Owe" subtitle="Balance Sheet" />
+      <PageHead
+        icon={<Landmark className="w-6 h-6 text-emerald-600" />}
+        title="What We Own & Owe"
+        bangla="সম্পদ আর দেনার অবস্থা"
+        tech="Balance Sheet"
+      >
         <div className="flex items-center gap-2 print:hidden">
           <ExportButtons csvHref={stmtUrl('balance-sheet', { asof: asOf || undefined }, 'csv')} />
+          <button onClick={handlePdf} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+            <FileText className="w-4 h-4" /> PDF
+          </button>
           <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
           </button>
         </div>
-      </div>
+      </PageHead>
 
       {meta && (
         <div className="flex flex-wrap items-center gap-3 mb-6 print:hidden">
@@ -221,6 +249,7 @@ function BalanceSheetInner() {
           </div>
         </>
       )}
+      <PrintFooter />
     </div>
   )
 }

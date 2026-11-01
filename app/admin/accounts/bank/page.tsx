@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic'
 import React, { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Landmark, RefreshCw, Plus, Pencil, CheckCircle2, AlertTriangle } from 'lucide-react'
+import { PageHead } from '../ui'
 
 // Accounts A4 — Bank Reconciliation register. Data: GET
 // /api/accounts/bank (one summary row per bank account: journal /
@@ -167,16 +168,7 @@ export default function BankReconciliationPage() {
 
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-            <Landmark className="w-6 h-6 text-emerald-600" /> Bank Reconciliation
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Statement import + matching against the journal bank lines. Reconciliation never writes journal
-            entries — it only compares what the bank says against what the books already say.
-          </p>
-        </div>
+      <PageHead icon={<Landmark className="w-6 h-6 text-emerald-600" />} title="Match with Bank" bangla="ব্যাংকের খাতার সাথে আমাদের হিসাব মেলানো" tech="Bank Reconciliation">
         <div className="flex gap-2">
           <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
@@ -185,7 +177,11 @@ export default function BankReconciliationPage() {
             <Plus className="w-4 h-4" /> Add bank account
           </button>
         </div>
-      </div>
+      </PageHead>
+      <p className="text-sm text-slate-500 -mt-4 mb-6">
+        Statement import + matching against the journal bank lines. Reconciliation never writes journal
+        entries — it only compares what the bank says against what the books already say.
+      </p>
 
       {error && <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 mb-4 text-sm text-rose-700 flex items-center gap-2"><AlertTriangle className="w-4 h-4 shrink-0" /> {error}</div>}
       {notice && <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 mb-4 text-sm text-emerald-800 flex items-center gap-2"><CheckCircle2 className="w-4 h-4 shrink-0" /> {notice}</div>}

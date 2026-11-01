@@ -1,6 +1,8 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import { Printer, Download } from 'lucide-react'
+import { PageHead, PrintHeader, PrintFooter, downloadPdf, bdt } from '../ui'
 
 // Accounts → Cheques (stage A8).
 // The cheque register: instruments ISSUED to payees and RECEIVED,
@@ -174,17 +176,47 @@ export default function ChequesPage() {
   const by = summary?.by_status ?? {}
   const pdcDue: any[] = summary?.pdc_due ?? []
 
+  const exportPdf = () =>
+    void downloadPdf({
+      title: 'Cheques',
+      subtitle: 'Cheque Register',
+      columns: ['Cheque No', 'Party', 'Direction', 'Bank', 'Amount', 'Status', 'Issued', 'Due'],
+      rows: cheques.map((c) => [
+        `#${c.cheque_no}`,
+        c.counterparty_name ?? '-',
+        c.direction,
+        c.bank_label ?? '-',
+        bdt(c.amount),
+        c.status,
+        c.issue_date ?? '-',
+        c.due_date ?? '-',
+      ]),
+      filename: 'cheques.pdf',
+    })
+
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">Cheques</h1>
-        <p className="mt-1 text-sm text-slate-500">
+        <PageHead title="Cheques" bangla="কোন চেক দেওয়া/পাওয়া, কোনটা পাশ হয়েছে" tech="Cheque Register">
+          <div className="flex flex-wrap gap-2">
+            <button onClick={() => window.print()} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+              <Printer className="w-4 h-4" /> Print
+            </button>
+            <button onClick={exportPdf} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+              <Download className="w-4 h-4" /> PDF
+            </button>
+          </div>
+        </PageHead>
+        <p className="-mt-4 text-sm text-slate-500">
           Register of cheques issued to payees and received. Recording a cheque posts nothing to the journal —
           clearing moves the money (issued: Accounts Payable → Bank; received: Bank → Accounts Receivable), and
           bouncing a cleared cheque reverses its entry. A cheque linked to a payable is for traceability only —
           settle the payable itself in Payables &amp; Ageing, not here.
         </p>
       </div>
+
+      <div className="accounts-print-area space-y-6">
+      <PrintHeader title="Cheques" subtitle="Cheque Register" />
 
       {error && (
         <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
@@ -488,6 +520,8 @@ export default function ChequesPage() {
             </table>
           </div>
         )}
+      </div>
+      <PrintFooter />
       </div>
     </div>
   )

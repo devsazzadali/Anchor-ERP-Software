@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic'
 import React, { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Inbox, RefreshCw, AlertTriangle, CheckCircle2, ArrowRight, HandMetal, Flag } from 'lucide-react'
+import { PageHead } from '../ui'
 
 // Accounts A9 — Exceptions Inbox. Data: GET /api/accounts/exceptions
 // (stored posting exceptions with the open → acknowledged →
@@ -107,20 +108,15 @@ export default function ExceptionsInboxPage() {
 
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-            <Inbox className="w-6 h-6 text-emerald-600" /> Accounts — Exceptions Inbox
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Every problem the books know about, in one list. Blocked postings are worked here;
-            data signals clear themselves when the source record is fixed.
-          </p>
-        </div>
+      <PageHead icon={<Inbox className="w-6 h-6 text-emerald-600" />} title="Needs Attention" bangla="যেখানে অমিল বা সমস্যা আছে" tech="Exceptions Inbox">
         <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
         </button>
-      </div>
+      </PageHead>
+      <p className="text-sm text-slate-500 -mt-4 mb-6">
+        Every problem the books know about, in one list. Blocked postings are worked here;
+        data signals clear themselves when the source record is fixed.
+      </p>
 
       {error && <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 mb-4 text-sm text-rose-700">{error}</div>}
       {actionError && <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 mb-4 text-sm text-rose-700">{actionError}</div>}

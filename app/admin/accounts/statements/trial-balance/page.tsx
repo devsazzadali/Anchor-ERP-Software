@@ -3,8 +3,9 @@
 export const dynamic = 'force-dynamic'
 import React, { Suspense, useCallback, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Scale, RefreshCw, CheckCircle2, AlertTriangle } from 'lucide-react'
-import { ExportButtons, PeriodScopeBar, stmtUrl, taka, takaSigned, type StmtMeta } from '../ui'
+import { Scale, RefreshCw, CheckCircle2, AlertTriangle, FileText } from 'lucide-react'
+import { ExportButtons, PeriodScopeBar, stmtUrl, takaSigned, type StmtMeta } from '../ui'
+import { PageHead, PrintHeader, PrintFooter, downloadPdf, taka, bdt } from '../../ui'
 
 // Accounts A2 — Trial balance for a period, or fiscal-year-to-date.
 // Data: GET /api/accounts/statements?type=trial-balance. Same
@@ -29,6 +30,7 @@ function TrialBalanceInner() {
   const [scope, setScope] = useState<'period' | 'fytd'>((search.get('scope') as any) === 'period' ? 'period' : 'fytd')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [scopeLabel, setScopeLabel] = useState('')
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -39,6 +41,7 @@ function TrialBalanceInner() {
       if (!res.ok) throw new Error(json.error || 'Failed to load trial balance')
       setMeta(json.meta)
       setStmt(json.statement)
+      setScopeLabel(json.scope?.label || '')
       if (!period) setPeriod(json.meta.default_period)
     } catch (e: any) {
       setError(e?.message || 'Failed to load trial balance')
@@ -49,22 +52,42 @@ function TrialBalanceInner() {
 
   useEffect(() => { load() }, [load])
 
+  const handlePdf = () => {
+    if (!stmt) return
+    void downloadPdf({
+      title: 'Books Check',
+      subtitle: 'Trial Balance',
+      dateRange: scopeLabel || undefined,
+      columns: ['Account', 'Debit (BDT)', 'Credit (BDT)'],
+      rows: stmt.rows.map((r) => [`${r.code} · ${r.name}`, r.debit, r.credit]),
+      summary: [
+        { label: 'Total Debit', value: bdt(stmt.total_debit) },
+        { label: 'Total Credit', value: bdt(stmt.total_credit) },
+        { label: 'Result', value: stmt.balanced ? 'Balanced — difference BDT 0.00' : `Difference ${bdt(stmt.difference)}` },
+      ],
+      filename: 'books-check-trial-balance.pdf',
+    })
+  }
+
   return (
-    <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-            <Scale className="w-6 h-6 text-emerald-600" /> Trial Balance
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">All accounts, posted journal entries only.</p>
-        </div>
+    <div className="p-6 lg:p-10 max-w-7xl mx-auto accounts-print-area">
+      <PrintHeader title="Books Check" subtitle="Trial Balance" />
+      <PageHead
+        icon={<Scale className="w-6 h-6 text-emerald-600" />}
+        title="Books Check"
+        bangla="হিসাব মিলেছে কিনা যাচাই"
+        tech="Trial Balance"
+      >
         <div className="flex items-center gap-2 print:hidden">
           <ExportButtons csvHref={stmtUrl('trial-balance', { period: period || undefined, scope }, 'csv')} />
+          <button onClick={handlePdf} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+            <FileText className="w-4 h-4" /> PDF
+          </button>
           <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
           </button>
         </div>
-      </div>
+      </PageHead>
 
       {meta && (
         <div className="mb-6 print:hidden">
@@ -89,6 +112,17 @@ function TrialBalanceInner() {
               </div>
             </div>
           </div>
+
+          {stmt.balanced ? (
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 mb-6">
+              <div className="text-lg font-bold text-emerald-900 font-bangla">হিসাব মিলেছে ✓</div>
+              <div className="text-sm text-slate-600 mt-1">Total Debit {taka(stmt.total_debit)} · Total Credit {taka(stmt.total_credit)}</div>
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 mb-6">
+              <div className="text-lg font-bold text-rose-900 font-bangla">অমিল: {taka(stmt.difference)}</div>
+            </div>
+          )}
 
           {stmt.entry_count === 0 ? (
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 text-sm text-slate-500">
@@ -132,6 +166,7 @@ function TrialBalanceInner() {
           )}
         </>
       )}
+      <PrintFooter />
     </div>
   )
 }

@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { FileBarChart2, Scale, TrendingUp, Landmark, RefreshCw, AlertTriangle, BookOpen } from 'lucide-react'
 import { PeriodScopeBar, stmtUrl, taka, type StmtMeta } from './ui'
+import { PageHead } from '../ui'
 
 // Accounts A2 — Statements index. Period picker + the three
 // statements, the journal-coverage strip, and the read-only
@@ -58,38 +59,38 @@ export default function StatementsIndexPage() {
     {
       href: `/admin/accounts/statements/trial-balance${q}`,
       icon: Scale,
-      title: 'Trial Balance',
+      title: 'Books Check',
+      bangla: 'হিসাব মিলেছে কিনা যাচাই',
       text: 'Every account with its debit, credit and balance for the period — the books balance to ৳0.00 or the badge says so.',
     },
     {
       href: `/admin/accounts/statements/pl${q}`,
       icon: TrendingUp,
-      title: 'Profit & Loss',
+      title: 'Profit & Loss (লাভ-ক্ষতি)',
+      bangla: 'আয় থেকে খরচ বাদ দিলে যা থাকে',
       text: 'Company result and per-branch result from the journal — income, expenses, and the coverage notes that qualify them.',
     },
     {
       href: `/admin/accounts/statements/balance-sheet${period ? `?period=${period}` : ''}`,
       icon: Landmark,
-      title: 'Balance Sheet',
+      title: 'What We Own & Owe',
+      bangla: 'সম্পদ আর দেনার অবস্থা',
       text: 'Assets, liabilities and equity as of a date. Provisional until the owner confirms the opening position.',
     },
   ]
 
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-            <FileBarChart2 className="w-6 h-6 text-emerald-600" /> Accounts — Statements
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Financial statements computed from the double-entry journal only — never re-keyed, never from module sums.
-          </p>
-        </div>
+      <PageHead
+        icon={<FileBarChart2 className="w-6 h-6 text-emerald-600" />}
+        title="Statements"
+        bangla="তিনটা বড় রিপোর্ট — হিসাব মিলেছে কিনা, লাভ-ক্ষতি, আর সম্পদ-দেনা"
+        tech="Financial Statements"
+      >
         <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50 print:hidden">
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
         </button>
-      </div>
+      </PageHead>
 
       {error && <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 mb-4 text-sm text-rose-700">{error}</div>}
       {loading && !meta && <div className="rounded-xl border border-slate-200 bg-slate-50 p-6 text-sm text-slate-500">Loading statements…</div>}
@@ -106,6 +107,7 @@ export default function StatementsIndexPage() {
                 <div className="flex items-center gap-2 text-base font-bold text-slate-900">
                   <c.icon className="w-5 h-5 text-emerald-600" /> {c.title}
                 </div>
+                <p className="mt-1 text-sm text-slate-600 font-bangla">{c.bangla}</p>
                 <p className="mt-2 text-sm text-slate-600">{c.text}</p>
                 <span className="mt-3 inline-block text-sm font-semibold text-emerald-700">Open →</span>
               </Link>

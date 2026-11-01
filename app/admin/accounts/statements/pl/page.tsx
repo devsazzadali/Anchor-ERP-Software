@@ -3,8 +3,9 @@
 export const dynamic = 'force-dynamic'
 import React, { Suspense, useCallback, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { TrendingUp, RefreshCw, AlertTriangle, Info } from 'lucide-react'
-import { ExportButtons, PeriodScopeBar, stmtUrl, taka, takaSigned, type StmtMeta } from '../ui'
+import { TrendingUp, RefreshCw, AlertTriangle, Info, FileText } from 'lucide-react'
+import { ExportButtons, PeriodScopeBar, stmtUrl, takaSigned, type StmtMeta } from '../ui'
+import { PageHead, PrintHeader, PrintFooter, downloadPdf, taka, bdt } from '../../ui'
 
 // Accounts A2 — Profit & Loss from the journal: company view or a
 // single branch (branch is a dimension on journal lines). The
@@ -66,6 +67,7 @@ function ProfitLossInner() {
   const [branchId, setBranchId] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [scopeLabel, setScopeLabel] = useState('')
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -76,6 +78,7 @@ function ProfitLossInner() {
       if (!res.ok) throw new Error(json.error || 'Failed to load profit & loss')
       setMeta(json.meta)
       setStmt(json.statement)
+      setScopeLabel(json.scope?.label || '')
       if (!period) setPeriod(json.meta.default_period)
     } catch (e: any) {
       setError(e?.message || 'Failed to load profit & loss')
@@ -89,22 +92,45 @@ function ProfitLossInner() {
   const net = stmt ? Number(stmt.net) : 0
   const n = stmt?.notes
 
+  const handlePdf = () => {
+    if (!stmt) return
+    void downloadPdf({
+      title: 'Profit & Loss',
+      subtitle: 'Income and Expenses',
+      dateRange: scopeLabel || undefined,
+      columns: ['Type', 'Account', 'Amount (BDT)'],
+      rows: [
+        ...stmt.income.map((r) => ['Income', `${r.code} · ${r.name}`, r.amount] as (string | number)[]),
+        ...stmt.expenses.map((r) => ['Expense', `${r.code} · ${r.name}`, r.amount] as (string | number)[]),
+      ],
+      summary: [
+        { label: 'Total Income', value: bdt(stmt.total_income) },
+        { label: 'Total Expenses', value: bdt(stmt.total_expenses) },
+        { label: net >= 0 ? 'Net Profit' : 'Net Loss', value: bdt(Math.abs(net)) },
+      ],
+      filename: 'profit-and-loss.pdf',
+    })
+  }
+
   return (
-    <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-            <TrendingUp className="w-6 h-6 text-emerald-600" /> Profit &amp; Loss
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">From the journal only — income and expense accounts, posted entries.</p>
-        </div>
+    <div className="p-6 lg:p-10 max-w-7xl mx-auto accounts-print-area">
+      <PrintHeader title="Profit & Loss" subtitle="Income and Expenses" />
+      <PageHead
+        icon={<TrendingUp className="w-6 h-6 text-emerald-600" />}
+        title="Profit & Loss (লাভ-ক্ষতি)"
+        bangla="আয় থেকে খরচ বাদ দিলে যা থাকে"
+        tech="Profit & Loss"
+      >
         <div className="flex items-center gap-2 print:hidden">
           <ExportButtons csvHref={stmtUrl('pl', { period: period || undefined, scope, branch_id: branchId || undefined }, 'csv')} />
+          <button onClick={handlePdf} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+            <FileText className="w-4 h-4" /> PDF
+          </button>
           <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
           </button>
         </div>
-      </div>
+      </PageHead>
 
       {meta && (
         <div className="flex flex-wrap items-center gap-3 mb-2 print:hidden">
@@ -221,6 +247,7 @@ function ProfitLossInner() {
           )}
         </>
       )}
+      <PrintFooter />
     </div>
   )
 }

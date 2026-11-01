@@ -3,6 +3,7 @@
 export const dynamic = 'force-dynamic'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { PackageCheck, RefreshCw, AlertTriangle, Download, FileJson, Info } from 'lucide-react'
+import { PageHead, downloadPdf } from '../ui'
 
 // Accounts A10 — Auditor Package. Pick a scope (full history, a
 // fiscal year, or one period) and download ONE bundle: README +
@@ -78,24 +79,34 @@ export default function AuditorPackagePage() {
 
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-            <PackageCheck className="w-6 h-6 text-emerald-600" /> Auditor Package
-          </h1>
-          <p className="text-sm text-slate-500 mt-1 max-w-3xl">
-            One download for the external auditor or CA: statements, the full journal and every
-            register, produced by the same services behind these screens — the figures cannot
-            disagree with what you see in Accounts.
-          </p>
+      <PageHead icon={<PackageCheck className="w-6 h-6 text-emerald-600" />} title="Auditor Report" bangla="অডিটরের জন্য সব রিপোর্ট এক ফাইলে" tech="Auditor Package">
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => void downloadPdf({
+              title: 'Auditor Report',
+              subtitle: 'Auditor Package',
+              columns: ['Section', 'Contents'],
+              rows: CONTENTS.map(([name, desc]) => [name, desc]),
+              summary: [{ label: 'Package', value: 'Auditor Report (ZIP of CSV files)' }],
+              filename: 'auditor-report-summary.pdf',
+            })}
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+          >
+            <Download className="w-4 h-4" /> Summary PDF
+          </button>
+          <button
+            onClick={load}
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
+          </button>
         </div>
-        <button
-          onClick={load}
-          className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-slate-200 text-sm font-semibold text-slate-600 hover:bg-slate-50"
-        >
-          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
-        </button>
-      </div>
+      </PageHead>
+      <p className="text-sm text-slate-500 -mt-4 mb-6 max-w-3xl">
+        One download for the external auditor or CA: statements, the full journal and every
+        register, produced by the same services behind these screens — the figures cannot
+        disagree with what you see in Accounts.
+      </p>
 
       {error && (
         <div className="mt-6 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">{error}</div>

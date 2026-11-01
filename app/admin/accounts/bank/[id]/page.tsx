@@ -322,6 +322,8 @@ export default function BankReconciliationWorkbenchPage() {
               ? <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-xs font-semibold">UNCONFIRMED — draft candidate</span>
               : <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-semibold">Confirmed</span>)}
           </h1>
+          <p className="text-sm text-slate-600 mt-1 font-bangla">ব্যাংকের খাতার সাথে আমাদের হিসাব মেলানো</p>
+          <p className="text-xs text-slate-400 mt-0.5">Bank Reconciliation — statement workbench</p>
           {account && (
             <p className="text-sm text-slate-500 mt-1">
               {account.account_name}

@@ -2,7 +2,8 @@
 
 export const dynamic = 'force-dynamic'
 import React, { useCallback, useEffect, useState } from 'react'
-import { Wallet, RefreshCw, CheckCircle2, AlertTriangle, History, HandCoins } from 'lucide-react'
+import { Wallet, RefreshCw, CheckCircle2, AlertTriangle, History, HandCoins, Printer, Download } from 'lucide-react'
+import { PageHead, PrintHeader, PrintFooter, downloadPdf, bdt } from '../ui'
 
 // Accounts A5 — Payables & Ageing. Data: GET /api/accounts/payables
 // (register + per-class tie-out against the source tables +
@@ -158,6 +159,28 @@ export default function PayablesPage() {
     }
   }
 
+  const openPayableItems = items.filter((i) => i.direction === 'payable' && i.status !== 'settled')
+  const exportPdf = () =>
+    void downloadPdf({
+      title: 'To Pay',
+      subtitle: 'Payables and Ageing',
+      columns: ['Party', 'Details', 'Amount (BDT)', 'Paid (BDT)', 'Still to Pay (BDT)'],
+      rows: openPayableItems.map((i) => [
+        i.counterparty_name || '-',
+        i.description,
+        bdt(i.amount),
+        bdt(i.paid_amount),
+        bdt(i.open_amount),
+      ]),
+      summary: [
+        {
+          label: 'Total Still to Pay',
+          value: bdt(ageing ? ageing.totals.payable.total : openPayableItems.reduce((s, i) => s + Number(i.open_amount || 0), 0)),
+        },
+      ],
+      filename: 'to-pay.pdf',
+    })
+
   const shown = items.filter((i) => i.direction === direction)
   const bucketCols: Array<[keyof Buckets, string]> = [
     ['current', 'Current'],
@@ -170,25 +193,26 @@ export default function PayablesPage() {
 
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-            <Wallet className="w-6 h-6 text-emerald-600" /> Accounts — Payables &amp; Ageing
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            What the business owes, mirrored from the records that created the obligations — with ageing and
-            settlements that can never double-pay.
-          </p>
-        </div>
-        <div className="flex gap-2">
+      <PageHead icon={<Wallet className="w-6 h-6 text-emerald-600" />} title="To Pay" bangla="কাকে কত টাকা দিতে হবে" tech="Payables & Ageing">
+        <div className="flex flex-wrap gap-2">
           <button onClick={sync} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700">
             <RefreshCw className="w-4 h-4" /> Sync from records
           </button>
           <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
           </button>
+          <button onClick={() => window.print()} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+            <Printer className="w-4 h-4" /> Print
+          </button>
+          <button onClick={exportPdf} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+            <Download className="w-4 h-4" /> PDF
+          </button>
         </div>
-      </div>
+      </PageHead>
+      <p className="text-sm text-slate-500 -mt-4 mb-6">
+        What the business owes, mirrored from the records that created the obligations — with ageing and
+        settlements that can never double-pay.
+      </p>
 
       {error && <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 mb-4 text-sm text-rose-700">{error}</div>}
       {notice && (
@@ -199,6 +223,9 @@ export default function PayablesPage() {
       {loading && items.length === 0 && (
         <div className="rounded-xl border border-slate-200 bg-slate-50 p-6 text-sm text-slate-500">Loading the register…</div>
       )}
+
+      <div className="accounts-print-area">
+      <PrintHeader title="To Pay" subtitle="Payables and Ageing" />
 
       {/* ── Tie-out ─────────────────────────────────────────── */}
       <h2 className="text-lg font-bold text-slate-900 mb-3">Register tie-out — register vs source records</h2>
@@ -453,6 +480,8 @@ export default function PayablesPage() {
             )}
           </tbody>
         </table>
+      </div>
+      <PrintFooter />
       </div>
     </div>
   )
