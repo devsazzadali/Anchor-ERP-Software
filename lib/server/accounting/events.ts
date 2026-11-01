@@ -104,12 +104,51 @@ export function buildClosingLines(row: any): PostEventInput['lines'] {
   return lines
 }
 
+/**
+ * Detect a pre-clone expense-request mirror whose link was never
+ * stamped. The pay flows write the BCE mirror with the description
+ * "[Expense Request] <request title>" AND expense_request_id set
+ * (see app/api/expense-requests routes); rows created before the
+ * clone carry the description but a NULL link, so the FK check in
+ * buildBceInput cannot see them and they double-post alongside P6
+ * (CALC-AUDIT Bug 1: 13 historical rows, ৳160,060 posted twice).
+ * Returns the uniquely matching paid request — same branch, same
+ * amount, title equal to the description remainder — or null when
+ * there is no match or the match is ambiguous (ambiguity keeps
+ * the FK-only behaviour; a paid-date tiebreak resolves same-title
+ * duplicates before giving up).
+ */
+async function findUnlinkedRequestMirror(db: Db, row: any): Promise<{ id: string } | null> {
+  const desc = String(row.description ?? '')
+  if (!desc.startsWith('[Expense Request]')) return null
+  const title = desc.slice('[Expense Request]'.length).trim()
+  if (!title) return null
+  const amount = n(row.amount)
+  if (amount <= 0) return null
+  const candidates = await db.employeeExpenseRequest.findMany({
+    where: { status: 'paid', title, branch_id: row.branch_id ?? null },
+    select: { id: true, amount: true, paid_at: true, updated_at: true },
+  })
+  const sameAmount = candidates.filter((r: any) => n(r.amount) === amount)
+  if (sameAmount.length === 1) return sameAmount[0]
+  if (sameAmount.length > 1) {
+    const dated = sameAmount.filter(
+      (r: any) => dhakaDateOf(r.paid_at ?? r.updated_at) === dateStr(row.expense_date),
+    )
+    return dated.length === 1 ? dated[0] : null
+  }
+  return null
+}
+
 // ── P2/P3 — branch cash expenses (classifier-driven) ───────────────
 export async function buildBceInput(db: Db, row: any): Promise<PostEventInput | null> {
   // Mirror copies post NOTHING here — they post from their source
   // (salary → P5, expense request → P6). The FR-2 lesson, encoded.
   if (row.salary_payment_id) return null
   if (row.expense_request_id) return null
+  // Pre-clone mirrors carry the pay-flow description but no link —
+  // the signature match is the same mirror (see helper above).
+  if (await findUnlinkedRequestMirror(db, row)) return null
   const stream = branchCashExpenseStream(row)
   const amount = n(row.amount)
   if (amount <= 0) return null
