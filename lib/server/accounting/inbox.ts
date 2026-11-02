@@ -626,25 +626,37 @@ export async function listInbox(db: Db): Promise<{ items: InboxItem[]; counts: I
     derivedItems(db, today),
   ])
 
-  const stored: InboxItem[] = storedRows.map((x: any) =>
-    item(
+  const stored: InboxItem[] = storedRows.map((x: any) => {
+    // FIX2 F-03: rows are no longer period-blocks only. A general
+    // posting failure (reason 'posting_failed', recorded by the
+    // hooks for every failure kind) gets its own wording — the
+    // "reopen the period" advice does not apply to it; the failure
+    // detail (error message) rides in detail.payload as before.
+    const failed = x.reason === 'posting_failed'
+    return item(
       {
         key: `stored:${x.id}`,
         kind: 'stored',
-        code: 'POSTING_BLOCKED',
+        code: failed ? 'POSTING_FAILED' : 'POSTING_BLOCKED',
         severity: 'high',
-        title: `Posting blocked — ${x.event_type} (${x.source_table})`,
-        text:
-          `A ${x.event_type} posting for ${x.source_table} was refused: period ${x.period_month} is ` +
-          `${String(x.reason).replace('period_', '')}. The source record stands; resolve by reopening the period ` +
-          `(break-glass) and re-firing, or by a correction entry in an open period — then resolve here with a note.`,
+        title: failed
+          ? `Posting failed — ${x.event_type} (${x.source_table})`
+          : `Posting blocked — ${x.event_type} (${x.source_table})`,
+        text: failed
+          ? `A ${x.event_type} posting for ${x.source_table} failed` +
+            `${x.detail?.error_message ? `: ${String(x.detail.error_message).slice(0, 200)}` : ''}. ` +
+            `The source record stands but its journal entry is missing — find and fix the cause, then ` +
+            `re-fire the posting or post a correction entry in an open period — then resolve here with a note.`
+          : `A ${x.event_type} posting for ${x.source_table} was refused: period ${x.period_month} is ` +
+            `${String(x.reason).replace('period_', '')}. The source record stands; resolve by reopening the period ` +
+            `(break-glass) and re-firing, or by a correction entry in an open period — then resolve here with a note.`,
         amount: null,
         count: null,
         source_table: x.source_table,
         source_id: x.source_id,
         since: dateOf(x.entry_date),
-        link: '/admin/accounts/periods',
-        link_label: 'Open periods',
+        link: failed ? '/admin/accounts/exceptions' : '/admin/accounts/periods',
+        link_label: failed ? 'Open exceptions' : 'Open periods',
         status: x.status,
         can_act: true,
         acknowledged_at: x.acknowledged_at?.toISOString() ?? null,
@@ -653,7 +665,7 @@ export async function listInbox(db: Db): Promise<{ items: InboxItem[]; counts: I
       },
       today
     )
-  )
+  })
 
   const counts: InboxCounts = {
     stored_open: storedRows.filter((x: any) => x.status === 'open').length,

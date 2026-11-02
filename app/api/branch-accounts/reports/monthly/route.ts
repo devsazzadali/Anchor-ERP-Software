@@ -6,7 +6,9 @@ import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { branchStreamAmount, branchCashExpenseStream } from '@/lib/expense-streams'
 
-// GET /api/branch-accounts/reports/monthly?year=2026&month=9&branch_id=xxx
+// GET + POST /api/branch-accounts/reports/monthly?year=2026&month=9&branch_id=xxx
+// (FIX2 F-10: GET is a pure read; POST is the explicit admin
+// stored-report sync — see the wrappers at the bottom of the file.)
 // Automatically aggregates verified daily cash ledgers, bank deposits, and expenses.
 // When branch_id is omitted or 'all', aggregates across all branches and returns both branch-wise and global summaries.
 //
@@ -16,7 +18,7 @@ import { branchStreamAmount, branchCashExpenseStream } from '@/lib/expense-strea
 // on exactly the shapes PostgREST used to return (date strings,
 // numbers) and is unchanged from the fixed copy. Fetches are complete
 // (no 1,000-row cap — B26).
-export async function GET(req: NextRequest) {
+async function handleMonthly(req: NextRequest, opts: { syncStoredReports: boolean }) {
   try {
     const caller = await getCallerProfile(req)
     if (!caller) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -246,11 +248,16 @@ export async function GET(req: NextRequest) {
     // NOTE (B36): "operating profit" here means branch sales minus
     // BRANCH CASH expenses only — salaries, rent and COGS booked
     // elsewhere are not included; the stored notes say so explicitly.
-    if (isAdmin) {
-      ;(async () => {
-        try {
+    // FIX2 F-10: the stored-report sync no longer rides along on
+    // the READ path. It runs only when the explicit POST wrapper
+    // asks for it (admin-gated there, and awaited so its outcome
+    // is reportable). The upserts below are unchanged.
+    if (opts.syncStoredReports) {
+      let syncedBranches = 0
+      try {
           for (const bs of branchSummaries) {
             if (bs.totalSales > 0 || bs.totalExpenses > 0) {
+              let branchSyncOk = true
               await prisma.branchFinancialReport
                 .upsert({
                   where: { branch_id_report_month: { branch_id: bs.branchId, report_month: monthStr } },
@@ -269,7 +276,7 @@ export async function GET(req: NextRequest) {
                     updated_at: new Date(),
                   },
                 })
-                .catch((e: any) => console.error('[MonthlyReport] financial sync failed:', e.message))
+                .catch((e: any) => { branchSyncOk = false; console.error('[MonthlyReport] financial sync failed:', e.message) })
 
               await prisma.branchPerformanceReport
                 .upsert({
@@ -295,13 +302,14 @@ export async function GET(req: NextRequest) {
                     updated_at: new Date(),
                   },
                 })
-                .catch((e: any) => console.error('[MonthlyReport] performance sync failed:', e.message))
+                .catch((e: any) => { branchSyncOk = false; console.error('[MonthlyReport] performance sync failed:', e.message) })
+              if (branchSyncOk) syncedBranches++
             }
           }
         } catch (syncErr) {
-          console.error('[MonthlyReport] background sync failed:', syncErr)
+          console.error('[MonthlyReport] stored-report sync failed:', syncErr)
         }
-      })()
+      return NextResponse.json({ success: true, year, month, synced_branches: syncedBranches })
     }
 
     return NextResponse.json({
@@ -343,4 +351,24 @@ export async function GET(req: NextRequest) {
     console.error('[api] app/api/branch-accounts/reports/monthly/route.ts error:', err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
+}
+
+// FIX2 F-10 wrappers. GET is a pure read — it must never write
+// (the old handler fire-and-forget upserted the stored monthly
+// reports on every admin read: audit 1's B38 surprise-write
+// pattern). POST is the EXPLICIT stored-report sync: admin-only,
+// runs the same aggregation, upserts branch_financial_reports +
+// branch_performance_reports, and reports the synced-branch count.
+// The consumers of the stored tables (performance-reports route,
+// partner overview) keep their freshness from this action — the
+// admin branch-financial-reports page fires it after loading.
+export async function GET(req: NextRequest) {
+  return handleMonthly(req, { syncStoredReports: false })
+}
+
+export async function POST(req: NextRequest) {
+  const caller = await getCallerProfile(req)
+  if (!caller) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!callerIsAdmin(caller)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  return handleMonthly(req, { syncStoredReports: true })
 }

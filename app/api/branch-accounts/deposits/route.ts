@@ -13,6 +13,7 @@ import {
   findDepositSalesOverlap,
 } from '@/lib/server/deposit-overlap'
 import { logAudit, diffFields } from '@/lib/server/audit'
+import { depositCreateBodySchema, validateBody } from '@/lib/server/schemas'
 
 // legacy queries replaced by Prisma via
 // the single role-resolution function. Admin status comes ONLY from
@@ -177,6 +178,13 @@ export async function POST(req: NextRequest) {
     if (!isAdmin && !isManager) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
     const body = await req.json()
+
+    // FIX2 F-11 (staged zod): validation-only schema gate — the
+    // hand-rolled checks below (required fields, B22 amount +
+    // breakdown discipline, overlap) remain the authority.
+    const valid = validateBody(depositCreateBodySchema, body)
+    if (!valid.ok) return NextResponse.json({ error: valid.error }, { status: 400 })
+
     const {
       deposit_date,
       sales_from_date,

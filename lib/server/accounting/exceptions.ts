@@ -11,7 +11,22 @@
  * lands. Resolution is a later, deliberate act (reopen the period
  * and re-fire the hook, or post a correction) — recording never
  * auto-resolves.
+ *
+ * FIX2 F-03 (Audit 2): period-blocks were the ONLY failures
+ * recorded — a posting that failed for any other reason (missing
+ * account mapping, constraint, bug, DB error) vanished into
+ * console.error and left the journal silently diverged from the
+ * operational write. recordPostingFailure (below) generalises the
+ * recorder: period-blocks keep the original A3 row shape
+ * (reason 'period_closed'/'period_locked'); every other failure
+ * lands as an open exception with reason 'posting_failed' and the
+ * error's name + message in detail, keyed the same way, read by
+ * the same overview flags + A9 inbox (which renders it with
+ * POSTING_FAILED wording). Still NEVER throws — it runs inside
+ * the hooks' fail-soft catch blocks; a recording failure itself is
+ * logged, as before.
  */
+import { dhakaToday } from '../../dhaka-time'
 import { isPeriodBlockedError, type Db, type PeriodBlockedError } from './post'
 
 /**
@@ -94,6 +109,81 @@ export async function recordIfPeriodBlocked(
   if (!isPeriodBlockedError(err)) return false
   await recordPostingException(db, err, fallback)
   return true
+}
+
+/**
+ * FIX2 F-03 — record a posting failure of ANY kind. Period-blocks
+ * delegate to the original A3 recorder unchanged; anything else
+ * becomes a general exception row (reason 'posting_failed') with
+ * the same keyed-upsert semantics: one row per (source_table,
+ * source_id, event_type), refreshed — and reopened, with the A9
+ * workflow fields cleared — when the same event fails again.
+ * entry_date/period_month are the attempt date (Dhaka): a general
+ * failure carries no event date of its own the way a period block
+ * does. Returns true when a row was recorded. NEVER throws.
+ */
+export async function recordPostingFailure(
+  db: Db,
+  err: unknown,
+  fallback?: { source_table?: string | null; source_id?: string | null; event_type?: string }
+): Promise<boolean> {
+  if (isPeriodBlockedError(err)) {
+    await recordPostingException(db, err, fallback)
+    return true
+  }
+  try {
+    const source_table = fallback?.source_table ?? null
+    const source_id = fallback?.source_id ?? null
+    const event_type = fallback?.event_type ?? 'unknown'
+    if (!source_table || !source_id) {
+      console.error('[accounts] posting failure without a source ref — cannot record exception:', (err as any)?.message || err)
+      return false
+    }
+    const today = dhakaToday()
+    const detail = {
+      error_name: (err as any)?.name ?? 'Error',
+      error_message: String((err as any)?.message ?? err).slice(0, 500),
+      recorded_from: 'hook_failure',
+    }
+    const existing = await db.postingException.findFirst({
+      where: { source_table, source_id, event_type },
+      select: { id: true, status: true },
+    })
+    if (existing) {
+      await db.postingException.update({
+        where: { id: existing.id },
+        data: {
+          entry_date: new Date(`${today}T00:00:00Z`),
+          period_month: today.slice(0, 7),
+          reason: 'posting_failed',
+          detail: detail as any,
+          status: 'open',
+          resolved_at: null,
+          resolved_by: null,
+          resolution_note: null,
+          acknowledged_at: null,
+          acknowledged_by: null,
+        },
+      })
+    } else {
+      await db.postingException.create({
+        data: {
+          source_table,
+          source_id,
+          event_type,
+          entry_date: new Date(`${today}T00:00:00Z`),
+          period_month: today.slice(0, 7),
+          reason: 'posting_failed',
+          detail: detail as any,
+          status: 'open',
+        },
+      })
+    }
+    return true
+  } catch (e: any) {
+    console.error('[accounts] recordPostingFailure failed (fail-soft):', e?.message || e)
+    return false
+  }
 }
 
 /** Open exceptions, oldest first — the overview flags + A9 feed. */

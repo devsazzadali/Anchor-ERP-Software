@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db'
 import { getCallerProfile, callerIsAdmin } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { issueSalaryPayment, SalaryIssueError } from '@/lib/server/salary-issue'
+import { salaryIssueBodySchema, validateBody } from '@/lib/server/schemas'
 
 export const dynamic = 'force-dynamic'
 
@@ -80,6 +81,13 @@ export async function POST(req: NextRequest) {
     if (!callerIsAdmin(caller)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
     const body = await req.json()
+
+    // FIX2 F-11 (staged zod): validation-only schema gate — the
+    // shared service's own checks (required ids, component
+    // parsing, server-recomputed total) remain the authority.
+    const valid = validateBody(salaryIssueBodySchema, body)
+    if (!valid.ok) return NextResponse.json({ error: valid.error }, { status: 400 })
+
     try {
       const result = await issueSalaryPayment(caller, {
         employee_id: body.employee_id,

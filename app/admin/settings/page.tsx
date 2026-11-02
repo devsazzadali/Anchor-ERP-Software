@@ -24,6 +24,7 @@ export default function AdminSettings() {
   // Password State
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [currentPassword, setCurrentPassword] = useState('')
 
   // System Settings State
   const [systemSettings, setSystemSettings] = useState({
@@ -152,18 +153,22 @@ export default function AdminSettings() {
       // own-password change via /api/auth/change-password
       // (the old 'Auth session missing' demo-mode fake success is
       // gone — an error is an error).
+      // FIX2 F-01: the server requires + verifies the CURRENT
+      // password, and a successful change revokes EVERY session
+      // (this one included) — hence the re-login redirect below.
       const res = await fetch('/api/auth/change-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: password })
+        body: JSON.stringify({ currentPassword, newPassword: password })
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to update password')
 
-      setFeedback({ type: 'success', message: 'Security credentials updated successfully!' })
+      setFeedback({ type: 'success', message: 'Password updated. For security, all sessions were signed out — please sign in again with your new password.' })
       setPassword('')
       setConfirmPassword('')
-      setTimeout(() => setFeedback(null), 3000)
+      setCurrentPassword('')
+      setTimeout(() => { window.location.href = '/login' }, 1500)
     } catch (err: any) {
       setFeedback({ type: 'error', message: err.message || 'Failed to update password.' })
     } finally {
@@ -343,12 +348,24 @@ export default function AdminSettings() {
               <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0" />
               <div className="text-[10px] text-slate-600 leading-relaxed font-sans">
                 <strong className="text-rose-600 uppercase tracking-wider block mb-0.5">Cryptographic Notice</strong>
-                Old passwords cannot be retrieved or viewed. Passwords are irreversibly hashed using bcrypt. If you update your credentials, your active sessions may be terminated for security purposes.
+                Old passwords cannot be retrieved or viewed. Passwords are irreversibly hashed using bcrypt. Updating your credentials requires your current password and terminates ALL of your active sessions (including this one) — you will need to sign in again with the new password.
               </div>
             </div>
 
             <form onSubmit={handleUpdatePassword} className="space-y-5 relative z-10">
               <div className="space-y-4">
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-500 tracking-wider uppercase mb-1.5 flex items-center gap-1.5"><Key className="w-3 h-3" /> Current Password</label>
+                  <input
+                    required
+                    type="password"
+                    value={currentPassword}
+                    onChange={e => setCurrentPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full bg-white border border-slate-900/10 rounded-xl py-3.5 px-4 text-xs text-slate-900 focus:outline-none focus:border-rose-500/50 focus:bg-slate-900/[0.04] transition-all font-mono tracking-widest"
+                  />
+                </div>
+
                 <div>
                   <label className="block text-[10px] font-bold text-slate-500 tracking-wider uppercase mb-1.5 flex items-center gap-1.5"><Key className="w-3 h-3" /> New Password</label>
                   <input
@@ -377,7 +394,7 @@ export default function AdminSettings() {
               <div className="pt-2">
                 <button
                   type="submit"
-                  disabled={isSavingPassword || !password || !confirmPassword}
+                  disabled={isSavingPassword || !password || !confirmPassword || !currentPassword}
                   className="w-full bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-600 font-bold py-3.5 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
                 >
                   {isSavingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />}

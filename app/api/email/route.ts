@@ -17,6 +17,7 @@ import {
 } from '@/lib/email-service'
 import { prisma } from '@/lib/db'
 import { getCallerProfile, callerIsAdmin, isPartnerAccount } from '@/lib/server/auth'
+import { requestMeta } from '@/lib/server/audit'
 
 // caller via the app session; helper
 // lookups (user email by id, admin notifications) via Prisma. The
@@ -115,9 +116,23 @@ export async function POST(request: Request) {
     let result
 
     switch (action) {
-      case 'LOGIN':
-        result = await sendLoginNotification(payload.email, payload.userName, payload.ip, payload.location)
+      case 'LOGIN': {
+        // FIX2 F-12: the login alert goes to the CALLER's own
+        // address, under the caller's own name, with the
+        // server-observed IP. The old code mailed a BODY-SUPPLIED
+        // address carrying body-supplied name/IP/location — any
+        // authenticated caller could send a convincing "new login"
+        // alert to anyone. Location is not server-derivable, so it
+        // is no longer accepted from the body (service default).
+        const ownEmail = await getUserEmailById(user.id)
+        if (ownEmail) {
+          const { ip } = requestMeta(request)
+          result = await sendLoginNotification(ownEmail, actorName, ip ?? 'Unknown')
+        } else {
+          result = { success: false, error: 'No email address on file for this account' }
+        }
         break
+      }
 
       case 'KYC_SUBMITTED': {
         const adminEmails = await getAdminEmails()
@@ -162,7 +177,10 @@ export async function POST(request: Request) {
       case 'TASK_COMPLETED': {
         const adminEmails = await getAdminEmails()
         if (adminEmails.length > 0) {
-          result = await sendTaskCompletionToAdmins(adminEmails, payload.userName, payload.taskTitle)
+          // FIX2 F-12: actorName (caller-derived), not the
+          // spoofable payload.userName — same A7 rule as the
+          // sibling user-triggered actions.
+          result = await sendTaskCompletionToAdmins(adminEmails, actorName, payload.taskTitle)
         }
         break
       }
@@ -281,6 +299,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, data: result })
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    // FIX2 F-12: never return err.message to the caller — internal
+    // / provider error text leaks implementation detail. The real
+    // error is logged server-side; the client gets a generic body.
+    console.error('[POST /api/email] Error:', err)
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }

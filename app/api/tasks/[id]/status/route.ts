@@ -45,8 +45,12 @@ export async function PATCH(req: NextRequest, context: any) {
       select: { assignee_id: true },
     })
     if (!assignment) {
+      // FIX2 F-13: generic denial — the old body embedded BOTH
+      // internal user UUIDs (the assignee's and the caller's),
+      // disclosing them to any authenticated caller probing task
+      // ids. Mirrors the sibling note route's clean message.
       return NextResponse.json(
-        { error: 'Not assigned to this task. task.assigned_to_id=' + task.assigned_to_id + ' vs user.id=' + user.id },
+        { error: 'Not assigned to this task' },
         { status: 403 }
       )
     }

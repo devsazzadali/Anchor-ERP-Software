@@ -150,3 +150,47 @@ export async function checkSessionRegistry(
     return false
   }
 }
+
+/**
+ * FIX2 F-01 — revoke EVERY session a user holds, in the two moves
+ * the admin revoke-all route pioneered: (1) stamp revoked_at on
+ * all the user's unrevoked registry rows, and (2) bump
+ * profiles.session_epoch — the epoch bump is what also kills the
+ * user's LEGACY (pre-registry) tokens, whose epoch claim is 0, at
+ * their next request. There is no way to spare one session: the
+ * epoch is per-user, so the caller's own current session dies too
+ * (forced re-login — the standard pattern for a credential change,
+ * and the only one that leaves no token alive).
+ *
+ * Shared by the admin revoke-all route (reason
+ * 'admin_revoke_all'), change-password ('password_change') and
+ * complete-reset ('password_reset'): a credential change must
+ * never leave a previously-issued session alive — a stolen cookie
+ * surviving a password reset would defeat the reset.
+ *
+ * Returns null when the profile does not exist.
+ */
+export async function revokeAllUserSessions(
+  userId: string,
+  reason: string
+): Promise<{ revokedCount: number; oldEpoch: number; newEpoch: number } | null> {
+  const profile = await prisma.profile.findUnique({
+    where: { id: userId },
+    select: { id: true, session_epoch: true },
+  })
+  if (!profile) return null
+
+  const revoked = await prisma.userSession.updateMany({
+    where: { user_id: userId, revoked_at: null },
+    data: { revoked_at: new Date(), revoke_reason: reason },
+  })
+  await prisma.profile.update({
+    where: { id: userId },
+    data: { session_epoch: { increment: 1 } },
+  })
+  return {
+    revokedCount: revoked.count,
+    oldEpoch: profile.session_epoch,
+    newEpoch: profile.session_epoch + 1,
+  }
+}

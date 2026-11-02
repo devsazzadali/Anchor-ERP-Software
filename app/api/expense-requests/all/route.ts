@@ -5,6 +5,7 @@ import { callerIsAdmin, getCallerProfile } from '@/lib/server/auth'
 import { toPlain } from '@/lib/server/respond'
 import { logAudit, diffFields } from '@/lib/server/audit'
 import { hookPostSource, hookSyncPayables } from '@/lib/server/accounting/hooks'
+import { expenseRequestCreateBodySchema, validateBody } from '@/lib/server/schemas'
 
 // the dashboard branch-expenses page
 // (partner surface) — ALL employee expense requests + the branch
@@ -14,13 +15,16 @@ import { hookPostSource, hookSyncPayables } from '@/lib/server/accounting/hooks'
 // (with the page's "(Admin)" name suffix preserved), branch comes
 // from the selected branch id, and paid/due are recomputed
 // server-side (due = total − paid, never a client figure).
+//
+// FIX2 F-04 (Audit 2): the create is now ADMIN-ONLY, matching its
+// "admin direct" semantics and the Accounts module's stance. A
+// create can be born fully-paid (paid_amount > 0 → status 'paid'
+// + a journal posting fires), which is settlement-equivalent —
+// partner accounts no longer hold that power (they keep the read
+// surface and the [id] confirm/reject/edit actions).
 
 function canRead(caller: { profile_type: string | null } & { is_admin: boolean }): boolean {
   return callerIsAdmin(caller as any) || caller.profile_type === 'partner' || caller.profile_type === 'head_office'
-}
-
-function canWrite(caller: { profile_type: string | null } & { is_admin: boolean }): boolean {
-  return callerIsAdmin(caller as any) || caller.profile_type === 'partner'
 }
 
 export async function GET(req: Request) {
@@ -44,9 +48,15 @@ export async function POST(req: Request) {
   try {
     const caller = await getCallerProfile(req)
     if (!caller) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    if (!canWrite(caller)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    if (!callerIsAdmin(caller as any)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
     const body = await req.json().catch(() => ({}))
+
+    // FIX2 F-11 (staged zod): validation-only schema gate — the
+    // hand-rolled checks below remain the authority.
+    const valid = validateBody(expenseRequestCreateBodySchema, body)
+    if (!valid.ok) return NextResponse.json({ error: valid.error }, { status: 400 })
+
     const title = typeof body.title === 'string' ? body.title.trim() : ''
     if (!title) return NextResponse.json({ error: 'Title is required.' }, { status: 400 })
 

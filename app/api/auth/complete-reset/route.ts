@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { hashPassword, validatePasswordPolicy } from '@/lib/server/passwords'
 import { logAudit } from '@/lib/server/audit'
+import { revokeAllUserSessions } from '@/lib/server/session-registry'
+import { completeResetBodySchema, validateBody } from '@/lib/server/schemas'
 
 // the atomic token consume is an
 // updateMany guarded on status='approved' (count 1 = consumed —
@@ -11,10 +13,12 @@ import { logAudit } from '@/lib/server/audit'
 
 export async function POST(request: Request) {
   try {
-    const { reqId, newPassword } = await request.json()
-    if (!reqId || !newPassword) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    const body = await request.json().catch(() => ({}))
+    const valid = validateBody(completeResetBodySchema, body)
+    if (!valid.ok) {
+      return NextResponse.json({ error: valid.error }, { status: 400 })
     }
+    const { reqId, newPassword } = body
 
     // BUG-005 FIX (superseded by S3, R2 Security Round): the shared
     // password policy (lib/server/passwords.ts validatePasswordPolicy —
@@ -90,6 +94,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Failed to update password. Please try again.' }, { status: 500 })
     }
 
+    // FIX2 F-01: a completed reset revokes EVERY existing session
+    // of the user (registry rows stamped + session_epoch bumped,
+    // which also kills legacy tokens). A reset is the recovery path
+    // for a compromised account — leaving a hijacked session alive
+    // afterwards would defeat it. Fail-soft on the revocation only:
+    // the password has already changed; a revocation error is
+    // logged loudly, never silently swallowed.
+    let sessionsRevoked: number | null = null
+    try {
+      const revocation = await revokeAllUserSessions(resetReq.user_id, 'password_reset')
+      sessionsRevoked = revocation?.revokedCount ?? null
+    } catch (revokeError) {
+      console.error('Failed to revoke sessions after password reset:', revokeError)
+    }
+
     // S3: unified audit event for the completed reset (S1 helper).
     await logAudit({
       caller: null,
@@ -102,6 +121,7 @@ export async function POST(request: Request) {
       entityTable: 'auth_users',
       entityId: resetReq.user_id,
       fieldChanges: [{ field: 'password', old: '[redacted]', new: '[redacted]' }],
+      newValue: { sessions_revoked: sessionsRevoked } as any,
     })
 
     return NextResponse.json({ message: 'Password updated successfully' }, { status: 200 })

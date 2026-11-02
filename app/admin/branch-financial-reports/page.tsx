@@ -233,6 +233,13 @@ export default function BranchFinancialReportsPage() {
         }
       )
       if (json) setLiveData(json)
+      // FIX2 F-10: the stored-report sync is an explicit POST now
+      // (the monthly GET is side-effect-free). Fire-and-forget,
+      // exactly the freshness the stored surfaces (performance
+      // reports, partner overview) used to get from the GET's
+      // hidden write — failures only affect stored-report
+      // freshness, never this page's live data.
+      fetch(`/api/branch-accounts/reports/monthly?${queryParams.toString()}`, { method: 'POST' }).catch(() => {})
     } catch (err: any) {
       console.error('Error fetching live financial report:', err)
       setFeedback({ type: 'error', message: err.message || 'Failed to fetch live financials' })

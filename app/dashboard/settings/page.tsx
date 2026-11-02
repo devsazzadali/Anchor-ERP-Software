@@ -56,6 +56,7 @@ export default function EmployeeSettings() {
   })
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [currentPassword, setCurrentPassword] = useState('')
 
   // Security Question
   const [securityQuestion, setSecurityQuestion] = useState('')
@@ -130,6 +131,7 @@ export default function EmployeeSettings() {
         throw new Error(body?.error || 'Failed to update profile')
       }
 
+      let passwordChanged = false
       if (newPassword) {
         if (newPassword !== confirmPassword) {
           throw new Error('New passwords do not match')
@@ -137,20 +139,36 @@ export default function EmployeeSettings() {
         if (newPassword.length < 6) {
           throw new Error('Password must be at least 6 characters')
         }
+        // FIX2 F-01: the server now requires (and verifies) the
+        // CURRENT password, and a successful change revokes every
+        // session — the re-login redirect happens below.
+        if (!currentPassword) {
+          throw new Error('Please enter your current password to set a new one.')
+        }
         const pwRes = await fetch('/api/auth/change-password', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password: newPassword }),
+          body: JSON.stringify({ currentPassword, newPassword }),
         })
         if (!pwRes.ok) {
           const body = await pwRes.json().catch(() => null)
           throw new Error(body?.error || 'Failed to update password')
         }
+        passwordChanged = true
       }
 
-      setFeedback({ type: 'success', message: 'Profile information updated successfully.' })
       setNewPassword('')
       setConfirmPassword('')
+      setCurrentPassword('')
+      if (passwordChanged) {
+        // FIX2 F-01: every session (this one included) was revoked
+        // server-side — send the user to sign in again with the
+        // new password instead of refreshing a dead session.
+        setFeedback({ type: 'success', message: 'Password changed successfully. For security, you have been signed out everywhere — please sign in again with your new password.' })
+        setTimeout(() => { window.location.href = '/login' }, 1500)
+        return
+      }
+      setFeedback({ type: 'success', message: 'Profile information updated successfully.' })
       setTimeout(() => setFeedback(null), 3000)
       
       // BUG-A5 FIX: Notify admins about profile update.
@@ -431,6 +449,19 @@ export default function EmployeeSettings() {
                 <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-5">Settings & Privacy</span>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-[10px] font-semibold text-slate-500 tracking-wider uppercase mb-1.5">Current Password</label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                      <input
+                        type="password"
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        placeholder="Required to set a new password"
+                        className="w-full bg-slate-900/[0.04] border border-slate-900/5 rounded-xl py-3 pl-10 pr-4 text-xs text-slate-900 focus:outline-none focus:border-[#1ca34c]/40 transition-all"
+                      />
+                    </div>
+                  </div>
                   <div>
                     <label className="block text-[10px] font-semibold text-slate-500 tracking-wider uppercase mb-1.5">New Password</label>
                     <div className="relative">

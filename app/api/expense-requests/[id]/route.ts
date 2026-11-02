@@ -7,6 +7,7 @@ import { toPlain } from '@/lib/server/respond'
 import { syncExpenseToLedger } from '@/lib/server/ledger-sync'
 import { logAudit, diffFields } from '@/lib/server/audit'
 import { hookPostSource, hookSyncPayables } from '@/lib/server/accounting/hooks'
+import { expenseRequestPatchBodySchema, validateBody } from '@/lib/server/schemas'
 
 // item actions for the dashboard
 // branch-expenses page — approve / reject / pay (the action modal)
@@ -17,6 +18,18 @@ import { hookPostSource, hookSyncPayables } from '@/lib/server/accounting/hooks'
 // amount actually paid); status transitions keep the page's exact
 // semantics (pay requires a TRX id, reject requires a reason —
 // both validated on the page and re-validated here).
+//
+// FIX2 F-04 (Audit 2): partner write power is now BOUNDED to match
+// the Accounts module's stance (callerIsAdmin only for money
+// movement). Partners keep the audience actions — confirm / reject
+// / edit of an UNSETTLED request — but SETTLEMENT (the pay flow)
+// and DELETE are admin-only: partners have no branch binding in
+// the data model, so their writes could not be branch-scoped the
+// way FR-1.1 scopes partner reads elsewhere; the only sound
+// boundary was removing settlement power. FIX2 F-02: DELETE also
+// refuses a SETTLED (paid) request for everyone, admins included —
+// settled money is void/reverse-only (law E3), never hard-delete
+// (the PATCH FR-14.2 guard, mirrored).
 
 function canWrite(caller: { profile_type: string | null } & { is_admin: boolean }): boolean {
   return callerIsAdmin(caller as any) || caller.profile_type === 'partner'
@@ -34,6 +47,11 @@ export async function PATCH(req: Request, context: any) {
 
     const body = await req.json().catch(() => ({}))
 
+    // FIX2 F-11 (staged zod): validation-only schema gate — the
+    // hand-rolled checks below remain the authority.
+    const valid = validateBody(expenseRequestPatchBodySchema, body)
+    if (!valid.ok) return NextResponse.json({ error: valid.error }, { status: 400 })
+
     // ── Pay flow (expense-model round, 2026-10-31) ────────────────
     // The audit gap this closes: this pay action used to settle the
     // request and book NOTHING — the money never appeared in any
@@ -47,6 +65,12 @@ export async function PATCH(req: Request, context: any) {
     // sat in the branch drawer, and no company-stream booking is
     // invented for it here (owner-decision item, see round report).
     if (body.action === 'pay') {
+      // FIX2 F-04: settlement is ADMIN-ONLY (see header). The
+      // partner audience keeps confirm/reject/edit; moving money
+      // matches the Accounts module's callerIsAdmin stance.
+      if (!callerIsAdmin(caller as any)) {
+        return NextResponse.json({ error: 'Forbidden: settling an expense request is admin-only.' }, { status: 403 })
+      }
       if (!String(body.trx_id || '').trim()) {
         return NextResponse.json({ error: 'Please enter the Transaction ID.' }, { status: 400 })
       }
@@ -205,10 +229,24 @@ export async function DELETE(req: Request, context: any) {
   try {
     const caller = await getCallerProfile(req)
     if (!caller) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    if (!canWrite(caller)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    // FIX2 F-04: delete is ADMIN-ONLY (see header) — a partner's
+    // audience actions never included destroying records.
+    if (!callerIsAdmin(caller as any)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
     const { id } = await context.params
     const before = await prisma.employeeExpenseRequest.findUnique({ where: { id } }).catch(() => null)
+    if (!before) return NextResponse.json({ error: 'Expense request not found' }, { status: 404 })
+    // FIX2 F-02: a SETTLED request is never hard-deleted. Deleting
+    // a paid request would orphan its booked branch_cash_expenses
+    // row, its journal posting and its payables sync while the
+    // source record vanishes (law E3: settled money is
+    // void/reverse-only — the PATCH FR-14.2 guard, mirrored here).
+    if (before.status === 'paid') {
+      return NextResponse.json(
+        { error: 'This request is already settled and cannot be deleted. Settled payments are voided or reversed, never deleted.' },
+        { status: 400 }
+      )
+    }
     await prisma.employeeExpenseRequest.delete({ where: { id } })
     await logAudit({
       caller, req, action: 'expense_request.delete', eventType: 'delete',

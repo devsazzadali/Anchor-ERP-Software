@@ -10,13 +10,18 @@
  * the Accounts overview's unposted-source count instead of breaking
  * operations. Idempotency in post.ts makes every hook safe to fire
  * more than once.
+ *
+ * FIX2 F-03: the catch blocks below record posting failures of
+ * EVERY kind durably (recordPostingFailure → posting_exceptions),
+ * not only period-blocks — a non-period failure used to exist only
+ * in the server log while the journal silently diverged.
  */
 import { prisma } from '@/lib/db'
 import { logAudit } from '../audit'
 import { dhakaToday } from '../../dhaka-time'
 import { getPeriodForDate, postEvent, uuidFromString, type Db } from './post'
 import { postForSource, reverseForSource, syncClosingEntry, ACCT } from './events'
-import { recordIfPeriodBlocked } from './exceptions'
+import { recordPostingFailure } from './exceptions'
 import { toPoishaExact } from './reports'
 import { syncPayableItemForSource, ensureProfileParty } from './payables'
 import { syncTaxForSource, reverseTaxForSource, recordSalaryTax } from './tax'
@@ -58,7 +63,7 @@ async function taxSync(sourceTable: string, sourceId: string, caller?: Caller): 
       })
     }
   } catch (err: any) {
-    await recordIfPeriodBlocked(prisma as Db, err, { source_table: sourceTable, source_id: sourceId })
+    await recordPostingFailure(prisma as Db, err, { source_table: sourceTable, source_id: sourceId, event_type: 'tax_sync' })
     console.error(`[accounts] taxSync ${sourceTable}/${sourceId} failed (fail-soft):`, err?.message || err)
   }
 }
@@ -78,9 +83,15 @@ export async function hookPostSource(
       await auditPost(caller, res.entry_id, sourceTable, sourceId, eventTypeLabel ?? sourceTable)
     }
   } catch (err: any) {
-    // A3: a posting refused by a closed/locked period becomes a
-    // durable posting exception (the source write stands).
-    await recordIfPeriodBlocked(prisma as Db, err, { source_table: sourceTable, source_id: sourceId })
+    // A3 + FIX2 F-03: a posting refused by a closed/locked period
+    // becomes a durable posting exception (the source write
+    // stands) — and so does a posting that fails for ANY other
+    // reason (reason 'posting_failed'), via recordPostingFailure.
+    await recordPostingFailure(prisma as Db, err, {
+      source_table: sourceTable,
+      source_id: sourceId,
+      event_type: eventTypeLabel ?? 'source_post',
+    })
     console.error(`[accounts] hookPostSource ${sourceTable}/${sourceId} failed (fail-soft):`, err?.message || err)
   }
   await taxSync(sourceTable, sourceId, caller)
@@ -103,7 +114,7 @@ export async function hookReverseSource(
       await auditPost(caller, res.entry_id, sourceTable, sourceId, 'reversal')
     }
   } catch (err: any) {
-    await recordIfPeriodBlocked(prisma as Db, err, { source_table: sourceTable, source_id: sourceId })
+    await recordPostingFailure(prisma as Db, err, { source_table: sourceTable, source_id: sourceId, event_type: 'reversal' })
     console.error(`[accounts] hookReverseSource ${sourceTable}/${sourceId} failed (fail-soft):`, err?.message || err)
   }
   // A7: a reversed/voided/deleted source takes its tax postings
@@ -115,7 +126,7 @@ export async function hookReverseSource(
         created_by: caller?.id ?? null,
       })
     } catch (err: any) {
-      await recordIfPeriodBlocked(prisma as Db, err, { source_table: sourceTable, source_id: sourceId })
+      await recordPostingFailure(prisma as Db, err, { source_table: sourceTable, source_id: sourceId, event_type: 'tax_reversal' })
       console.error(`[accounts] tax reversal ${sourceTable}/${sourceId} failed (fail-soft):`, err?.message || err)
     }
   }
@@ -219,7 +230,7 @@ async function resyncSourceInner(
       if (res?.created) await auditPost(caller, res.entry_id, sourceTable, sourceId, 'repost')
     }
   } catch (err: any) {
-    await recordIfPeriodBlocked(prisma as Db, err, { source_table: sourceTable, source_id: sourceId })
+    await recordPostingFailure(prisma as Db, err, { source_table: sourceTable, source_id: sourceId, event_type: 'resync' })
     console.error(`[accounts] hookResyncSource ${sourceTable}/${sourceId} failed (fail-soft):`, err?.message || err)
   }
 }
@@ -284,7 +295,7 @@ export async function hookTaxSalary(
       })
     }
   } catch (err: any) {
-    await recordIfPeriodBlocked(prisma as Db, err, {
+    await recordPostingFailure(prisma as Db, err, {
       source_table: 'salary_payments',
       source_id: paymentId,
       event_type: 'tax_tds_salary',
@@ -297,6 +308,15 @@ export async function hookSyncPayables(sourceTable: string, sourceId: string): P
   try {
     await syncPayableItemForSource(prisma as Db, sourceTable, sourceId)
   } catch (err: any) {
+    // FIX2 F-03: this hook previously recorded NOTHING on failure
+    // (not even a period-block). It now records like every other
+    // hook — the payables mirror diverging silently is the same
+    // class of invisible drift F-03 closes.
+    await recordPostingFailure(prisma as Db, err, {
+      source_table: sourceTable,
+      source_id: sourceId,
+      event_type: 'payables_sync',
+    })
     console.error(`[accounts] hookSyncPayables ${sourceTable}/${sourceId} failed (fail-soft):`, err?.message || err)
   }
 }
@@ -322,9 +342,10 @@ export async function hookSyncClosing(ledgerRowId: string, caller?: Caller): Pro
       })
     }
   } catch (err: any) {
-    await recordIfPeriodBlocked(prisma as Db, err, {
+    await recordPostingFailure(prisma as Db, err, {
       source_table: 'branch_cash_ledger',
       source_id: ledgerRowId,
+      event_type: 'closing_sync',
     })
     console.error(`[accounts] hookSyncClosing ${ledgerRowId} failed (fail-soft):`, err?.message || err)
   }
@@ -438,7 +459,7 @@ export async function hookCompanyPaidChange(expenseId: string, caller?: Caller):
       }
     }
   } catch (err: any) {
-    await recordIfPeriodBlocked(prisma as Db, err, {
+    await recordPostingFailure(prisma as Db, err, {
       source_table: 'company_expenses',
       source_id: expenseId,
       event_type: 'company_expense_payment',
