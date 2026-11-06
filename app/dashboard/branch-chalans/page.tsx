@@ -410,7 +410,8 @@ export default function PartnerBranchChalansPage() {
     setter: React.Dispatch<React.SetStateAction<{ code: string; name: string; quantity: string; cost_price: string; sale_price: string; shipping_cost: string }[]>>
   ) => (
     <div>
-      <div className="grid grid-cols-[80px_1fr_60px_80px_80px_80px_28px] md:grid-cols-[90px_1fr_72px_96px_96px_96px_28px] gap-2 mb-2 px-1">
+      {/* Column headers — visible on sm+; on small screens each field carries its own label */}
+      <div className="hidden sm:grid grid-cols-[68px_minmax(100px,1fr)_52px_84px_84px_84px_36px] gap-2 mb-2 px-1">
         <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600">Code</span>
         <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600">Product Title / Name</span>
         <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600 text-center">Qty</span>
@@ -430,48 +431,66 @@ export default function PartnerBranchChalansPage() {
           const rowShipTotal = qty * shipParsed
           return (
             <div key={idx}>
-              <div className="grid grid-cols-[80px_1fr_60px_80px_80px_80px_28px] md:grid-cols-[90px_1fr_72px_96px_96px_96px_28px] gap-2 items-center">
-                <input
-                  type="text" placeholder="e.g. A-101"
-                  value={item.code}
-                  onChange={e => updateItem(idx, 'code', e.target.value, setter)}
-                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2 text-xs text-[#15803d] placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all w-full font-mono"
-                />
-                <input
-                  type="text" placeholder="e.g. Shirt"
-                  value={item.name}
-                  onChange={e => updateItem(idx, 'name', e.target.value, setter)}
-                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all w-full"
-                />
-                <input
-                  type="number" min="1" step="1" placeholder="0"
-                  value={item.quantity}
-                  onChange={e => updateItem(idx, 'quantity', e.target.value, setter)}
-                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-center w-full"
-                />
-                <input
-                  type="number" min="0" step="0.01" placeholder="0"
-                  value={item.cost_price}
-                  onChange={e => updateItem(idx, 'cost_price', e.target.value, setter)}
-                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-right w-full"
-                />
-                <input
-                  type="number" min="0" step="0.01" placeholder="0"
-                  value={item.sale_price}
-                  onChange={e => updateItem(idx, 'sale_price', e.target.value, setter)}
-                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-right w-full"
-                />
-                <input
-                  type="number" min="0" step="0.01" placeholder="—"
-                  value={item.shipping_cost}
-                  onChange={e => updateItem(idx, 'shipping_cost', e.target.value, setter)}
-                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-right w-full"
-                />
+              <div className="grid grid-cols-12 gap-1.5 sm:gap-2 sm:grid-cols-[68px_minmax(100px,1fr)_52px_84px_84px_84px_36px] items-center">
+                <div className="col-span-4 order-1 sm:col-span-1 sm:order-none">
+                  <span className="block text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-1 sm:hidden">Code</span>
+                  <input
+                    type="text" placeholder="e.g. A-101"
+                    value={item.code}
+                    onChange={e => updateItem(idx, 'code', e.target.value, setter)}
+                    className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2 text-xs text-[#15803d] placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all w-full font-mono"
+                  />
+                </div>
+                <div className="col-span-6 order-2 sm:col-span-1 sm:order-none">
+                  <span className="block text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-1 sm:hidden">Product Title / Name</span>
+                  <input
+                    type="text" placeholder="e.g. Shirt"
+                    value={item.name}
+                    onChange={e => updateItem(idx, 'name', e.target.value, setter)}
+                    className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all w-full"
+                  />
+                </div>
+                <div className="col-span-3 order-4 sm:col-span-1 sm:order-none">
+                  <span className="block text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-1 sm:hidden">Qty</span>
+                  <input
+                    type="number" min="1" step="1" placeholder="0"
+                    value={item.quantity}
+                    onChange={e => updateItem(idx, 'quantity', e.target.value, setter)}
+                    className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-center w-full"
+                  />
+                </div>
+                <div className="col-span-3 order-5 sm:col-span-1 sm:order-none">
+                  <span className="block text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-1 sm:hidden">Cost ৳</span>
+                  <input
+                    type="number" min="0" step="0.01" placeholder="0"
+                    value={item.cost_price}
+                    onChange={e => updateItem(idx, 'cost_price', e.target.value, setter)}
+                    className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-right w-full"
+                  />
+                </div>
+                <div className="col-span-3 order-6 sm:col-span-1 sm:order-none">
+                  <span className="block text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-1 sm:hidden">Sale ৳</span>
+                  <input
+                    type="number" min="0" step="0.01" placeholder="0"
+                    value={item.sale_price}
+                    onChange={e => updateItem(idx, 'sale_price', e.target.value, setter)}
+                    className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-right w-full"
+                  />
+                </div>
+                <div className="col-span-3 order-7 sm:col-span-1 sm:order-none">
+                  <span className="block text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-1 sm:hidden">Ship ৳</span>
+                  <input
+                    type="number" min="0" step="0.01" placeholder="—"
+                    value={item.shipping_cost}
+                    onChange={e => updateItem(idx, 'shipping_cost', e.target.value, setter)}
+                    className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-right w-full"
+                  />
+                </div>
                 <button
                   type="button"
                   onClick={() => removeItemRow(idx, items, setter)}
                   disabled={items.length <= 1}
-                  className="w-10 h-10 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-600 hover:bg-rose-500/20 transition-all flex items-center justify-center disabled:opacity-20 disabled:cursor-not-allowed"
+                  className="col-span-2 order-3 sm:col-span-1 sm:order-none justify-self-center w-9 h-9 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-600 hover:bg-rose-500/20 transition-all flex items-center justify-center disabled:opacity-20 disabled:cursor-not-allowed"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -792,7 +811,7 @@ export default function PartnerBranchChalansPage() {
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.96, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96, y: 20 }}
-              className="w-full max-w-xl bg-white border border-slate-900/10 rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+              className="w-full max-w-2xl bg-white border border-slate-900/10 rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
             >
               {/* Modal Header */}
               <div className="p-5 border-b border-slate-900/5 flex items-center justify-between shrink-0">
@@ -812,22 +831,20 @@ export default function PartnerBranchChalansPage() {
                 <form id="new-chalan-form" onSubmit={handleSubmit} className="space-y-5">
                   {renderItemRows(formItems, setFormItems)}
 
-                  {/* Grand total */}
+                  {/* Grand total — shipping sits in the middle, always visible */}
                   <div className="p-4 rounded-xl bg-[#1ca34c]/5 border border-[#1ca34c]/15 flex flex-col gap-2">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Total Cost</span>
                       <span className="text-sm font-bold text-slate-900">৳ {grandTotalCostNew.toLocaleString('en-BD')}</span>
                     </div>
                     <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Total Shipping Cost</span>
+                      <span className="text-sm font-bold text-slate-900">৳ {grandTotalShippingNew.toLocaleString('en-BD')}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
                       <span className="text-[10px] text-[#15803d] uppercase tracking-wider font-bold">Expected Revenue</span>
                       <span className="text-xl font-bold text-[#15803d]">৳ {grandTotalSaleNew.toLocaleString('en-BD')}</span>
                     </div>
-                    {grandTotalShippingNew > 0 && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Total Shipping Cost</span>
-                        <span className="text-sm font-bold text-slate-900">৳ {grandTotalShippingNew.toLocaleString('en-BD')}</span>
-                      </div>
-                    )}
                   </div>
 
                   {/* Notes */}
@@ -876,7 +893,7 @@ export default function PartnerBranchChalansPage() {
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.96, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96, y: 20 }}
-              className="w-full max-w-xl bg-white border border-indigo-500/20 rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+              className="w-full max-w-2xl bg-white border border-indigo-500/20 rounded-2xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
             >
               {/* Modal Header */}
               <div className="p-5 border-b border-slate-900/5 flex items-center justify-between shrink-0">
@@ -896,22 +913,20 @@ export default function PartnerBranchChalansPage() {
                 <form id="edit-chalan-form" onSubmit={handleEdit} className="space-y-5">
                   {renderItemRows(editItems, setEditItems)}
 
-                  {/* Grand total */}
+                  {/* Grand total — shipping sits in the middle, always visible */}
                   <div className="p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/15 flex flex-col gap-2">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Total Cost</span>
                       <span className="text-sm font-bold text-slate-900">৳ {grandTotalCostEdit.toLocaleString('en-BD')}</span>
                     </div>
                     <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Total Shipping Cost</span>
+                      <span className="text-sm font-bold text-slate-900">৳ {grandTotalShippingEdit.toLocaleString('en-BD')}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
                       <span className="text-[10px] text-indigo-600 uppercase tracking-wider font-bold">Expected Revenue</span>
                       <span className="text-xl font-bold text-indigo-600">৳ {grandTotalSaleEdit.toLocaleString('en-BD')}</span>
                     </div>
-                    {grandTotalShippingEdit > 0 && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Total Shipping Cost</span>
-                        <span className="text-sm font-bold text-slate-900">৳ {grandTotalShippingEdit.toLocaleString('en-BD')}</span>
-                      </div>
-                    )}
                   </div>
 
                   {/* Notes */}

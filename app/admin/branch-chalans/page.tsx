@@ -772,7 +772,7 @@ export default function AdminBranchChalansPage() {
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.96, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96, y: 20 }}
-              className="w-full max-w-xl bg-white border border-slate-900/10 rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+              className="w-full max-w-2xl bg-white border border-slate-900/10 rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
             >
               {/* Modal Header */}
               <div className="p-5 border-b border-slate-900/5 flex items-center justify-between shrink-0">
@@ -793,9 +793,9 @@ export default function AdminBranchChalansPage() {
               <div className="overflow-y-auto custom-scrollbar p-5 space-y-5 flex-1">
                 <form id="new-chalan-form" onSubmit={handleSubmit} className="space-y-5">
 
-                  {/* Column headers */}
-                  <div className="overflow-x-auto custom-scrollbar pb-1">
-                    <div className="grid grid-cols-[80px_1fr_60px_80px_80px_80px_40px] gap-2 mb-2 px-1 min-w-[640px]">
+                  {/* Column headers — visible on sm+; on small screens each field carries its own label */}
+                  <div>
+                    <div className="hidden sm:grid grid-cols-[68px_minmax(100px,1fr)_52px_84px_84px_84px_36px] gap-2 mb-2 px-1">
                       <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600">Code</span>
                       <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600">Product Name</span>
                       <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600 text-center">Qty</span>
@@ -814,54 +814,72 @@ export default function AdminBranchChalansPage() {
                         const rowSale = qty * sp
                         return (
                           <div key={idx}>
-                            <div className="grid grid-cols-[80px_1fr_60px_80px_80px_80px_40px] gap-2 items-center min-w-[640px]">
-                              <input
-                                type="text" placeholder="Code"
-                                value={item.code}
-                                onChange={e => {
-                                  // Hack to determine which update function to call based on context
-                                  // Since this replace hits both new and edit forms, we use generic ID check
-                                  if (e.target.closest('#new-chalan-form')) updateItem(idx, 'code', e.target.value);
-                                  else if (typeof updateEditItem !== 'undefined') updateEditItem(idx, 'code', e.target.value);
-                                }}
-                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all w-full font-mono"
-                              />
-                              <input
-                                type="text"
-                                placeholder={`e.g. Shirt, Dress`}
-                                value={item.name}
-                                onChange={e => updateItem(idx, 'name', e.target.value)}
-                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all w-full"
-                              />
-                              <input
-                                type="number" min="1" step="1" placeholder="0"
-                                value={item.quantity}
-                                onChange={e => updateItem(idx, 'quantity', e.target.value)}
-                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-center w-full"
-                              />
-                              <input
-                                type="number" min="0" step="0.01" placeholder="0"
-                                value={item.cost_price}
-                                onChange={e => updateItem(idx, 'cost_price', e.target.value)}
-                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-right w-full"
-                              />
-                              <input
-                                type="number" min="0" step="0.01" placeholder="0"
-                                value={item.sale_price}
-                                onChange={e => updateItem(idx, 'sale_price', e.target.value)}
-                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-right w-full"
-                              />
-                              <input
-                                type="number" min="0" step="0.01" placeholder="—"
-                                value={item.shipping_cost}
-                                onChange={e => updateItem(idx, 'shipping_cost', e.target.value)}
-                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-right w-full"
-                              />
+                            <div className="grid grid-cols-12 gap-1.5 sm:gap-2 sm:grid-cols-[68px_minmax(100px,1fr)_52px_84px_84px_84px_36px] items-center">
+                              <div className="col-span-4 order-1 sm:col-span-1 sm:order-none">
+                                <span className="block text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-1 sm:hidden">Code</span>
+                                <input
+                                  type="text" placeholder="Code"
+                                  value={item.code}
+                                  onChange={e => {
+                                    // Hack to determine which update function to call based on context
+                                    // Since this replace hits both new and edit forms, we use generic ID check
+                                    if (e.target.closest('#new-chalan-form')) updateItem(idx, 'code', e.target.value);
+                                    else if (typeof updateEditItem !== 'undefined') updateEditItem(idx, 'code', e.target.value);
+                                  }}
+                                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all w-full font-mono"
+                                />
+                              </div>
+                              <div className="col-span-6 order-2 sm:col-span-1 sm:order-none">
+                                <span className="block text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-1 sm:hidden">Product Name</span>
+                                <input
+                                  type="text"
+                                  placeholder={`e.g. Shirt, Dress`}
+                                  value={item.name}
+                                  onChange={e => updateItem(idx, 'name', e.target.value)}
+                                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all w-full"
+                                />
+                              </div>
+                              <div className="col-span-3 order-4 sm:col-span-1 sm:order-none">
+                                <span className="block text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-1 sm:hidden">Qty</span>
+                                <input
+                                  type="number" min="1" step="1" placeholder="0"
+                                  value={item.quantity}
+                                  onChange={e => updateItem(idx, 'quantity', e.target.value)}
+                                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-center w-full"
+                                />
+                              </div>
+                              <div className="col-span-3 order-5 sm:col-span-1 sm:order-none">
+                                <span className="block text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-1 sm:hidden">Buy Price</span>
+                                <input
+                                  type="number" min="0" step="0.01" placeholder="0"
+                                  value={item.cost_price}
+                                  onChange={e => updateItem(idx, 'cost_price', e.target.value)}
+                                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-right w-full"
+                                />
+                              </div>
+                              <div className="col-span-3 order-6 sm:col-span-1 sm:order-none">
+                                <span className="block text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-1 sm:hidden">Sell Price</span>
+                                <input
+                                  type="number" min="0" step="0.01" placeholder="0"
+                                  value={item.sale_price}
+                                  onChange={e => updateItem(idx, 'sale_price', e.target.value)}
+                                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-right w-full"
+                                />
+                              </div>
+                              <div className="col-span-3 order-7 sm:col-span-1 sm:order-none">
+                                <span className="block text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-1 sm:hidden">Shipping Cost</span>
+                                <input
+                                  type="number" min="0" step="0.01" placeholder="—"
+                                  value={item.shipping_cost}
+                                  onChange={e => updateItem(idx, 'shipping_cost', e.target.value)}
+                                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all text-right w-full"
+                                />
+                              </div>
                               <button
                                 type="button"
                                 onClick={() => removeItemRow(idx)}
                                 disabled={formItems.length <= 1}
-                                className="w-10 h-10 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-600 hover:bg-rose-500/20 transition-all flex items-center justify-center disabled:opacity-20 disabled:cursor-not-allowed"
+                                className="col-span-2 order-3 sm:col-span-1 sm:order-none justify-self-center w-9 h-9 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-600 hover:bg-rose-500/20 transition-all flex items-center justify-center disabled:opacity-20 disabled:cursor-not-allowed"
                               >
                                 <X className="w-3 h-3" />
                               </button>
@@ -887,22 +905,20 @@ export default function AdminBranchChalansPage() {
                     </button>
                   </div>
 
-                  {/* Grand total display */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="p-4 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+                  {/* Grand total display — shipping sits in the middle, always visible */}
+                  <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                    <div className="p-3 sm:p-4 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
                       <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Total Cost</span>
-                      <span className="text-xl font-bold text-slate-900">৳ {grandTotalCost.toLocaleString('en-BD')}</span>
+                      <span className="text-base sm:text-xl font-bold text-slate-900">৳ {grandTotalCost.toLocaleString('en-BD')}</span>
                     </div>
-                    <div className="p-4 rounded-xl bg-[#1ca34c]/5 border border-[#1ca34c]/15 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+                    <div className="p-3 sm:p-4 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+                      <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Total Shipping Cost</span>
+                      <span className="text-base sm:text-xl font-bold text-slate-900">৳ {grandTotalShipping.toLocaleString('en-BD')}</span>
+                    </div>
+                    <div className="p-3 sm:p-4 rounded-xl bg-[#1ca34c]/5 border border-[#1ca34c]/15 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
                       <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Total Sale</span>
-                      <span className="text-xl font-bold text-[#15803d]">৳ {grandTotalSale.toLocaleString('en-BD')}</span>
+                      <span className="text-base sm:text-xl font-bold text-[#15803d]">৳ {grandTotalSale.toLocaleString('en-BD')}</span>
                     </div>
-                    {grandTotalShipping > 0 && (
-                      <div className="p-4 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
-                        <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Total Shipping Cost</span>
-                        <span className="text-xl font-bold text-slate-900">৳ {grandTotalShipping.toLocaleString('en-BD')}</span>
-                      </div>
-                    )}
                   </div>
 
                   {/* Notes */}
@@ -1149,7 +1165,7 @@ export default function AdminBranchChalansPage() {
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.96, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96, y: 20 }}
-              className="w-full max-w-xl bg-white border border-indigo-500/20 rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+              className="w-full max-w-2xl bg-white border border-indigo-500/20 rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
             >
               {/* Modal Header */}
               <div className="p-5 border-b border-slate-900/5 flex items-center justify-between shrink-0">
@@ -1168,9 +1184,9 @@ export default function AdminBranchChalansPage() {
               <div className="overflow-y-auto custom-scrollbar p-5 space-y-5 flex-1">
                 <form id="edit-chalan-form" onSubmit={handleEdit} className="space-y-5">
 
-                  {/* Column headers */}
-                  <div className="overflow-x-auto custom-scrollbar pb-1">
-                    <div className="grid grid-cols-[80px_1fr_60px_80px_80px_80px_40px] gap-2 mb-2 px-1 min-w-[640px]">
+                  {/* Column headers — visible on sm+; on small screens each field carries its own label */}
+                  <div>
+                    <div className="hidden sm:grid grid-cols-[68px_minmax(100px,1fr)_52px_84px_84px_84px_36px] gap-2 mb-2 px-1">
                       <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600">Code</span>
                       <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600">Product Name</span>
                       <span className="text-[9px] font-bold uppercase tracking-widest text-slate-600 text-center">Qty</span>
@@ -1189,53 +1205,71 @@ export default function AdminBranchChalansPage() {
                         const rowSale = qty * sp
                         return (
                           <div key={idx}>
-                            <div className="grid grid-cols-[80px_1fr_60px_80px_80px_80px_40px] gap-2 items-center min-w-[640px]">
-                              <input
-                                type="text" placeholder="Code"
-                                value={item.code}
-                                onChange={e => {
-                                  // Hack to determine which update function to call based on context
-                                  // Since this replace hits both new and edit forms, we use generic ID check
-                                  if (e.target.closest('#new-chalan-form')) updateItem(idx, 'code', e.target.value);
-                                  else if (typeof updateEditItem !== 'undefined') updateEditItem(idx, 'code', e.target.value);
-                                }}
-                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all w-full font-mono"
-                              />
-                              <input
-                                type="text" placeholder="e.g. Shirt, Dress"
-                                value={item.name}
-                                onChange={e => updateEditItem(idx, 'name', e.target.value)}
-                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-indigo-500/40 transition-all w-full"
-                              />
-                              <input
-                                type="number" min="1" step="1" placeholder="0"
-                                value={item.quantity}
-                                onChange={e => updateEditItem(idx, 'quantity', e.target.value)}
-                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-indigo-500/40 transition-all text-center w-full"
-                              />
-                              <input
-                                type="number" min="0" step="0.01" placeholder="0"
-                                value={item.cost_price}
-                                onChange={e => updateEditItem(idx, 'cost_price', e.target.value)}
-                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-indigo-500/40 transition-all text-right w-full"
-                              />
-                              <input
-                                type="number" min="0" step="0.01" placeholder="0"
-                                value={item.sale_price}
-                                onChange={e => updateEditItem(idx, 'sale_price', e.target.value)}
-                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-indigo-500/40 transition-all text-right w-full"
-                              />
-                              <input
-                                type="number" min="0" step="0.01" placeholder="—"
-                                value={item.shipping_cost}
-                                onChange={e => updateEditItem(idx, 'shipping_cost', e.target.value)}
-                                className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-indigo-500/40 transition-all text-right w-full"
-                              />
+                            <div className="grid grid-cols-12 gap-1.5 sm:gap-2 sm:grid-cols-[68px_minmax(100px,1fr)_52px_84px_84px_84px_36px] items-center">
+                              <div className="col-span-4 order-1 sm:col-span-1 sm:order-none">
+                                <span className="block text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-1 sm:hidden">Code</span>
+                                <input
+                                  type="text" placeholder="Code"
+                                  value={item.code}
+                                  onChange={e => {
+                                    // Hack to determine which update function to call based on context
+                                    // Since this replace hits both new and edit forms, we use generic ID check
+                                    if (e.target.closest('#new-chalan-form')) updateItem(idx, 'code', e.target.value);
+                                    else if (typeof updateEditItem !== 'undefined') updateEditItem(idx, 'code', e.target.value);
+                                  }}
+                                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-[#1ca34c]/40 transition-all w-full font-mono"
+                                />
+                              </div>
+                              <div className="col-span-6 order-2 sm:col-span-1 sm:order-none">
+                                <span className="block text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-1 sm:hidden">Product Name</span>
+                                <input
+                                  type="text" placeholder="e.g. Shirt, Dress"
+                                  value={item.name}
+                                  onChange={e => updateEditItem(idx, 'name', e.target.value)}
+                                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-indigo-500/40 transition-all w-full"
+                                />
+                              </div>
+                              <div className="col-span-3 order-4 sm:col-span-1 sm:order-none">
+                                <span className="block text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-1 sm:hidden">Qty</span>
+                                <input
+                                  type="number" min="1" step="1" placeholder="0"
+                                  value={item.quantity}
+                                  onChange={e => updateEditItem(idx, 'quantity', e.target.value)}
+                                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-indigo-500/40 transition-all text-center w-full"
+                                />
+                              </div>
+                              <div className="col-span-3 order-5 sm:col-span-1 sm:order-none">
+                                <span className="block text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-1 sm:hidden">Buy Price</span>
+                                <input
+                                  type="number" min="0" step="0.01" placeholder="0"
+                                  value={item.cost_price}
+                                  onChange={e => updateEditItem(idx, 'cost_price', e.target.value)}
+                                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-indigo-500/40 transition-all text-right w-full"
+                                />
+                              </div>
+                              <div className="col-span-3 order-6 sm:col-span-1 sm:order-none">
+                                <span className="block text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-1 sm:hidden">Sell Price</span>
+                                <input
+                                  type="number" min="0" step="0.01" placeholder="0"
+                                  value={item.sale_price}
+                                  onChange={e => updateEditItem(idx, 'sale_price', e.target.value)}
+                                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-indigo-500/40 transition-all text-right w-full"
+                                />
+                              </div>
+                              <div className="col-span-3 order-7 sm:col-span-1 sm:order-none">
+                                <span className="block text-[9px] font-bold uppercase tracking-widest text-slate-600 mb-1 sm:hidden">Shipping Cost</span>
+                                <input
+                                  type="number" min="0" step="0.01" placeholder="—"
+                                  value={item.shipping_cost}
+                                  onChange={e => updateEditItem(idx, 'shipping_cost', e.target.value)}
+                                  className="bg-slate-900/[0.04] border border-slate-900/10 rounded-xl px-2 py-2 text-xs text-slate-900 placeholder-slate-600 focus:outline-none focus:border-indigo-500/40 transition-all text-right w-full"
+                                />
+                              </div>
                               <button
                                 type="button"
                                 onClick={() => removeEditItemRow(idx)}
                                 disabled={editItems.length <= 1}
-                                className="w-10 h-10 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-600 hover:bg-rose-500/20 transition-all flex items-center justify-center disabled:opacity-20 disabled:cursor-not-allowed"
+                                className="col-span-2 order-3 sm:col-span-1 sm:order-none justify-self-center w-9 h-9 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-600 hover:bg-rose-500/20 transition-all flex items-center justify-center disabled:opacity-20 disabled:cursor-not-allowed"
                               >
                                 <X className="w-3 h-3" />
                               </button>
@@ -1259,22 +1293,20 @@ export default function AdminBranchChalansPage() {
                     </button>
                   </div>
 
-                  {/* Grand total */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="p-4 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+                  {/* Grand total — shipping sits in the middle, always visible */}
+                  <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                    <div className="p-3 sm:p-4 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
                       <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Total Cost</span>
-                      <span className="text-xl font-bold text-slate-900">৳ {grandTotalEditCost.toLocaleString('en-BD')}</span>
+                      <span className="text-base sm:text-xl font-bold text-slate-900">৳ {grandTotalEditCost.toLocaleString('en-BD')}</span>
                     </div>
-                    <div className="p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/15 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+                    <div className="p-3 sm:p-4 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
+                      <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Total Shipping Cost</span>
+                      <span className="text-base sm:text-xl font-bold text-indigo-600">৳ {grandTotalEditShipping.toLocaleString('en-BD')}</span>
+                    </div>
+                    <div className="p-3 sm:p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/15 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
                       <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Total Sale</span>
-                      <span className="text-xl font-bold text-indigo-600">৳ {grandTotalEditSale.toLocaleString('en-BD')}</span>
+                      <span className="text-base sm:text-xl font-bold text-indigo-600">৳ {grandTotalEditSale.toLocaleString('en-BD')}</span>
                     </div>
-                    {grandTotalEditShipping > 0 && (
-                      <div className="p-4 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 flex flex-wrap items-center justify-between gap-x-2 gap-y-1">
-                        <span className="text-[10px] text-slate-500 uppercase tracking-wider font-bold">Total Shipping Cost</span>
-                        <span className="text-xl font-bold text-indigo-600">৳ {grandTotalEditShipping.toLocaleString('en-BD')}</span>
-                      </div>
-                    )}
                   </div>
 
                   {/* Notes */}
