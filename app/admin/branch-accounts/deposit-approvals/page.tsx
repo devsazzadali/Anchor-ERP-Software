@@ -15,10 +15,12 @@ import { generatePdf } from '@/lib/pdf-generator'
 import { generateExcel } from '@/lib/excel-generator'
 import DepositSlipModal from '@/components/DepositSlipModal'
 import { parseDailyBreakdown, getDailyBreakdownList, cleanDepositNotes, parseKhuchraAmount } from '@/lib/branch-deposit-utils'
+import { useLanguage } from '@/lib/i18n/provider'
 
 const fmt = (n: number) => '৳' + Number(n ?? 0).toLocaleString('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 
 export default function DepositApprovalsPage() {
+  const { t } = useLanguage()
   const router = useRouter()
   const [deposits, setDeposits] = useState<any[]>([])
   const [totalsSummary, setTotalsSummary] = useState<{ approved_record_total: number; credited_total: number } | null>(null)
@@ -669,7 +671,7 @@ export default function DepositApprovalsPage() {
                             <div className="flex items-center justify-between border-b border-[#1ca34c]/20 pb-2">
                               <span className="text-[11px] font-bold text-[#15803d] uppercase tracking-wider flex items-center gap-1.5 font-serif">
                                 <Layers className="w-3.5 h-3.5" />
-                                প্রতিদিনের জমার বিবরণ · Daily Sales Breakdown ({list.length} Days Combined)
+                                {t.branch.depositApprovalsTitle} ({list.length} Days Combined)
                               </span>
                               <span className="text-[10px] text-slate-500 font-mono">
                                 Total: {fmt(dep.amount)}

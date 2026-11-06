@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { FileBarChart2, Scale, TrendingUp, Landmark, RefreshCw, AlertTriangle, BookOpen } from 'lucide-react'
 import { PeriodScopeBar, stmtUrl, taka, type StmtMeta } from './ui'
 import { PageHead } from '../ui'
+import { useLanguage } from '@/lib/i18n/provider'
 
 // Accounts A2 — Statements index. Period picker + the three
 // statements, the journal-coverage strip, and the read-only
@@ -30,6 +31,7 @@ const POSTING_MAP: Array<{ id: string; event: string; debit: string; credit: str
 ]
 
 export default function StatementsIndexPage() {
+  const { t } = useLanguage()
   const [meta, setMeta] = useState<StmtMeta | null>(null)
   const [period, setPeriod] = useState('')
   const [scope, setScope] = useState<'period' | 'fytd'>('fytd')
@@ -59,23 +61,23 @@ export default function StatementsIndexPage() {
     {
       href: `/admin/accounts/statements/trial-balance${q}`,
       icon: Scale,
-      title: 'Books Check',
-      bangla: 'হিসাব মিলেছে কিনা যাচাই',
-      text: 'Every account with its debit, credit and balance for the period — the books balance to ৳0.00 or the badge says so.',
+      title: t.accounts.head.trialBalance.title,
+      bangla: t.accounts.head.trialBalance.sub,
+      text: t.accounts.statementsIndex.booksCheckText,
     },
     {
       href: `/admin/accounts/statements/pl${q}`,
       icon: TrendingUp,
-      title: 'Profit & Loss (লাভ-ক্ষতি)',
-      bangla: 'আয় থেকে খরচ বাদ দিলে যা থাকে',
-      text: 'Company result and per-branch result from the journal — income, expenses, and the coverage notes that qualify them.',
+      title: t.accounts.head.pl.title,
+      bangla: t.accounts.head.pl.sub,
+      text: t.accounts.statementsIndex.plText,
     },
     {
       href: `/admin/accounts/statements/balance-sheet${period ? `?period=${period}` : ''}`,
       icon: Landmark,
-      title: 'What We Own & Owe',
-      bangla: 'সম্পদ আর দেনার অবস্থা',
-      text: 'Assets, liabilities and equity as of a date. Provisional until the owner confirms the opening position.',
+      title: t.accounts.head.balanceSheet.title,
+      bangla: t.accounts.head.balanceSheet.sub,
+      text: t.accounts.statementsIndex.balanceSheetText,
     },
   ]
 
@@ -83,9 +85,9 @@ export default function StatementsIndexPage() {
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
       <PageHead
         icon={<FileBarChart2 className="w-6 h-6 text-emerald-600" />}
-        title="Statements"
-        bangla="তিনটা বড় রিপোর্ট — হিসাব মিলেছে কিনা, লাভ-ক্ষতি, আর সম্পদ-দেনা"
-        tech="Financial Statements"
+        title={t.accounts.head.statements.title}
+        bangla={t.accounts.head.statements.sub}
+        tech={t.accounts.head.statements.tech}
       >
         <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50 print:hidden">
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh

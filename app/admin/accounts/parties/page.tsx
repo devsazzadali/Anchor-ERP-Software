@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Users, RefreshCw, Pencil, CheckCircle2, AlertTriangle, Trash2 } from 'lucide-react'
 import { PageHead } from '../ui'
+import { useLanguage } from '@/lib/i18n/provider'
 
 // Accounts A5 — Counterparties. Data: GET /api/accounts/parties.
 // The register is DERIVED from existing records (salary
@@ -45,6 +46,7 @@ const SOURCE_LABEL: Record<string, string> = {
 }
 
 export default function PartiesPage() {
+  const { t } = useLanguage()
   const [parties, setParties] = useState<Party[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -90,7 +92,7 @@ export default function PartiesPage() {
 
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <PageHead icon={<Users className="w-6 h-6 text-emerald-600" />} title="People & Companies" bangla="যাদের সাথে লেনদেন হয়" tech="Counterparties">
+      <PageHead icon={<Users className="w-6 h-6 text-emerald-600" />} title={t.accounts.head.parties.title} bangla={t.accounts.head.parties.sub} tech={t.accounts.head.parties.tech}>
         <div className="flex gap-2">
           <button
             onClick={() => act({ action: 'sync' }, 'Counterparties re-derived from the source records.')}

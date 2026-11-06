@@ -1,10 +1,11 @@
 'use client'
 
 export const dynamic = 'force-dynamic'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { Wallet, RefreshCw, Plus, Trash2, Pencil, Landmark, AlertTriangle, Send, CheckCheck, Play, Ban, Download } from 'lucide-react'
 import { PageHead, downloadPdf, bdt } from '../../ui'
+import { useLanguage, fill } from '@/lib/i18n/provider'
 import PaymentAccountCard, { type PaymentAccountField } from '@/components/PaymentAccountCard'
 import { salaryAccountFields } from '@/app/admin/salaries/IssueSalaryModal'
 
@@ -85,7 +86,32 @@ const EMPTY_FORM = {
   bonus: '', commission: '', tiffin: '', deductions: '', deduction_label: '', total_payable_days: '',
 }
 
+type AttDrafts = {
+  configured: boolean
+  available: boolean
+  month: string
+  summaries: Array<{
+    employee_id: string
+    employee_name: string
+    branch_id: string | null
+    matched_via: 'email' | 'phone' | 'employee_id'
+    present: number
+    absent: number
+    late: number
+    half_day: number
+    working_minutes: number
+    approved_overtime_minutes: number
+    holiday_duty_days: number
+    approved_leave_days: number
+    suggested_payable_days: number
+  }>
+  unmatched: Array<{ name: string; employee_code: string | null }>
+}
+
+const mins = (m: number) => `${Math.floor(m / 60)}h ${m % 60}m`
+
 export default function PayrollRunDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { t } = useLanguage()
   const [runId, setRunId] = useState<string>('')
   const [run, setRun] = useState<Run | null>(null)
   const [lines, setLines] = useState<Line[]>([])
@@ -101,6 +127,9 @@ export default function PayrollRunDetailPage({ params }: { params: Promise<{ id:
   const [editingId, setEditingId] = useState<string | null>(null)
   const [voidReason, setVoidReason] = useState('')
   const [cardFor, setCardFor] = useState<string | null>(null)
+  const [attendance, setAttendance] = useState<AttDrafts | null>(null)
+  const [attLoading, setAttLoading] = useState(false)
+  const attFetchedFor = useRef('')
 
   useEffect(() => { params.then((p) => setRunId(p.id)) }, [params])
 
@@ -136,6 +165,22 @@ export default function PayrollRunDetailPage({ params }: { params: Promise<{ id:
   }, [runId, applyDetail])
 
   useEffect(() => { load() }, [load])
+
+  // Attendance draft inputs (read-only): fetched once per run
+  // while the run is a draft. Fail-soft — any failure simply
+  // leaves the panel in its unavailable state; payroll itself
+  // never depends on the attendance system.
+  useEffect(() => {
+    if (!runId || run?.status !== 'draft') return
+    if (attFetchedFor.current === runId) return
+    attFetchedFor.current = runId
+    setAttLoading(true)
+    fetch(`/api/accounts/payroll/${runId}/attendance`)
+      .then((r) => r.json())
+      .then((j) => { if (j && !j.error) setAttendance(j) })
+      .catch(() => {})
+      .finally(() => setAttLoading(false))
+  }, [runId, run?.status])
 
   const act = async (payload: any): Promise<any> => {
     setBusy(true)
@@ -263,7 +308,7 @@ export default function PayrollRunDetailPage({ params }: { params: Promise<{ id:
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
       <Link href="/admin/accounts/payroll" className="text-sm font-semibold text-emerald-700 hover:underline">← Payroll runs</Link>
       <div className="mt-3">
-        <PageHead icon={<Wallet className="w-6 h-6 text-emerald-600" />} title={`Salary Accounts — ${run?.month ?? '…'}`} bangla="বেতনের হিসাব এক জায়গায়" tech="Payroll run detail">
+        <PageHead icon={<Wallet className="w-6 h-6 text-emerald-600" />} title={`${t.accounts.head.payrollDetail.title} — ${run?.month ?? '…'}`} bangla={t.accounts.head.payrollDetail.sub} tech={t.accounts.head.payrollDetail.tech}>
           <div className="flex flex-wrap gap-2">
             <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
@@ -461,6 +506,95 @@ export default function PayrollRunDetailPage({ params }: { params: Promise<{ id:
                   </button>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* Attendance draft inputs (read-only, draft runs only) */}
+          {isDraft && (
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 mb-6">
+              <h2 className="text-sm font-bold text-slate-900 mb-1">{t.accounts.payrollAttendance.title}</h2>
+              <p className="text-xs text-slate-500 mb-3">{t.accounts.payrollAttendance.sub}</p>
+              {attLoading && <p className="text-sm text-slate-500">{t.accounts.payrollAttendance.loading}</p>}
+              {!attLoading && attendance && !attendance.configured && (
+                <p className="text-sm text-slate-500">{t.accounts.payrollAttendance.notConfigured}</p>
+              )}
+              {!attLoading && attendance && attendance.configured && !attendance.available && (
+                <p className="text-sm text-amber-700">{t.accounts.payrollAttendance.unavailable}</p>
+              )}
+              {!attLoading && attendance && attendance.available && (
+                <>
+                  {attendance.summaries.length > 0 && (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm min-w-[860px]">
+                        <thead>
+                          <tr className="text-left text-xs uppercase tracking-wider text-slate-400 border-b border-slate-100">
+                            <th className="px-3 py-2 font-semibold">{t.accounts.payrollAttendance.colEmployee}</th>
+                            <th className="px-3 py-2 font-semibold">{t.accounts.payrollAttendance.colDays}</th>
+                            <th className="px-3 py-2 font-semibold text-right">{t.accounts.payrollAttendance.colWorked}</th>
+                            <th className="px-3 py-2 font-semibold text-right">{t.accounts.payrollAttendance.colOt}</th>
+                            <th className="px-3 py-2 font-semibold text-right">{t.accounts.payrollAttendance.colHoliday}</th>
+                            <th className="px-3 py-2 font-semibold text-right">{t.accounts.payrollAttendance.colPayable}</th>
+                            <th className="px-3 py-2"></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {attendance.summaries.map((s) => (
+                            <tr key={s.employee_id} className="border-b border-slate-50">
+                              <td className="px-3 py-2">
+                                <div className="font-medium text-slate-800">{s.employee_name}</div>
+                                <div className="text-[11px] text-slate-400">
+                                  {fill(t.accounts.payrollAttendance.matchedBy, {
+                                    via: s.matched_via === 'email'
+                                      ? t.accounts.payrollAttendance.viaEmail
+                                      : s.matched_via === 'phone'
+                                        ? t.accounts.payrollAttendance.viaPhone
+                                        : t.accounts.payrollAttendance.viaEmployeeId,
+                                  })}
+                                </div>
+                              </td>
+                              <td className="px-3 py-2 tabular-nums text-slate-600">
+                                {fill(t.accounts.payrollAttendance.daysValue, {
+                                  present: s.present, absent: s.absent, late: s.late, half: s.half_day, leave: s.approved_leave_days,
+                                })}
+                              </td>
+                              <td className="px-3 py-2 text-right tabular-nums">{mins(s.working_minutes)}</td>
+                              <td className="px-3 py-2 text-right tabular-nums">{mins(s.approved_overtime_minutes)}</td>
+                              <td className="px-3 py-2 text-right tabular-nums">{s.holiday_duty_days}</td>
+                              <td className="px-3 py-2 text-right tabular-nums font-semibold">{s.suggested_payable_days}</td>
+                              <td className="px-3 py-2 text-right whitespace-nowrap">
+                                <button
+                                  className="text-emerald-700 font-semibold hover:underline"
+                                  onClick={() => {
+                                    setEditingId(null)
+                                    setForm({
+                                      ...EMPTY_FORM,
+                                      employee_id: s.employee_id,
+                                      branch_id: s.branch_id || '',
+                                      total_payable_days: String(s.suggested_payable_days),
+                                    })
+                                    setActionMsg(fill(t.accounts.payrollAttendance.filled, { name: s.employee_name }))
+                                  }}
+                                >
+                                  {t.accounts.payrollAttendance.useDays}
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                  {attendance.unmatched.length > 0 && (
+                    <div className="mt-4 rounded-lg bg-amber-50 border border-amber-100 px-3 py-2">
+                      <div className="text-sm font-semibold text-amber-800">{t.accounts.payrollAttendance.unmatchedTitle}</div>
+                      <div className="text-sm text-amber-700 mt-1">
+                        {attendance.unmatched.map((u) => u.employee_code ? `${u.name} (${u.employee_code})` : u.name).join(' · ')}
+                      </div>
+                      <div className="text-xs text-amber-600 mt-1">{t.accounts.payrollAttendance.unmatchedNote}</div>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           )}
 

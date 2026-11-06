@@ -208,6 +208,7 @@ async function notifyAdminsOfDailyClosing({
 
     // 2. Dispatch email asynchronously
     sendDailyClosingEmailToAdmins({
+      language: profile.language,
       branchName: branchLabel,
       managerName: managerLabel,
       ledgerDate: ledger.ledger_date,

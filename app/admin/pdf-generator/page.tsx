@@ -15,150 +15,34 @@ import {
   RefreshCw, Settings2, Table as TableIcon, Minus, Eye, Edit3, Maximize2,
   Columns, Sliders
 } from 'lucide-react'
+import { useLanguage, dictionaryFor } from '@/lib/i18n/provider'
 
-// ─── Document Templates (Bengali & English Corporate ERP Standards) ──────────
-const TEMPLATES: Record<string, { name: string; icon: string; title: string; content: string }> = {
-  blank: {
-    name: 'Blank Document / ফাঁকা নথি',
-    icon: '📄',
-    title: 'OFFICIAL DOCUMENT',
-    content: '<p style="font-size:14px; color:#1e293b; line-height:2">এখানে আপনার ডকুমেন্টের বিষয়বস্তু লিখুন...</p>',
-  },
-  notice: {
-    name: 'Notice / নোটিশ',
-    icon: '📢',
-    title: 'OFFICIAL NOTICE / নোটিশ',
-    content: `
-      <p style="text-align:center; font-size:15px; margin-bottom:14px;"><strong>বিষয়: &nbsp;ঈদুল ফিতর উপলক্ষে অফিস ছুটি সংক্রান্ত নোটিশ</strong></p>
-      <p style="text-align:justify; line-height:2.0; margin-bottom:12px;">এতদ্বারা Anchor Fashion-এর প্রধান কার্যালয়সহ সকল শাখা অফিসের সর্বস্তরের কর্মকর্তা ও কর্মচারীদের অবগতির জন্য জানানো যাচ্ছে যে, পবিত্র ঈদুল ফিতর উপলক্ষে আগামী [তারিখ উল্লেখ করুন] হতে [তারিখ উল্লেখ করুন] পর্যন্ত প্রতিষ্ঠানের সকল কার্যক্রম বন্ধ থাকবে।</p>
-      <p style="text-align:justify; line-height:2.0; margin-bottom:12px;">ছুটি শেষে আগামী [তারিখ উল্লেখ করুন] রোজ [বারের নাম] সকাল ৯:০০ ঘটিকা হতে যথারীতি অফিস কার্যক্রম পুনরায় চালু হবে। ছুটির পূর্বে সকল শাখার হিসাব-নিকাশ ও ক্যাশ ক্লোজিং সম্পন্ন করার জন্য শাখা ব্যবস্থাপকদের অনুরোধ জানানো হলো।</p>
-      <p style="margin-top:16px; line-height:2.0;">কর্তৃপক্ষের অনুমোদনক্রমে এই নোটিশ জারি করা হলো এবং সকলের প্রতি ঈদের শুভেচ্ছা জ্ঞাপন করা হলো।</p>
-    `.trim(),
-  },
-  order: {
-    name: 'Office Order / অফিস আদেশ',
-    icon: '📋',
-    title: 'OFFICE ORDER / অফিস আদেশ',
-    content: `
-      <p style="text-align:center; font-size:15px; margin-bottom:14px;"><strong>বিষয়: &nbsp;শাখা হিসাব ব্যবস্থাপনা ও দৈনিক রিপোর্ট প্রদান সংক্রান্ত নির্দেশনা</strong></p>
-      <p style="text-align:justify; line-height:2.0; margin-bottom:12px;">প্রতিষ্ঠানের অভ্যন্তরীণ হিসাবরক্ষণ প্রক্রিয়া আরও সুশৃঙ্খল ও জবাবদিহিতামূলক করার স্বার্থে যথাযথ কর্তৃপক্ষের নির্দেশক্রমে নিম্নরূপ নির্দেশনা জারি করা হলো:</p>
-      <ol style="line-height:2.1; margin-left:24px; margin-bottom:14px;">
-        <li>প্রতিদিন রাত ৮:০০ ঘটিকার মধ্যে সকল শাখাকে তাদের দৈনিক বিক্রয়, নগদ জমা ও খরচের হিসাব Anchor ERP সিস্টেমে এন্ট্রি করতে হবে।</li>
-        <li>অনুমোদিত ভাউচার ব্যতীত কোনো প্রকার শাখা ব্যয় বা অগ্রিম প্রদান সম্পূর্ণরূপে নিষিদ্ধ।</li>
-        <li>ব্যাংক ডিপোজিট স্লিপ সংশ্লিষ্ট শাখায় তাৎক্ষণিকভাবে স্ক্যান করে সিস্টেমে আপলোড নিশ্চিত করতে হবে।</li>
-      </ol>
-      <p style="text-align:justify; line-height:2.0;">উপরোক্ত নির্দেশনাসমূহ অবিলম্বে কার্যকর হবে। সংশ্লিষ্ট সকলকে এ আদেশ কঠোরভাবে অনুসরণের নির্দেশ দেওয়া হলো।</p>
-    `.trim(),
-  },
-  certificate: {
-    name: 'Certificate / প্রত্যয়নপত্র',
-    icon: '🏅',
-    title: 'CERTIFICATE / প্রত্যয়নপত্র',
-    content: `
-      <p style="text-align:center; font-size:16px; font-weight:bold; margin-bottom:18px; letter-spacing:0.04em;">প্রত্যয়নপত্র (TO WHOM IT MAY CONCERN)</p>
-      <p style="text-align:justify; line-height:2.1; margin-bottom:14px;">এই মর্মে প্রত্যয়ন করা যাচ্ছে যে, জনাব / জনাবা <strong>[কর্মকর্তার পূর্ণ নাম]</strong>, পিতা: [পিতার নাম], মাতা: [মাতার নাম], আমাদের প্রতিষ্ঠানে <strong>[পদবী]</strong> হিসেবে গত [যোগদানের তারিখ] হতে অদ্যাবধি সততা ও নিষ্ঠার সাথে কর্মরত আছেন।</p>
-      <p style="text-align:justify; line-height:2.1; margin-bottom:14px;">কর্মকালীন সময়ে তাঁর আচরণ ও দায়িত্বপালন অত্যন্ত প্রশংসনীয়। আমাদের জানামতে তিনি কোনো প্রতিষ্ঠান-বিরোধী বা শৃঙ্খলা-পরিপন্থী কর্মকাণ্ডে কখনোই জড়িত ছিলেন না। তাঁর বর্তমান মাসিক বেতন ও ভাতাদি নিয়মিত পরিশোধ করা হয়।</p>
-      <p style="text-align:justify; line-height:2.1;">তাঁর ভবিষ্যৎ জীবনের সার্বিক উন্নতি ও সাফল্য কামনা করা যাচ্ছে। এই প্রত্যয়নপত্র তাঁর ব্যক্তিগত/অফিসিয়াল প্রয়োজনে কর্তৃপক্ষের অনুরোধে প্রদান করা হলো।</p>
-    `.trim(),
-  },
-  memo: {
-    name: 'Internal Memo / স্মারকপত্র',
-    icon: '📝',
-    title: 'INTERNAL MEMO / স্মারকপত্র',
-    content: `
-      <div style="border-bottom:1px solid #d0d6e0; padding-bottom:10px; margin-bottom:16px; line-height:1.9;">
-        <p><strong>প্রতি (To):</strong> &nbsp;সকল বিভাগীয় প্রধান ও শাখা ব্যবস্থাপক</p>
-        <p><strong>থেকে (From):</strong> &nbsp;অর্থ ও প্রশাসন বিভাগ, প্রধান কার্যালয়</p>
-        <p><strong>বিষয় (Subject):</strong> &nbsp;মাসিক আর্থিক ক্লোজিং এবং ভাউচার নিরীক্ষা সংক্রান্ত</p>
-      </div>
-      <p style="text-align:justify; line-height:2.0; margin-bottom:12px;">চলতি মাসের হিসাব ক্লোজিং প্রক্রিয়ার অংশ হিসেবে সকল শাখার মাসিক ব্যয় বিবরণী, ভাউচার ফাইল এবং ব্যাংক বিবরণী আগামী [তারিখ উল্লেখ করুন] তারিখের মধ্যে প্রধান কার্যালয়ের অডিট বিভাগে প্রেরণের নির্দেশ দেওয়া যাচ্ছে।</p>
-      <p style="text-align:justify; line-height:2.0;">কোনো প্রকার গরমিল বা অমিল পরিলক্ষিত হলে শাখা হিসাবরক্ষককে তাৎক্ষণিকভাবে জবাবদিহি করতে হবে। এ বিষয়ে সকলের সহযোগিতা একান্ত কাম্য।</p>
-    `.trim(),
-  },
-  salary: {
-    name: 'Salary Approval / বেতন অনুমোদন',
-    icon: '💰',
-    title: 'SALARY DISBURSEMENT / বেতন অনুমোদন পত্র',
-    content: `
-      <p style="text-align:center; font-size:15px; margin-bottom:14px;"><strong>বিষয়: &nbsp;কর্মকর্তা ও কর্মচারীদের মাসিক বেতন ও ভাতাদি প্রদান অনুমোদন</strong></p>
-      <p style="text-align:justify; line-height:2.0; margin-bottom:14px;">হিসাব বিভাগ কর্তৃক প্রস্তুতকৃত চলতি মাসের বেতন বিল যথাযথভাবে নিরীক্ষাপূর্বক উপযুক্ত কর্তৃপক্ষের অনুমোদনক্রমে নিম্নরূপভাবে অর্থ ছাড় করার নির্দেশ প্রদান করা হলো:</p>
-      <table style="width:100%; border-collapse:collapse; margin:14px 0; font-size:12px;">
-        <thead>
-          <tr style="background:#f1f5f9;">
-            <th style="border:1px solid #cbd5e1; padding:8px; text-align:center; width:40px;">ক্র.</th>
-            <th style="border:1px solid #cbd5e1; padding:8px; text-align:left;">কর্মকর্তা / কর্মচারীর নাম</th>
-            <th style="border:1px solid #cbd5e1; padding:8px; text-align:left;">পদবী ও শাখা</th>
-            <th style="border:1px solid #cbd5e1; padding:8px; text-align:right;">মূল বেতন (BDT)</th>
-            <th style="border:1px solid #cbd5e1; padding:8px; text-align:right;">মোট প্রদেয় (BDT)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">০১</td>
-            <td style="border:1px solid #cbd5e1; padding:8px;">[কর্মকর্তার নাম ০১]</td>
-            <td style="border:1px solid #cbd5e1; padding:8px;">শাখা ব্যবস্থাপক (মিরপুর)</td>
-            <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">৪৫,০০০.০০</td>
-            <td style="border:1px solid #cbd5e1; padding:8px; text-align:right; font-weight:bold; color:#0f3057;">৪৫,০০০.০০</td>
-          </tr>
-          <tr style="background:#f8fafc;">
-            <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">০২</td>
-            <td style="border:1px solid #cbd5e1; padding:8px;">[কর্মকর্তার নাম ০২]</td>
-            <td style="border:1px solid #cbd5e1; padding:8px;">হিসাব কর্মকর্তা (উত্তরা)</td>
-            <td style="border:1px solid #cbd5e1; padding:8px; text-align:right;">৩৫,০০০.০০</td>
-            <td style="border:1px solid #cbd5e1; padding:8px; text-align:right; font-weight:bold; color:#0f3057;">৩৫,০০০.০০</td>
-          </tr>
-        </tbody>
-      </table>
-      <p style="text-align:justify; line-height:2.0; margin-top:12px;">ট্রেজারি ও ব্যাংক অ্যাকাউন্ট হতে সরাসরি সংশ্লিষ্ট কর্মকর্তা-কর্মচারীদের ব্যাংক একাউন্টে বিএফটিএন / অনলাইন ট্রান্সফারের মাধ্যমে অর্থ প্রেরণের জন্য অনুরোধ করা যাচ্ছে।</p>
-    `.trim(),
-  },
-  expense: {
-    name: 'Expense Approval / খরচ অনুমোদন',
-    icon: '📑',
-    title: 'EXPENSE APPROVAL / খরচ অনুমোদন ভাউচার',
-    content: `
-      <p style="text-align:center; font-size:15px; margin-bottom:14px;"><strong>বিষয়: &nbsp;শাখা পরিচালন ও রক্ষণাবেক্ষণ ব্যয় অনুমোদন প্রসঙ্গে</strong></p>
-      <p style="text-align:justify; line-height:2.0; margin-bottom:14px;">শাখা কার্যালয় কর্তৃক জমাকৃত নিম্নবর্ণিত জরুরি পরিচালন ব্যয়ের রসিদ ও ভাউচারাদি নিরীক্ষান্তে উপযুক্ত কর্তৃপক্ষের সিদ্ধান্ত মোতাবেক অনুমোদন প্রদান করা হলো:</p>
-      <table style="width:100%; border-collapse:collapse; margin:14px 0; font-size:12px;">
-        <thead>
-          <tr style="background:#f1f5f9;">
-            <th style="border:1px solid #cbd5e1; padding:8px; text-align:center; width:40px;">ক্র.</th>
-            <th style="border:1px solid #cbd5e1; padding:8px; text-align:left;">ব্যয়ের খাত ও বিবরণ</th>
-            <th style="border:1px solid #cbd5e1; padding:8px; text-align:left;">অনুরোধকারী শাখা</th>
-            <th style="border:1px solid #cbd5e1; padding:8px; text-align:center;">তারিখ</th>
-            <th style="border:1px solid #cbd5e1; padding:8px; text-align:right;">অনুমোদিত অর্থ (BDT)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">০১</td>
-            <td style="border:1px solid #cbd5e1; padding:8px;">অফিস বিদ্যুৎ ও ইউটিলিটি বিল</td>
-            <td style="border:1px solid #cbd5e1; padding:8px;">বনানী শাখা</td>
-            <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">[তারিখ]</td>
-            <td style="border:1px solid #cbd5e1; padding:8px; text-align:right; font-weight:bold; color:#0f3057;">১২,৫০০.০০</td>
-          </tr>
-          <tr style="background:#f8fafc;">
-            <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">০২</td>
-            <td style="border:1px solid #cbd5e1; padding:8px;">জরুরি স্টেশনারি ও প্রিন্টিং মালামাল ক্রয়</td>
-            <td style="border:1px solid #cbd5e1; padding:8px;">ধানমন্ডি শাখা</td>
-            <td style="border:1px solid #cbd5e1; padding:8px; text-align:center;">[তারিখ]</td>
-            <td style="border:1px solid #cbd5e1; padding:8px; text-align:right; font-weight:bold; color:#0f3057;">৪,২০০.০০</td>
-          </tr>
-        </tbody>
-      </table>
-      <p style="text-align:justify; line-height:2.0; margin-top:12px;">অনুমোদিত অর্থ অবিলম্বে পেটি ক্যাশ অথবা ব্যাংক হতে পরিশোধের ব্যবস্থা গ্রহণের নির্দেশ দেওয়া হলো।</p>
-    `.trim(),
-  },
+// ─── Document Templates ─────────────────────────────────────────────────────
+// Display strings (name / title / content) live in the i18n dictionaries
+// (lib/i18n) so generated documents follow the acting user's language.
+// Only the icon stays here.
+const TEMPLATE_KEYS = ['blank', 'notice', 'order', 'certificate', 'memo', 'salary', 'expense'] as const
+type TemplateKey = (typeof TEMPLATE_KEYS)[number]
+const TEMPLATE_META: Record<TemplateKey, { icon: string }> = {
+  blank: { icon: '📄' },
+  notice: { icon: '📢' },
+  order: { icon: '📋' },
+  certificate: { icon: '🏅' },
+  memo: { icon: '📝' },
+  salary: { icon: '💰' },
+  expense: { icon: '📑' },
 }
 
 // ─── Font Options with Proper CSS Variables for Bengali ──────────────────────
-const FONT_FAMILIES = [
+const FONT_FAMILIES: Array<{ label: string; value: string; labelKey?: 'fontHindSiliguri' | 'fontNotoSans' }> = [
   {
-    label: 'Hind Siliguri (বাংলা)',
+    label: 'Hind Siliguri (Bengali)',
+    labelKey: 'fontHindSiliguri',
     value: "var(--font-hind-siliguri), 'Hind Siliguri', 'Noto Sans Bengali', sans-serif",
   },
   {
-    label: 'Noto Sans Bengali (বাংলা)',
+    label: 'Noto Sans Bengali (Bengali)',
+    labelKey: 'fontNotoSans',
     value: "var(--font-noto-sans-bengali), 'Noto Sans Bengali', 'Hind Siliguri', sans-serif",
   },
   {
@@ -214,6 +98,7 @@ function LiveMirror({
   editorRef: React.RefObject<HTMLDivElement | null>
   fontFamily: string
 }) {
+  const { t } = useLanguage()
   const mirrorRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -224,12 +109,12 @@ function LiveMirror({
     const sync = () => {
       mirror.innerHTML =
         editor.innerHTML ||
-        '<p style="color:#94a3b8; font-size:13px; font-style:italic">এখানে আপনার ডকুমেন্টের বিষয়বস্তু দেখা যাবে — বাম পাশে লিখুন বা টেমপ্লেট নির্বাচন করুন।</p>'
+        `<p style="color:#94a3b8; font-size:13px; font-style:italic">${t.pdf.ui.previewPlaceholder}</p>`
     }
     sync()
     editor.addEventListener('input', sync)
     return () => editor.removeEventListener('input', sync)
-  }, [editorRef])
+  }, [editorRef, t])
 
   return (
     <div
@@ -250,13 +135,16 @@ function LiveMirror({
 
 // ─── Main PDF Generator Page ─────────────────────────────────────────────────
 export default function PdfGeneratorPage() {
+  const { t, locale } = useLanguage()
   const editorRef = useRef<HTMLDivElement>(null)
   const previewRef = useRef<HTMLDivElement>(null)
   const previewContainerRef = useRef<HTMLDivElement>(null)
 
   // Document State
   const [activeTemplate, setActiveTemplate] = useState('notice')
-  const [docTitle, setDocTitle] = useState('OFFICIAL NOTICE / নোটিশ')
+  const [docTitle, setDocTitle] = useState(() => dictionaryFor('en').pdf.templates.notice.title)
+  const titleDirtyRef = useRef(false)
+  const contentDirtyRef = useRef(false)
   const [docRef, setDocRef] = useState(`REF-${Date.now().toString().slice(-8)}`)
   const [docBranch, setDocBranch] = useState('All Branches')
   const [docPreparedBy, setDocPreparedBy] = useState('Operations Management')
@@ -347,19 +235,32 @@ export default function PdfGeneratorPage() {
   // Initialize with Notice template on mount
   useEffect(() => {
     if (editorRef.current) {
-      editorRef.current.innerHTML = TEMPLATES.notice.content
+      editorRef.current.innerHTML = t.pdf.templates.notice.content
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // When the user's language loads/changes, re-apply the active template's
+  // title + content — but only while the user has not edited them.
+  useEffect(() => {
+    if (!titleDirtyRef.current) setDocTitle(t.pdf.templates[activeTemplate as TemplateKey].title)
+    if (!contentDirtyRef.current && editorRef.current) {
+      editorRef.current.innerHTML = t.pdf.templates[activeTemplate as TemplateKey].content
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locale])
 
   const applyTemplate = useCallback((key: string) => {
     setActiveTemplate(key)
-    setDocTitle(TEMPLATES[key].title)
+    titleDirtyRef.current = false
+    contentDirtyRef.current = false
+    setDocTitle(t.pdf.templates[key as TemplateKey].title)
     if (editorRef.current) {
-      editorRef.current.innerHTML = TEMPLATES[key].content
+      editorRef.current.innerHTML = t.pdf.templates[key as TemplateKey].content
       editorRef.current.focus()
     }
     setShowTemplateMenu(false)
-  }, [])
+  }, [t])
 
   const exec = useCallback((cmd: string, val?: string) => {
     document.execCommand(cmd, false, val)
@@ -401,16 +302,16 @@ export default function PdfGeneratorPage() {
       <table style="width:100%; border-collapse:collapse; margin:12px 0; font-size:12.5px;">
         <thead>
           <tr style="background:#f1f5f9;">
-            <th style="border:1px solid #cbd5e1; padding:6px 10px; text-align:left;">আইটেম / বিবরণ</th>
-            <th style="border:1px solid #cbd5e1; padding:6px 10px; text-align:center; width:80px;">পরিমাণ</th>
-            <th style="border:1px solid #cbd5e1; padding:6px 10px; text-align:right; width:120px;">মূল্য (BDT)</th>
+            <th style="border:1px solid #cbd5e1; padding:6px 10px; text-align:left;">${t.pdf.ui.itemHeader}</th>
+            <th style="border:1px solid #cbd5e1; padding:6px 10px; text-align:center; width:80px;">${t.pdf.ui.qtyHeader}</th>
+            <th style="border:1px solid #cbd5e1; padding:6px 10px; text-align:right; width:120px;">${t.pdf.ui.priceHeader}</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td style="border:1px solid #cbd5e1; padding:6px 10px;">বিবরণ লিখুন</td>
-            <td style="border:1px solid #cbd5e1; padding:6px 10px; text-align:center;">১</td>
-            <td style="border:1px solid #cbd5e1; padding:6px 10px; text-align:right;">০.০০</td>
+            <td style="border:1px solid #cbd5e1; padding:6px 10px;">${t.pdf.ui.itemPlaceholder}</td>
+            <td style="border:1px solid #cbd5e1; padding:6px 10px; text-align:center;">${t.pdf.ui.qtySample}</td>
+            <td style="border:1px solid #cbd5e1; padding:6px 10px; text-align:right;">${t.pdf.ui.priceSample}</td>
           </tr>
         </tbody>
       </table>
@@ -616,7 +517,7 @@ export default function PdfGeneratorPage() {
                 <Wand2 className="w-3.5 h-3.5 text-[#8a6d1f]" />
                 <span className="hidden md:inline">Template:</span>
                 <span className="truncate max-w-[110px] sm:max-w-none">
-                  {TEMPLATES[activeTemplate]?.icon} {TEMPLATES[activeTemplate]?.name}
+                  {TEMPLATE_META[activeTemplate as TemplateKey]?.icon} {t.pdf.templates[activeTemplate as TemplateKey]?.name}
                 </span>
                 <ChevronDown className="w-3 h-3 opacity-50" />
               </button>
@@ -633,7 +534,7 @@ export default function PdfGeneratorPage() {
                       Select Document Format
                     </div>
                     <div>
-                      {Object.keys(TEMPLATES).map((key) => (
+                      {TEMPLATE_KEYS.map((key) => (
                         <button
                           key={key}
                           onClick={() => applyTemplate(key)}
@@ -641,8 +542,8 @@ export default function PdfGeneratorPage() {
                             activeTemplate === key ? 'text-[#8a6d1f] bg-[#d4af37]/10 font-semibold' : 'text-slate-600'
                           }`}
                         >
-                          <span className="text-base">{TEMPLATES[key].icon}</span>
-                          <span className="flex-1">{TEMPLATES[key].name}</span>
+                          <span className="text-base">{TEMPLATE_META[key].icon}</span>
+                          <span className="flex-1">{t.pdf.templates[key].name}</span>
                           {activeTemplate === key && <Check className="w-3.5 h-3.5 ml-auto text-[#8a6d1f]" />}
                         </button>
                       ))}
@@ -708,18 +609,18 @@ export default function PdfGeneratorPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                   <div className="sm:col-span-2 lg:col-span-2">
                     <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
-                      Document Title (ডকুমেন্টের শিরোনাম)
+                      {t.pdf.ui.fieldDocTitle}
                     </label>
                     <input
                       value={docTitle}
-                      onChange={(e) => setDocTitle(e.target.value)}
+                      onChange={(e) => { titleDirtyRef.current = true; setDocTitle(e.target.value) }}
                       className="w-full bg-slate-900/[0.04] border border-slate-900/10 rounded-lg px-3 py-1.5 text-xs text-slate-900 focus:outline-none focus:border-[#d4af37]/50"
                       placeholder="OFFICIAL NOTICE"
                     />
                   </div>
                   <div>
                     <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
-                      Reference No (স্মারক নম্বর)
+                      {t.pdf.ui.fieldRefNo}
                     </label>
                     <input
                       value={docRef}
@@ -730,7 +631,7 @@ export default function PdfGeneratorPage() {
                   </div>
                   <div>
                     <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
-                      Branch / Scope (শাখা বা পরিধি)
+                      {t.pdf.ui.fieldBranch}
                     </label>
                     <input
                       value={docBranch}
@@ -741,7 +642,7 @@ export default function PdfGeneratorPage() {
                   </div>
                   <div>
                     <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
-                      Prepared By (প্রস্তুতকারী)
+                      {t.pdf.ui.fieldPreparedBy}
                     </label>
                     <input
                       value={docPreparedBy}
@@ -759,7 +660,7 @@ export default function PdfGeneratorPage() {
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
                         <span className="w-2 h-2 rounded-full bg-amber-400" />
-                        Watermark (ওয়াটারমার্ক)
+                        {t.pdf.ui.fieldWatermark}
                       </span>
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input
@@ -821,7 +722,7 @@ export default function PdfGeneratorPage() {
                   {/* Address Card Toggle */}
                   <div className="bg-slate-900/[0.04] p-3 rounded-xl border border-slate-900/10 flex flex-col justify-between">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-slate-700">Address Card (ঠিকানা)</span>
+                      <span className="text-xs font-semibold text-slate-700">{t.pdf.ui.addressCard}</span>
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input
                           type="checkbox"
@@ -850,7 +751,7 @@ export default function PdfGeneratorPage() {
                   {/* Signature Block Toggle */}
                   <div className="bg-slate-900/[0.04] p-3 rounded-xl border border-slate-900/10 flex flex-col justify-between">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-slate-700">Signature Block (স্বাক্ষর)</span>
+                      <span className="text-xs font-semibold text-slate-700">{t.pdf.ui.signatureBlock}</span>
                       <label className="relative inline-flex items-center cursor-pointer">
                         <input
                           type="checkbox"
@@ -946,10 +847,10 @@ export default function PdfGeneratorPage() {
             <div className="bg-white border-b border-slate-900/8 px-2.5 py-2 flex items-center gap-1.5 flex-wrap">
               {/* History */}
               <div className="flex items-center bg-slate-900/[0.04] rounded-lg p-0.5">
-                <TBtn onClick={() => exec('undo')} title="Undo (পূর্বাবস্থায়)">
+                <TBtn onClick={() => exec('undo')} title={t.pdf.ui.undo}>
                   <Undo className="w-3.5 h-3.5" />
                 </TBtn>
-                <TBtn onClick={() => exec('redo')} title="Redo (পুনরায়)">
+                <TBtn onClick={() => exec('redo')} title={t.pdf.ui.redo}>
                   <Redo className="w-3.5 h-3.5" />
                 </TBtn>
               </div>
@@ -1034,7 +935,7 @@ export default function PdfGeneratorPage() {
                   title="Font Family"
                 >
                   <span className="font-bangla font-bold text-sm text-[#8a6d1f]">অ</span>
-                  <span className="text-[11px] hidden sm:inline">ফন্ট</span>
+                  <span className="text-[11px] hidden sm:inline">{t.pdf.ui.fontLabel}</span>
                   <ChevronDown className="w-3 h-3 opacity-50" />
                 </button>
 
@@ -1058,7 +959,7 @@ export default function PdfGeneratorPage() {
                           }`}
                           style={{ fontFamily: f.value }}
                         >
-                          <span>{f.label}</span>
+                          <span>{f.labelKey ? t.pdf.ui[f.labelKey] : f.label}</span>
                           {activeFont === f.value && <Check className="w-3 h-3 text-[#8a6d1f]" />}
                         </button>
                       ))}
@@ -1157,7 +1058,7 @@ export default function PdfGeneratorPage() {
               <div className="mb-2 flex items-center justify-between text-[10px] text-slate-500 uppercase tracking-wider">
                 <span className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  এখানে টাইপ বা পেস্ট করুন (বাংলা ও English)
+                  {t.pdf.ui.editorPlaceholder}
                 </span>
                 <span className="text-[#8a6d1f]">Rich Text Editor</span>
               </div>
@@ -1175,6 +1076,7 @@ export default function PdfGeneratorPage() {
                   fontSize: '13.5px',
                   outline: 'none',
                 }}
+                onInput={() => { contentDirtyRef.current = true }}
                 onPaste={(e) => {
                   e.preventDefault()
                   const text = e.clipboardData.getData('text/plain')
@@ -1183,7 +1085,7 @@ export default function PdfGeneratorPage() {
               />
 
               <div className="mt-2 text-[10px] text-slate-500 flex items-center justify-between">
-                <span>* বাংলা যুক্তবর্ণ ও ফন্ট স্বয়ংক্রিয়ভাবে নিখুঁত রেন্ডার হবে।</span>
+                <span>{t.pdf.ui.renderNote}</span>
                 <span>A4 Corporate Standards</span>
               </div>
             </div>

@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Landmark, RefreshCw, Plus, Pencil, CheckCircle2, AlertTriangle } from 'lucide-react'
 import { PageHead } from '../ui'
+import { useLanguage } from '@/lib/i18n/provider'
 
 // Accounts A4 — Bank Reconciliation register. Data: GET
 // /api/accounts/bank (one summary row per bank account: journal /
@@ -54,6 +55,7 @@ const takaOrDash = (v: string | number | null | undefined) => (v == null || v ==
 const inputCls = 'w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500'
 
 export default function BankReconciliationPage() {
+  const { t } = useLanguage()
   const [data, setData] = useState<Payload | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -168,7 +170,7 @@ export default function BankReconciliationPage() {
 
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <PageHead icon={<Landmark className="w-6 h-6 text-emerald-600" />} title="Match with Bank" bangla="ব্যাংকের খাতার সাথে আমাদের হিসাব মেলানো" tech="Bank Reconciliation">
+      <PageHead icon={<Landmark className="w-6 h-6 text-emerald-600" />} title={t.accounts.head.bank.title} bangla={t.accounts.head.bank.sub} tech={t.accounts.head.bank.tech}>
         <div className="flex gap-2">
           <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh

@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Inbox, RefreshCw, AlertTriangle, CheckCircle2, ArrowRight, HandMetal, Flag } from 'lucide-react'
 import { PageHead } from '../ui'
+import { useLanguage } from '@/lib/i18n/provider'
 
 // Accounts A9 — Exceptions Inbox. Data: GET /api/accounts/exceptions
 // (stored posting exceptions with the open → acknowledged →
@@ -49,6 +50,7 @@ const SEV_BORDER: Record<string, string> = {
 }
 
 export default function ExceptionsInboxPage() {
+  const { t } = useLanguage()
   const [items, setItems] = useState<InboxItem[] | null>(null)
   const [counts, setCounts] = useState<Counts | null>(null)
   const [loading, setLoading] = useState(true)
@@ -108,7 +110,7 @@ export default function ExceptionsInboxPage() {
 
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <PageHead icon={<Inbox className="w-6 h-6 text-emerald-600" />} title="Needs Attention" bangla="যেখানে অমিল বা সমস্যা আছে" tech="Exceptions Inbox">
+      <PageHead icon={<Inbox className="w-6 h-6 text-emerald-600" />} title={t.accounts.head.exceptions.title} bangla={t.accounts.head.exceptions.sub} tech={t.accounts.head.exceptions.tech}>
         <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
         </button>

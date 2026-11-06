@@ -18,6 +18,7 @@ import DepositSlipModal from '@/components/DepositSlipModal'
 import { parseKhuchraAmount } from '@/lib/branch-deposit-utils'
 import { useBranchAuth } from '@/lib/hooks/use-branch-auth'
 import { fetchWithCache, getCachedData, setCachedData, invalidateBranchCache } from '@/lib/branch-cache'
+import { useLanguage } from '@/lib/i18n/provider'
 
 // the only direct data reads left in the fixed
 // copy were branches and the per-branch drawer float — both now go
@@ -128,6 +129,7 @@ type LiveFinancialReportResponse = {
 }
 
 export default function BranchFinancialReportsPage() {
+  const { t } = useLanguage()
   const router = useRouter()
   const { user, isAdmin, isAuthorized, isLoading: isAuthLoading } = useBranchAuth()
 
@@ -1515,7 +1517,7 @@ export default function BranchFinancialReportsPage() {
                     <p className="text-sm font-bold font-mono text-emerald-600 mt-0.5">{fmt(inspectBranch.digitalSales)}</p>
                   </div>
                   <div className="p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5">
-                    <p className="text-[9px] uppercase tracking-wider text-slate-500">Total Sales (মোট বিক্রি)</p>
+                    <p className="text-[9px] uppercase tracking-wider text-slate-500">{t.branch.financialReports.totalSales}</p>
                     <p className="text-sm font-bold font-serif text-[#15803d] mt-0.5">{fmt(inspectBranch.totalSales)}</p>
                   </div>
                   <div className="p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5">

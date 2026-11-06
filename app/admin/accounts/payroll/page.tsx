@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Wallet, RefreshCw, Plus, AlertTriangle, CheckCircle2, Printer, Download } from 'lucide-react'
 import { PageHead, PrintHeader, PrintFooter, downloadPdf, bdt } from '../ui'
+import { useLanguage } from '@/lib/i18n/provider'
 
 // Accounts A6 — Payroll runs. Data: GET /api/accounts/payroll.
 // A run drafts the month's already-issued payments for review and
@@ -40,6 +41,7 @@ const STATUS_STYLE: Record<string, string> = {
 }
 
 export default function PayrollRunsPage() {
+  const { t } = useLanguage()
   const [runs, setRuns] = useState<RunRow[] | null>(null)
   const [settingsCount, setSettingsCount] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
@@ -104,7 +106,7 @@ export default function PayrollRunsPage() {
 
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <PageHead icon={<Wallet className="w-6 h-6 text-emerald-600" />} title="Salary Accounts" bangla="বেতনের হিসাব এক জায়গায়" tech="Payroll">
+      <PageHead icon={<Wallet className="w-6 h-6 text-emerald-600" />} title={t.accounts.head.payroll.title} bangla={t.accounts.head.payroll.sub} tech={t.accounts.head.payroll.tech}>
         <div className="flex flex-wrap gap-2">
           <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh

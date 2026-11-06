@@ -22,6 +22,7 @@ import { generatePdf } from '@/lib/pdf-generator'
 import { getCachedData, setCachedData, invalidateBranchCache } from '@/lib/branch-cache'
 import { roundMoney } from '@/lib/money'
 import PaymentAccountCard, { type PaymentAccountField } from '@/components/PaymentAccountCard'
+import { useLanguage } from '@/lib/i18n/provider'
 
 // Part B: the requester's payment details (stored on the request
 // itself — the destination the employee entered for reimbursement)
@@ -98,6 +99,7 @@ const STATUS_CONFIG: Record<string, { label: string; cls: string; dot: string }>
 
 // ─────────────────────────────────────────────────────────────────────────────
 export default function AdminBranchExpensesPage() {
+  const { t } = useLanguage()
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -1615,7 +1617,7 @@ export default function AdminBranchExpensesPage() {
                         <Banknote className="w-4 h-4 text-emerald-600" />
                         <div>
                           <p className="text-xs font-semibold text-emerald-600">Cash (Branch Drawer)</p>
-                          <p className="text-[10px] text-emerald-600">Branch-এর daily cash closing থেকে deduct হবে।</p>
+                          <p className="text-[10px] text-emerald-600">{t.branch.expenseNotes.adminDeduct}</p>
                         </div>
                       </div>
                     </div>
@@ -1660,7 +1662,7 @@ export default function AdminBranchExpensesPage() {
                     />
                     {actionRequest.payment_method === 'cash' && (
                       <p className="text-[10px] text-emerald-600 mt-1">
-                        ✅ Cash expense পায়ের daily closing cash থেকে automatically deduct হবে।
+                        ✅ {t.branch.expenseNotes.adminCashAutoDeduct}
                       </p>
                     )}
                   </div>

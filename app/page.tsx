@@ -22,6 +22,7 @@ import Link from 'next/link'
 
 import { useRouter } from 'next/navigation'
 import { useAuth } from './context/AuthContext'
+import { useLanguage, fill } from '@/lib/i18n/provider'
 
 // authentication goes through the app's own API
 // (/api/auth/login, /api/auth/register backed by Prisma) — there is
@@ -30,6 +31,7 @@ import { useAuth } from './context/AuthContext'
 export default function AuthPage() {
 
   const { role: loginUserRole, isAuthenticated, verificationStatus, loading, refresh } = useAuth();
+  const { t } = useLanguage();
 
 
   const [tab, setTab] = useState<'login' | 'register'>('login')
@@ -38,6 +40,19 @@ export default function AuthPage() {
   const [showRegPassword, setShowRegPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error', message: string } | null>(null)
+  // Login lockout state (HTTP 423 from /api/auth/login): shown as its
+  // own prominent banner, separate from the generic error feedback,
+  // so a locked user can tell a lock apart from a wrong password.
+  const [lockInfo, setLockInfo] = useState<{ lockedUntil: string } | null>(null)
+  const [, setLockTick] = useState(0)
+
+  // While the lock banner is up, re-render periodically so the
+  // "try again in N minutes" line counts down.
+  useEffect(() => {
+    if (!lockInfo) return
+    const id = setInterval(() => setLockTick((n) => n + 1), 20000)
+    return () => clearInterval(id)
+  }, [lockInfo])
 
   // Role Selection Modal
   const [showRoleModal, setShowRoleModal] = useState(false)
@@ -242,6 +257,7 @@ export default function AuthPage() {
   const onLogin = async (data: any) => {
     setIsSubmitting(true)
     setFeedback(null)
+    setLockInfo(null)
 
     // Hardcoded bypasses removed for security.
     // All users must authenticate via the app auth API.
@@ -257,6 +273,13 @@ export default function AuthPage() {
         body: JSON.stringify({ email: data.email, password: data.password }),
       });
       const loginData = await loginRes.json();
+      if (loginData?.error === 'locked') {
+        // Locked out (too many failed attempts): show the dedicated
+        // locked banner instead of the generic error message.
+        setLockInfo({ lockedUntil: loginData.lockedUntil });
+        setIsSubmitting(false);
+        return;
+      }
       if (!loginRes.ok) throw new Error(loginData.error || 'Authentication failed');
       const authUser = loginData.user;
       const profile = loginData.profile;
@@ -568,14 +591,14 @@ export default function AuthPage() {
           {/* Form Tabs Toggle */}
           <div className="flex w-full bg-white p-1.5 rounded-full border border-slate-900/5 mb-8 relative">
             <button
-              onClick={() => { setTab('login'); setFeedback(null); }}
+              onClick={() => { setTab('login'); setFeedback(null); setLockInfo(null); }}
               className={`flex-1 text-center py-2.5 rounded-full text-xs font-semibold tracking-wide transition-all z-10 ${tab === 'login' ? 'text-white font-bold' : 'text-slate-500'
                 }`}
             >
               Sign In to Account
             </button>
             <button
-              onClick={() => { setTab('register'); setFeedback(null); }}
+              onClick={() => { setTab('register'); setFeedback(null); setLockInfo(null); }}
               className={`flex-1 text-center py-2.5 rounded-full text-xs font-semibold tracking-wide transition-all z-10 ${tab === 'register' ? 'text-white font-bold' : 'text-slate-500'
                 }`}
             >
@@ -607,6 +630,40 @@ export default function AuthPage() {
               >
                 {feedback.type === 'success' ? <Check className="w-4 h-4 shrink-0 mt-0.5" /> : <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5" />}
                 <span>{feedback.message}</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Login lockout banner — its own state, distinct from the
+              generic error above: the account/IP is temporarily
+              deactivated after too many wrong-password attempts. */}
+          <AnimatePresence mode="wait">
+            {tab === 'login' && lockInfo && (
+              <motion.div
+                key="login-locked"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="p-4 rounded-xl border mb-6 flex gap-3 bg-amber-500/10 border-amber-500/30 text-amber-700"
+                role="alert"
+              >
+                <Lock className="w-4 h-4 shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <p className="text-xs font-bold">{t.auth.lockedTitle}</p>
+                  <p className="text-xs leading-relaxed">{t.auth.lockedMessage}</p>
+                  {(() => {
+                    const msLeft = new Date(lockInfo.lockedUntil).getTime() - Date.now()
+                    if (!Number.isFinite(msLeft)) return null
+                    const minutes = Math.ceil(msLeft / 60000)
+                    return (
+                      <p className="text-xs font-semibold">
+                        {minutes > 1
+                          ? fill(t.auth.lockedRetryMinutes, { minutes })
+                          : t.auth.lockedRetryOneMinute}
+                      </p>
+                    )
+                  })()}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>

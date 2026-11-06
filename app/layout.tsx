@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from './context/AuthContext';
+import { LanguageProvider } from '../lib/i18n/provider';
 import SidebarWrapper from '../components/SidebarWrapper';
 import PwaInitializer from '../components/PwaInitializer';
 
@@ -110,10 +111,12 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col md:flex-row font-sans" suppressHydrationWarning={true}>
         <PwaInitializer />
         <AuthProvider>
-          <SidebarWrapper />
-          <div className="flex-1 min-w-0 w-full">
-            {children}
-          </div>
+          <LanguageProvider>
+            <SidebarWrapper />
+            <div className="flex-1 min-w-0 w-full">
+              {children}
+            </div>
+          </LanguageProvider>
         </AuthProvider>
       </body>
     </html>

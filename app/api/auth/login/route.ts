@@ -7,7 +7,7 @@ import { toPlain } from '@/lib/server/respond'
 import { logAudit, requestMeta } from '@/lib/server/audit'
 import { isPartnerAccount } from '@/lib/server/auth'
 import {
-  isRateLimited,
+  getRateLimitState,
   recordRateLimitFailure,
   resetRateLimit,
 } from '@/lib/server/rate-limit'
@@ -30,9 +30,15 @@ import { getAdminEmails, sendAccountLockoutAlertToAdmins } from '@/lib/email-ser
 // rate_limit_counters — 'login_account' (key = lowercased email)
 // and 'login_ip' (key = client IP): 5 failures inside a 15-minute
 // window lock the key for 15 minutes. The lock is checked BEFORE
-// password verification and the response stays the generic
-// 'Invalid login credentials' — lock state is never revealed in
-// the body. On success the ACCOUNT counter resets; the IP counter
+// password verification. Per the owner's 2026-11-06 order, a locked
+// attempt is answered with a DISTINCT response (HTTP 423, body
+// { error: 'locked', lockedUntil }) so the login page can show a
+// clear "temporarily deactivated" message with the remaining time —
+// the generic 'Invalid login credentials' error was misleading
+// users into thinking their correct password was wrong. Ordinary
+// failures below the lock threshold keep the generic error, and the
+// failure that TRIGGERS the lock already returns the locked
+// response. On success the ACCOUNT counter resets; the IP counter
 // is left to decay by its window (one shared office IP must not be
 // permanently punished, and a success proves nothing about other
 // accounts being attacked from the same IP). On the lock
@@ -43,6 +49,26 @@ const FAILURE_WINDOW_MS = 15 * 60 * 1000
 const LOCK_MS = 15 * 60 * 1000
 const MAX_FAILURES = 5
 const GENERIC_ERROR = 'Invalid login credentials'
+
+/** The locked-out response: HTTP 423 with a machine-readable body
+ *  ({ error: 'locked', lockedUntil, retryAfterSeconds }) so the
+ *  login page can render its dedicated locked state and tell the
+ *  user when the account can be tried again. */
+function lockedResponse(lockedUntil: Date | null) {
+  const until = lockedUntil ?? new Date(Date.now() + LOCK_MS)
+  const retryAfterSeconds = Math.max(
+    1,
+    Math.ceil((until.getTime() - Date.now()) / 1000)
+  )
+  return NextResponse.json(
+    {
+      error: 'locked',
+      lockedUntil: until.toISOString(),
+      retryAfterSeconds,
+    },
+    { status: 423, headers: { 'Retry-After': String(retryAfterSeconds) } }
+  )
+}
 
 /** Lockout side-effects: admin notifications + email + audit.
  *  Every step is fail-soft — alerts must never break login. */
@@ -144,17 +170,26 @@ export async function POST(req: Request) {
       select: { id: true, email: true, password_hash: true, legacy_bcrypt_hash: true },
     })
 
-    // S3: lock check BEFORE password verification. Generic body —
-    // the caller cannot tell a lock from a wrong password.
-    let lockedNow = false
+    // S3: lock check BEFORE password verification. When either
+    // bucket is locked, the response is the distinct locked body —
+    // even a correct password gets it, so the user can tell a lock
+    // apart from a wrong password. When both buckets are locked the
+    // lock clears only when the LATER one expires.
+    let lockedUntil: Date | null = null
     try {
-      lockedNow =
-        (await isRateLimited('login_account', normalizedEmail)) ||
-        (await isRateLimited('login_ip', ipKey))
+      const [accountState, ipState] = await Promise.all([
+        getRateLimitState('login_account', normalizedEmail),
+        getRateLimitState('login_ip', ipKey),
+      ])
+      for (const s of [accountState, ipState]) {
+        if (s?.locked && s.lockedUntil && (!lockedUntil || s.lockedUntil > lockedUntil)) {
+          lockedUntil = s.lockedUntil
+        }
+      }
     } catch (err) {
       console.error('[login] rate-limit check failed (proceeding):', err)
     }
-    if (lockedNow) {
+    if (lockedUntil) {
       await logAudit({
         caller: null,
         req,
@@ -167,7 +202,7 @@ export async function POST(req: Request) {
         entityId: authUser?.id ?? null,
         newValue: { email: normalizedEmail, reason: 'locked' },
       })
-      return NextResponse.json({ error: GENERIC_ERROR }, { status: 401 })
+      return lockedResponse(lockedUntil)
     }
 
     const check = authUser
@@ -178,6 +213,7 @@ export async function POST(req: Request) {
       // S3: count the failure on both buckets (unknown emails count
       // against the submitted email string + the IP). A lock
       // transition on either bucket fires the admin alert once.
+      let failureLockedUntil: Date | null = null
       try {
         const accountResult = await recordRateLimitFailure(
           'login_account',
@@ -218,6 +254,15 @@ export async function POST(req: Request) {
             })
           }
         }
+        // If this failure locked either bucket, remember when the
+        // lock ends (the later of the two) so the response below is
+        // the locked one — the user learns about the lockout from
+        // the very attempt that caused it.
+        for (const r of [accountResult, ipResult]) {
+          if (r.locked && r.lockedUntil && (!failureLockedUntil || r.lockedUntil > failureLockedUntil)) {
+            failureLockedUntil = r.lockedUntil
+          }
+        }
       } catch (err) {
         console.error('[login] rate-limit record failed (fail-soft):', err)
       }
@@ -234,6 +279,7 @@ export async function POST(req: Request) {
         entityId: authUser?.id ?? null,
         newValue: { email: normalizedEmail, reason: 'invalid_credentials' },
       })
+      if (failureLockedUntil) return lockedResponse(failureLockedUntil)
       return NextResponse.json({ error: GENERIC_ERROR }, { status: 401 })
     }
 

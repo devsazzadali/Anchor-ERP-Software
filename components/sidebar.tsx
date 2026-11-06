@@ -10,6 +10,8 @@ import {
   Building2, PiggyBank, Banknote, Calculator, FileText, History, BarChart3, UserCog, ChevronDown, Laptop,
   Calendar, FileOutput, BookMarked, Landmark
 } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n/provider';
+import type { Dictionary } from '@/lib/i18n/en';
 
 export type AllowedRole = 'admin' | 'super_admin' | 'partner' | 'employee' | 'head_office' | 'branch_manager';
 
@@ -21,134 +23,148 @@ export interface SidebarProps {
 }
 
 // ── Navigation definitions ─────────────────────────────────────────────────
+// i18n: items carry a dictionary KEY (labelKey), never a display
+// string — the label is resolved at render from the active
+// dictionary (lib/i18n), so a language switch re-renders the whole
+// navigation in the new language with no stale captured strings.
 
-const adminNavigation = [
-  { name: 'System Telemetry',        icon: LayoutDashboard, href: '/admin/dashboard' },
+type NavLabelKey = keyof Dictionary['nav'];
 
-  { name: 'User Directory',          icon: User,            href: '/admin/users'     },
-  { name: 'Branch Management',       icon: MapPin,          href: '/admin/branches'  },
-  { name: 'Master Salary Ledger',    icon: Receipt,         href: '/admin/salaries'  },
-  { name: 'Unified Fin Summary',     icon: Calculator,      href: '/admin/financial-summary' },
-  { name: 'Financial Reports',       icon: Banknote,        href: '/admin/branch-financial-reports' },
-  { name: 'Payment Proofs & Payouts',icon: FileCheck,       href: '/admin/payments' },
-  { name: 'Branch Chalans',          icon: Package,         href: '/admin/branch-chalans' },
-  { name: 'KYC Verifications',       icon: ShieldAlert,     href: '/admin/kyc'       },
-  { name: 'User Settings Panel',     icon: UserCog,         href: '/admin/user-settings' },
-  { name: 'Security Audit Log',      icon: Shield,          href: '/admin/audit'     },
-  { name: 'Active Sessions',         icon: Laptop,          href: '/admin/sessions'  },
-  { name: 'Ledger Heads',            icon: BookMarked,      href: '/admin/branch-expenses' },
-  { name: 'Expense Requests',        icon: Receipt,         href: '/admin/expense-requests' },
-  { name: 'General Expenses',        icon: Wallet,          href: '/admin/expenses'  },
-  { name: 'Task Management',         icon: ListTodo,        href: '/admin/tasks'     },
-  { name: 'PDF Generator',           icon: FileOutput,      href: '/admin/pdf-generator' },
+interface NavItem {
+  labelKey: NavLabelKey;
+  icon: React.ComponentType<{ className?: string }>;
+  href: string;
+  divider?: boolean;
+  subItems?: { labelKey: NavLabelKey; href: string }[];
+}
+
+const adminNavigation: NavItem[] = [
+  { labelKey: 'systemTelemetry',        icon: LayoutDashboard, href: '/admin/dashboard' },
+
+  { labelKey: 'userDirectory',          icon: User,            href: '/admin/users'     },
+  { labelKey: 'branchManagement',       icon: MapPin,          href: '/admin/branches'  },
+  { labelKey: 'masterSalaryLedger',    icon: Receipt,         href: '/admin/salaries'  },
+  { labelKey: 'unifiedFinSummary',     icon: Calculator,      href: '/admin/financial-summary' },
+  { labelKey: 'financialReports',       icon: Banknote,        href: '/admin/branch-financial-reports' },
+  { labelKey: 'paymentProofs', icon: FileCheck,       href: '/admin/payments' },
+  { labelKey: 'branchChalans',          icon: Package,         href: '/admin/branch-chalans' },
+  { labelKey: 'kycVerifications',       icon: ShieldAlert,     href: '/admin/kyc'       },
+  { labelKey: 'userSettingsPanel',     icon: UserCog,         href: '/admin/user-settings' },
+  { labelKey: 'securityAuditLog',      icon: Shield,          href: '/admin/audit'     },
+  { labelKey: 'activeSessions',         icon: Laptop,          href: '/admin/sessions'  },
+  { labelKey: 'ledgerHeads',            icon: BookMarked,      href: '/admin/branch-expenses' },
+  { labelKey: 'expenseRequests',        icon: Receipt,         href: '/admin/expense-requests' },
+  { labelKey: 'generalExpenses',        icon: Wallet,          href: '/admin/expenses'  },
+  { labelKey: 'taskManagement',         icon: ListTodo,        href: '/admin/tasks'     },
+  { labelKey: 'pdfGenerator',           icon: FileOutput,      href: '/admin/pdf-generator' },
   {
-    name: 'Branch Accounts',
+    labelKey: 'branchAccounts',
     icon: Building2,
     href: '#',
     divider: true,
     subItems: [
-      { name: 'Accounts Overview', href: '/admin/branch-accounts' },
-      { name: 'Deposit Approvals', href: '/admin/branch-accounts/deposit-approvals' },
+      { labelKey: 'accountsOverview', href: '/admin/branch-accounts' },
+      { labelKey: 'depositApprovals', href: '/admin/branch-accounts/deposit-approvals' },
       // F6: duplicate 'Financial Reports' (/admin/branch-financial-reports)
       // removed from this group — it already has a main-list entry above.
-      { name: 'Change Requisitions', href: '/admin/bundle-requests' },
-      { name: 'Reconciliation',   href: '/admin/branch-accounts/reconciliation' },
-      { name: 'Branch Performance', href: '/admin/branch-performance' }
+      { labelKey: 'changeRequisitions', href: '/admin/bundle-requests' },
+      { labelKey: 'reconciliation',   href: '/admin/branch-accounts/reconciliation' },
+      { labelKey: 'branchPerformance', href: '/admin/branch-performance' }
     ]
   },
   {
     // Accounts A1: the double-entry books section (admin-only —
     // this navigation only renders for admins). Separate from
     // Branch Accounts, which stays the branch cash-control module.
-    name: 'Accounts',
+    labelKey: 'accounts',
     icon: Landmark,
     href: '#',
     divider: true,
     subItems: [
-      { name: 'Accounts at a Glance', href: '/admin/accounts' },
+      { labelKey: 'accountsAtAGlance', href: '/admin/accounts' },
       // Accounts A9: the exceptions inbox — blocked postings with
       // a workflow + every derived data signal. The badge shows
       // the live open-item count (fetched below, admin nav only).
-      { name: 'Needs Attention', href: '/admin/accounts/exceptions' },
-      { name: 'Money Categories', href: '/admin/accounts/chart' },
-      { name: 'All Entries', href: '/admin/accounts/journal' },
-      { name: 'Starting Figures', href: '/admin/accounts/opening' },
+      { labelKey: 'needsAttention', href: '/admin/accounts/exceptions' },
+      { labelKey: 'moneyCategories', href: '/admin/accounts/chart' },
+      { labelKey: 'allEntries', href: '/admin/accounts/journal' },
+      { labelKey: 'startingFigures', href: '/admin/accounts/opening' },
       // Accounts A3: period close & lock, FY rollover.
-      { name: 'Month Open / Close', href: '/admin/accounts/periods' },
+      { labelKey: 'monthOpenClose', href: '/admin/accounts/periods' },
       // Accounts A4: bank accounts, statement import + reconciliation.
-      { name: 'Match with Bank', href: '/admin/accounts/bank' },
+      { labelKey: 'matchWithBank', href: '/admin/accounts/bank' },
       // Accounts A5: counterparties + payables/receivables register with ageing.
-      { name: 'People & Companies', href: '/admin/accounts/parties' },
-      { name: 'To Pay', href: '/admin/accounts/payables' },
+      { labelKey: 'peopleCompanies', href: '/admin/accounts/parties' },
+      { labelKey: 'toPay', href: '/admin/accounts/payables' },
       // Accounts A6: the monthly payroll cycle (disburses through
       // the one shared salary path).
-      { name: 'Salary Accounts', href: '/admin/accounts/payroll' },
+      { labelKey: 'salaryAccounts', href: '/admin/accounts/payroll' },
       // Accounts A7: VAT/TDS configuration + register (dormant
       // until the owner/CA enters rates).
-      { name: 'VAT & Tax', href: '/admin/accounts/tax' },
+      { labelKey: 'vatTax', href: '/admin/accounts/tax' },
       // Accounts A8: cheque register — issued/received lifecycle,
       // clearing posts through the journal; PDC due list.
-      { name: 'Cheques', href: '/admin/accounts/cheques' },
+      { labelKey: 'cheques', href: '/admin/accounts/cheques' },
       // Accounts A2: statements over the journal.
-      { name: 'Statements', href: '/admin/accounts/statements' },
-      { name: 'Books Check', href: '/admin/accounts/statements/trial-balance' },
-      { name: 'Profit & Loss (লাভ-ক্ষতি)', href: '/admin/accounts/statements/pl' },
-      { name: 'What We Own & Owe', href: '/admin/accounts/statements/balance-sheet' },
+      { labelKey: 'statements', href: '/admin/accounts/statements' },
+      { labelKey: 'booksCheck', href: '/admin/accounts/statements/trial-balance' },
+      { labelKey: 'profitLoss', href: '/admin/accounts/statements/pl' },
+      { labelKey: 'whatWeOwnOwe', href: '/admin/accounts/statements/balance-sheet' },
       // Accounts A10: one-click auditor package (ZIP/JSON) built
       // from the same services as every screen above.
-      { name: 'Auditor Report', href: '/admin/accounts/auditor' },
+      { labelKey: 'auditorReport', href: '/admin/accounts/auditor' },
     ]
   },
-  { name: 'System Settings',         icon: Settings,        href: '/admin/settings', divider: true },
+  { labelKey: 'systemSettings',         icon: Settings,        href: '/admin/settings', divider: true },
 ];
 
-const partnerNavigation = [
-  { name: 'Partner Dashboard',  icon: LayoutDashboard, href: '/dashboard'                    },
-  { name: 'Profile Settings',   icon: User,            href: '/dashboard/settings'            },
-  { name: 'Expense Requests',   icon: Wallet,          href: '/dashboard/expense-requests'    },
+const partnerNavigation: NavItem[] = [
+  { labelKey: 'partnerDashboard',  icon: LayoutDashboard, href: '/dashboard'                    },
+  { labelKey: 'profileSettings',   icon: User,            href: '/dashboard/settings'            },
+  { labelKey: 'expenseRequests',   icon: Wallet,          href: '/dashboard/expense-requests'    },
   // FR-13: the partner expense-issuance workflow (1,819-line page)
   // existed but was unreachable from navigation — linked, not deleted.
-  { name: 'Branch Expenses',    icon: Receipt,         href: '/dashboard/branch-expenses'      },
-  { name: 'Branch Chalans',     icon: Package,         href: '/dashboard/branch-chalans'      },
-  { name: 'Branch Performance', icon: TrendingUp,      href: '/dashboard/branch-performance'  },
-  { name: 'Salary Ledger',      icon: Receipt,         href: '/dashboard/salaries'            },
+  { labelKey: 'branchExpenses',    icon: Receipt,         href: '/dashboard/branch-expenses'      },
+  { labelKey: 'branchChalans',     icon: Package,         href: '/dashboard/branch-chalans'      },
+  { labelKey: 'branchPerformance', icon: TrendingUp,      href: '/dashboard/branch-performance'  },
+  { labelKey: 'salaryLedger',      icon: Receipt,         href: '/dashboard/salaries'            },
   // Dead link removed: '/dashboard/product-chalans' never existed
   // (404 for partners + employees). Chalan work lives under
   // Branch Chalans above.
-  { name: 'Assigned Tasks',     icon: ListTodo,        href: '/dashboard/tasks'               },
+  { labelKey: 'assignedTasks',     icon: ListTodo,        href: '/dashboard/tasks'               },
 ];
 
-const employeeNavigation = [
-  { name: 'Employee Portal',    icon: LayoutDashboard, href: '/dashboard'                    },
-  { name: 'Profile Settings',   icon: User,            href: '/dashboard/settings'            },
-  { name: 'Salary Ledger',      icon: Receipt,         href: '/dashboard/salaries'            },
-  { name: 'Branch Chalans',     icon: Package,         href: '/dashboard/branch-chalans'      },
-  { name: 'Assigned Tasks',     icon: ListTodo,        href: '/dashboard/tasks'               },
+const employeeNavigation: NavItem[] = [
+  { labelKey: 'employeePortal',    icon: LayoutDashboard, href: '/dashboard'                    },
+  { labelKey: 'profileSettings',   icon: User,            href: '/dashboard/settings'            },
+  { labelKey: 'salaryLedger',      icon: Receipt,         href: '/dashboard/salaries'            },
+  { labelKey: 'branchChalans',     icon: Package,         href: '/dashboard/branch-chalans'      },
+  { labelKey: 'assignedTasks',     icon: ListTodo,        href: '/dashboard/tasks'               },
 ];
 
-const headOfficeNavigation = [
-  { name: 'Corporate Portal',   icon: LayoutDashboard, href: '/dashboard'                    },
-  { name: 'Profile Settings',   icon: User,            href: '/dashboard/settings'            },
-  { name: 'Salary Ledger',      icon: Receipt,         href: '/dashboard/salaries'            },
-  { name: 'Branch Chalans',     icon: Package,         href: '/dashboard/branch-chalans'      },
-  { name: 'Branch Performance', icon: TrendingUp,      href: '/dashboard/branch-performance'  },
-  { name: 'Assigned Tasks',     icon: ListTodo,        href: '/dashboard/tasks'               },
+const headOfficeNavigation: NavItem[] = [
+  { labelKey: 'corporatePortal',   icon: LayoutDashboard, href: '/dashboard'                    },
+  { labelKey: 'profileSettings',   icon: User,            href: '/dashboard/settings'            },
+  { labelKey: 'salaryLedger',      icon: Receipt,         href: '/dashboard/salaries'            },
+  { labelKey: 'branchChalans',     icon: Package,         href: '/dashboard/branch-chalans'      },
+  { labelKey: 'branchPerformance', icon: TrendingUp,      href: '/dashboard/branch-performance'  },
+  { labelKey: 'assignedTasks',     icon: ListTodo,        href: '/dashboard/tasks'               },
 ];
 
 // ── Branch Manager navigation (Strictly Branch Accounts & Operations) ────────
-const branchManagerNavigation = [
-  { name: 'Branch Dashboard',   icon: LayoutDashboard, href: '/dashboard/branch-accounts' },
-  { name: 'Daily Closing',      icon: Calendar,        href: '/dashboard/branch-accounts/daily-closing' },
-  { name: 'Cash Ledger',        icon: Banknote,        href: '/dashboard/branch-accounts/cash-ledger' },
-  { name: 'Bank Deposit',       icon: PiggyBank,       href: '/dashboard/branch-accounts/bank-deposit' },
-  { name: 'Deposit History',    icon: History,         href: '/dashboard/branch-accounts/deposit-history' },
-  { name: 'Change Requisition', icon: Wallet,          href: '/dashboard/branch-accounts/bundle-requests' },
-  { name: 'Bank Statements',    icon: FileText,        href: '/dashboard/branch-accounts/bank-statement' },
-  { name: 'Sales Summary',      icon: TrendingUp,      href: '/dashboard/branch-accounts/sales-summary' },
-  { name: 'Reconciliation',     icon: BarChart3,       href: '/dashboard/branch-accounts/reconciliation' },
-  { name: 'Monthly Report',     icon: FileText,        href: '/dashboard/branch-accounts/monthly-report' },
-  { name: 'Expense Requests',   icon: Wallet,          href: '/dashboard/expense-requests', divider: true },
-  { name: 'Profile Settings',   icon: User,            href: '/dashboard/settings' },
+const branchManagerNavigation: NavItem[] = [
+  { labelKey: 'branchDashboard',   icon: LayoutDashboard, href: '/dashboard/branch-accounts' },
+  { labelKey: 'dailyClosing',      icon: Calendar,        href: '/dashboard/branch-accounts/daily-closing' },
+  { labelKey: 'cashLedger',        icon: Banknote,        href: '/dashboard/branch-accounts/cash-ledger' },
+  { labelKey: 'bankDeposit',       icon: PiggyBank,       href: '/dashboard/branch-accounts/bank-deposit' },
+  { labelKey: 'depositHistory',    icon: History,         href: '/dashboard/branch-accounts/deposit-history' },
+  { labelKey: 'changeRequisition', icon: Wallet,          href: '/dashboard/branch-accounts/bundle-requests' },
+  { labelKey: 'bankStatements',    icon: FileText,        href: '/dashboard/branch-accounts/bank-statement' },
+  { labelKey: 'salesSummary',      icon: TrendingUp,      href: '/dashboard/branch-accounts/sales-summary' },
+  { labelKey: 'reconciliation',     icon: BarChart3,       href: '/dashboard/branch-accounts/reconciliation' },
+  { labelKey: 'monthlyReport',     icon: FileText,        href: '/dashboard/branch-accounts/monthly-report' },
+  { labelKey: 'expenseRequests',   icon: Wallet,          href: '/dashboard/expense-requests', divider: true },
+  { labelKey: 'profileSettings',   icon: User,            href: '/dashboard/settings' },
 ];
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -196,9 +212,10 @@ function getNavigation(role: AllowedRole) {
 export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: SidebarProps) {
   const router   = useRouter();
   const pathname = usePathname();
+  const { t } = useLanguage();
 
   const [userName, setUserName] = useState<string>('');
-  const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({ 'Branch Accounts': true, 'Branch Management': true });
+  const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({ 'branchAccounts': true });
 
   const toggleMenu = (name: string) => { setExpandedMenus(prev => ({ ...prev, [name]: !prev[name] })); };
   const [userEmail, setUserEmail] = useState<string>('');
@@ -240,7 +257,7 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
   // roles); the API is admin-gated, and any failure just leaves
   // the badge hidden.
   const [exceptionsCount, setExceptionsCount] = useState<number>(0);
-  const hasAccountsNav = navigation.some((n) => n.name === 'Accounts');
+  const hasAccountsNav = navigation.some((n) => n.labelKey === 'accounts');
   useEffect(() => {
     if (!hasAccountsNav) return;
     let cancelled = false;
@@ -277,17 +294,17 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
           <img src="/logos.png" alt="Anchor ERP Official Logo" className="w-12 h-12 object-contain drop-shadow-md shrink-0" />
           <div>
             <h1 className="text-sm font-extrabold tracking-wider text-slate-900 font-serif">ANCHOR ERP</h1>
-            <p className="text-[7.5px] uppercase tracking-[0.25em] text-[#15803d] font-semibold">Enterprise Resource Planning</p>
+            <p className="text-[7.5px] uppercase tracking-[0.25em] text-[#15803d] font-semibold">{t.nav.brandTagline}</p>
           </div>
         </div>
 
         {/* Role badge */}
         <div className="mb-4 px-1">
           <span className="text-[9px] uppercase tracking-widest text-[#15803d]/70 font-semibold">
-            {forcedRole === 'admin' || forcedRole === 'super_admin' ? 'Admin Panel' :
-             forcedRole === 'partner'        ? 'Partner Portal' :
-             forcedRole === 'branch_manager' ? 'Branch Manager' :
-             forcedRole === 'head_office'    ? 'Head Office Portal' : 'Employee Portal'}
+            {forcedRole === 'admin' || forcedRole === 'super_admin' ? t.nav.adminPanel :
+             forcedRole === 'partner'        ? t.nav.partnerPortal :
+             forcedRole === 'branch_manager' ? t.nav.branchManager :
+             forcedRole === 'head_office'    ? t.nav.headOfficePortal : t.nav.employeePortalBadge}
           </span>
         </div>
 
@@ -301,20 +318,21 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
             // exact-match special case (a longer sibling always wins).
             const isActive = node.href !== '#' && node.href === activeTopHref;
 
-            const isMenuExpanded = expandedMenus[node.name] || false;
+            const isMenuExpanded = expandedMenus[node.labelKey] || false;
             const Icon = node.icon;
+            const label = t.nav[node.labelKey];
 
             // If the item has subItems, render a collapsible menu
-            if ((node as any).subItems) {
-              const subItems = (node as any).subItems as { name: string, href: string }[];
+            if (node.subItems) {
+              const subItems = node.subItems;
               const activeSubHref = longestActiveHref(pathname, subItems.map((s) => s.href));
               const isChildActive = activeSubHref !== null;
 
               return (
-                <React.Fragment key={node.name}>
-                  {(node as any).divider && <div className="my-3 border-t border-slate-900/[0.08]" />}
+                <React.Fragment key={node.labelKey}>
+                  {node.divider && <div className="my-3 border-t border-slate-900/[0.08]" />}
                   <button
-                    onClick={() => toggleMenu(node.name)}
+                    onClick={() => toggleMenu(node.labelKey)}
                     className={`w-full flex items-center justify-between px-4 py-2.5 rounded-full text-xs font-medium transition-all group relative cursor-pointer ${
                       isChildActive
                         ? 'text-[#15803d] bg-[#e8f7ee]'
@@ -325,7 +343,7 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
                   >
                     <div className="flex items-center gap-3.5 min-w-0">
                       <Icon className={`w-4 h-4 shrink-0 transition-transform ${isChildActive ? 'text-[#1ca34c]' : 'text-slate-500 group-hover:text-slate-900'}`} />
-                      <span className="min-w-0 break-words leading-snug">{node.name}</span>
+                      <span className="min-w-0 break-words leading-snug">{label}</span>
                     </div>
                     <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isMenuExpanded ? 'rotate-180' : ''}`} />
                   </button>
@@ -336,7 +354,7 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
                         const isSubActive = sub.href === activeSubHref;
                         return (
                           <Link
-                            key={sub.name}
+                            key={sub.labelKey}
                             href={sub.href}
                             onClick={() => { closeMenu && closeMenu(); }}
                             className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs transition-all relative ${
@@ -345,7 +363,7 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
                                 : 'text-slate-500 hover:text-slate-600 hover:bg-slate-900/[0.04]'
                             }`}
                           >
-                            <span className="min-w-0 break-words leading-snug">{sub.name}</span>
+                            <span className="min-w-0 break-words leading-snug">{t.nav[sub.labelKey]}</span>
                             {sub.href === '/admin/accounts/exceptions' && exceptionsCount > 0 && (
                               <span className="ml-auto shrink-0 min-w-5 h-5 px-1 rounded-full bg-rose-600 text-white text-[10px] font-bold inline-flex items-center justify-center">
                                 {exceptionsCount}
@@ -361,9 +379,9 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
             }
 
             return (
-              <React.Fragment key={node.name}>
+              <React.Fragment key={node.labelKey}>
                 {/* Divider before section header items */}
-                {(node as any).divider && (
+                {node.divider && (
                   <div className="my-3 border-t border-slate-900/[0.08]" />
                 )}
                 <Link
@@ -383,7 +401,7 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
                       isActive ? 'text-[#1ca34c]' : 'text-slate-500 group-hover:text-[#15803d]'
                     }`}
                   />
-                  <span className="min-w-0 break-words leading-snug">{node.name}</span>
+                  <span className="min-w-0 break-words leading-snug">{label}</span>
                 </Link>
               </React.Fragment>
             );
@@ -398,9 +416,9 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
           <div className="absolute -top-10 -right-10 w-20 h-20 bg-[#1ca34c]/5 rounded-full filter blur-xl group-hover:bg-[#1ca34c]/10 transition-all" />
           <div className="flex items-center gap-2 mb-1">
             <Sparkles className="w-3.5 h-3.5 text-[#15803d]" />
-            <span className="text-[9px] font-bold text-slate-900 uppercase tracking-wider">Anchor ERP AI Fraud Risk</span>
+            <span className="text-[9px] font-bold text-slate-900 uppercase tracking-wider">{t.nav.aiWidgetTitle}</span>
           </div>
-          <p className="text-[10px] text-slate-500 font-sans">Verification node secure. Zero structural anomalies detected.</p>
+          <p className="text-[10px] text-slate-500 font-sans">{t.nav.aiWidgetText}</p>
         </div>
 
         {/* Profile capsule */}
@@ -409,7 +427,7 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
             {userName ? userName.charAt(0).toUpperCase() : <User className="w-3 h-3" />}
           </div>
           <div className="overflow-hidden">
-            <h4 className="text-[11px] font-bold text-slate-900 truncate">{userName || 'Loading…'}</h4>
+            <h4 className="text-[11px] font-bold text-slate-900 truncate">{userName || t.nav.loading}</h4>
             <p className="text-[9px] text-slate-500 truncate">{userEmail || ''}</p>
           </div>
         </div>
@@ -420,7 +438,7 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
           className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-full text-rose-600 hover:bg-rose-500/10 font-semibold text-xs transition-all cursor-pointer"
         >
           <LogOut className="w-4 h-4 shrink-0" />
-          <span>Sign Out</span>
+          <span>{t.nav.signOut}</span>
         </button>
       </div>
     </div>

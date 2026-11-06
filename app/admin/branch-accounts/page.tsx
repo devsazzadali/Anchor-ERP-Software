@@ -16,6 +16,7 @@ import { generatePdf } from '@/lib/pdf-generator'
 import { generateExcel } from '@/lib/excel-generator'
 import { useBranchAuth } from '@/lib/hooks/use-branch-auth'
 import { fetchWithCache, invalidateBranchCache, getCachedData, setCachedData } from '@/lib/branch-cache'
+import { useLanguage } from '@/lib/i18n/provider'
 
 const fmt = (n: number | null | undefined) => {
   const num = Number(n ?? 0)
@@ -49,6 +50,7 @@ const formatDatePretty = (dateStr: string) => {
 }
 
 export default function AdminBranchAccountsPage() {
+  const { t } = useLanguage()
   const router = useRouter()
   const { user, isAdmin, isAuthorized, isLoading: isAuthLoading } = useBranchAuth()
   
@@ -797,7 +799,7 @@ export default function AdminBranchAccountsPage() {
               <TrendingUp className="w-5 h-5 text-emerald-600" />
               <span className="text-[9px] font-bold text-emerald-600/80 uppercase tracking-widest">Revenue</span>
             </div>
-            <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Total Gross Sales (মোট বিক্রি)</p>
+            <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">{t.branch.adminCards.totalGrossSales}</p>
             <p className="text-xl md:text-2xl font-bold font-serif text-slate-900">{fmt(metrics.totalGrossSales)}</p>
             <p className="text-[10px] text-slate-500 mt-1">Cash: {fmt(metrics.totalCashSales)} | Digital: {fmt(metrics.totalDigitalCollections)}</p>
           </div>
@@ -807,7 +809,7 @@ export default function AdminBranchAccountsPage() {
               <Building2 className="w-5 h-5 text-blue-600" />
               <span className="text-[9px] font-bold text-blue-600/80 uppercase tracking-widest">Remittance</span>
             </div>
-            <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Bank Deposits Handled (ব্যাংকে জমা)</p>
+            <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">{t.branch.adminCards.bankDepositsHandled}</p>
             <p className="text-xl md:text-2xl font-bold font-serif text-blue-600">{fmt(metrics.totalBankDeposits)}</p>
             <p className="text-[10px] text-slate-500 mt-1">
               Deposits — ledger figure: Σ bank_deposits_out on ledger days in the selected window
@@ -820,7 +822,7 @@ export default function AdminBranchAccountsPage() {
               <Wallet className="w-5 h-5 text-[#15803d]" />
               <span className="text-[9px] font-bold text-[#15803d]/80 uppercase tracking-widest">Drawer Cash</span>
             </div>
-            <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Closing Cash Retained (ক্লোজিং ক্যাশ)</p>
+            <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">{t.branch.adminCards.closingCashRetained}</p>
             <p className="text-xl md:text-2xl font-bold font-serif text-[#15803d]">{fmt(metrics.totalClosingCash)}</p>
             <p className="text-[10px] text-slate-500 mt-1">Current closing cash (latest entries)</p>
           </div>
@@ -830,7 +832,7 @@ export default function AdminBranchAccountsPage() {
               <ShieldAlert className="w-5 h-5 text-amber-600" />
               <span className="text-[9px] font-bold text-amber-600/80 uppercase tracking-widest">Audit</span>
             </div>
-            <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Shortage Alerts (হিসাব স্থিতি)</p>
+            <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">{t.branch.adminCards.shortageAlerts}</p>
             <p className="text-xl md:text-2xl font-bold font-serif text-slate-900">
               {metrics.shortageCount} days {metrics.shortageCount > 0 ? `(-${fmt(metrics.totalShortageAmount)})` : '(0 Shortage)'}
             </p>
@@ -977,7 +979,7 @@ export default function AdminBranchAccountsPage() {
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-slate-900/10 bg-slate-900/[0.04]">
-                  {['Branch', 'Date & Day', 'Khuchra (খুচরা)', 'Cash Sales', 'Digital MFS'].map(h => (
+                  {['Branch', 'Date & Day', t.branch.adminCards.khuchra, 'Cash Sales', 'Digital MFS'].map(h => (
                     <th key={h} className="text-left p-3.5 text-[9px] uppercase tracking-widest text-slate-500 font-semibold whitespace-nowrap">{h}</th>
                   ))}
                   <th className="text-left p-3.5 text-[9px] uppercase tracking-widest text-slate-500 font-semibold whitespace-nowrap" title="Total Sales = Cash Sales + Digital/MFS Sales">Total Sales</th>
@@ -1142,7 +1144,7 @@ export default function AdminBranchAccountsPage() {
                 {/* Cash Drawer: Khuchra & Cash Sales */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-900/5">
                   <div>
-                    <label className="block text-[10px] uppercase tracking-wider text-slate-500 mb-1">Khuchra / Change Float (৳) (খুচরা টাকা)</label>
+                    <label className="block text-[10px] uppercase tracking-wider text-slate-500 mb-1">{t.branch.adminCards.khuchraFloatLabel}</label>
                     <input
                       type="number"
                       min="0"
@@ -1338,7 +1340,7 @@ export default function AdminBranchAccountsPage() {
                 {/* Cash Drawer: Khuchra & Cash Sales */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-[10px] uppercase tracking-wider text-slate-500 mb-1">Khuchra / Change Float (৳) (খুচরা টাকা)</label>
+                    <label className="block text-[10px] uppercase tracking-wider text-slate-500 mb-1">{t.branch.adminCards.khuchraFloatLabel}</label>
                     <input
                       type="number"
                       min="0"

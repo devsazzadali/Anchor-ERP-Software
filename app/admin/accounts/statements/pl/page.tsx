@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation'
 import { TrendingUp, RefreshCw, AlertTriangle, Info, FileText } from 'lucide-react'
 import { ExportButtons, PeriodScopeBar, stmtUrl, takaSigned, type StmtMeta } from '../ui'
 import { PageHead, PrintHeader, PrintFooter, downloadPdf, taka, bdt } from '../../ui'
+import { useLanguage } from '@/lib/i18n/provider'
 
 // Accounts A2 — Profit & Loss from the journal: company view or a
 // single branch (branch is a dimension on journal lines). The
@@ -59,6 +60,7 @@ function Section(props: { title: string; rows: PlRowT[]; totalLabel: string; tot
 }
 
 function ProfitLossInner() {
+  const { t } = useLanguage()
   const search = useSearchParams()
   const [meta, setMeta] = useState<StmtMeta | null>(null)
   const [stmt, setStmt] = useState<PL | null>(null)
@@ -117,9 +119,7 @@ function ProfitLossInner() {
       <PrintHeader title="Profit & Loss" subtitle="Income and Expenses" />
       <PageHead
         icon={<TrendingUp className="w-6 h-6 text-emerald-600" />}
-        title="Profit & Loss (লাভ-ক্ষতি)"
-        bangla="আয় থেকে খরচ বাদ দিলে যা থাকে"
-        tech="Profit & Loss"
+        title={t.accounts.head.pl.title} bangla={t.accounts.head.pl.sub} tech={t.accounts.head.pl.tech}
       >
         <div className="flex items-center gap-2 print:hidden">
           <ExportButtons csvHref={stmtUrl('pl', { period: period || undefined, scope, branch_id: branchId || undefined }, 'csv')} />
@@ -253,6 +253,7 @@ function ProfitLossInner() {
 }
 
 export default function ProfitLossPage() {
+  const { t } = useLanguage()
   return (
     <Suspense fallback={<div className="p-6 text-sm text-slate-500">Loading profit &amp; loss…</div>}>
       <ProfitLossInner />

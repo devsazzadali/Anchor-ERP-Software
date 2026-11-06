@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic'
 import React, { useCallback, useEffect, useState } from 'react'
 import { CalendarClock, RefreshCw, CheckCircle2, AlertTriangle, Lock, LockOpen, CalendarCheck2, Flag } from 'lucide-react'
 import { PageHead } from '../ui'
+import { useLanguage } from '@/lib/i18n/provider'
 
 // Accounts A3 — Periods & fiscal years. Data: GET /api/accounts/periods
 // (fiscal years + periods + pre-close checklist). Actions POST to the
@@ -36,6 +37,7 @@ const statusChip = (s: string) =>
         : 'bg-slate-100 text-slate-700'
 
 export default function AccountsPeriodsPage() {
+  const { t } = useLanguage()
   const [data, setData] = useState<Payload | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -90,7 +92,7 @@ export default function AccountsPeriodsPage() {
 
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <PageHead icon={<CalendarClock className="w-6 h-6 text-emerald-600" />} title="Month Open / Close" bangla="কোন মাসের হিসাব বন্ধ বা খোলা" tech="Accounting Periods & Fiscal Years">
+      <PageHead icon={<CalendarClock className="w-6 h-6 text-emerald-600" />} title={t.accounts.head.periods.title} bangla={t.accounts.head.periods.sub} tech={t.accounts.head.periods.tech}>
         <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
         </button>

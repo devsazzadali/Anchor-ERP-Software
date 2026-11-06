@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Printer, Download } from 'lucide-react'
 import { PageHead, PrintHeader, PrintFooter, downloadPdf, bdt } from '../ui'
+import { useLanguage } from '@/lib/i18n/provider'
 
 // Accounts → Cheques (stage A8).
 // The cheque register: instruments ISSUED to payees and RECEIVED,
@@ -47,6 +48,7 @@ const EMPTY_DRAFT: Draft = {
 }
 
 export default function ChequesPage() {
+  const { t } = useLanguage()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
@@ -197,7 +199,7 @@ export default function ChequesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <PageHead title="Cheques" bangla="কোন চেক দেওয়া/পাওয়া, কোনটা পাশ হয়েছে" tech="Cheque Register">
+        <PageHead title={t.accounts.head.cheques.title} bangla={t.accounts.head.cheques.sub} tech={t.accounts.head.cheques.tech}>
           <div className="flex flex-wrap gap-2">
             <button onClick={() => window.print()} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
               <Printer className="w-4 h-4" /> Print

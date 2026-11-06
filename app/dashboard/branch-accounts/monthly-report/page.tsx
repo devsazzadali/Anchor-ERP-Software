@@ -13,12 +13,14 @@ import { generateExcel } from '@/lib/excel-generator'
 
 import { useBranchAuth } from '@/lib/hooks/use-branch-auth'
 import { fetchWithCache, getCachedData } from '@/lib/branch-cache'
+import { useLanguage } from '@/lib/i18n/provider'
 
 const fmt = (n: any) => (Number(n || 0) < 0 ? '-' : '') + '৳' + Math.abs(Number(n || 0)).toLocaleString('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December']
 
 export default function MonthlyReportPage() {
+  const { t } = useLanguage()
   const router = useRouter()
   const searchParams = useSearchParams()
   const branchId = searchParams?.get('branch_id') || ''
@@ -212,7 +214,7 @@ export default function MonthlyReportPage() {
                   <span className="w-9 h-9 rounded-xl bg-[#e8f7ee] flex items-center justify-center"><TrendingUp className="w-4 h-4 text-[#15803d]" /></span>
                   <span className="text-[9px] font-bold text-[#15803d] uppercase tracking-widest">Gross Sales</span>
                 </div>
-                <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Total Sales (মোট বিক্রি)</p>
+                <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">{t.branch.monthlyReport.totalSales}</p>
                 <p className="text-xl md:text-2xl font-extrabold text-slate-900">{fmt(s.totalSales)}</p>
                 <p className="text-[10px] text-slate-500 mt-1">Cash: {fmt(s.totalCashSales)} · Digital: {fmt(s.totalDigitalSales)}</p>
               </div>
@@ -222,7 +224,7 @@ export default function MonthlyReportPage() {
                   <span className="w-9 h-9 rounded-xl bg-blue-500/10 flex items-center justify-center"><Building2 className="w-4 h-4 text-blue-600" /></span>
                   <span className="text-[9px] font-bold text-blue-600 uppercase tracking-widest">Bank Remitted</span>
                 </div>
-                <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Bank Deposits (ব্যাংকে জমা)</p>
+                <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">{t.branch.monthlyReport.bankDeposits}</p>
                 <p className="text-xl md:text-2xl font-extrabold text-blue-600">{fmt(s.totalApprovedDeposits)}</p>
                 <p className="text-[10px] text-slate-500 mt-1">Pending: {fmt(s.totalPendingDeposits)}</p>
               </div>
@@ -232,7 +234,7 @@ export default function MonthlyReportPage() {
                   <span className="w-9 h-9 rounded-xl bg-rose-500/10 flex items-center justify-center"><TrendingDown className="w-4 h-4 text-rose-600" /></span>
                   <span className="text-[9px] font-bold text-rose-600 uppercase tracking-widest">Expenses</span>
                 </div>
-                <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Cash Expenses (খরচ)</p>
+                <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">{t.branch.monthlyReport.cashExpenses}</p>
                 <p className="text-xl md:text-2xl font-extrabold text-rose-600">{fmt(s.totalExpenses)}</p>
                 <p className="text-[10px] text-slate-500 mt-1">Paid out of physical cash</p>
               </div>
@@ -242,7 +244,7 @@ export default function MonthlyReportPage() {
                   <span className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center"><Wallet className="w-4 h-4 text-emerald-600" /></span>
                   <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest">Closing Cash</span>
                 </div>
-                <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Drawer Cash (ক্লোজিং ক্যাশ)</p>
+                <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">{t.branch.monthlyReport.drawerCash}</p>
                 <p className="text-xl md:text-2xl font-extrabold text-emerald-600">{fmt(s.netCash)}</p>
                 <p className="text-[10px] text-slate-500 mt-1">Closed across {s.daysClosed} days</p>
               </div>
@@ -254,7 +256,7 @@ export default function MonthlyReportPage() {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <Building2 className="w-4 h-4 text-blue-600" />
-                    <span className="text-xs font-bold uppercase tracking-wider text-blue-600">Bank-Wise Deposit Breakdown (ব্যাংক অনুযায়ী জমা)</span>
+                    <span className="text-xs font-bold uppercase tracking-wider text-blue-600">{t.branch.monthlyReport.bankWiseBreakdown}</span>
                   </div>
                   <span className="text-[10px] text-slate-500 font-semibold">{bankBreakdown.length} Accounts Used</span>
                 </div>
@@ -277,7 +279,7 @@ export default function MonthlyReportPage() {
               <div className="p-4 rounded-2xl border border-amber-500/20 bg-amber-500/5">
                 <div className="flex items-center gap-2 mb-2">
                   <ShieldAlert className="w-4 h-4 text-amber-600" />
-                  <p className="text-[10px] uppercase tracking-widest text-amber-600 font-bold">Cash Count Discrepancies (অডিট বৈষম্য)</p>
+                  <p className="text-[10px] uppercase tracking-widest text-amber-600 font-bold">{t.branch.monthlyReport.cashDiscrepancies}</p>
                 </div>
                 <div className="flex flex-wrap gap-4 text-xs text-slate-600">
                   <span>Shortage days: <span className="text-rose-600 font-semibold">{s.daysWithShortage}</span></span>

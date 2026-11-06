@@ -17,6 +17,8 @@ import { uploadFile } from '@/lib/files-client'
 
 import { useBranchAuth } from '@/lib/hooks/use-branch-auth'
 import { fetchWithCache, getCachedData, invalidateBranchCache } from '@/lib/branch-cache'
+import { useLanguage } from '@/lib/i18n/provider'
+import { fill } from '@/lib/i18n/provider'
 
 const fmt = (n: any) => (Number(n || 0) < 0 ? '-' : '') + '৳' + Math.abs(Number(n || 0)).toLocaleString('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 
@@ -48,6 +50,7 @@ const STATUS_CONFIG: Record<string, { label: string; icon: any; cls: string; bad
 }
 
 export default function DepositHistoryPage() {
+  const { t } = useLanguage()
   const router = useRouter()
   const { isAuthorized, isLoading: isAuthLoading } = useBranchAuth()
   const [selectedStatus, setSelectedStatus] = useState('all')
@@ -430,13 +433,13 @@ export default function DepositHistoryPage() {
                     {/* Visual Equation Banner */}
                     {khuchra > 0 && (
                       <div className="px-3.5 py-2 rounded-lg bg-slate-900/[0.04] border border-slate-900/5 text-[11px] text-slate-600 flex items-center gap-2 flex-wrap font-mono">
-                        <span className="text-emerald-600 font-semibold">🏦 {fmt(dep.amount)} (ব্যাংক জমা)</span>
+                        <span className="text-emerald-600 font-semibold">🏦 {fmt(dep.amount)} ({t.branch.depositHistory.bankDepositTag})</span>
                         <span className="text-slate-500">+</span>
-                        <span className="text-orange-600 font-semibold">🪙 {fmt(khuchra)} (ড্রয়ারে অবশিষ্ট খুচরা)</span>
+                        <span className="text-orange-600 font-semibold">🪙 {fmt(khuchra)} ({t.branch.depositHistory.khuchraRemainTag})</span>
                         <span className="text-slate-500">=</span>
-                        <span className="text-[#15803d] font-bold">মোট বিক্রয় {fmt(totalPeriodCash)}</span>
+                        <span className="text-[#15803d] font-bold">{t.branch.depositHistory.totalSalesLine} {fmt(totalPeriodCash)}</span>
                         <span className="text-[10px] text-slate-500 italic ml-auto font-sans">
-                          (খুচরা ২০ টাকা ড্রয়ারে থেকে যাবে এবং পরের দিনের ওপেনিং ব্যালেন্স হিসেবে যোগ হবে)
+                          {t.branch.depositHistory.khuchraNote}
                         </span>
                       </div>
                     )}
@@ -552,7 +555,7 @@ export default function DepositHistoryPage() {
                       <div className="p-3.5 rounded-xl bg-gradient-to-br from-[#1ca34c]/5 to-transparent border border-[#1ca34c]/20 space-y-2">
                         <div className="flex items-center justify-between">
                           <span className="text-[10px] font-bold uppercase tracking-wider text-[#15803d] flex items-center gap-1.5">
-                            <Layers className="w-3.5 h-3.5" /> প্রতিদিনের বিক্রির বিবরণ ({breakdownList.length} Days Breakdown)
+                            <Layers className="w-3.5 h-3.5" /> {t.branch.depositHistory.dailyBreakdown} ({breakdownList.length} Days Breakdown)
                           </span>
                           <span className="text-[10px] text-slate-500 font-mono">
                             Total Deposited: {fmt(dep.amount)}
@@ -593,7 +596,7 @@ export default function DepositHistoryPage() {
                           onClick={() => openEditModal(dep)}
                           className="px-3.5 py-1.5 rounded-xl bg-[#1ca34c]/10 border border-[#1ca34c]/30 text-[#15803d] hover:bg-[#1ca34c]/20 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
                         >
-                          <Edit3 className="w-3.5 h-3.5" /> Edit Submission (তথ্য সংশোধন)
+                          <Edit3 className="w-3.5 h-3.5" /> {t.branch.depositHistory.editSubmission}
                         </button>
                       )}
 
@@ -603,7 +606,7 @@ export default function DepositHistoryPage() {
                           href={`/dashboard/branch-accounts/bank-deposit?date=${dep.deposit_date}&resubmit_id=${dep.id}`}
                           className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-xs font-bold flex items-center gap-1.5 transition-all hover:opacity-95"
                         >
-                          Resubmit (পুনরায় পাঠান)
+                          {t.branch.depositHistory.resubmit}
                         </Link>
                       )}
                     </div>
@@ -761,7 +764,7 @@ export default function DepositHistoryPage() {
                   ) : (
                     <Save className="w-3.5 h-3.5" />
                   )}
-                  Save Changes (পরিবর্তন সেভ করুন)
+                  {t.branch.depositHistory.saveChanges}
                 </button>
                 <button
                   onClick={() => setEditingDeposit(null)}

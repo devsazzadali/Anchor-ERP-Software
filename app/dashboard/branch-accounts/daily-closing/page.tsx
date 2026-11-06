@@ -15,6 +15,7 @@ import { generatePdf } from '@/lib/pdf-generator'
 import { useBranchAuth } from '@/lib/hooks/use-branch-auth'
 import { dhakaToday } from '@/lib/dhaka-time'
 import { fetchWithCache, invalidateBranchCache, getCachedData } from '@/lib/branch-cache'
+import { useLanguage } from '@/lib/i18n/provider'
 
 const fmt = (n: any) => (Number(n || 0) < 0 ? '-' : '') + '৳' + Math.abs(Number(n || 0)).toLocaleString('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 
@@ -31,6 +32,7 @@ const formatDatePretty = (dateStr: string) => {
 }
 
 export default function DailyClosingPage() {
+  const { t } = useLanguage()
   const router = useRouter()
   const { user, isAdmin, branchName: authBranchName, isAuthorized, isLoading: isAuthLoading } = useBranchAuth()
   // B56: "today" is the Asia/Dhaka date — the old UTC date made the
@@ -515,7 +517,7 @@ export default function DailyClosingPage() {
             {/* Top 4 Clear Accounting Hero Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="p-5 rounded-3xl border border-[#1ca34c]/20 bg-[#1ca34c]/5 text-center flex flex-col justify-center">
-                <p className="text-[10px] uppercase tracking-widest text-[#15803d]/80 mb-1 font-semibold">Total Day's Sales (মোট বিক্রি)</p>
+                <p className="text-[10px] uppercase tracking-widest text-[#15803d]/80 mb-1 font-semibold">t.branch.dailyClosing.totalDaysSales</p>
                 <p className="text-2xl lg:text-3xl font-extrabold text-[#15803d]">
                   {fmt(closedTotalRevenue)}
                 </p>
@@ -525,7 +527,7 @@ export default function DailyClosingPage() {
               </div>
 
               <div className="p-5 rounded-3xl border border-blue-500/20 bg-blue-500/5 text-center flex flex-col justify-center">
-                <p className="text-[10px] uppercase tracking-widest text-blue-600/80 mb-1 font-semibold">Bank Deposits (ব্যাংকে জমা)</p>
+                <p className="text-[10px] uppercase tracking-widest text-blue-600/80 mb-1 font-semibold">t.branch.dailyClosing.bankDeposits</p>
                 <p className="text-2xl lg:text-3xl font-extrabold text-slate-900">
                   {fmt(ledger.bank_deposits_out || 0)}
                 </p>
@@ -533,7 +535,7 @@ export default function DailyClosingPage() {
               </div>
 
               <div className="p-5 rounded-3xl border border-emerald-500/20 bg-emerald-500/5 text-center flex flex-col justify-center">
-                <p className="text-[10px] uppercase tracking-widest text-emerald-600/80 mb-1 font-semibold">Counted Closing Cash (ড্রয়ার ক্যাশ)</p>
+                <p className="text-[10px] uppercase tracking-widest text-emerald-600/80 mb-1 font-semibold">t.branch.dailyClosing.countedClosingCash</p>
                 <p className="text-2xl lg:text-3xl font-extrabold text-emerald-600">
                   {fmt(ledger.actual_cash)}
                 </p>
@@ -543,7 +545,7 @@ export default function DailyClosingPage() {
               </div>
 
               <div className="p-5 rounded-3xl border border-amber-500/20 bg-amber-500/5 text-center flex flex-col justify-center">
-                <p className="text-[10px] uppercase tracking-widest text-amber-600/80 mb-1 font-semibold">Reconciliation Status (হিসাব স্থিতি)</p>
+                <p className="text-[10px] uppercase tracking-widest text-amber-600/80 mb-1 font-semibold">t.branch.dailyClosing.reconciliationStatus</p>
                 <p className={`text-2xl lg:text-3xl font-extrabold ${
                   ledger.difference_status === 'matched' ? 'text-emerald-600' :
                   ledger.difference_status === 'shortage' ? 'text-rose-600' : 'text-amber-600'
@@ -554,7 +556,7 @@ export default function DailyClosingPage() {
                   }
                 </p>
                 <p className="text-[10px] text-slate-500 mt-1 uppercase tracking-wider font-semibold">
-                  Status: {ledger.difference_status === 'matched' ? 'Exact Match (সঠিক)' : ledger.difference_status === 'shortage' ? 'Shortage (ঘাটতি)' : 'Excess (উদ্বৃত্ত)'}
+                  Status: {ledger.difference_status === 'matched' ? t.branch.dailyClosing.exactMatch : ledger.difference_status === 'shortage' ? t.branch.dailyClosing.shortage : t.branch.dailyClosing.excess}
                 </p>
               </div>
             </div>
@@ -568,7 +570,7 @@ export default function DailyClosingPage() {
                   <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">Physical Drawer Cash Reconciliation</h3>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-slate-900/[0.08] text-xs">
-                  <span className="text-slate-500">1. Opening Cash / Khuchra Float (ড্রয়ারে খুচরা টাকা)</span>
+                  <span className="text-slate-500">1. t.branch.dailyClosing.openingFloat</span>
                   <span className="font-semibold text-slate-900">{fmt(ledger.opening_cash ?? ledger.khuchra_amount ?? 0)}</span>
                 </div>
                 {ledger.opening_chain_break && (
@@ -577,31 +579,31 @@ export default function DailyClosingPage() {
                   </div>
                 )}
                 <div className="flex justify-between py-1.5 border-b border-slate-900/[0.08] text-xs">
-                  <span className="text-slate-500">2. (+) Physical Cash Sales (সারাদিনের ক্যাশ বিক্রি)</span>
+                  <span className="text-slate-500">2. (+) t.branch.dailyClosing.cashSalesDay</span>
                   <span className="font-semibold text-emerald-600">+{fmt(ledger.cash_sales)}</span>
                 </div>
                 {Number(ledger.other_cash_in || 0) > 0 && (
                   <div className="flex justify-between py-1.5 border-b border-slate-900/[0.08] text-xs">
-                    <span className="text-slate-500">3. (+) Other Cash In (অন্যান্য নগদ গ্রহণ)</span>
+                    <span className="text-slate-500">3. (+) t.branch.dailyClosing.otherCashIn</span>
                     <span className="font-semibold text-blue-600">+{fmt(ledger.other_cash_in)}</span>
                   </div>
                 )}
                 <div className="flex justify-between py-1.5 border-b border-slate-900/[0.08] text-xs bg-slate-900/[0.04] px-2 rounded">
-                  <span className="text-slate-600 font-semibold">= Total Cash Handled (মোট সংগৃহীত নগদ)</span>
+                  <span className="text-slate-600 font-semibold">= t.branch.dailyClosing.totalCashHandled</span>
                   <span className="font-bold text-slate-900 font-serif">
                     {fmt(Number(ledger.opening_cash ?? ledger.khuchra_amount ?? 0) + Number(ledger.cash_sales || 0) + Number(ledger.other_cash_in || 0))}
                   </span>
                 </div>
                 {Number(ledger.cash_expenses || 0) > 0 && (
                   <div className="flex justify-between py-1.5 border-b border-slate-900/[0.08] text-xs">
-                    <span className="text-slate-500">4. (−) Cash Expenses Paid (নগদ খরচ)</span>
+                    <span className="text-slate-500">4. (−) t.branch.dailyClosing.cashExpensesPaid</span>
                     <span className="font-semibold text-rose-600">−{fmt(ledger.cash_expenses)}</span>
                   </div>
                 )}
                 {Number(ledger.bank_deposits_out || 0) > 0 && (
                   <div className="flex justify-between py-1.5 border-b border-slate-900/[0.08] text-xs">
                     <div>
-                      <span className="text-slate-500">5. (−) Bank Deposits Taken to Bank (ব্যাংকে জমা)</span>
+                      <span className="text-slate-500">5. (−) t.branch.dailyClosing.depositsTakenToBank</span>
                       <p className="text-[9px] text-[#15803d]/80">Transferred from drawer to bank account</p>
                     </div>
                     <span className="font-semibold text-amber-600">−{fmt(ledger.bank_deposits_out)}</span>
@@ -610,22 +612,22 @@ export default function DailyClosingPage() {
                 {Number(ledger.pending_deposits_out || 0) > 0 && (
                   <div className="flex justify-between py-1.5 border-b border-slate-900/[0.08] text-xs">
                     <div>
-                      <span className="text-slate-500">6. Bank Deposits Pending HQ Approval (অনুমোদনাধীন জমা) — memo</span>
+                      <span className="text-slate-500">6. t.branch.dailyClosing.depositsPendingHqMemo</span>
                       <p className="text-[9px] text-amber-600/80">Submitted today; deducted from the drawer only once HQ approves (B54)</p>
                     </div>
                     <span className="font-semibold text-amber-600/90">{fmt(ledger.pending_deposits_out)}</span>
                   </div>
                 )}
                 <div className="flex justify-between py-1.5 border-b border-slate-900/[0.08] text-xs bg-[#1ca34c]/10 px-2 rounded border border-[#1ca34c]/20">
-                  <span className="text-[#15803d] font-semibold">= Expected Closing Cash (ড্রয়ারে থাকা উচিত)</span>
+                  <span className="text-[#15803d] font-semibold">= t.branch.dailyClosing.expectedClosingCash</span>
                   <span className="font-bold text-[#15803d] font-serif">{fmt(ledger.expected_closing_cash)}</span>
                 </div>
                 <div className="flex justify-between py-1.5 border-b border-slate-900/[0.08] text-xs">
-                  <span className="text-slate-600 font-bold">Counted Physical Cash (ড্রয়ারে গুনে পাওয়া ক্যাশ)</span>
+                  <span className="text-slate-600 font-bold">t.branch.dailyClosing.countedPhysicalCash</span>
                   <span className="font-bold text-emerald-600 font-serif">{fmt(ledger.actual_cash)}</span>
                 </div>
                 <div className="flex justify-between py-1.5 text-xs">
-                  <span className="text-slate-500 font-semibold">Variance / Discrepancy (পার্থক্য)</span>
+                  <span className="text-slate-500 font-semibold">t.branch.dailyClosing.variance</span>
                   <span className={`font-bold font-serif ${
                     ledger.difference_status === 'matched' ? 'text-emerald-600' :
                     ledger.difference_status === 'shortage' ? 'text-rose-600' : 'text-amber-600'
@@ -699,7 +701,7 @@ export default function DailyClosingPage() {
               <div>
                 <div className="flex justify-between items-center mb-1.5">
                   <label className="block text-[10px] uppercase tracking-widest text-slate-500 font-semibold">
-                    Khuchra / Change Float (ড্রয়ারে থাকা খুচরা টাকা / ভাংতি) (৳)
+                    t.branch.dailyClosing.khuchraFloatLabel (৳)
                   </label>
                   <span className="text-[9px] text-[#15803d]">Petty Cash & Drawer Float</span>
                 </div>
@@ -716,7 +718,7 @@ export default function DailyClosingPage() {
                   />
                 </div>
                 <p className="text-[9px] text-slate-500 mt-1">
-                  নগদ বিক্রির টাকার বাইরে ড্রয়ারে যে ভাংতি/খুচরা টাকা রক্ষিত থাকে তা এখানে দিন।
+                  t.branch.dailyClosing.khuchraHint
                 </p>
                 {derivedOpening !== null && (
                   <p className="text-[9px] text-[#15803d] mt-1 font-semibold">
@@ -826,7 +828,7 @@ export default function DailyClosingPage() {
               <div>
                 <div className="flex justify-between items-center mb-1.5">
                   <label className="block text-[10px] uppercase tracking-widest text-slate-500">
-                    Physical Cash Sales (সারাদিনের ক্যাশ বিক্রি) (৳)
+                    t.branch.dailyClosing.cashSalesDay (৳)
                   </label>
                   <span className="text-[9px] text-[#15803d]">
                     {cashSales !== '' ? 'Custom Amount' : Number(ledger?.cash_sales || 0) > 0 ? 'Loaded from POS Register' : 'Pure cash sales'}
@@ -849,10 +851,10 @@ export default function DailyClosingPage() {
               {/* Counted Physical Drawer Cash */}
               <div>
                 <label className="block text-[10px] uppercase tracking-widest text-slate-500 mb-1.5">
-                  Total Counted Physical Cash in Drawer (ড্রয়ারে থাকা মোট ক্যাশ - বিক্রির টাকাসহ) (৳) *
+                  t.branch.dailyClosing.countedTotalLabel *
                 </label>
                 <p className="text-[10px] text-amber-600 mb-2 font-semibold">
-                  ড্রয়ারে থাকা সমস্ত ক্যাশ (বিক্রি + খুচরা) একসাথে গুনে এন্ট্রি করুন।
+                  t.branch.dailyClosing.countedTotalHint
                 </p>
                 <div className="relative">
                   <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-serif">৳</span>
@@ -881,29 +883,29 @@ export default function DailyClosingPage() {
 
                 <div className="space-y-1.5 text-xs">
                   <div className="flex justify-between items-center py-1 border-b border-slate-900/[0.08]">
-                    <span className="text-slate-500">Khuchra / Float (খুচরা ও ভাংতি টাকা)</span>
+                    <span className="text-slate-500">t.branch.dailyClosing.khuchraFloatShort</span>
                     <span className="font-semibold text-slate-900 font-serif">+ {fmt(currentKhuchraNum)}</span>
                   </div>
                   <div className="flex justify-between items-center py-1 border-b border-slate-900/[0.08]">
-                    <span className="text-slate-500">(+) Physical Cash Sales (সারাদিনের ক্যাশ বিক্রি)</span>
+                    <span className="text-slate-500">(+) t.branch.dailyClosing.cashSalesDay</span>
                     <span className="font-semibold text-emerald-600 font-serif">+ {fmt(activeCashSales)}</span>
                   </div>
                   {currentOtherIn > 0 && (
                     <div className="flex justify-between items-center py-1 border-b border-slate-900/[0.08]">
-                      <span className="text-slate-500">(+) Other Cash In (অন্যান্য জমা)</span>
+                      <span className="text-slate-500">(+) t.branch.dailyClosing.otherCashInShort</span>
                       <span className="font-semibold text-blue-600 font-serif">+ {fmt(currentOtherIn)}</span>
                     </div>
                   )}
                   {currentExpenses > 0 && (
                     <div className="flex justify-between items-center py-1 border-b border-slate-900/[0.08]">
-                      <span className="text-slate-500">(−) Cash Expenses Paid (দৈনিক খরচ)</span>
+                      <span className="text-slate-500">(−) t.branch.dailyClosing.cashExpensesDaily</span>
                       <span className="font-semibold text-rose-600 font-serif">− {fmt(currentExpenses)}</span>
                     </div>
                   )}
                   {currentBankDeposits > 0 && (
                     <div className="flex justify-between items-center py-1 border-b border-slate-900/[0.08]">
                       <div>
-                        <span className="text-slate-500">(−) Bank Deposits Taken to Bank (ব্যাংকে জমা দেওয়া ক্যাশ)</span>
+                        <span className="text-slate-500">(−) t.branch.dailyClosing.depositsTakenCash</span>
                         <p className="text-[9px] text-[#15803d]/80">Deducted immediately from drawer — will not count as shortage</p>
                       </div>
                       <span className="font-semibold text-amber-600 font-serif">− {fmt(currentBankDeposits)}</span>
@@ -912,14 +914,14 @@ export default function DailyClosingPage() {
                   {currentPendingDeposits > 0 && (
                     <div className="flex justify-between items-center py-1 border-b border-slate-900/[0.08]">
                       <div>
-                        <span className="text-slate-500">(−) Bank Deposits Pending Approval (ব্যাংকে জমা - অনুমোদনের অপেক্ষায়)</span>
+                        <span className="text-slate-500">(−) t.branch.dailyClosing.depositsPendingApproval</span>
                         <p className="text-[9px] text-amber-600/80">Already deposited in bank — deducted from drawer so no shortage occurs</p>
                       </div>
                       <span className="font-semibold text-amber-600/90 font-serif">− {fmt(currentPendingDeposits)}</span>
                     </div>
                   )}
                   <div className="pt-2 flex justify-between items-center text-sm font-bold border-t border-slate-900/10 bg-slate-900/[0.04] p-2 rounded-lg">
-                    <span className="text-[#15803d] uppercase tracking-wider text-xs">= Expected Cash in Drawer (ড্রয়ারে থাকা উচিত)</span>
+                    <span className="text-[#15803d] uppercase tracking-wider text-xs">= t.branch.dailyClosing.expectedCashInDrawer</span>
                     <span className="font-serif text-[#15803d] text-base">{fmt(expectedCash)}</span>
                   </div>
                 </div>
@@ -942,7 +944,7 @@ export default function DailyClosingPage() {
                   </div>
                   <div className="pt-2 border-t border-slate-900/10 flex items-center justify-between">
                     <span className="text-xs uppercase tracking-wider font-semibold text-slate-600">
-                      Discrepancy (পার্থক্য):
+                      t.branch.dailyClosing.discrepancyLabel
                     </span>
                     <span className={`text-sm font-bold font-serif ${
                       diffStatus === 'matched' ? 'text-emerald-600'
@@ -950,8 +952,8 @@ export default function DailyClosingPage() {
                       : 'text-amber-600'
                     }`}>
                       {diffStatus === 'matched'
-                        ? '✅ ৳0 (Exact Match / কোনো গরমিল নেই)'
-                        : `${difference! >= 0 ? '+' : ''}${fmt(difference!)} (${diffStatus === 'shortage' ? 'Shortage / ঘাটতি' : 'Excess / উদ্বৃত্ত'})`
+                        ? `✅ ৳0 (${t.branch.dailyClosing.exactMatch} / ${t.branch.dailyClosing.exactMatchFull})`
+                        : `${difference! >= 0 ? '+' : ''}${fmt(difference!)} (${diffStatus === 'shortage' ? t.branch.dailyClosing.shortageShort : t.branch.dailyClosing.excessShort})`
                       }
                     </span>
                   </div>
@@ -1028,7 +1030,7 @@ export default function DailyClosingPage() {
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-slate-900/10 bg-slate-900/[0.04]">
-                  {['Date & Day', 'Khuchra (খুচরা)', 'Cash Sales', 'Digital MFS', 'Total Sales', 'Bank Deposits', 'Closing Cash', 'Discrepancy', 'Status', 'Action'].map(h => (
+                  {['Date & Day', t.branch.dailyClosing.khuchra, 'Cash Sales', 'Digital MFS', 'Total Sales', 'Bank Deposits', 'Closing Cash', 'Discrepancy', 'Status', 'Action'].map(h => (
                     <th key={h} className="text-left p-3.5 text-[9px] uppercase tracking-widest text-slate-500 font-semibold whitespace-nowrap">{h}</th>
                   ))}
                 </tr>

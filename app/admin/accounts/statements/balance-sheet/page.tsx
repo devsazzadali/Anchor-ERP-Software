@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation'
 import { Landmark, RefreshCw, CheckCircle2, AlertTriangle, FileText } from 'lucide-react'
 import { ExportButtons, stmtUrl, takaSigned, type StmtMeta } from '../ui'
 import { PageHead, PrintHeader, PrintFooter, downloadPdf, taka, bdt } from '../../ui'
+import { useLanguage } from '@/lib/i18n/provider'
 
 // Accounts A2 — Balance sheet as of a date: cumulative journal
 // position (assets / liabilities / equity + the accumulated P&L
@@ -53,6 +54,7 @@ function SectionRows(props: { rows: BSRow[] }) {
 }
 
 function BalanceSheetInner() {
+  const { t } = useLanguage()
   const search = useSearchParams()
   const [meta, setMeta] = useState<StmtMeta | null>(null)
   const [stmt, setStmt] = useState<BS | null>(null)
@@ -111,9 +113,9 @@ function BalanceSheetInner() {
       <PrintHeader title="What We Own & Owe" subtitle="Balance Sheet" />
       <PageHead
         icon={<Landmark className="w-6 h-6 text-emerald-600" />}
-        title="What We Own & Owe"
-        bangla="সম্পদ আর দেনার অবস্থা"
-        tech="Balance Sheet"
+        title={t.accounts.head.balanceSheet.title}
+        bangla={t.accounts.head.balanceSheet.sub}
+        tech={t.accounts.head.balanceSheet.tech}
       >
         <div className="flex items-center gap-2 print:hidden">
           <ExportButtons csvHref={stmtUrl('balance-sheet', { asof: asOf || undefined }, 'csv')} />
@@ -255,6 +257,7 @@ function BalanceSheetInner() {
 }
 
 export default function BalanceSheetPage() {
+  const { t } = useLanguage()
   return (
     <Suspense fallback={<div className="p-6 text-sm text-slate-500">Loading balance sheet…</div>}>
       <BalanceSheetInner />

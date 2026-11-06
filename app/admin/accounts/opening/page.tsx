@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic'
 import React, { useCallback, useEffect, useState } from 'react'
 import { ListTree, RefreshCw, Calculator, ShieldCheck, AlertTriangle, CheckCircle2 } from 'lucide-react'
 import { PageHead } from '../ui'
+import { useLanguage } from '@/lib/i18n/provider'
 
 // Accounts A1 — Opening Position. The position is COMPUTED from
 // the existing records (counted branch cash from the latest closed
@@ -27,6 +28,7 @@ type Position = {
 const taka = (v: string | number) => `৳${Number(v).toLocaleString('en-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
 export default function OpeningPositionPage() {
+  const { t } = useLanguage()
   const [positions, setPositions] = useState<Position[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -102,7 +104,7 @@ export default function OpeningPositionPage() {
 
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <PageHead icon={<ListTree className="w-6 h-6 text-emerald-600" />} title="Starting Figures" bangla="হিসাব শুরুর সময়ের অবস্থা" tech="Opening Position">
+      <PageHead icon={<ListTree className="w-6 h-6 text-emerald-600" />} title={t.accounts.head.opening.title} bangla={t.accounts.head.opening.sub} tech={t.accounts.head.opening.tech}>
         <div className="flex gap-2">
           <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh

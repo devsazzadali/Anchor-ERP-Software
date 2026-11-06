@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation'
 import { Scale, RefreshCw, CheckCircle2, AlertTriangle, FileText } from 'lucide-react'
 import { ExportButtons, PeriodScopeBar, stmtUrl, takaSigned, type StmtMeta } from '../ui'
 import { PageHead, PrintHeader, PrintFooter, downloadPdf, taka, bdt } from '../../ui'
+import { useLanguage } from '@/lib/i18n/provider'
 
 // Accounts A2 — Trial balance for a period, or fiscal-year-to-date.
 // Data: GET /api/accounts/statements?type=trial-balance. Same
@@ -23,6 +24,7 @@ type TB = {
 }
 
 function TrialBalanceInner() {
+  const { t } = useLanguage()
   const search = useSearchParams()
   const [meta, setMeta] = useState<StmtMeta | null>(null)
   const [stmt, setStmt] = useState<TB | null>(null)
@@ -74,9 +76,7 @@ function TrialBalanceInner() {
       <PrintHeader title="Books Check" subtitle="Trial Balance" />
       <PageHead
         icon={<Scale className="w-6 h-6 text-emerald-600" />}
-        title="Books Check"
-        bangla="হিসাব মিলেছে কিনা যাচাই"
-        tech="Trial Balance"
+        title={t.accounts.head.trialBalance.title} bangla={t.accounts.head.trialBalance.sub} tech={t.accounts.head.trialBalance.tech}
       >
         <div className="flex items-center gap-2 print:hidden">
           <ExportButtons csvHref={stmtUrl('trial-balance', { period: period || undefined, scope }, 'csv')} />
@@ -115,12 +115,12 @@ function TrialBalanceInner() {
 
           {stmt.balanced ? (
             <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 mb-6">
-              <div className="text-lg font-bold text-emerald-900 font-bangla">হিসাব মিলেছে ✓</div>
+              <div className="text-lg font-bold text-emerald-900 font-bangla">{t.accounts.trialBalance.balanced}</div>
               <div className="text-sm text-slate-600 mt-1">Total Debit {taka(stmt.total_debit)} · Total Credit {taka(stmt.total_credit)}</div>
             </div>
           ) : (
             <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 mb-6">
-              <div className="text-lg font-bold text-rose-900 font-bangla">অমিল: {taka(stmt.difference)}</div>
+              <div className="text-lg font-bold text-rose-900 font-bangla">{t.accounts.trialBalance.difference} {taka(stmt.difference)}</div>
             </div>
           )}
 
@@ -172,6 +172,7 @@ function TrialBalanceInner() {
 }
 
 export default function TrialBalancePage() {
+  const { t } = useLanguage()
   return (
     <Suspense fallback={<div className="p-6 text-sm text-slate-500">Loading trial balance…</div>}>
       <TrialBalanceInner />

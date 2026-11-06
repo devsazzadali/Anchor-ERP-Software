@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { PageHead } from '../ui'
+import { useLanguage } from '@/lib/i18n/provider'
 
 // Accounts → VAT & TDS (stage A7).
 // Configuration panel for the four tax types + the register
@@ -49,6 +50,7 @@ interface Draft {
 }
 
 export default function TaxPage() {
+  const { t } = useLanguage()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
@@ -138,7 +140,7 @@ export default function TaxPage() {
   return (
     <div className="space-y-6">
       <div>
-        <PageHead title="VAT & Tax" bangla="সরকারি ভ্যাট আর ট্যাক্সের হিসাব" tech="VAT / TDS" />
+        <PageHead title={t.accounts.head.tax.title} bangla={t.accounts.head.tax.sub} tech={t.accounts.head.tax.tech} />
         <p className="-mt-4 text-sm text-slate-500">
           Tax register for VAT and tax deducted at source. Tax is recorded only for the types you configure
           below — and only on events dated on or after the type&apos;s effective-from date.

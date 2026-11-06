@@ -650,6 +650,9 @@ model Profile {
   // resolver rejects mismatches — this is what kills even
   // pre-registry (legacy) tokens on revoke-all.
   session_epoch                 Int       @default(0)
+  // i18n (2026-11-02): per-user UI language — 'en' (default) or 'bn'.
+  // Additive column, applied by scripts/i18n-language-ddl.mjs.
+  language                      String    @default("en")
   is_branch_manager             Boolean   @default(false)
   last_login                    DateTime? @db.Timestamptz(6)
   // DDL/ALTER-only columns below (attendance migrations; not present in

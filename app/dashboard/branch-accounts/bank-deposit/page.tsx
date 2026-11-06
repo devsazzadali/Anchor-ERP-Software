@@ -12,10 +12,14 @@ import Link from 'next/link'
 import { parseDailyBreakdown, cleanDepositNotes } from '@/lib/branch-deposit-utils'
 import { allocateProportionally } from '@/lib/money'
 import { uploadFile as uploadFileToStorage } from '@/lib/files-client'
+import { useLanguage } from '@/lib/i18n/provider'
+import { fill } from '@/lib/i18n/provider'
 
 const fmt = (n: any) => (Number(n || 0) < 0 ? '-' : '') + '৳' + Math.abs(Number(n || 0)).toLocaleString('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 
 // Curated list of major Bangladeshi banks (Full official names)
+const OTHER_BANK = 'Other / Custom Bank'
+
 const BD_BANKS = [
   'Islami Bank Bangladesh PLC',
   'BRAC Bank PLC',
@@ -47,7 +51,7 @@ const BD_BANKS = [
   'Janata Bank PLC',
   'Rupali Bank PLC',
   'Bangladesh Krishi Bank',
-  'Other / Custom Bank (অন্য ব্যাংক)',
+  OTHER_BANK,
 ]
 
 function getDatesInRange(startStr: string, endStr: string): string[] {
@@ -126,6 +130,7 @@ async function compressImageFile(file: File, maxWidth = 1600, maxHeight = 1600, 
 }
 
 export default function BankDepositPage() {
+  const { t } = useLanguage()
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -138,6 +143,7 @@ export default function BankDepositPage() {
 }
 
 function BankDepositContent() {
+  const { t } = useLanguage()
   const router = useRouter()
   const searchParams = useSearchParams()
   const paramDate = searchParams?.get('date') || null
@@ -416,7 +422,7 @@ function BankDepositContent() {
 
   const handleBankSelect = (bankName: string) => {
     setSelectedBank(bankName)
-    if (bankName && bankName !== 'Other / Custom Bank (অন্য ব্যাংক)') {
+    if (bankName && bankName !== OTHER_BANK) {
       setForm(f => ({ ...f, bank_account_name: `Anchor Fashion Main Account — ${bankName}` }))
     }
   }
@@ -646,19 +652,19 @@ function BankDepositContent() {
               <div className="flex-1">
                 <div className="flex items-center justify-between gap-2 flex-wrap">
                   <h4 className="font-bold text-sm text-amber-700">
-                    পূর্ববর্তী ডিপোজিট প্রত্যাখ্যাত (Previous Deposit Rejected)
+                    {t.branch.bankDeposit.rejectedTitle}
                   </h4>
                   <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300">
                     ✓ Re-application Allowed
                   </span>
                 </div>
                 <p className="text-xs text-slate-600 mt-1">
-                  তারিখ: <span className="text-slate-900 font-medium">{form.deposit_date}</span> · এডমিনের কারণ:{' '}
-                  <span className="text-rose-300 font-semibold italic">"{rejectedDepositForDate.rejection_reason || 'তথ্য বা স্লিপের ত্রুটি'}"</span>
+                  {t.branch.bankDeposit.dateLabel} <span className="text-slate-900 font-medium">{form.deposit_date}</span> · {t.branch.bankDeposit.adminReasonLabel}{' '}
+                  <span className="text-rose-300 font-semibold italic">"{rejectedDepositForDate.rejection_reason || t.branch.bankDeposit.rejectedReasonFallback}"</span>
                 </p>
                 <p className="text-[11px] text-amber-600/90 mt-1.5 flex items-center gap-1.5">
                   <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  আপনি নিচের ফর্মের তথ্য সংশোধন করে ও সঠিক স্লিপের ছবি সংযুক্ত করে এই তারিখের জন্য পুনরায় আবেদন জমা দিতে পারবেন।
+                  {t.branch.bankDeposit.rejectedHint}
                 </p>
               </div>
             </div>
@@ -674,15 +680,15 @@ function BankDepositContent() {
               </div>
               <div className="flex-1">
                 <h4 className="font-bold text-sm text-rose-300">
-                  এই তারিখে ইতোমধ্যে একটি ডিপোজিট সক্রিয় রয়েছে
+                  {t.branch.bankDeposit.existingTitle}
                 </h4>
                 <p className="text-xs text-slate-600 mt-1">
-                  তারিখ: <span className="text-slate-900 font-medium">{form.deposit_date}</span> · পরিমাণ:{' '}
-                  <span className="text-[#15803d] font-semibold">৳{Number(existingDepositForDate.amount || 0).toLocaleString()}</span> · স্ট্যাটাস:{' '}
+                  {t.branch.bankDeposit.dateLabel} <span className="text-slate-900 font-medium">{form.deposit_date}</span> · {t.branch.bankDeposit.amountLabel}{' '}
+                  <span className="text-[#15803d] font-semibold">৳{Number(existingDepositForDate.amount || 0).toLocaleString()}</span> · {t.branch.bankDeposit.statusLabel}{' '}
                   <span className="uppercase font-bold text-amber-600">{existingDepositForDate.status}</span>
                 </p>
                 <p className="text-[11px] text-rose-600/80 mt-1">
-                  নিয়মানুযায়ী প্রতি ব্রাঞ্চে প্রতিদিন সর্বোচ্চ ১টি সক্রিয় ব্যাংক ডিপোজিট অনুমোদিত। পূর্ববর্তী ডিপোজিটটি রিজেক্ট হলে তবেই নতুন আবেদন করা যাবে।
+                  {t.branch.bankDeposit.existingRule}
                 </p>
               </div>
             </div>
@@ -944,7 +950,7 @@ function BankDepositContent() {
                     {khuchraAmount > 0 && (
                       <p className="text-[10px] text-amber-600/70 mt-2 flex items-center gap-1">
                         <Info className="w-3 h-3 shrink-0" />
-                        {fmt(khuchraAmount)} in small notes will remain in the branch drawer as change (খুচরা).
+                        {fill(t.branch.bankDeposit.khuchraNote, { amount: fmt(khuchraAmount) })}
                       </p>
                     )}
                   </div>
@@ -954,16 +960,16 @@ function BankDepositContent() {
               {/* Bangladeshi Banks Selector & Account Title */}
               <div>
                 <label className="block text-[10px] uppercase tracking-widest text-[#15803d] font-semibold mb-1.5">
-                  Select Bank (বাংলাদেশের ব্যাংক নির্বাচন করুন) *
+                  {t.branch.bankDeposit.selectBankLabel}
                 </label>
                 <select
                   value={selectedBank}
                   onChange={e => handleBankSelect(e.target.value)}
                   className="w-full bg-white border border-slate-900/10 rounded-xl px-3 py-2.5 text-slate-900 text-sm focus:outline-none focus:border-[#1ca34c]/40 transition-colors mb-2.5 cursor-pointer"
                 >
-                  <option value="">-- Select Bank (ব্যাংক নির্বাচন করুন) --</option>
+                  <option value="">{t.branch.bankDeposit.selectBankPlaceholder}</option>
                   {BD_BANKS.map(b => (
-                    <option key={b} value={b}>{b}</option>
+                    <option key={b} value={b}>{b === OTHER_BANK ? t.branch.bankDeposit.otherBank : b}</option>
                   ))}
                 </select>
 

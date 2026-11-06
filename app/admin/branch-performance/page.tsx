@@ -19,6 +19,7 @@ import { generatePdf } from '@/lib/pdf-generator'
 import { generateExcel } from '@/lib/excel-generator'
 import { useBranchAuth } from '@/lib/hooks/use-branch-auth'
 import { fetchWithCache, getCachedData, setCachedData, invalidateBranchCache } from '@/lib/branch-cache'
+import { useLanguage } from '@/lib/i18n/provider'
 
 const fmt = (n: number | null | undefined) =>
   '৳' + Number(n ?? 0).toLocaleString('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
@@ -105,6 +106,7 @@ type LivePerformanceReportResponse = {
 }
 
 export default function AdminBranchPerformancePage() {
+  const { t } = useLanguage()
   const router       = useRouter()
   const pathname     = usePathname()
   const searchParams = useSearchParams()
@@ -580,7 +582,7 @@ export default function AdminBranchPerformancePage() {
               <Banknote className="w-5 h-5 text-[#15803d]" />
               <span className="text-[9px] font-bold text-[#15803d]/80 uppercase tracking-widest">Revenue</span>
             </div>
-            <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Total Gross Sales (মোট বিক্রি)</p>
+            <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">{t.branch.performanceCards.totalGrossSales}</p>
             <p className="text-xl sm:text-2xl font-bold font-serif text-[#15803d]">{fmt(overallStats.totalSales)}</p>
             <p className="text-[10px] text-slate-500 mt-1">
               Pure Cash + Digital Collections
@@ -604,7 +606,7 @@ export default function AdminBranchPerformancePage() {
               <Landmark className="w-5 h-5 text-blue-600" />
               <span className="text-[9px] font-bold text-blue-600/80 uppercase tracking-widest">Remittance</span>
             </div>
-            <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Bank Remitted (ব্যাংক জমা)</p>
+            <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">{t.branch.performanceCards.bankRemitted}</p>
             <p className="text-xl sm:text-2xl font-bold font-serif text-blue-600">{fmt(overallStats.totalApprovedDeposits)}</p>
             <p className="text-[10px] text-slate-500 mt-1">
               Approved deposits in corporate accounts
@@ -616,7 +618,7 @@ export default function AdminBranchPerformancePage() {
               <Coins className="w-5 h-5 text-[#15803d]" />
               <span className="text-[9px] font-bold text-[#15803d]/80 uppercase tracking-widest">Drawer Float</span>
             </div>
-            <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">Closing Cash Retained (ড্রয়ার ক্যাশ)</p>
+            <p className="text-[9px] uppercase tracking-widest text-slate-500 mb-1">{t.branch.performanceCards.closingCashRetained}</p>
             <p className="text-xl sm:text-2xl font-bold font-serif text-[#15803d]">
               {fmt(overallStats.totalClosingCash)}
             </p>
@@ -899,23 +901,23 @@ export default function AdminBranchPerformancePage() {
             {activeBranchSummary && (
               <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
                 <div className="p-4 rounded-xl bg-slate-900/[0.04] border border-slate-900/5">
-                  <p className="text-[9px] uppercase tracking-wider text-slate-500">Cash Sales (নগদ)</p>
+                  <p className="text-[9px] uppercase tracking-wider text-slate-500">{t.branch.performanceCards.cashSales}</p>
                   <p className="text-base font-bold font-mono text-slate-900 mt-1">{fmt(activeBranchSummary.cashSales)}</p>
                 </div>
                 <div className="p-4 rounded-xl bg-slate-900/[0.04] border border-slate-900/5">
-                  <p className="text-[9px] uppercase tracking-wider text-slate-500">Digital Sales (ডিজিটাল)</p>
+                  <p className="text-[9px] uppercase tracking-wider text-slate-500">{t.branch.performanceCards.digitalSales}</p>
                   <p className="text-base font-bold font-mono text-emerald-600 mt-1">{fmt(activeBranchSummary.digitalSales)}</p>
                 </div>
                 <div className="p-4 rounded-xl bg-slate-900/[0.04] border border-slate-900/5">
-                  <p className="text-[9px] uppercase tracking-wider text-slate-500">Total Revenue (মোট বিক্রি)</p>
+                  <p className="text-[9px] uppercase tracking-wider text-slate-500">{t.branch.performanceCards.totalRevenue}</p>
                   <p className="text-base font-bold font-serif text-[#15803d] mt-1">{fmt(activeBranchSummary.totalSales)}</p>
                 </div>
                 <div className="p-4 rounded-xl bg-slate-900/[0.04] border border-slate-900/5">
-                  <p className="text-[9px] uppercase tracking-wider text-slate-500">Store Expenses (খরচ)</p>
+                  <p className="text-[9px] uppercase tracking-wider text-slate-500">{t.branch.performanceCards.storeExpenses}</p>
                   <p className="text-base font-bold font-mono text-rose-600 mt-1">{fmt(activeBranchSummary.totalExpenses)}</p>
                 </div>
                 <div className="p-4 rounded-xl bg-slate-900/[0.04] border border-slate-900/5">
-                  <p className="text-[9px] uppercase tracking-wider text-slate-500">Closing Cash (ড্রয়ার ক্যাশ)</p>
+                  <p className="text-[9px] uppercase tracking-wider text-slate-500">{t.branch.performanceCards.closingCash}</p>
                   <p className="text-base font-bold font-mono text-[#15803d] mt-1">{fmt(activeBranchSummary.netCash)}</p>
                 </div>
               </div>

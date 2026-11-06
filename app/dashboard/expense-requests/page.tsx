@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import { uploadFile } from '@/lib/files-client'
 import StatsCard from '@/components/stats-card'
+import { useLanguage } from '@/lib/i18n/provider'
 
 // profile from /api/auth/me; own
 // requests from GET /api/expense-requests; submit via POST
@@ -60,6 +61,7 @@ const statusConfig: Record<string, { label: string; cls: string; icon: React.FC<
 }
 
 export default function EmployeeExpenseRequestsPageWrapper() {
+  const { t } = useLanguage()
   return (
     <Suspense fallback={<div>Loading expenses...</div>}>
       <EmployeeExpenseRequestsPage />
@@ -68,6 +70,7 @@ export default function EmployeeExpenseRequestsPageWrapper() {
 }
 
 function EmployeeExpenseRequestsPage() {
+  const { t } = useLanguage()
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [requests, setRequests] = useState<ExpenseRequest[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -624,8 +627,8 @@ function EmployeeExpenseRequestsPage() {
                         <div>
                           <p className="text-xs font-semibold text-emerald-600">Branch Cash Expense</p>
                           <p className="text-[10px] text-emerald-600 mt-0.5 leading-relaxed">
-                            এই amount টি branch-এর daily cash closing থেকে automatically deduct হবে।
-                            কোনো account number দরকার নেই।
+                            {t.branch.expenseNotes.dashDeduct}
+                            {t.branch.expenseNotes.dashNoAccount}
                           </p>
                         </div>
                       </div>
@@ -774,7 +777,7 @@ function EmployeeExpenseRequestsPage() {
                   {selectedRequest.payment_method === 'cash' && (
                     <div className="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
                       <p className="text-[10px] text-emerald-600 uppercase tracking-wider font-bold mb-1">Cash Expense</p>
-                      <p className="text-xs text-emerald-600">Branch daily cash থেকে deduct হবে।</p>
+                      <p className="text-xs text-emerald-600">{t.branch.expenseNotes.dashDeductShort}</p>
                     </div>
                   )}
 

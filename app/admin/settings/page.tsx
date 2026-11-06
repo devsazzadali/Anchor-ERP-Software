@@ -7,6 +7,7 @@ import {
   User, ShieldCheck, Check, AlertTriangle, Key,
   MapPin, Phone, Globe, Image as ImageIcon, Loader2
 } from 'lucide-react'
+import LanguageSettingsCard from '@/components/LanguageSettingsCard'
 
 export default function AdminSettings() {
   // Profile State
@@ -219,6 +220,8 @@ export default function AdminSettings() {
           </h2>
           <p className="text-xs text-slate-500 mt-1">Manage your administrative footprint and authentication credentials.</p>
         </div>
+
+        <LanguageSettingsCard />
 
         <AnimatePresence mode="wait">
           {feedback && (

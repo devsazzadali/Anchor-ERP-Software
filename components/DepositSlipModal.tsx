@@ -8,6 +8,7 @@ import {
   Calendar, CreditCard, Hash, AlertCircle, Layers
 } from 'lucide-react'
 import { parseDailyBreakdown, getDailyBreakdownList, cleanDepositNotes, parseKhuchraAmount } from '@/lib/branch-deposit-utils'
+import { useLanguage } from '@/lib/i18n/provider'
 
 interface DepositData {
   id: string
@@ -55,6 +56,7 @@ export default function DepositSlipModal({
   onReject,
   isProcessingAction = false
 }: DepositSlipModalProps) {
+  const { t } = useLanguage()
   const [zoom, setZoom] = useState(1)
   const [rotation, setRotation] = useState(0)
   const [imageError, setImageError] = useState(false)
@@ -395,7 +397,7 @@ export default function DepositSlipModal({
                     <div className="p-3 rounded-xl bg-gradient-to-br from-[#1ca34c]/10 to-transparent border border-[#1ca34c]/25 space-y-2">
                       <div className="flex items-center justify-between border-b border-[#1ca34c]/20 pb-1.5">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-[#15803d] flex items-center gap-1.5">
-                          <Layers className="w-3 h-3" /> প্রতিদিনের জমার বিবরণ ({list.length} Days)
+                          <Layers className="w-3 h-3" /> {t.branch.dailyDepositDetails} ({list.length} Days)
                         </span>
                         <span className="text-[9px] text-slate-500 font-mono">
                           Daily Breakdown

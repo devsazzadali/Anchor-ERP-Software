@@ -7,6 +7,7 @@ import { Landmark, User, MapPin, Check, Edit3, ShieldAlert, FileText, ChevronRig
 import * as XLSX from 'xlsx'
 import { generatePdf } from '@/lib/pdf-generator'
 import { hashSecurityAnswer } from '@/lib/security-answer'
+import LanguageSettingsCard from '@/components/LanguageSettingsCard'
 
 // profile + salary history from
 // GET /api/me/profile (security digest never leaves the server —
@@ -327,6 +328,8 @@ export default function EmployeeSettings() {
             <span>{feedback.message}</span>
           </div>
         )}
+
+        <LanguageSettingsCard />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           

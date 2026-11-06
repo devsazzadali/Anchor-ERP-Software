@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { PackageCheck, RefreshCw, AlertTriangle, Download, FileJson, Info } from 'lucide-react'
 import { PageHead, downloadPdf } from '../ui'
+import { useLanguage } from '@/lib/i18n/provider'
 
 // Accounts A10 — Auditor Package. Pick a scope (full history, a
 // fiscal year, or one period) and download ONE bundle: README +
@@ -39,6 +40,7 @@ const CONTENTS: Array<[string, string]> = [
 ]
 
 export default function AuditorPackagePage() {
+  const { t } = useLanguage()
   const [meta, setMeta] = useState<Meta | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -79,7 +81,7 @@ export default function AuditorPackagePage() {
 
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <PageHead icon={<PackageCheck className="w-6 h-6 text-emerald-600" />} title="Auditor Report" bangla="অডিটরের জন্য সব রিপোর্ট এক ফাইলে" tech="Auditor Package">
+      <PageHead icon={<PackageCheck className="w-6 h-6 text-emerald-600" />} title={t.accounts.head.auditor.title} bangla={t.accounts.head.auditor.sub} tech={t.accounts.head.auditor.tech}>
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => void downloadPdf({

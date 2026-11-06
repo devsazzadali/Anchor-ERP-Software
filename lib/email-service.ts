@@ -2,6 +2,7 @@ import { Resend } from 'resend';
 import { bundleValueFor } from '@/lib/bundles';
 import { prisma } from '@/lib/db';
 import { isPartnerAccount } from '@/lib/server/auth';
+import { dictionaryFor } from '@/lib/i18n/dictionaries'
 
 /**
  * Fetches dynamic system settings from the database.
@@ -1359,6 +1360,7 @@ export async function sendDailyClosingEmailToAdmins({
   expectedClosingCash,
   difference,
   differenceNotes,
+  language,
 }: {
   branchName: string;
   managerName: string;
@@ -1379,7 +1381,10 @@ export async function sendDailyClosingEmailToAdmins({
   expectedClosingCash?: number;
   difference: number;
   differenceNotes?: string | null;
+  /** Acting user's saved language — the summary labels follow it. */
+  language?: string;
 }) {
+  const L = dictionaryFor(language === 'bn' ? 'bn' : 'en').email.dailySummary;
   const adminEmails = await getAdminEmails();
   if (!adminEmails || adminEmails.length === 0) return { success: false };
 
@@ -1414,7 +1419,7 @@ export async function sendDailyClosingEmailToAdmins({
       <!-- 1. Total Daily Sales Section -->
       <div style="margin-top: 16px; padding: 14px; background-color: #0b0d13; border: 1px solid #282d3c; border-radius: 8px;">
         <div style="font-size: 11px; font-weight: 700; color: #d4af37; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;">
-          🛍️ GROSS SALES REVENUE (মোট বিক্রয়)
+          🛍️ ${L.grossSales}
         </div>
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="font-size: 13px;">
           <tr style="border-bottom: 1px solid #1e222d;">
@@ -1439,11 +1444,11 @@ export async function sendDailyClosingEmailToAdmins({
         </div>
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="font-size: 13px;">
           <tr>
-            <td style="padding: 4px 0; color: #cbd5e1;">Opening Drawer Float (সকালের ক্যাশ)</td>
+            <td style="padding: 4px 0; color: #cbd5e1;">${L.openingFloat}</td>
             <td align="right" style="padding: 4px 0; font-weight: 600; color: #cbd5e1; font-family: monospace;">${formattedAmount(openingCash)}</td>
           </tr>
           <tr>
-            <td style="padding: 4px 0; color: #cbd5e1;">(+) Pure Cash Sales (নগদ বিক্রি)</td>
+            <td style="padding: 4px 0; color: #cbd5e1;">${L.pureCashSales}</td>
             <td align="right" style="padding: 4px 0; font-weight: 600; color: #34d399; font-family: monospace;">+${formattedAmount(cashSales)}</td>
           </tr>
           ${otherCashIn > 0 ? `
@@ -1454,13 +1459,13 @@ export async function sendDailyClosingEmailToAdmins({
           ` : ''}
           ${cashExpenses > 0 ? `
           <tr>
-            <td style="padding: 4px 0; color: #cbd5e1;">(-) Drawer Cash Expenses (খরচ)</td>
+            <td style="padding: 4px 0; color: #cbd5e1;">${L.drawerExpenses}</td>
             <td align="right" style="padding: 4px 0; font-weight: 600; color: #f87171; font-family: monospace;">-${formattedAmount(cashExpenses)}</td>
           </tr>
           ` : ''}
           ${bankDepositsOut > 0 ? `
           <tr>
-            <td style="padding: 4px 0; color: #cbd5e1;">(-) Bank Deposits Remitted (ব্যাংক জমা)</td>
+            <td style="padding: 4px 0; color: #cbd5e1;">${L.bankDeposits}</td>
             <td align="right" style="padding: 4px 0; font-weight: 600; color: #38bdf8; font-family: monospace;">-${formattedAmount(bankDepositsOut)}</td>
           </tr>
           ` : ''}
@@ -1469,7 +1474,7 @@ export async function sendDailyClosingEmailToAdmins({
             <td align="right" style="padding: 6px 0; font-weight: 700; color: #f8fafc; font-family: monospace;">${formattedAmount(expectedCash)}</td>
           </tr>
           <tr style="border-top: 2px solid #334155;">
-            <td style="padding: 8px 0 4px 0; font-weight: 700; color: #ffffff;">Actual Counted Cash (ড্রয়ার ক্যাশ)</td>
+            <td style="padding: 8px 0 4px 0; font-weight: 700; color: #ffffff;">${L.actualCounted}</td>
             <td align="right" style="padding: 8px 0 4px 0; font-weight: 800; color: #d4af37; font-size: 15px; font-family: monospace;">${formattedAmount(actualCash)}</td>
           </tr>
           <tr>

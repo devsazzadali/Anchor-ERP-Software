@@ -5,6 +5,8 @@ import React, { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Landmark, RefreshCw, CheckCircle2, AlertTriangle, Scale, BookOpen, ListTree, Flag } from 'lucide-react'
 import { PageHead, taka } from './ui'
+import { useLanguage } from '@/lib/i18n/provider'
+import { fill } from '@/lib/i18n/provider'
 
 // Accounts A1 — section home, simplified (presentation only).
 // Data: GET /api/accounts/overview (trial-balance health, per-class
@@ -51,24 +53,10 @@ type ExceptionsData = {
   counts: { total_active: number }
 }
 
-const ATTENTION_LABELS: Record<string, string> = {
-  DEPOSIT_DRIFT: 'ব্যাংক জমার হিসাবে অমিল',
-  CLOSING_SHORTAGES: 'কিছু দিনের হিসাবে ক্যাশ কম মিলেছে',
-  PAYABLE_OVERDUE: 'মেয়াদ পেরিয়ে যাওয়া পাওনা',
-  CHALAN_COST_MISSING: 'কিছু চালানে খরচের হিসাব লেখা হয়নি',
-  DUPLICATE_RECORD: 'একই টাকা দুইবার লেখা থাকতে পারে',
-  TXN_ID_REUSED: 'একই ব্যাংক লেনদেন নম্বর বারবার ব্যবহার হয়েছে',
-  UNBOOKED_PAID_REQUEST: 'টাকা দেওয়া হয়েছে কিন্তু খাতায় ওঠেনি',
-  CASH_NOT_RECORDED: 'কিছু শাখার হাতের ক্যাশের হিসাব নেই',
-  KYC_PENDING: 'কিছু মানুষের পরিচয় যাচাই বাকি',
-  PENDING_REQUESTS: 'কিছু খরচের আবেদন সিদ্ধান্তের অপেক্ষায়',
-  PERIOD_CLOSE_PENDING: 'আগের কিছু মাস এখনো বন্ধ করা হয়নি',
-  SALARY_HEAD_QUIRK: 'বেতনের দুই হিসাবে অমিল',
-}
-
 const CASH_CODES = ['1000', '1005', '1020']
 
 export default function AccountsOverviewPage() {
+  const { t } = useLanguage()
   const [data, setData] = useState<Overview | null>(null)
   const [pl, setPl] = useState<PlData | null>(null)
   const [tbStmt, setTbStmt] = useState<TbStmtData | null>(null)
@@ -158,7 +146,7 @@ export default function AccountsOverviewPage() {
       if (!g) {
         g = {
           code: item.code,
-          label: ATTENTION_LABELS[item.code] ?? item.title,
+          label: (t.accounts.home.attention as Record<string, string>)[item.code] ?? item.title,
           count: 0,
           amount: 0,
           hasAmount: false,
@@ -177,7 +165,7 @@ export default function AccountsOverviewPage() {
 
   const detailLink = (href: string) => (
     <Link href={href} className="mt-3 inline-block text-sm font-semibold text-emerald-700 hover:underline font-bangla">
-      বিস্তারিত →
+      {t.accounts.home.detailsLink}
     </Link>
   )
 
@@ -185,9 +173,9 @@ export default function AccountsOverviewPage() {
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
       <PageHead
         icon={<Landmark className="w-6 h-6 text-emerald-600" />}
-        title="Accounts at a Glance"
-        bangla="পুরো ব্যবসার হিসাব এক পেজে"
-        tech="Accounts Overview"
+        title={t.accounts.home.title}
+        bangla={t.accounts.home.sub}
+        tech={t.accounts.home.tech}
       >
         <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
@@ -204,13 +192,13 @@ export default function AccountsOverviewPage() {
             <div className="rounded-2xl border border-slate-200 bg-white p-5">
               <div className="text-sm font-semibold text-slate-700">Income — {periodLabel}</div>
               <div className="mt-2 text-3xl font-bold text-slate-900 tabular-nums">{pl ? taka(pl.statement.total_income) : '—'}</div>
-              <p className="mt-1 text-sm text-slate-600 font-bangla">এই মাসে বিক্রিসহ মোট আয়</p>
+              <p className="mt-1 text-sm text-slate-600 font-bangla">{t.accounts.home.incomeSub}</p>
               {detailLink('/admin/accounts/statements/pl')}
             </div>
             <div className="rounded-2xl border border-slate-200 bg-white p-5">
               <div className="text-sm font-semibold text-slate-700">Expenses — {periodLabel}</div>
               <div className="mt-2 text-3xl font-bold text-slate-900 tabular-nums">{pl ? taka(pl.statement.total_expenses) : '—'}</div>
-              <p className="mt-1 text-sm text-slate-600 font-bangla">এই মাসে মোট খরচ</p>
+              <p className="mt-1 text-sm text-slate-600 font-bangla">{t.accounts.home.expensesSub}</p>
               {detailLink('/admin/accounts/statements/pl')}
             </div>
             <div className={`rounded-2xl border p-5 ${pl ? (plNet >= 0 ? 'border-emerald-200 bg-emerald-50' : 'border-rose-200 bg-rose-50') : 'border-slate-200 bg-white'}`}>
@@ -219,11 +207,11 @@ export default function AccountsOverviewPage() {
                 {pl ? (
                   <>
                     <span className={plNet >= 0 ? 'text-emerald-700' : 'text-rose-700'}>{taka(pl.statement.net)}</span>{' '}
-                    <span className={`text-lg font-bangla ${plNet >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>{plNet >= 0 ? 'লাভ' : 'ক্ষতি'}</span>
+                    <span className={`text-lg font-bangla ${plNet >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>{plNet >= 0 ? t.accounts.home.profitWord : t.accounts.home.lossWord}</span>
                   </>
                 ) : '—'}
               </div>
-              <p className="mt-1 text-sm text-slate-600 font-bangla">আয় থেকে খরচ বাদ দিলে যা থাকে</p>
+              <p className="mt-1 text-sm text-slate-600 font-bangla">{t.accounts.home.profitSub}</p>
               {detailLink('/admin/accounts/statements/pl')}
             </div>
           </div>
@@ -232,7 +220,7 @@ export default function AccountsOverviewPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
             <div className="rounded-2xl border border-slate-200 bg-white p-5">
               <div className="text-sm font-semibold text-slate-700">Cash in hand</div>
-              <p className="mt-1 text-sm text-slate-600 font-bangla">বিভিন্ন খাতে হাতে থাকা টাকা — খাতার হিসাব অনুযায়ী</p>
+              <p className="mt-1 text-sm text-slate-600 font-bangla">{t.accounts.home.cashSub}</p>
               <div className="mt-3 space-y-1.5">
                 {!tbStmt && <div className="text-2xl font-bold text-slate-900">—</div>}
                 {tbStmt && cashRows.length === 0 && <div className="text-sm text-slate-500">—</div>}
@@ -245,7 +233,7 @@ export default function AccountsOverviewPage() {
               </div>
               {cashHeadOffice && cashHeadOffice.balance < 0 && (
                 <p className="mt-3 text-xs text-amber-700 font-bangla">
-                  Head Office-এর খাতা মাইনাস — মালিকের নিজের টাকা কোম্পানিতে এসেছে, যার আলাদা রেকর্ড নেই (Starting Figures-এ বিস্তারিত)।
+                  {t.accounts.home.headOfficeNote}
                 </p>
               )}
               {detailLink('/admin/accounts/statements/trial-balance')}
@@ -253,7 +241,7 @@ export default function AccountsOverviewPage() {
 
             <div className="rounded-2xl border border-slate-200 bg-white p-5">
               <div className="text-sm font-semibold text-slate-700">Money in bank</div>
-              <p className="mt-1 text-sm text-slate-600 font-bangla">ব্যাংক অ্যাকাউন্টে জমা — আমাদের খাতা অনুযায়ী</p>
+              <p className="mt-1 text-sm text-slate-600 font-bangla">{t.accounts.home.bankSub}</p>
               <div className="mt-3 space-y-2">
                 {!bank && <div className="text-2xl font-bold text-slate-900">—</div>}
                 {bank && bank.accounts.length === 0 && <div className="text-sm text-slate-500">—</div>}
@@ -266,7 +254,7 @@ export default function AccountsOverviewPage() {
                     {a.is_draft && (
                       <div className="mt-0.5">
                         <span className="px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">UNCONFIRMED</span>{' '}
-                        <span className="text-xs text-amber-700 font-bangla">ব্যাংকের আসল statement দিয়ে এখনো মেলানো হয়নি</span>
+                        <span className="text-xs text-amber-700 font-bangla">{t.accounts.home.bankUnconfirmed}</span>
                       </div>
                     )}
                   </div>
@@ -277,16 +265,16 @@ export default function AccountsOverviewPage() {
 
             <div className="rounded-2xl border border-slate-200 bg-white p-5">
               <div className="text-sm font-semibold text-slate-700">To Pay</div>
-              <p className="mt-1 text-sm text-slate-600 font-bangla">কাকে কত টাকা দিতে হবে</p>
+              <p className="mt-1 text-sm text-slate-600 font-bangla">{t.accounts.home.toPaySub}</p>
               <div className="mt-2 text-3xl font-bold text-slate-900 tabular-nums">
                 {payables ? taka(payables.ageing.totals.payable.total) : '—'}
               </div>
               {payables && (
                 <>
-                  <div className="mt-1 text-sm text-slate-600 font-bangla">{payableOpenCount}টি পাওনা বাকি</div>
+                  <div className="mt-1 text-sm text-slate-600 font-bangla">{fill(t.accounts.home.payablesOutstanding, { count: payableOpenCount })}</div>
                   <div className="mt-1 text-sm text-slate-600 font-bangla">
-                    কার কাছে পাব: {taka(payables.ageing.totals.receivable.total)}{' '}
-                    <span className="text-slate-500">(অন্যরা আমাদের কাছে যা পায়/দেবে)</span>
+                    {t.accounts.home.receivableLabel} {taka(payables.ageing.totals.receivable.total)}{' '}
+                    <span className="text-slate-500">{t.accounts.home.receivableNote}</span>
                   </div>
                 </>
               )}
@@ -299,14 +287,14 @@ export default function AccountsOverviewPage() {
               </div>
               {tb.balanced ? (
                 <>
-                  <div className="mt-2 text-2xl font-bold text-emerald-700 font-bangla">হিসাব মিলেছে ✓</div>
-                  <p className="mt-1 text-sm text-slate-600 font-bangla">সব হিসাব ঠিকঠাক মিলে গেছে</p>
+                  <div className="mt-2 text-2xl font-bold text-emerald-700 font-bangla">{t.accounts.home.booksBalanced}</div>
+                  <p className="mt-1 text-sm text-slate-600 font-bangla">{t.accounts.home.booksBalancedSub}</p>
                   <div className="mt-1 text-xs text-slate-500">
                     Dr {taka(tb.total_debit)} · Cr {taka(tb.total_credit)} · {tb.entries} entries
                   </div>
                 </>
               ) : (
-                <div className="mt-2 text-2xl font-bold text-rose-700 font-bangla">অমিল: {taka(tb.difference)}</div>
+                <div className="mt-2 text-2xl font-bold text-rose-700 font-bangla">{t.accounts.home.difference} {taka(tb.difference)}</div>
               )}
               {detailLink('/admin/accounts/statements/trial-balance')}
             </div>
@@ -316,14 +304,14 @@ export default function AccountsOverviewPage() {
           {exceptions && (
             attentionTotal === 0 ? (
               <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5 mb-6">
-                <h2 className="text-lg font-bold text-emerald-800 font-bangla">খেয়াল করুন</h2>
+                <h2 className="text-lg font-bold text-emerald-800 font-bangla">{t.accounts.home.pleaseNote}</h2>
                 <p className="text-xs text-slate-400 mt-0.5">Needs Attention</p>
-                <p className="mt-2 text-sm font-semibold text-emerald-700 font-bangla">সব ঠিক আছে ✓ — কোনো সমস্যা নেই</p>
+                <p className="mt-2 text-sm font-semibold text-emerald-700 font-bangla">{t.accounts.home.allFine}</p>
               </div>
             ) : (
               <div className="rounded-2xl border border-amber-200 bg-amber-50 p-5 mb-6">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="text-lg font-bold text-slate-900 font-bangla">খেয়াল করুন</h2>
+                  <h2 className="text-lg font-bold text-slate-900 font-bangla">{t.accounts.home.pleaseNote}</h2>
                   <span className="px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 text-sm font-bold">{attentionTotal}</span>
                 </div>
                 <p className="text-xs text-slate-400 mt-0.5">Needs Attention</p>
@@ -332,14 +320,14 @@ export default function AccountsOverviewPage() {
                     <Link key={g.code} href={g.link} className="flex flex-wrap items-baseline justify-between gap-2 rounded-lg px-2 py-1.5 text-sm hover:bg-amber-100">
                       <span className="text-slate-800 font-bangla">{g.label}</span>
                       <span className="text-slate-600">
-                        <span className="font-bangla">{g.count}টি</span>
+                        <span className="font-bangla">{fill(t.accounts.home.items, { count: g.count })}</span>
                         {g.hasAmount && <> · <span className="font-semibold tabular-nums">{taka(g.amount)}</span></>}
                       </span>
                     </Link>
                   ))}
                 </div>
                 <Link href="/admin/accounts/exceptions" className="mt-3 inline-block text-sm font-semibold text-emerald-700 hover:underline font-bangla">
-                  সব দেখুন →
+                  {t.accounts.home.viewAll}
                 </Link>
               </div>
             )

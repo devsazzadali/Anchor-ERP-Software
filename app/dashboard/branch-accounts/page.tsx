@@ -13,6 +13,7 @@ import {
 
 import { useBranchAuth } from '@/lib/hooks/use-branch-auth'
 import { fetchWithCache, getCachedData } from '@/lib/branch-cache'
+import { useLanguage } from '@/lib/i18n/provider'
 
 function StatCard({
   title, value, sub, icon: Icon, color = 'gold', trend
@@ -74,6 +75,7 @@ function StatusBadge({ status }: { status: string }) {
 const fmt = (n: any) => (Number(n || 0) < 0 ? '-' : '') + '৳' + Math.abs(Number(n || 0)).toLocaleString('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 
 export default function BranchAccountsDashboard() {
+  const { t } = useLanguage()
   const router = useRouter()
   const { profile, ready } = useBranchAuth()
 
@@ -202,32 +204,32 @@ export default function BranchAccountsDashboard() {
 
         {/* Today's KPI Cards */}
         <div className="mb-2">
-          <h2 className="text-[10px] uppercase tracking-widest text-slate-500 mb-4 font-semibold">Today's Executive Summary (আজকের হিসাব)</h2>
+          <h2 className="text-[10px] uppercase tracking-widest text-slate-500 mb-4 font-semibold">{t.branch.dashboardCards.executiveSummary}</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <StatCard
-            title="Total Sales (মোট বিক্রি)"
+            title={t.branch.dashboardCards.totalSales}
             value={fmt((Number(today.cashSales || 0) + Number(today.bkashSales || 0) + Number(today.nagadSales || 0) + Number(today.rocketSales || 0) + Number(today.cardSales || 0) + Number(today.bankTransferSales || 0)))}
             sub={`Cash: ${fmt(today.cashSales || 0)}`}
             icon={TrendingUp}
             color="gold"
           />
           <StatCard
-            title="Bank Deposits (ব্যাংকে জমা)"
+            title={t.branch.dashboardCards.bankDeposits}
             value={fmt(today.bankDepositsOut || 0)}
             sub="Ledger bank_deposits_out · today"
             icon={Building2}
             color="blue"
           />
           <StatCard
-            title="Closing Cash (ড্রয়ার ক্যাশ)"
+            title={t.branch.dashboardCards.closingCash}
             value={today.isClosed ? fmt(today.actualCash) : fmt(today.expectedClosingCash)}
             sub={today.isClosed ? 'Counted physical cash' : 'Expected in hand'}
             icon={Wallet}
             color="green"
           />
           <StatCard
-            title="Audit Status (হিসাব স্থিতি)"
+            title={t.branch.dashboardCards.auditStatus}
             value={today.differenceStatus ? today.differenceStatus.charAt(0).toUpperCase() + today.differenceStatus.slice(1) : (today.isClosed ? 'Closed' : 'Open')}
             sub={today.isClosed ? (today.cashDifference ? `Diff: ${Number(today.cashDifference) >= 0 ? '+' : ''}${fmt(today.cashDifference)}` : 'Zero Discrepancy') : 'Pending day closing'}
             icon={today.differenceStatus === 'matched' || (!today.cashDifference && today.isClosed) ? CheckCircle : today.differenceStatus === 'shortage' ? XCircle : AlertTriangle}
@@ -246,7 +248,7 @@ export default function BranchAccountsDashboard() {
 
         {/* Monthly Performance & Deposits */}
         <div className="mb-2">
-          <h2 className="text-[10px] uppercase tracking-widest text-slate-500 mb-4 font-semibold">This Month — Financial Performance (মাসিক কর্মক্ষমতা)</h2>
+          <h2 className="text-[10px] uppercase tracking-widest text-slate-500 mb-4 font-semibold">{t.branch.dashboardCards.monthPerformance}</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <StatCard title="MTD Total Gross Sales" value={fmt(monthly.totalSales || 0)}  icon={TrendingUp}  color="gold"   sub={`Cash: ${fmt(monthly.cashSales || 0)}`} />

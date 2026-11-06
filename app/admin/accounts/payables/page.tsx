@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Wallet, RefreshCw, CheckCircle2, AlertTriangle, History, HandCoins, Printer, Download } from 'lucide-react'
 import { PageHead, PrintHeader, PrintFooter, downloadPdf, bdt } from '../ui'
+import { useLanguage } from '@/lib/i18n/provider'
 
 // Accounts A5 — Payables & Ageing. Data: GET /api/accounts/payables
 // (register + per-class tie-out against the source tables +
@@ -65,6 +66,7 @@ const STATUS_STYLE: Record<string, string> = {
 }
 
 export default function PayablesPage() {
+  const { t } = useLanguage()
   const [items, setItems] = useState<Item[]>([])
   const [tieOut, setTieOut] = useState<TieOut[]>([])
   const [ageing, setAgeing] = useState<{ as_of: string; basis: string; totals: { payable: Buckets; receivable: Buckets }; by_counterparty: any[] } | null>(null)
@@ -193,7 +195,7 @@ export default function PayablesPage() {
 
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <PageHead icon={<Wallet className="w-6 h-6 text-emerald-600" />} title="To Pay" bangla="কাকে কত টাকা দিতে হবে" tech="Payables & Ageing">
+      <PageHead icon={<Wallet className="w-6 h-6 text-emerald-600" />} title={t.accounts.head.payables.title} bangla={t.accounts.head.payables.sub} tech={t.accounts.head.payables.tech}>
         <div className="flex flex-wrap gap-2">
           <button onClick={sync} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700">
             <RefreshCw className="w-4 h-4" /> Sync from records
