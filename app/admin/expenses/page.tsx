@@ -941,7 +941,7 @@ export default function AdminExpenses() {
                 )}
               </AnimatePresence>
 
-              {/* Table or Empty State */}
+              {/* Grid or Empty State */}
               {detailExpenses.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 gap-4">
                   <div className="w-14 h-14 rounded-2xl bg-slate-900/[0.04] border border-slate-900/5 flex items-center justify-center">
@@ -961,107 +961,122 @@ export default function AdminExpenses() {
                   )}
                 </div>
               ) : (
-                <div className="overflow-x-auto custom-scrollbar">
-                  <table className="w-full text-left min-w-[750px]">
-                    <thead>
-                      <tr className="text-[9px] uppercase tracking-[0.1em] text-slate-600 font-bold border-b border-slate-900/[0.08]">
-                        <th className="py-3 pl-5">Purpose</th>
-                        <th className="py-3">Branch</th>
-                        <th className="py-3">Date</th>
-                        <th className="py-3">Logged By</th>
-                        <th className="py-3 text-right">Total</th>
-                        <th className="py-3 text-right">Paid</th>
-                        <th className="py-3 text-right pr-5">Due</th>
-                        <th className="py-3 pr-5"></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {detailExpenses.map(exp => {
-                        const isEditing = editId === exp.id
-                        const isChecked = selectedIds.includes(exp.id)
-                        return (
-                          <tr key={exp.id} onClick={() => {
-                              if (isSelectMode) {
-                                if (isChecked) setSelectedIds(selectedIds.filter(id => id !== exp.id))
-                                else setSelectedIds([...selectedIds, exp.id])
-                              }
-                            }} className={`border-b border-slate-900/[0.08] text-xs transition-colors hover:bg-slate-900/[0.04] ${isSelectMode ? 'cursor-pointer' : ''} ${isChecked ? 'bg-[#1ca34c]/5' : ''}`}>
-                            <td className="py-3.5 pl-5 text-slate-900 font-medium max-w-[220px]">
-                                <div className="flex items-center gap-3">
-                                  {isSelectMode && (
-                                    <div className="relative flex items-center justify-center shrink-0 w-4 h-4">
-                                      <input type="checkbox" checked={isChecked} onChange={() => {}} className="peer absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
-                                      <div className="w-full h-full rounded-[4px] border border-slate-900/20 bg-white peer-checked:bg-[#1ca34c] peer-checked:border-[#1ca34c] flex items-center justify-center transition-all duration-200">
-                                        <Check className="w-3 h-3 text-black opacity-0 peer-checked:opacity-100 transition-opacity" strokeWidth={3} />
-                                      </div>
-                                    </div>
-                                  )}
-                                  <div className="min-w-0">
-                                    <div className="truncate" title={exp.purpose}>{exp.purpose}</div>
-                                    {expenseKindOf(exp) === 'setup' ? (
-                                      <span className="inline-flex items-center mt-1 px-1.5 py-px rounded bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 text-[8px] font-bold uppercase tracking-wider">Setup · One-time</span>
-                                    ) : (
-                                      <span className="inline-flex items-center mt-1 px-1.5 py-px rounded bg-slate-900/[0.04] text-slate-500 border border-slate-900/10 text-[8px] font-bold uppercase tracking-wider">Regular</span>
-                                    )}
-                                    {exp.vat_bearing && (
-                                      <span className="inline-flex items-center mt-1 ml-1 px-1.5 py-px rounded bg-amber-500/10 text-amber-700 border border-amber-500/20 text-[8px] font-bold uppercase tracking-wider" title="Flagged VAT-bearing — input VAT is recorded when VAT input is configured in Accounts → VAT & TDS">VAT</span>
-                                    )}
-                                  </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 p-5">
+                  {detailExpenses.map(exp => {
+                    const isEditing = editId === exp.id
+                    const isChecked = selectedIds.includes(exp.id)
+                    return (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        key={exp.id}
+                        onClick={() => {
+                          if (isSelectMode) {
+                            if (isChecked) setSelectedIds(selectedIds.filter(id => id !== exp.id))
+                            else setSelectedIds([...selectedIds, exp.id])
+                          }
+                        }}
+                        className={`glass-panel p-6 rounded-2xl relative shadow-xl hover:border-[#1ca34c]/30 transition-all border group ${
+                          isSelectMode ? 'cursor-pointer' : ''
+                        } ${isChecked && isSelectMode ? 'border-[#1ca34c]/40 bg-[#1ca34c]/5' : 'border-slate-900/5'}`}
+                      >
+                        <div className="flex justify-between items-start mb-4">
+                          <div className="flex items-center gap-3 min-w-0">
+                            {isSelectMode && (
+                              <div className="relative flex items-center justify-center shrink-0 w-4 h-4">
+                                <input type="checkbox" checked={isChecked} onChange={() => {}} className="peer absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                                <div className="w-full h-full rounded-[4px] border border-slate-900/20 bg-white peer-checked:bg-[#1ca34c] peer-checked:border-[#1ca34c] flex items-center justify-center transition-all duration-200">
+                                  <Check className="w-3 h-3 text-black opacity-0 peer-checked:opacity-100 transition-opacity" strokeWidth={3} />
                                 </div>
-                              </td>
-                            <td className="py-3.5">
-                              {exp.is_all_branches ? (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-600 border border-blue-500/15 text-[9px] font-bold uppercase">
-                                  <Globe className="w-2.5 h-2.5" /> All
-                                </span>
-                              ) : (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#1ca34c]/8 text-[#15803d] border border-[#1ca34c]/15 text-[9px] font-bold uppercase">
-                                  <MapPin className="w-2.5 h-2.5" /> {(exp.branch_name || 'HO').length > 14 ? (exp.branch_name || 'HO').slice(0, 14) + '…' : (exp.branch_name || 'HO')}
-                                </span>
-                              )}
-                            </td>
-                            <td className="py-3.5 text-slate-500 text-[11px]">
-                              {new Date(exp.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                            </td>
-                            <td className="py-3.5 text-slate-500 text-[11px] max-w-[90px] truncate">{exp.created_by_name}</td>
-                            <td className="py-3.5 text-right text-slate-900 font-semibold">৳{Number(exp.total_amount).toLocaleString()}</td>
-                            <td className="py-3.5 text-right text-emerald-600 font-semibold">৳{Number(exp.paid_amount).toLocaleString()}</td>
-                            <td className="py-3.5 text-right pr-5">
-                              {isEditing ? (
-                                <form onSubmit={submitEdit} className="flex items-center gap-1 justify-end">
-                                  <select value={editKind} onChange={e => setEditKind(e.target.value as ExpenseKind)} title="Expense type"
-                                    className="bg-white border border-slate-900/15 rounded-md p-1 text-slate-900 text-[10px] focus:outline-none">
-                                    <option value="operating">Regular</option>
-                                    <option value="setup">Setup</option>
-                                  </select>
-                                  <label className="flex items-center gap-1 text-[10px] text-slate-600" title="VAT-bearing (input VAT claimable)">
-                                    <input type="checkbox" checked={editVat} onChange={e => setEditVat(e.target.checked)} className="w-3.5 h-3.5" />
-                                    VAT
-                                  </label>
-                                  <input type="number" step="0.01" value={editPaid} onChange={e => setEditPaid(e.target.value)}
-                                    className="w-20 bg-white border border-slate-900/15 rounded-md p-1 text-slate-900 text-xs focus:outline-none" />
-                                  <button type="submit" className="text-emerald-600 hover:text-emerald-700 p-2"><Check className="w-3.5 h-3.5" /></button>
-                                  <button type="button" onClick={() => { setEditId(null); setEditPaid('') }} className="text-slate-500 hover:text-slate-900 p-2"><X className="w-3.5 h-3.5" /></button>
-                                </form>
-                              ) : (
-                                <span className={`font-semibold ${Number(exp.due_amount) > 0 ? 'text-rose-600' : 'text-slate-600'}`}>
-                                  ৳{Number(exp.due_amount).toLocaleString()}
-                                </span>
-                              )}
-                            </td>
-                            <td className="py-3.5 pr-5">
-                              {!isEditing && (
-                                <div className="flex items-center justify-end gap-2">
-                                  <button onClick={() => { setEditId(exp.id); setEditPaid(String(exp.paid_amount)); setEditKind(expenseKindOf(exp)); setEditVat(!!exp.vat_bearing) }} className="text-slate-600 hover:text-[#15803d] transition-colors p-2 rounded-md"><Edit className="w-3.5 h-3.5" /></button>
-                                  <button onClick={() => handleDelete(exp.id)} className="text-slate-600 hover:text-rose-600 transition-colors p-2 rounded-md"><Trash2 className="w-3.5 h-3.5" /></button>
-                                </div>
-                              )}
-                            </td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
+                              </div>
+                            )}
+                            <div className="w-10 h-10 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 flex items-center justify-center text-slate-900 font-bold text-sm shrink-0">
+                              {(exp.purpose || '?').trim().charAt(0).toUpperCase()}
+                            </div>
+                            <div className="min-w-0">
+                              <h4 className="text-sm font-bold text-slate-900 group-hover:text-[#15803d] transition-colors truncate" title={exp.purpose}>{exp.purpose}</h4>
+                              <span className="text-[10px] text-slate-500 uppercase tracking-wider block truncate">{exp.branch_name || 'HO'}</span>
+                            </div>
+                          </div>
+                          {Number(exp.due_amount) > 0 ? (
+                            <div className="px-2 py-1 rounded-md bg-rose-500/10 text-rose-600 text-[10px] font-bold border border-rose-500/20 shrink-0">
+                              Due ৳{Number(exp.due_amount).toLocaleString()}
+                            </div>
+                          ) : (
+                            <div className="px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-600 text-[10px] font-bold border border-emerald-500/20 shrink-0">
+                              Paid
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-1 mb-4">
+                          {expenseKindOf(exp) === 'setup' ? (
+                            <span className="inline-flex items-center px-1.5 py-px rounded bg-[#1ca34c]/10 text-[#15803d] border border-[#1ca34c]/20 text-[8px] font-bold uppercase tracking-wider">Setup · One-time</span>
+                          ) : (
+                            <span className="inline-flex items-center px-1.5 py-px rounded bg-slate-900/[0.04] text-slate-500 border border-slate-900/10 text-[8px] font-bold uppercase tracking-wider">Regular</span>
+                          )}
+                          {exp.vat_bearing && (
+                            <span className="inline-flex items-center px-1.5 py-px rounded bg-amber-500/10 text-amber-700 border border-amber-500/20 text-[8px] font-bold uppercase tracking-wider" title="Flagged VAT-bearing — input VAT is recorded when VAT input is configured in Accounts → VAT & TDS">VAT</span>
+                          )}
+                          {exp.is_all_branches ? (
+                            <span className="inline-flex items-center gap-1 px-1.5 py-px rounded bg-blue-500/10 text-blue-600 border border-blue-500/15 text-[8px] font-bold uppercase tracking-wider">
+                              <Globe className="w-2.5 h-2.5" /> All Branches
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-1.5 py-px rounded bg-[#1ca34c]/8 text-[#15803d] border border-[#1ca34c]/15 text-[8px] font-bold uppercase tracking-wider">
+                              <MapPin className="w-2.5 h-2.5" /> {(exp.branch_name || 'HO').length > 14 ? (exp.branch_name || 'HO').slice(0, 14) + '…' : (exp.branch_name || 'HO')}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="my-4">
+                          <h3 className="text-xl font-bold text-slate-900 mb-1">
+                            ৳{Number(exp.total_amount).toLocaleString()} <span className="text-xs text-slate-500 font-normal">BDT</span>
+                          </h3>
+                          <p className="text-[10px] text-slate-500">
+                            Paid: <span className="text-emerald-600 font-semibold">৳{Number(exp.paid_amount).toLocaleString()}</span>
+                            {' · '}Due: <span className={`font-semibold ${Number(exp.due_amount) > 0 ? 'text-rose-600' : 'text-slate-500'}`}>৳{Number(exp.due_amount).toLocaleString()}</span>
+                          </p>
+                        </div>
+
+                        {isEditing && (
+                          <form onSubmit={submitEdit} onClick={e => e.stopPropagation()} className="mb-4 p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 space-y-2">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <select value={editKind} onChange={e => setEditKind(e.target.value as ExpenseKind)} title="Expense type"
+                                className="bg-white border border-slate-900/15 rounded-md p-1.5 text-slate-900 text-[10px] focus:outline-none">
+                                <option value="operating">Regular</option>
+                                <option value="setup">Setup</option>
+                              </select>
+                              <label className="flex items-center gap-1 text-[10px] text-slate-600" title="VAT-bearing (input VAT claimable)">
+                                <input type="checkbox" checked={editVat} onChange={e => setEditVat(e.target.checked)} className="w-3.5 h-3.5" />
+                                VAT
+                              </label>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <input type="number" step="0.01" value={editPaid} onChange={e => setEditPaid(e.target.value)}
+                                className="flex-1 min-w-0 bg-white border border-slate-900/15 rounded-md p-1.5 text-slate-900 text-xs focus:outline-none" />
+                              <button type="submit" className="text-emerald-600 hover:text-emerald-700 p-2"><Check className="w-3.5 h-3.5" /></button>
+                              <button type="button" onClick={() => { setEditId(null); setEditPaid('') }} className="text-slate-500 hover:text-slate-900 p-2"><X className="w-3.5 h-3.5" /></button>
+                            </div>
+                          </form>
+                        )}
+
+                        <div className="pt-4 border-t border-slate-900/5 flex justify-between items-center text-[10px] gap-2">
+                          <div className="flex items-center gap-1.5 text-slate-500 min-w-0">
+                            <Check className="w-3 h-3 text-emerald-600 shrink-0" />
+                            {new Date(exp.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                            <span className="truncate">· {exp.created_by_name}</span>
+                          </div>
+                          {!isEditing && (
+                            <div className="flex items-center gap-1 shrink-0">
+                              <button onClick={e => { e.stopPropagation(); setEditId(exp.id); setEditPaid(String(exp.paid_amount)); setEditKind(expenseKindOf(exp)); setEditVat(!!exp.vat_bearing) }} className="text-slate-600 hover:text-[#15803d] transition-colors p-2 rounded-md"><Edit className="w-3.5 h-3.5" /></button>
+                              <button onClick={e => { e.stopPropagation(); handleDelete(exp.id) }} className="text-slate-600 hover:text-rose-600 transition-colors p-2 rounded-md"><Trash2 className="w-3.5 h-3.5" /></button>
+                            </div>
+                          )}
+                        </div>
+                      </motion.div>
+                    )
+                  })}
                 </div>
               )}
             </div>

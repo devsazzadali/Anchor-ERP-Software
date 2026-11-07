@@ -114,6 +114,26 @@ function ProfitLossInner() {
     })
   }
 
+  // Branch report PDF: one row per branch from the SAME payload's
+  // by_branch breakdown (company view only) — identical figures to
+  // the on-screen "Result by branch" table, official design.
+  const handleBranchPdf = () => {
+    if (!stmt || !stmt.by_branch) return
+    void downloadPdf({
+      title: 'Profit & Loss by Branch',
+      subtitle: 'Branch-wise Income, Expenses and Net Result',
+      dateRange: scopeLabel || undefined,
+      columns: ['Branch', 'Income (BDT)', 'Expenses (BDT)', 'Net (BDT)'],
+      rows: stmt.by_branch.map((b) => [b.branch_name, b.income, b.expenses, b.net] as (string | number)[]),
+      summary: [
+        { label: 'Total Income (all branches)', value: bdt(stmt.total_income) },
+        { label: 'Total Expenses (all branches)', value: bdt(stmt.total_expenses) },
+        { label: net >= 0 ? 'Net Profit' : 'Net Loss', value: bdt(Math.abs(net)) },
+      ],
+      filename: 'profit-and-loss-by-branch.pdf',
+    })
+  }
+
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto accounts-print-area">
       <PrintHeader title="Profit & Loss" subtitle="Income and Expenses" />
@@ -203,6 +223,11 @@ function ProfitLossInner() {
                   <p className="mt-2 text-xs text-slate-500">
                     Every income/expense journal line carries a branch, so the branch rows sum to the company totals above.
                   </p>
+                  <div className="mt-3 print:hidden">
+                    <button onClick={handleBranchPdf} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+                      <FileText className="w-4 h-4" /> Branch Report PDF
+                    </button>
+                  </div>
                 </>
               )}
             </>

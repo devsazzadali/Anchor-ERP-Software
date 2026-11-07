@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import {
   Wallet, RefreshCw, Calendar, AlertTriangle, Building2, Download,
-  Search, ChevronLeft, Plus, Receipt, Trash2, X, CheckCircle, PackageOpen, MapPin, Check, Settings
+  Search, ChevronLeft, Plus, Receipt, Trash2, X, CheckCircle, PackageOpen, MapPin, Check, Settings, User
 } from 'lucide-react'
 
 import IssueSalaryModal from '../salaries/IssueSalaryModal'
@@ -420,7 +420,7 @@ export default function AdminBranchExpensesPage() {
               </div>
             </div>
 
-            {/* Table or Empty State */}
+            {/* Grid or Empty State */}
             {isLoading ? (
               <div className="py-16 flex justify-center">
                  <div className="w-8 h-8 border-2 border-[#1ca34c] border-t-transparent rounded-full animate-spin" />
@@ -442,66 +442,81 @@ export default function AdminBranchExpensesPage() {
                   </button>
                 </div>
             ) : (
-              <div className="overflow-x-auto custom-scrollbar">
-                <table className="w-full text-left min-w-[750px]">
-                  <thead>
-                    <tr className="text-[9px] uppercase tracking-[0.1em] text-slate-600 font-bold border-b border-slate-900/[0.08]">
-                      <th className="py-3 pl-5">Description</th>
-                      <th className="py-3">Account</th>
-                      <th className="py-3">Branch</th>
-                      <th className="py-3">Date</th>
-                      <th className="py-3 text-right">Amount</th>
-                      <th className="py-3 pr-5"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {expenses.map((exp: any) => (
-                      <tr key={exp.id} className="border-b border-slate-900/[0.08] text-xs transition-colors hover:bg-slate-900/[0.04]">
-                        <td className="py-3.5 pl-5 text-slate-900 font-medium max-w-[220px]">
-                          <div className="truncate" title={exp.description}>{exp.description}</div>
-                          {exp.notes && <div className="text-[10px] text-slate-500 truncate mt-0.5" title={exp.notes}>{exp.notes}</div>}
-                        </td>
-                        <td className="py-3.5 text-slate-500 text-[10px]">
-                          {exp.recipient_account ? (
-                            <div className="truncate max-w-[150px]" title={exp.recipient_account}>{exp.recipient_account}</div>
-                          ) : (
-                            <span className="text-slate-600">-</span>
-                          )}
-                        </td>
-                        <td className="py-3.5">
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#1ca34c]/8 text-[#15803d] border border-[#1ca34c]/15 text-[9px] font-bold uppercase">
-                            <MapPin className="w-2.5 h-2.5" /> {(() => {
-                              const bName = exp.branch_name || branches.find((b: any) => b.id === exp.branch_id)?.name || 'Branch';
-                              return bName.length > 14 ? bName.slice(0, 14) + '…' : bName;
-                            })()}
-                          </span>
-                        </td>
-                        <td className="py-3.5 text-slate-500 text-[11px]">
-                          {new Date(exp.expense_date || exp.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                        </td>
-                        <td className="py-3.5 text-right text-rose-600 font-bold">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {expenses.map((exp: any) => {
+                  const bName = exp.branch_name || branches.find((b: any) => b.id === exp.branch_id)?.name || 'Branch'
+                  const paidAmt = Number(exp.paid_amount ?? exp.amount ?? 0)
+                  const dueAmt = Number(exp.due_amount ?? 0)
+                  const isFullyPaid = dueAmt <= 0
+                  return (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      key={exp.id}
+                      className="glass-panel p-6 rounded-2xl relative shadow-xl hover:border-[#1ca34c]/30 transition-all border border-slate-900/5 group"
+                    >
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-10 h-10 rounded-xl bg-slate-900/[0.04] border border-slate-900/10 flex items-center justify-center text-slate-900 font-bold text-sm shrink-0">
+                            {(exp.description || '?').trim().charAt(0).toUpperCase()}
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="text-sm font-bold text-slate-900 group-hover:text-[#15803d] transition-colors truncate" title={exp.description}>{exp.description}</h4>
+                            <span className="text-[10px] text-slate-500 uppercase tracking-wider block truncate">{bName}</span>
+                          </div>
+                        </div>
+                        {isFullyPaid ? (
+                          <div className="px-2 py-1 rounded-md bg-emerald-500/10 text-emerald-600 text-[10px] font-bold border border-emerald-500/20 shrink-0">
+                            Paid
+                          </div>
+                        ) : (
+                          <div className="px-2 py-1 rounded-md bg-rose-500/10 text-rose-600 text-[10px] font-bold border border-rose-500/20 shrink-0">
+                            Due {fmt(dueAmt)}
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="my-4">
+                        <h3 className="text-xl font-bold text-slate-900 mb-1">
                           {fmt(exp.amount)}
-                        </td>
-                        <td className="py-3.5 pr-5">
-                          {canDelete && (
-                            <div className="flex items-center justify-end">
-                              {confirmDeleteId === exp.id ? (
-                                <div className="flex items-center gap-1">
-                                  <button onClick={() => handleDelete(exp.id)} className="px-3 py-2.5 rounded-md bg-rose-500/20 border border-rose-500/30 text-rose-600 text-[10px] font-bold hover:bg-rose-500/30 transition-all cursor-pointer">Confirm</button>
-                                  <button onClick={() => setConfirmDeleteId(null)} className="p-2.5 rounded-md text-slate-500 hover:text-slate-900 transition-all cursor-pointer bg-slate-900/[0.04]"><X className="w-3.5 h-3.5" /></button>
-                                </div>
-                              ) : (
-                                <button onClick={() => setConfirmDeleteId(exp.id)} className="p-2.5 rounded-md text-slate-600 hover:text-rose-600 transition-colors cursor-pointer" title="Delete expense">
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
-                              )}
+                        </h3>
+                        {(paidAmt !== Number(exp.amount) || dueAmt > 0) && (
+                          <p className="text-[10px] text-slate-500">
+                            Paid: <span className="text-emerald-600 font-semibold">{fmt(paidAmt)}</span>
+                            {dueAmt > 0 && <> · Due: <span className="text-rose-600 font-semibold">{fmt(dueAmt)}</span></>}
+                          </p>
+                        )}
+                      </div>
+
+                      {exp.notes && (
+                        <div className="text-[10px] text-slate-500 mb-3 truncate" title={exp.notes}>{exp.notes}</div>
+                      )}
+
+                      <div className="pt-4 border-t border-slate-900/5 flex justify-between items-center text-[10px] gap-2">
+                        <div className="flex items-center gap-1.5 text-slate-500 min-w-0">
+                          <Calendar className="w-3 h-3 text-[#15803d] shrink-0" />
+                          {new Date(exp.expense_date || exp.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        </div>
+                        <span className="text-slate-500 truncate flex items-center gap-1 min-w-0" title={exp.recipient_account || undefined}>
+                          <User className="w-3 h-3 shrink-0" />
+                          <span className="truncate">{exp.recipient_account || '—'}</span>
+                        </span>
+                        {canDelete && (
+                          confirmDeleteId === exp.id ? (
+                            <div className="flex items-center gap-1 shrink-0">
+                              <button onClick={() => handleDelete(exp.id)} className="px-3 py-2.5 rounded-md bg-rose-500/20 border border-rose-500/30 text-rose-600 text-[10px] font-bold hover:bg-rose-500/30 transition-all cursor-pointer">Confirm</button>
+                              <button onClick={() => setConfirmDeleteId(null)} className="p-2.5 rounded-md text-slate-500 hover:text-slate-900 transition-all cursor-pointer bg-slate-900/[0.04]"><X className="w-3.5 h-3.5" /></button>
                             </div>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                          ) : (
+                            <button onClick={() => setConfirmDeleteId(exp.id)} className="p-2.5 rounded-md text-slate-600 hover:text-rose-600 transition-colors cursor-pointer shrink-0" title="Delete expense">
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )
+                        )}
+                      </div>
+                    </motion.div>
+                  )
+                })}
               </div>
             )}
           </div>

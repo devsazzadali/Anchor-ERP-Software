@@ -356,6 +356,15 @@ html, body {
     padding: 10mm 12mm !important;
     background: #fff !important;
   }
+  /* Statement tables print at the width of the actual print area.
+     On screen they carry min-widths (min-w-[560px] etc.) so narrow
+     screens get a horizontal scroll instead; in print that minimum
+     forces the table wider than the printable area and the rightmost
+     column (amounts) is clipped off the sheet. */
+  .accounts-print-area table {
+    min-width: 0 !important;
+    max-width: 100%;
+  }
   .accounts-print-header {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;

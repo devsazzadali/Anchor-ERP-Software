@@ -92,7 +92,16 @@ export async function statementMeta(db: Db): Promise<StatementMeta> {
   const [periods, branches, position, coverage] = await Promise.all([
     loadPeriods(db),
     db.branch.findMany({ select: { id: true, name: true }, orderBy: { name: 'asc' } }),
-    db.openingPosition.findFirst({ orderBy: { created_at: 'desc' } }),
+    // The OPENING POSITION for status purposes is the CONFIRMED one when it
+    // exists: an admin can recompute a fresh DRAFT at any time (a routine,
+    // harmless action), and that draft must not flip the balance sheet back
+    // to PROVISIONAL or resurrect "still a DRAFT" wording once the owner has
+    // confirmed a position. Fall back to the newest position when none is
+    // confirmed yet.
+    db.openingPosition.findFirst({
+      where: { status: 'confirmed' },
+      orderBy: { created_at: 'desc' },
+    }).then((confirmed: any) => confirmed ?? db.openingPosition.findFirst({ orderBy: { created_at: 'desc' } })),
     db.journalEntry.aggregate({
       where: { status: 'posted' },
       _min: { entry_date: true },
