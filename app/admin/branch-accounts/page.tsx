@@ -15,6 +15,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { generatePdf } from '@/lib/pdf-generator'
 import { generateExcel } from '@/lib/excel-generator'
 import { useBranchAuth } from '@/lib/hooks/use-branch-auth'
+import { useStickyBranch } from '@/lib/hooks/use-sticky-branch'
 import { fetchWithCache, invalidateBranchCache, getCachedData, setCachedData } from '@/lib/branch-cache'
 import { useLanguage } from '@/lib/i18n/provider'
 
@@ -73,7 +74,12 @@ export default function AdminBranchAccountsPage() {
   })
   
   // Filters
-  const [selectedBranch, setSelectedBranch] = useState<string>('all')
+  // Sticky branch (plan §5.1): the selection is shared with the
+  // other operational pages via useStickyBranch; this page's own
+  // 'all' spelling maps to the shared '' (all branches).
+  const [stickyBranch, setStickyBranch] = useStickyBranch()
+  const selectedBranch = stickyBranch === '' ? 'all' : stickyBranch
+  const setSelectedBranch = (v: string) => setStickyBranch(v === 'all' ? '' : v)
   const [datePreset, setDatePreset] = useState<'today' | '7days' | 'month' | '30days' | 'all' | 'custom'>('30days')
   const [fromDate, setFromDate] = useState<string>('')
   const [toDate, setToDate] = useState<string>('')

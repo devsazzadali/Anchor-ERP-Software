@@ -44,6 +44,12 @@ export default function PayrollRunsPage() {
   const { t } = useLanguage()
   const [runs, setRuns] = useState<RunRow[] | null>(null)
   const [settingsCount, setSettingsCount] = useState<number | null>(null)
+  const [employees, setEmployees] = useState<Array<{ id: string; full_name: string }>>([])
+  const [structures, setStructures] = useState<Array<{ user_id: string; full_name: string | null; gross: string }>>([])
+  const [wizard, setWizard] = useState({ user_id: '', basic: '', house_rent: '', medical: '', conveyance: '', overtime_rate: '' })
+  const [wizardBusy, setWizardBusy] = useState(false)
+  const [wizardError, setWizardError] = useState<string | null>(null)
+  const [wizardSaved, setWizardSaved] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [month, setMonth] = useState('')
@@ -60,6 +66,8 @@ export default function PayrollRunsPage() {
       if (!res.ok) throw new Error(json.error || 'Failed to load payroll runs')
       setRuns(json.runs || [])
       setSettingsCount(json.salary_settings_count ?? 0)
+      setEmployees(json.employees || [])
+      setStructures(json.structures || [])
     } catch (e: any) {
       setError(e?.message || 'Failed to load payroll runs')
     } finally {
@@ -68,6 +76,39 @@ export default function PayrollRunsPage() {
   }, [])
 
   useEffect(() => { load() }, [load])
+
+  const wizardGross = [wizard.basic, wizard.house_rent, wizard.medical, wizard.conveyance]
+    .reduce((s, v) => s + (Number(v) || 0), 0)
+
+  const saveStructure = async () => {
+    setWizardBusy(true)
+    setWizardError(null)
+    setWizardSaved(false)
+    try {
+      const res = await fetch('/api/accounts/payroll', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'save_structure',
+          user_id: wizard.user_id,
+          basic: wizard.basic,
+          house_rent: wizard.house_rent,
+          medical: wizard.medical,
+          conveyance: wizard.conveyance,
+          overtime_rate: wizard.overtime_rate,
+        }),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Save failed')
+      setWizardSaved(true)
+      setWizard({ user_id: '', basic: '', house_rent: '', medical: '', conveyance: '', overtime_rate: '' })
+      await load()
+    } catch (e: any) {
+      setWizardError(e?.message || 'Save failed')
+    } finally {
+      setWizardBusy(false)
+    }
+  }
 
   const create = async () => {
     setCreating(true)
@@ -106,7 +147,7 @@ export default function PayrollRunsPage() {
 
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <PageHead icon={<Wallet className="w-6 h-6 text-emerald-600" />} title={t.accounts.head.payroll.title} bangla={t.accounts.head.payroll.sub} tech={t.accounts.head.payroll.tech}>
+      <PageHead icon={<Wallet className="w-6 h-6 text-emerald-600" />} title={t.accounts.head.payroll.title} bangla={t.accounts.head.payroll.sub} tech={t.accounts.head.payroll.tech} purpose={t.accounts.head.payroll.purpose}>
         <div className="flex flex-wrap gap-2">
           <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
@@ -144,6 +185,84 @@ export default function PayrollRunsPage() {
           <span>{settingsCount} salary structure(s) are recorded — new runs offer them as suggested lines.</span>
         </div>
       )}
+
+      {/* ── Salary setup wizard (Step 5, D3) ─────────────────── */}
+      <div className="rounded-2xl border border-emerald-200 bg-white p-5 mb-6">
+        <h2 className="text-base font-bold text-slate-900 font-bangla">{t.accounts.payrollWizard.title}</h2>
+        {structures.length === 0 && (
+          <div className="mt-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <div className="text-sm font-semibold text-slate-800 font-bangla">{t.accounts.payrollWizard.emptyTitle}</div>
+            <p className="mt-1 text-sm text-slate-600 font-bangla">{t.accounts.payrollWizard.emptyText}</p>
+          </div>
+        )}
+        {structures.length > 0 && (
+          <div className="mt-3 space-y-1">
+            {structures.map((s) => (
+              <div key={s.user_id} className="flex items-baseline justify-between text-sm border-b border-slate-50 py-1">
+                <span className="text-slate-700">{s.full_name ?? s.user_id}</span>
+                <span className="font-semibold tabular-nums">{taka(Number(s.gross))}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="mt-4">
+          <div className="text-sm font-semibold text-slate-700 font-bangla">{t.accounts.payrollWizard.stepEmployee}</div>
+          <select
+            value={wizard.user_id}
+            onChange={(e) => setWizard({ ...wizard, user_id: e.target.value })}
+            className="mt-1 block w-full max-w-md rounded-lg border border-slate-300 px-3 py-2 text-sm"
+          >
+            <option value="">—</option>
+            {employees.map((e) => (
+              <option key={e.id} value={e.id}>{e.full_name}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="mt-4">
+          <div className="text-sm font-semibold text-slate-700 font-bangla">{t.accounts.payrollWizard.stepComponents}</div>
+          <div className="mt-2 grid grid-cols-2 md:grid-cols-5 gap-3">
+            {([
+              ['basic', t.accounts.payrollWizard.basic],
+              ['house_rent', t.accounts.payrollWizard.houseRent],
+              ['medical', t.accounts.payrollWizard.medical],
+              ['conveyance', t.accounts.payrollWizard.conveyance],
+              ['overtime_rate', t.accounts.payrollWizard.overtimeRate],
+            ] as const).map(([key, label]) => (
+              <label key={key} className="block">
+                <span className="text-xs font-semibold text-slate-500 font-bangla">{label}</span>
+                <input
+                  type="number" step="0.01" min="0"
+                  value={wizard[key]}
+                  onChange={(e) => setWizard({ ...wizard, [key]: e.target.value })}
+                  className="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  placeholder="0.00"
+                />
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center gap-4">
+          <div>
+            <div className="text-sm font-semibold text-slate-700 font-bangla">{t.accounts.payrollWizard.stepReview}</div>
+            <div className="text-sm text-slate-600">
+              <span className="font-bangla">{t.accounts.payrollWizard.grossPreview}</span>{' '}
+              <span className="text-lg font-bold text-slate-900 tabular-nums">{taka(wizardGross)}</span>
+            </div>
+          </div>
+          <button
+            disabled={wizardBusy || !wizard.user_id || !(Number(wizard.basic) > 0)}
+            onClick={saveStructure}
+            className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 disabled:opacity-50 font-bangla"
+          >
+            {t.accounts.payrollWizard.saveButton}
+          </button>
+          {wizardSaved && <span className="text-sm font-semibold text-emerald-700 font-bangla">{t.accounts.payrollWizard.savedNotice}</span>}
+          {wizardError && <span className="text-sm font-semibold text-rose-700">{wizardError}</span>}
+        </div>
+      </div>
 
       <div className="rounded-2xl border border-slate-200 bg-white p-5 mb-6">
         <h2 className="text-sm font-bold text-slate-900 mb-3">Start a run</h2>

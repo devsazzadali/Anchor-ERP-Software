@@ -8,6 +8,7 @@
 
 import React from 'react'
 import { Download, Printer } from 'lucide-react'
+import { useLanguage } from '@/lib/i18n/provider'
 
 export const taka = (v: string | number) =>
   `৳${Number(v).toLocaleString('en-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -43,10 +44,11 @@ export function PeriodScopeBar(props: {
   onScope?: (s: 'period' | 'fytd') => void
 }) {
   const { periods, period, onPeriod, scope, onScope } = props
+  const { t } = useLanguage()
   return (
     <div className="flex flex-wrap items-center gap-3">
       <label className="inline-flex items-center gap-2 text-sm text-slate-600">
-        Period
+        {t.accounts.statementsUi.periodLabel}
         <select
           value={period}
           onChange={(e) => onPeriod(e.target.value)}
@@ -67,11 +69,25 @@ export function PeriodScopeBar(props: {
               onClick={() => onScope(s)}
               className={`px-3 py-2 text-sm font-semibold ${scope === s ? 'bg-emerald-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}
             >
-              {s === 'period' ? 'This period' : 'FY to date'}
+              {s === 'period' ? t.accounts.statementsUi.thisMonth : t.accounts.statementsUi.yearToDate}
             </button>
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+/**
+ * The company-wide ribbon (plan §5.1/§5.2): statements that are
+ * never branch-split (Trial Balance, Balance Sheet) say so at the
+ * top, so nobody mistakes a company figure for one branch's.
+ */
+export function CompanyWideRibbon() {
+  const { t } = useLanguage()
+  return (
+    <div className="rounded-xl border border-sky-200 bg-sky-50 px-4 py-2.5 mb-4 text-sm font-semibold text-sky-900 font-bangla print:hidden">
+      {t.accounts.statementsUi.companyWide}
     </div>
   )
 }

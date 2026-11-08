@@ -140,7 +140,7 @@ export default function TaxPage() {
   return (
     <div className="space-y-6">
       <div>
-        <PageHead title={t.accounts.head.tax.title} bangla={t.accounts.head.tax.sub} tech={t.accounts.head.tax.tech} />
+        <PageHead title={t.accounts.head.tax.title} bangla={t.accounts.head.tax.sub} tech={t.accounts.head.tax.tech} purpose={t.accounts.head.tax.purpose} />
         <p className="-mt-4 text-sm text-slate-500">
           Tax register for VAT and tax deducted at source. Tax is recorded only for the types you configure
           below — and only on events dated on or after the type&apos;s effective-from date.

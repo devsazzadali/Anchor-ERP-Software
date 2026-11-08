@@ -30,12 +30,19 @@ export interface SidebarProps {
 
 type NavLabelKey = keyof Dictionary['nav'];
 
+type NavSubItem = { labelKey: NavLabelKey; href: string; dividerBefore?: boolean };
+/** A sub-menu entry is either a plain link or a nested collapsible group. */
+type NavSubEntry = NavSubItem | { groupLabelKey: NavLabelKey; items: NavSubItem[] };
+
+const flatSubHrefs = (items: NavSubEntry[]): string[] =>
+  items.flatMap((e) => ('items' in e ? e.items.map((i) => i.href) : [e.href]));
+
 interface NavItem {
   labelKey: NavLabelKey;
   icon: React.ComponentType<{ className?: string }>;
   href: string;
   divider?: boolean;
-  subItems?: { labelKey: NavLabelKey; href: string }[];
+  subItems?: NavSubEntry[];
 }
 
 const adminNavigation: NavItem[] = [
@@ -86,33 +93,32 @@ const adminNavigation: NavItem[] = [
       // a workflow + every derived data signal. The badge shows
       // the live open-item count (fetched below, admin nav only).
       { labelKey: 'needsAttention', href: '/admin/accounts/exceptions' },
-      { labelKey: 'moneyCategories', href: '/admin/accounts/chart' },
-      { labelKey: 'allEntries', href: '/admin/accounts/journal' },
-      { labelKey: 'startingFigures', href: '/admin/accounts/opening' },
-      // Accounts A3: period close & lock, FY rollover.
-      { labelKey: 'monthOpenClose', href: '/admin/accounts/periods' },
+      // Payables register; the counterparties list lives inside it as a tab.
+      { labelKey: 'toPay', href: '/admin/accounts/payables' },
       // Accounts A4: bank accounts, statement import + reconciliation.
       { labelKey: 'matchWithBank', href: '/admin/accounts/bank' },
-      // Accounts A5: counterparties + payables/receivables register with ageing.
-      { labelKey: 'peopleCompanies', href: '/admin/accounts/parties' },
-      { labelKey: 'toPay', href: '/admin/accounts/payables' },
-      // Accounts A6: the monthly payroll cycle (disburses through
-      // the one shared salary path).
-      { labelKey: 'salaryAccounts', href: '/admin/accounts/payroll' },
-      // Accounts A7: VAT/TDS configuration + register (dormant
-      // until the owner/CA enters rates).
-      { labelKey: 'vatTax', href: '/admin/accounts/tax' },
-      // Accounts A8: cheque register — issued/received lifecycle,
-      // clearing posts through the journal; PDC due list.
-      { labelKey: 'cheques', href: '/admin/accounts/cheques' },
-      // Accounts A2: statements over the journal.
+      // Accounts A2: the reports hub (books check, P&L, balance sheet).
       { labelKey: 'statements', href: '/admin/accounts/statements' },
-      { labelKey: 'booksCheck', href: '/admin/accounts/statements/trial-balance' },
-      { labelKey: 'profitLoss', href: '/admin/accounts/statements/pl' },
-      { labelKey: 'whatWeOwnOwe', href: '/admin/accounts/statements/balance-sheet' },
-      // Accounts A10: one-click auditor package (ZIP/JSON) built
-      // from the same services as every screen above.
-      { labelKey: 'auditorReport', href: '/admin/accounts/auditor' },
+      // Accounts A6: the monthly payroll cycle (disburses through
+      // the one shared salary path) — set apart from the daily five.
+      { labelKey: 'salaryAccounts', href: '/admin/accounts/payroll', dividerBefore: true },
+      // Advanced — the accountant's surfaces, collapsed by default:
+      // chart, journal, periods (A3), opening, cheques (A8), VAT/TDS
+      // (A7, dormant until rates are set), the posting map, and the
+      // one-click auditor package (A10).
+      {
+        groupLabelKey: 'advancedSection',
+        items: [
+          { labelKey: 'moneyCategories', href: '/admin/accounts/chart' },
+          { labelKey: 'allEntries', href: '/admin/accounts/journal' },
+          { labelKey: 'monthOpenClose', href: '/admin/accounts/periods' },
+          { labelKey: 'startingFigures', href: '/admin/accounts/opening' },
+          { labelKey: 'cheques', href: '/admin/accounts/cheques' },
+          { labelKey: 'vatTax', href: '/admin/accounts/tax' },
+          { labelKey: 'postingMap', href: '/admin/accounts/posting-map' },
+          { labelKey: 'auditorReport', href: '/admin/accounts/auditor' },
+        ],
+      },
     ]
   },
   { labelKey: 'systemSettings',         icon: Settings,        href: '/admin/settings', divider: true },
@@ -154,6 +160,7 @@ const headOfficeNavigation: NavItem[] = [
 // ── Branch Manager navigation (Strictly Branch Accounts & Operations) ────────
 const branchManagerNavigation: NavItem[] = [
   { labelKey: 'branchDashboard',   icon: LayoutDashboard, href: '/dashboard/branch-accounts' },
+  { labelKey: 'myBranchAccounts',  icon: Landmark,        href: '/dashboard/branch-accounts/my-accounts' },
   { labelKey: 'dailyClosing',      icon: Calendar,        href: '/dashboard/branch-accounts/daily-closing' },
   { labelKey: 'cashLedger',        icon: Banknote,        href: '/dashboard/branch-accounts/cash-ledger' },
   { labelKey: 'bankDeposit',       icon: PiggyBank,       href: '/dashboard/branch-accounts/bank-deposit' },
@@ -218,6 +225,29 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
   const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>({ 'branchAccounts': true });
 
   const toggleMenu = (name: string) => { setExpandedMenus(prev => ({ ...prev, [name]: !prev[name] })); };
+
+  const renderSubLink = (item: NavSubItem, activeSubHref: string | null, closeMenu?: () => void) => {
+    const isSubActive = item.href === activeSubHref;
+    return (
+      <Link
+        key={item.labelKey}
+        href={item.href}
+        onClick={() => { closeMenu && closeMenu(); }}
+        className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs transition-all relative ${
+          isSubActive
+            ? 'bg-[#e8f7ee] text-[#15803d] font-semibold'
+            : 'text-slate-500 hover:text-slate-600 hover:bg-slate-900/[0.04]'
+        }`}
+      >
+        <span className="min-w-0 break-words leading-snug">{t.nav[item.labelKey]}</span>
+        {item.href === '/admin/accounts/exceptions' && exceptionsCount > 0 && (
+          <span className="ml-auto shrink-0 min-w-5 h-5 px-1 rounded-full bg-rose-600 text-white text-[10px] font-bold inline-flex items-center justify-center">
+            {exceptionsCount}
+          </span>
+        )}
+      </Link>
+    );
+  };
   const [userEmail, setUserEmail] = useState<string>('');
 
   useEffect(() => {
@@ -325,7 +355,7 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
             // If the item has subItems, render a collapsible menu
             if (node.subItems) {
               const subItems = node.subItems;
-              const activeSubHref = longestActiveHref(pathname, subItems.map((s) => s.href));
+              const activeSubHref = longestActiveHref(pathname, flatSubHrefs(subItems));
               const isChildActive = activeSubHref !== null;
 
               return (
@@ -351,25 +381,36 @@ export default function Sidebar({ forcedRole, mobile, closeMenu, onLogout }: Sid
                   {isMenuExpanded && (
                     <div className="mt-1 mb-2 ml-4 pl-3 border-l border-slate-900/10 space-y-1">
                       {subItems.map(sub => {
-                        const isSubActive = sub.href === activeSubHref;
+                        if ('items' in sub) {
+                          const groupKey = `grp-${sub.groupLabelKey}`;
+                          const groupActive = sub.items.some((i) => i.href === activeSubHref);
+                          const groupOpen = !!expandedMenus[groupKey] || groupActive;
+                          return (
+                            <React.Fragment key={sub.groupLabelKey}>
+                              <button
+                                onClick={() => toggleMenu(groupKey)}
+                                className={`w-full flex items-center justify-between px-4 py-2 rounded-full text-xs transition-all cursor-pointer ${
+                                  groupActive
+                                    ? 'text-[#15803d] font-semibold'
+                                    : 'text-slate-500 hover:text-slate-700 hover:bg-slate-900/[0.04]'
+                                }`}
+                              >
+                                <span className="min-w-0 break-words leading-snug text-left">{t.nav[sub.groupLabelKey]}</span>
+                                <ChevronDown className={`w-3.5 h-3.5 shrink-0 transition-transform ${groupOpen ? 'rotate-180' : ''}`} />
+                              </button>
+                              {groupOpen && (
+                                <div className="ml-3 pl-2 border-l border-slate-900/10 space-y-1">
+                                  {sub.items.map((item) => renderSubLink(item, activeSubHref, closeMenu))}
+                                </div>
+                              )}
+                            </React.Fragment>
+                          );
+                        }
                         return (
-                          <Link
-                            key={sub.labelKey}
-                            href={sub.href}
-                            onClick={() => { closeMenu && closeMenu(); }}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs transition-all relative ${
-                              isSubActive
-                                ? 'bg-[#e8f7ee] text-[#15803d] font-semibold'
-                                : 'text-slate-500 hover:text-slate-600 hover:bg-slate-900/[0.04]'
-                            }`}
-                          >
-                            <span className="min-w-0 break-words leading-snug">{t.nav[sub.labelKey]}</span>
-                            {sub.href === '/admin/accounts/exceptions' && exceptionsCount > 0 && (
-                              <span className="ml-auto shrink-0 min-w-5 h-5 px-1 rounded-full bg-rose-600 text-white text-[10px] font-bold inline-flex items-center justify-center">
-                                {exceptionsCount}
-                              </span>
-                            )}
-                          </Link>
+                          <React.Fragment key={sub.labelKey}>
+                            {sub.dividerBefore && <div className="my-2 border-t border-slate-900/[0.08]" />}
+                            {renderSubLink(sub, activeSubHref, closeMenu)}
+                          </React.Fragment>
                         );
                       })}
                     </div>

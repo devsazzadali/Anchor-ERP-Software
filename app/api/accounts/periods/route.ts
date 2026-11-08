@@ -13,6 +13,7 @@ import {
 import { trialBalance, unpostedSources } from '@/lib/server/accounting/reports'
 import { listOpenExceptions } from '@/lib/server/accounting/exceptions'
 import { computeOpeningPosition } from '@/lib/server/accounting/opening'
+import { reconciliationStatus } from '@/lib/server/accounting/bankrec'
 
 // /api/accounts/periods — period close & lock + FY rollover (A3).
 // GET: fiscal years with their periods (status + close metadata),
@@ -50,8 +51,60 @@ export async function GET(req: Request) {
     const unpostedTotal = Object.entries(unposted)
       .filter(([k]) => k !== 'chalans_uncosted_flagged')
       .reduce((a, [, v]) => a + (v as number), 0)
+
+    // ── Month-end checks (plan §7 ধাপ ৪, D8) ──────────────────
+    // Current-state checks for the guided close flow: bank
+    // matched?, payroll pending?, shortages open?, cost-less
+    // chalans (visible warning with count/amount, never hidden).
+    const db: any = prisma as any
+    const bankAccounts = await db.bankAccount.findMany({ orderBy: { label: 'asc' } })
+    const bankChecks = []
+    for (const a of bankAccounts) {
+      const st: any = await reconciliationStatus(db, a).catch(() => null)
+      bankChecks.push({
+        id: a.id,
+        name: a.label,
+        difference: st ? st.difference : null,
+        unmatched_count: st ? (st.entries || []).filter((e: any) => !e.matched_entry_id).length : 0,
+        // Step 5's statement-confirm stamp also satisfies this
+        // step: the owner confirmed the book against the real
+        // statement and it matched exactly.
+        confirmed: a.confirmed_statement_balance != null,
+      })
+    }
+    const [payrollPending, shortageAgg, costlessAgg] = await Promise.all([
+      db.payrollRun.count({ where: { status: { notIn: ['issued', 'voided'] } } }),
+      db.branchCashLedger.aggregate({
+        where: { cash_difference: { lt: 0 } },
+        _count: true,
+        _sum: { cash_difference: true },
+      }),
+      db.productChalan.aggregate({
+        where: { total_cost: { lte: 0 } },
+        _count: true,
+        _sum: { total_amount: true },
+      }),
+    ])
+    const month_end = {
+      bank: {
+        accounts: bankChecks,
+        unmatched_total: bankChecks.reduce((s: number, a: any) => s + a.unmatched_count, 0),
+        all_matched: bankChecks.every((a: any) => a.confirmed || (a.difference !== null && Number(a.difference) === 0)),
+      },
+      payroll_pending: payrollPending,
+      shortages: {
+        count: shortageAgg._count,
+        amount: Math.abs(Number(shortageAgg._sum.cash_difference ?? 0)).toFixed(2),
+      },
+      costless_chalans: {
+        count: costlessAgg._count,
+        sale_value: Number(costlessAgg._sum.total_amount ?? 0).toFixed(2),
+      },
+    }
+
     return NextResponse.json({
       fiscal_years: years,
+      month_end,
       checklist: {
         trial_balance_balanced: tb.balanced,
         trial_balance_difference: (tb.difference / 100).toFixed(2),

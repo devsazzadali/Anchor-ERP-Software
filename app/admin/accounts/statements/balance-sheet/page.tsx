@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic'
 import React, { Suspense, useCallback, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Landmark, RefreshCw, CheckCircle2, AlertTriangle, FileText } from 'lucide-react'
-import { ExportButtons, stmtUrl, takaSigned, type StmtMeta } from '../ui'
+import { CompanyWideRibbon, ExportButtons, stmtUrl, takaSigned, type StmtMeta } from '../ui'
 import { PageHead, PrintHeader, PrintFooter, downloadPdf, taka, bdt } from '../../ui'
 import { useLanguage } from '@/lib/i18n/provider'
 
@@ -115,7 +115,7 @@ function BalanceSheetInner() {
         icon={<Landmark className="w-6 h-6 text-emerald-600" />}
         title={t.accounts.head.balanceSheet.title}
         bangla={t.accounts.head.balanceSheet.sub}
-        tech={t.accounts.head.balanceSheet.tech}
+        tech={t.accounts.head.balanceSheet.tech} purpose={t.accounts.head.balanceSheet.purpose}
       >
         <div className="flex items-center gap-2 print:hidden">
           <ExportButtons csvHref={stmtUrl('balance-sheet', { asof: asOf || undefined }, 'csv')} />
@@ -127,6 +127,8 @@ function BalanceSheetInner() {
           </button>
         </div>
       </PageHead>
+
+      <CompanyWideRibbon />
 
       {meta && (
         <div className="flex flex-wrap items-center gap-3 mb-6 print:hidden">

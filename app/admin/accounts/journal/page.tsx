@@ -72,7 +72,7 @@ export default function JournalPage() {
 
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <PageHead icon={<BookOpen className="w-6 h-6 text-emerald-600" />} title={t.accounts.head.journal.title} bangla={t.accounts.head.journal.sub} tech={t.accounts.head.journal.tech}>
+      <PageHead icon={<BookOpen className="w-6 h-6 text-emerald-600" />} title={t.accounts.head.journal.title} bangla={t.accounts.head.journal.sub} tech={t.accounts.head.journal.tech} purpose={t.accounts.head.journal.purpose}>
         <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
         </button>

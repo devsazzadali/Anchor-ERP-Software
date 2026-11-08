@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic'
 import React, { Suspense, useCallback, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Scale, RefreshCw, CheckCircle2, AlertTriangle, FileText } from 'lucide-react'
-import { ExportButtons, PeriodScopeBar, stmtUrl, takaSigned, type StmtMeta } from '../ui'
+import { CompanyWideRibbon, ExportButtons, PeriodScopeBar, stmtUrl, takaSigned, type StmtMeta } from '../ui'
 import { PageHead, PrintHeader, PrintFooter, downloadPdf, taka, bdt } from '../../ui'
 import { useLanguage } from '@/lib/i18n/provider'
 
@@ -29,7 +29,7 @@ function TrialBalanceInner() {
   const [meta, setMeta] = useState<StmtMeta | null>(null)
   const [stmt, setStmt] = useState<TB | null>(null)
   const [period, setPeriod] = useState(search.get('period') || '')
-  const [scope, setScope] = useState<'period' | 'fytd'>((search.get('scope') as any) === 'period' ? 'period' : 'fytd')
+  const [scope, setScope] = useState<'period' | 'fytd'>((search.get('scope') as any) === 'fytd' ? 'fytd' : 'period')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [scopeLabel, setScopeLabel] = useState('')
@@ -76,7 +76,7 @@ function TrialBalanceInner() {
       <PrintHeader title="Books Check" subtitle="Trial Balance" />
       <PageHead
         icon={<Scale className="w-6 h-6 text-emerald-600" />}
-        title={t.accounts.head.trialBalance.title} bangla={t.accounts.head.trialBalance.sub} tech={t.accounts.head.trialBalance.tech}
+        title={t.accounts.head.trialBalance.title} bangla={t.accounts.head.trialBalance.sub} tech={t.accounts.head.trialBalance.tech} purpose={t.accounts.head.trialBalance.purpose}
       >
         <div className="flex items-center gap-2 print:hidden">
           <ExportButtons csvHref={stmtUrl('trial-balance', { period: period || undefined, scope }, 'csv')} />
@@ -88,6 +88,8 @@ function TrialBalanceInner() {
           </button>
         </div>
       </PageHead>
+
+      <CompanyWideRibbon />
 
       {meta && (
         <div className="mb-6 print:hidden">

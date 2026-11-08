@@ -3,7 +3,7 @@
 export const dynamic = 'force-dynamic'
 import React, { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { Landmark, RefreshCw, CheckCircle2, AlertTriangle, Scale, BookOpen, ListTree, Flag } from 'lucide-react'
+import { Landmark, RefreshCw, CheckCircle2, AlertTriangle, Scale, BookOpen, ListTree, Flag, ArrowRight } from 'lucide-react'
 import { PageHead, taka } from './ui'
 import { useLanguage } from '@/lib/i18n/provider'
 import { fill } from '@/lib/i18n/provider'
@@ -31,6 +31,11 @@ type Overview = {
   flags: FlagRow[]
   // Accounts A9: exceptions inbox counts (additive).
   inbox?: { stored_open: number; stored_acknowledged: number; stored_resolved: number; derived: number; total_active: number }
+  // Round 2 Step 6: the owner's daily check (additive).
+  daily_check?: {
+    date: string; closings_today: number; closings_unposted: number
+    cash_difference_today: string; deposits_pending: number; payroll_pending: number
+  }
 }
 
 type PlData = {
@@ -49,7 +54,7 @@ type PayablesData = {
   ageing: { totals: { payable: { total: string }; receivable: { total: string } } }
 }
 type ExceptionsData = {
-  items: Array<{ code: string; title: string; amount: string | null; count: number | null; link: string }>
+  items: Array<{ code: string; title: string; severity: 'high' | 'medium' | 'low'; amount: string | null; count: number | null; link: string; link_label: string }>
   counts: { total_active: number }
 }
 
@@ -163,6 +168,17 @@ export default function AccountsOverviewPage() {
   }
   const attentionTotal = exceptions?.counts?.total_active ?? 0
 
+  // Today's top tasks (plan §5): the five most urgent exception
+  // items — severity first, then amount — each deep-linking to
+  // the exact place that fixes it.
+  const SEV_RANK: Record<string, number> = { high: 0, medium: 1, low: 2 }
+  const topTasks = (exceptions?.items ?? [])
+    .slice()
+    .sort((a, b) =>
+      (SEV_RANK[a.severity] - SEV_RANK[b.severity]) ||
+      ((b.amount != null ? Number(b.amount) : -1) - (a.amount != null ? Number(a.amount) : -1)))
+    .slice(0, 5)
+
   const detailLink = (href: string) => (
     <Link href={href} className="mt-3 inline-block text-sm font-semibold text-emerald-700 hover:underline font-bangla">
       {t.accounts.home.detailsLink}
@@ -176,6 +192,7 @@ export default function AccountsOverviewPage() {
         title={t.accounts.home.title}
         bangla={t.accounts.home.sub}
         tech={t.accounts.home.tech}
+        purpose={t.accounts.home.purpose}
       >
         <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
@@ -331,6 +348,78 @@ export default function AccountsOverviewPage() {
                 </Link>
               </div>
             )
+          )}
+
+          {/* Daily check — the owner's morning questions (§5) */}
+          {data.daily_check && (() => {
+            const dc = data.daily_check
+            const dcDict = t.accounts.home.dailyCheck
+            type DcRow = { ok: boolean | null; text: string; detail?: string }
+            const rows: DcRow[] = [
+              dc.closings_today === 0
+                ? { ok: null, text: dcDict.salesNone }
+                : {
+                    ok: dc.closings_unposted === 0,
+                    text: dcDict.salesArrived,
+                    detail: dc.closings_unposted === 0
+                      ? dcDict.salesPosted
+                      : dcDict.salesUnposted.replace('{count}', String(dc.closings_unposted)),
+                  },
+              dc.closings_today === 0
+                ? { ok: null, text: dcDict.cashNone }
+                : Number(dc.cash_difference_today) === 0
+                  ? { ok: true, text: dcDict.cashMatched }
+                  : { ok: false, text: dcDict.cashShortage, detail: taka(dc.cash_difference_today) },
+              dc.deposits_pending === 0
+                ? { ok: true, text: dcDict.depositsNone }
+                : { ok: false, text: dcDict.depositsPending, detail: String(dc.deposits_pending) },
+              dc.payroll_pending === 0
+                ? { ok: true, text: dcDict.payrollNone }
+                : { ok: false, text: dcDict.payrollPending, detail: String(dc.payroll_pending) },
+            ]
+            return (
+              <div className="rounded-2xl border border-slate-200 bg-white p-5 mb-6">
+                <h2 className="text-lg font-bold text-slate-900 font-bangla">{t.accounts.home.dailyCheckTitle}</h2>
+                <p className="text-xs text-slate-400 mt-0.5">{dc.date} · Asia/Dhaka</p>
+                <div className="mt-3 space-y-2">
+                  {rows.map((r, i) => (
+                    <div key={i} className="flex flex-wrap items-baseline gap-2 text-sm">
+                      {r.ok === true
+                        ? <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 translate-y-0.5" />
+                        : r.ok === false
+                          ? <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 translate-y-0.5" />
+                          : <span className="w-4 h-4 shrink-0 text-center text-slate-300">•</span>}
+                      <span className="text-slate-800 font-bangla">{r.text}</span>
+                      {r.detail && <span className="text-slate-500 text-xs">{r.detail}</span>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          })()}
+
+          {/* Top tasks — the five most urgent fixes (§5) */}
+          {exceptions && topTasks.length > 0 && (
+            <div className="rounded-2xl border border-slate-200 bg-white p-5 mb-6">
+              <h2 className="text-lg font-bold text-slate-900 font-bangla">{t.accounts.home.topTasksTitle}</h2>
+              <p className="text-xs text-slate-400 mt-0.5 font-bangla">{t.accounts.home.topTasksSub}</p>
+              <div className="mt-3 space-y-2">
+                {topTasks.map((it, i) => (
+                  <div key={`${it.code}-${i}`} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-100 bg-slate-50 px-3 py-2">
+                    <span className="flex items-baseline gap-2 min-w-0">
+                      <span className={`px-1.5 py-0.5 rounded text-[11px] font-bold uppercase ${it.severity === 'high' ? 'bg-rose-100 text-rose-800' : it.severity === 'medium' ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-600'}`}>{it.severity}</span>
+                      <span className="text-sm font-medium text-slate-800 truncate font-bangla">
+                        {(t.accounts.home.attention as Record<string, string>)[it.code] ?? it.title}
+                      </span>
+                      {it.amount != null && <span className="text-sm font-bold text-slate-900 tabular-nums">{taka(Number(it.amount))}</span>}
+                    </span>
+                    <Link href={it.link} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 font-bangla shrink-0">
+                      {t.accounts.exceptionsUi.fixIt} <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            </div>
           )}
 
           {/* Kept detail sections — books coverage + starting figures */}

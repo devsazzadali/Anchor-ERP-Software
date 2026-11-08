@@ -199,7 +199,7 @@ export default function ChequesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <PageHead title={t.accounts.head.cheques.title} bangla={t.accounts.head.cheques.sub} tech={t.accounts.head.cheques.tech}>
+        <PageHead title={t.accounts.head.cheques.title} bangla={t.accounts.head.cheques.sub} tech={t.accounts.head.cheques.tech} purpose={t.accounts.head.cheques.purpose}>
           <div className="flex flex-wrap gap-2">
             <button onClick={() => window.print()} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
               <Printer className="w-4 h-4" /> Print

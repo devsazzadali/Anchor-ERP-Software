@@ -2,8 +2,11 @@
 
 export const dynamic = 'force-dynamic'
 import React, { useCallback, useEffect, useState } from 'react'
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { Wallet, RefreshCw, CheckCircle2, AlertTriangle, History, HandCoins, Printer, Download } from 'lucide-react'
 import { PageHead, PrintHeader, PrintFooter, downloadPdf, bdt } from '../ui'
+import PartiesPanel from '../parties/PartiesPanel'
 import { useLanguage } from '@/lib/i18n/provider'
 
 // Accounts A5 — Payables & Ageing. Data: GET /api/accounts/payables
@@ -67,8 +70,11 @@ const STATUS_STYLE: Record<string, string> = {
 
 export default function PayablesPage() {
   const { t } = useLanguage()
+  const searchParams = useSearchParams()
+  const tab = searchParams.get('tab') === 'parties' ? 'parties' : 'register'
   const [items, setItems] = useState<Item[]>([])
   const [tieOut, setTieOut] = useState<TieOut[]>([])
+  const [journalTie, setJournalTie] = useState<{ register_open_payable: string; account_2000_balance: string; match: boolean; difference: string } | null>(null)
   const [ageing, setAgeing] = useState<{ as_of: string; basis: string; totals: { payable: Buckets; receivable: Buckets }; by_counterparty: any[] } | null>(null)
   const [paidVia, setPaidVia] = useState<Array<{ code: string; label: string }>>([])
   const [loading, setLoading] = useState(true)
@@ -88,6 +94,7 @@ export default function PayablesPage() {
       if (!res.ok) throw new Error(json.error || 'Failed to load the register')
       setItems(json.items)
       setTieOut(json.tie_out)
+      setJournalTie(json.journal_tie_out ?? null)
       setAgeing(json.ageing)
       setPaidVia(json.paid_via)
     } catch (e: any) {
@@ -195,7 +202,7 @@ export default function PayablesPage() {
 
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <PageHead icon={<Wallet className="w-6 h-6 text-emerald-600" />} title={t.accounts.head.payables.title} bangla={t.accounts.head.payables.sub} tech={t.accounts.head.payables.tech}>
+      <PageHead icon={<Wallet className="w-6 h-6 text-emerald-600" />} title={t.accounts.head.payables.title} bangla={t.accounts.head.payables.sub} tech={t.accounts.head.payables.tech} purpose={t.accounts.head.payables.purpose}>
         <div className="flex flex-wrap gap-2">
           <button onClick={sync} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700">
             <RefreshCw className="w-4 h-4" /> Sync from records
@@ -216,6 +223,30 @@ export default function PayablesPage() {
         settlements that can never double-pay.
       </p>
 
+      <div className="flex flex-wrap gap-2 mb-6 print:hidden" role="tablist">
+        <Link
+          href="/admin/accounts/payables"
+          role="tab"
+          aria-selected={tab === 'register'}
+          className={`px-4 py-2 rounded-full text-sm font-semibold transition ${tab === 'register' ? 'bg-emerald-600 text-white' : 'border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+        >
+          {t.nav.toPay}
+        </Link>
+        <Link
+          href="/admin/accounts/payables?tab=parties"
+          role="tab"
+          aria-selected={tab === 'parties'}
+          className={`px-4 py-2 rounded-full text-sm font-semibold transition ${tab === 'parties' ? 'bg-emerald-600 text-white' : 'border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+        >
+          {t.nav.peopleCompanies}
+        </Link>
+      </div>
+
+      {tab === 'parties' ? (
+        <PartiesPanel />
+      ) : (
+      <>
+
       {error && <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 mb-4 text-sm text-rose-700">{error}</div>}
       {notice && (
         <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 mb-4 text-sm text-emerald-800 flex items-center gap-2 w-full">
@@ -228,6 +259,28 @@ export default function PayablesPage() {
 
       <div className="accounts-print-area">
       <PrintHeader title="To Pay" subtitle="Payables and Ageing" />
+
+      {/* ── Books tie-out: register total vs journal 2000 ────── */}
+      {journalTie && (
+        <div className={`rounded-2xl border p-5 mb-6 ${journalTie.match ? 'border-emerald-200 bg-emerald-50' : 'border-rose-200 bg-rose-50'}`}>
+          <div className="text-sm font-semibold text-slate-700 font-bangla">{t.accounts.payablesTie.title}</div>
+          <div className="mt-2 flex flex-wrap items-baseline gap-x-8 gap-y-2">
+            <div>
+              <span className="text-xs text-slate-500 font-bangla">{t.accounts.payablesTie.registerTotal}</span>
+              <div className="text-2xl font-bold text-slate-900 tabular-nums">{taka(journalTie.register_open_payable)}</div>
+            </div>
+            <div>
+              <span className="text-xs text-slate-500 font-bangla">{t.accounts.payablesTie.journalTotal}</span>
+              <div className="text-2xl font-bold text-slate-900 tabular-nums">{taka(journalTie.account_2000_balance)}</div>
+            </div>
+            <div className={`text-lg font-bold ${journalTie.match ? 'text-emerald-700' : 'text-rose-700'}`}>
+              {journalTie.match
+                ? <span className="inline-flex items-center gap-1.5 font-bangla"><CheckCircle2 className="w-5 h-5" /> {t.accounts.payablesTie.matched}</span>
+                : <span className="inline-flex items-center gap-1.5"><AlertTriangle className="w-5 h-5" /> {t.accounts.payablesTie.difference}: {taka(journalTie.difference)}</span>}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Tie-out ─────────────────────────────────────────── */}
       <h2 className="text-lg font-bold text-slate-900 mb-3">Register tie-out — register vs source records</h2>
@@ -485,6 +538,9 @@ export default function PayablesPage() {
       </div>
       <PrintFooter />
       </div>
+
+      </>
+      )}
     </div>
   )
 }

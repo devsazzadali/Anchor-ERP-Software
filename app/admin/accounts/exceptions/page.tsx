@@ -107,10 +107,14 @@ export default function ExceptionsInboxPage() {
     (it) => (kindFilter === 'all' || it.kind === kindFilter) && (sevFilter === 'all' || it.severity === sevFilter)
   )
   const highActive = (items ?? []).filter((it) => it.severity === 'high').length
+  // Money at risk (plan §5 Q5): sum of the amounts the open items
+  // carry; items without an amount are counted, never hidden.
+  const atRiskTotal = (items ?? []).reduce((s, it) => s + (it.amount != null ? Number(it.amount) || 0 : 0), 0)
+  const noAmountCount = (items ?? []).filter((it) => it.amount == null).length
 
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <PageHead icon={<Inbox className="w-6 h-6 text-emerald-600" />} title={t.accounts.head.exceptions.title} bangla={t.accounts.head.exceptions.sub} tech={t.accounts.head.exceptions.tech}>
+      <PageHead icon={<Inbox className="w-6 h-6 text-emerald-600" />} title={t.accounts.head.exceptions.title} bangla={t.accounts.head.exceptions.sub} tech={t.accounts.head.exceptions.tech} purpose={t.accounts.head.exceptions.purpose}>
         <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
         </button>
@@ -126,6 +130,17 @@ export default function ExceptionsInboxPage() {
 
       {counts && items && (
         <>
+          <div className="rounded-2xl border border-rose-200 bg-rose-50 p-5 mb-6">
+            <div className="text-sm font-semibold text-slate-700 font-bangla">{t.accounts.exceptionsUi.moneyAtRisk}</div>
+            <div className="mt-1 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+              <span className="text-3xl font-bold text-rose-700 tabular-nums">{taka(atRiskTotal.toFixed(2))}</span>
+              <span className="text-sm text-slate-600 font-bangla">{t.accounts.exceptionsUi.moneyAtRiskSub}</span>
+            </div>
+            {noAmountCount > 0 && (
+              <div className="mt-1 text-xs text-slate-500 font-bangla">{t.accounts.exceptionsUi.noAmountItems.replace('{count}', String(noAmountCount))}</div>
+            )}
+          </div>
+
           <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
             <div className="rounded-2xl border border-rose-200 bg-rose-50 p-5">
               <div className="text-sm font-semibold text-slate-700">Blocked postings — open</div>
@@ -194,9 +209,10 @@ export default function ExceptionsInboxPage() {
                     )}
                   </div>
                   <div className="flex flex-col items-end gap-2 shrink-0">
-                    <Link href={it.link} className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-700 hover:underline">
-                      {it.link_label} <ArrowRight className="w-4 h-4" />
+                    <Link href={it.link} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 font-bangla">
+                      {t.accounts.exceptionsUi.fixIt} <ArrowRight className="w-4 h-4" />
                     </Link>
+                    <span className="text-[11px] text-slate-400">{it.link_label}</span>
                     {it.can_act && (
                       <>
                         {it.status === 'open' && (

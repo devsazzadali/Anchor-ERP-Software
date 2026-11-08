@@ -7,6 +7,8 @@ import { TrendingUp, RefreshCw, AlertTriangle, Info, FileText } from 'lucide-rea
 import { ExportButtons, PeriodScopeBar, stmtUrl, takaSigned, type StmtMeta } from '../ui'
 import { PageHead, PrintHeader, PrintFooter, downloadPdf, taka, bdt } from '../../ui'
 import { useLanguage } from '@/lib/i18n/provider'
+import { useStickyBranch } from '@/lib/hooks/use-sticky-branch'
+import { BranchSwitcher } from '@/components/branch-switcher'
 
 // Accounts A2 — Profit & Loss from the journal: company view or a
 // single branch (branch is a dimension on journal lines). The
@@ -65,8 +67,11 @@ function ProfitLossInner() {
   const [meta, setMeta] = useState<StmtMeta | null>(null)
   const [stmt, setStmt] = useState<PL | null>(null)
   const [period, setPeriod] = useState(search.get('period') || '')
-  const [scope, setScope] = useState<'period' | 'fytd'>((search.get('scope') as any) === 'period' ? 'period' : 'fytd')
-  const [branchId, setBranchId] = useState('')
+  const [scope, setScope] = useState<'period' | 'fytd'>((search.get('scope') as any) === 'fytd' ? 'fytd' : 'period')
+  // Sticky branch (plan §5.1): the shared selection — a branch
+  // picked on any operational page is the branch this report opens
+  // on, and picking one here carries over there.
+  const [branchId, setBranchId] = useStickyBranch()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [scopeLabel, setScopeLabel] = useState('')
@@ -94,11 +99,34 @@ function ProfitLossInner() {
   const net = stmt ? Number(stmt.net) : 0
   const n = stmt?.notes
 
+  // Consolidation tie-out (plan §5.3): the branch rows — every
+  // branch, Head Office, and the company-level lines that carry no
+  // branch — must sum back to the company totals above.
+  const branchSums = stmt?.by_branch
+    ? {
+        income: stmt.by_branch.reduce((a, b) => a + Number(b.income || 0), 0),
+        expenses: stmt.by_branch.reduce((a, b) => a + Number(b.expenses || 0), 0),
+        net: stmt.by_branch.reduce((a, b) => a + Number(b.net || 0), 0),
+      }
+    : null
+  const branchTies =
+    !!stmt && !!branchSums &&
+    Math.abs(branchSums.income - Number(stmt.total_income)) < 0.005 &&
+    Math.abs(branchSums.expenses - Number(stmt.total_expenses)) < 0.005 &&
+    Math.abs(branchSums.net - Number(stmt.net)) < 0.005
+
   const handlePdf = () => {
     if (!stmt) return
+    // The PDF defaults to the currently selected branch + month:
+    // the payload above was fetched for exactly that branch and
+    // scope, and the file says so in its subtitle and name.
+    const branchName = stmt.branch_id
+      ? meta?.branches.find((b) => b.id === stmt.branch_id)?.name ?? 'Branch'
+      : 'All branches (company)'
+    const slug = branchName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
     void downloadPdf({
       title: 'Profit & Loss',
-      subtitle: 'Income and Expenses',
+      subtitle: `Income and Expenses — ${branchName}`,
       dateRange: scopeLabel || undefined,
       columns: ['Type', 'Account', 'Amount (BDT)'],
       rows: [
@@ -110,7 +138,7 @@ function ProfitLossInner() {
         { label: 'Total Expenses', value: bdt(stmt.total_expenses) },
         { label: net >= 0 ? 'Net Profit' : 'Net Loss', value: bdt(Math.abs(net)) },
       ],
-      filename: 'profit-and-loss.pdf',
+      filename: `profit-and-loss-${slug}-${period || 'current'}.pdf`,
     })
   }
 
@@ -139,7 +167,7 @@ function ProfitLossInner() {
       <PrintHeader title="Profit & Loss" subtitle="Income and Expenses" />
       <PageHead
         icon={<TrendingUp className="w-6 h-6 text-emerald-600" />}
-        title={t.accounts.head.pl.title} bangla={t.accounts.head.pl.sub} tech={t.accounts.head.pl.tech}
+        title={t.accounts.head.pl.title} bangla={t.accounts.head.pl.sub} tech={t.accounts.head.pl.tech} purpose={t.accounts.head.pl.purpose}
       >
         <div className="flex items-center gap-2 print:hidden">
           <ExportButtons csvHref={stmtUrl('pl', { period: period || undefined, scope, branch_id: branchId || undefined }, 'csv')} />
@@ -155,19 +183,7 @@ function ProfitLossInner() {
       {meta && (
         <div className="flex flex-wrap items-center gap-3 mb-2 print:hidden">
           <PeriodScopeBar periods={meta.periods} period={period} onPeriod={setPeriod} scope={scope} onScope={setScope} />
-          <label className="inline-flex items-center gap-2 text-sm text-slate-600">
-            Branch
-            <select
-              value={branchId}
-              onChange={(e) => setBranchId(e.target.value)}
-              className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800"
-            >
-              <option value="">All branches (company)</option>
-              {meta.branches.map((b) => (
-                <option key={b.id} value={b.id}>{b.name}</option>
-              ))}
-            </select>
-          </label>
+          <BranchSwitcher value={branchId} onChange={setBranchId} branches={meta.branches} />
         </div>
       )}
 
@@ -217,11 +233,23 @@ function ProfitLossInner() {
                             <td className="px-4 py-2.5 text-right tabular-nums font-medium">{takaSigned(b.net)}</td>
                           </tr>
                         ))}
+                        {branchSums && (
+                          <tr className="bg-slate-50 font-bold text-slate-900">
+                            <td className="px-4 py-2.5">
+                              Branch rows total {branchTies
+                                ? <span className="text-emerald-700">= company result ✓</span>
+                                : <span className="text-rose-700">≠ company result — investigate</span>}
+                            </td>
+                            <td className="px-4 py-2.5 text-right tabular-nums">{taka(branchSums.income)}</td>
+                            <td className="px-4 py-2.5 text-right tabular-nums">{taka(branchSums.expenses)}</td>
+                            <td className="px-4 py-2.5 text-right tabular-nums">{takaSigned(branchSums.net)}</td>
+                          </tr>
+                        )}
                       </tbody>
                     </table>
                   </div>
                   <p className="mt-2 text-xs text-slate-500">
-                    Every income/expense journal line carries a branch, so the branch rows sum to the company totals above.
+                    Every income/expense journal line carries a branch or is company-level, so the branch rows sum to the company totals above — the total row proves it.
                   </p>
                   <div className="mt-3 print:hidden">
                     <button onClick={handleBranchPdf} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">

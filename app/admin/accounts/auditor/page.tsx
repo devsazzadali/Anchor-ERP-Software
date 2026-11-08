@@ -81,7 +81,7 @@ export default function AuditorPackagePage() {
 
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <PageHead icon={<PackageCheck className="w-6 h-6 text-emerald-600" />} title={t.accounts.head.auditor.title} bangla={t.accounts.head.auditor.sub} tech={t.accounts.head.auditor.tech}>
+      <PageHead icon={<PackageCheck className="w-6 h-6 text-emerald-600" />} title={t.accounts.head.auditor.title} bangla={t.accounts.head.auditor.sub} tech={t.accounts.head.auditor.tech} purpose={t.accounts.head.auditor.purpose}>
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => void downloadPdf({

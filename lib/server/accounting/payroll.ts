@@ -304,6 +304,62 @@ export async function listEmployees(db: Db): Promise<any[]> {
   })
 }
 
+// ── Salary structures (Round 2 Step 5, D3) ─────────────────────
+// salary_settings is the structure store payroll suggestions
+// read. Until now nothing wrote it; the setup wizard does, one
+// employee at a time. Amounts are taka strings, validated here.
+
+export async function listSalaryStructures(db: Db): Promise<any[]> {
+  const rows = await db.salarySetting.findMany({ orderBy: { created_at: 'asc' } })
+  const ids = rows.map((r: any) => r.user_id).filter(Boolean)
+  const profiles = ids.length
+    ? await db.profile.findMany({ where: { id: { in: ids } }, select: { id: true, full_name: true } })
+    : []
+  const nameOf = new Map(profiles.map((p: any) => [p.id, p.full_name]))
+  return rows.map((r: any) => ({
+    id: r.id,
+    user_id: r.user_id,
+    full_name: r.user_id ? (nameOf.get(r.user_id) ?? null) : null,
+    base_salary: n(r.base_salary).toFixed(2),
+    house_rent_allowance: n(r.house_rent_allowance).toFixed(2),
+    medical_allowance: n(r.medical_allowance).toFixed(2),
+    transport_allowance: n(r.transport_allowance).toFixed(2),
+    overtime_rate_per_hour: r.overtime_rate_per_hour == null ? null : n(r.overtime_rate_per_hour).toFixed(2),
+    gross: (n(r.base_salary) + n(r.house_rent_allowance) + n(r.medical_allowance) + n(r.transport_allowance)).toFixed(2),
+  }))
+}
+
+export async function saveSalaryStructure(db: Db, input: any) {
+  const userId = String(input?.user_id ?? '')
+  if (!userId) throw new PayrollError(400, 'user_id is required')
+  const profile = await db.profile.findUnique({ where: { id: userId }, select: { id: true } })
+  if (!profile) throw new PayrollError(404, 'Employee not found')
+  const amount = (v: unknown, field: string): number => {
+    if (v === undefined || v === null || v === '') return 0
+    const s = String(v).trim()
+    if (!/^\d+(\.\d{1,2})?$/.test(s)) throw new PayrollError(400, `${field} must be a valid amount ≥ 0`)
+    return Number(s)
+  }
+  const basic = amount(input.basic, 'basic')
+  if (!(basic > 0)) throw new PayrollError(400, 'basic must be greater than 0')
+  const data = {
+    base_salary: basic.toFixed(2),
+    house_rent_allowance: amount(input.house_rent, 'house_rent').toFixed(2),
+    medical_allowance: amount(input.medical, 'medical').toFixed(2),
+    transport_allowance: amount(input.conveyance, 'conveyance').toFixed(2),
+    overtime_rate_per_hour:
+      input.overtime_rate === undefined || input.overtime_rate === null || input.overtime_rate === ''
+        ? null
+        : amount(input.overtime_rate, 'overtime_rate').toFixed(2),
+    updated_at: new Date(),
+  }
+  const before = await db.salarySetting.findUnique({ where: { user_id: userId } })
+  const after = before
+    ? await db.salarySetting.update({ where: { user_id: userId }, data })
+    : await db.salarySetting.create({ data: { user_id: userId, ...data } })
+  return { before, after }
+}
+
 // ── Line editing (draft runs only) ──────────────────────────────
 
 function parseComponents(input: any): {

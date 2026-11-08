@@ -13,6 +13,7 @@ import {
   CLASS_META,
   PayableError,
 } from '@/lib/server/accounting/payables'
+import { trialBalance, taka } from '@/lib/server/accounting/reports'
 
 // /api/accounts/payables — the payables/receivables register,
 // ageing and settlements (A5). The register MIRRORS obligations
@@ -46,13 +47,27 @@ export async function GET(req: Request) {
     if (itemId) {
       return NextResponse.json({ settlements: await listSettlements(db, itemId) })
     }
-    const [items, tie_out, ageing, paid_via] = await Promise.all([
+    const [items, tie_out, ageing, paid_via, tb] = await Promise.all([
       listRegister(db),
       registerTieOut(db),
       ageingReport(db),
       paidViaOptions(db),
+      trialBalance(db),
     ])
-    return NextResponse.json({ items, tie_out, ageing, paid_via, class_meta: CLASS_META })
+    // Books tie-out (plan §4.2): the register's open payable total
+    // against the journal's Accounts Payable (2000) balance — the
+    // two must agree to the poisha. Read-only; computed from the
+    // same services the snapshot tooling uses.
+    const acct2000 = tb.rows.find((r: any) => r.code === '2000')
+    const journalPayablePoisha = acct2000 ? -acct2000.balance : 0
+    const registerPayablePoisha = Math.round(Number(ageing.totals.payable.total || 0) * 100)
+    const journal_tie_out = {
+      register_open_payable: taka(registerPayablePoisha),
+      account_2000_balance: taka(journalPayablePoisha),
+      match: registerPayablePoisha === journalPayablePoisha,
+      difference: taka(Math.abs(registerPayablePoisha - journalPayablePoisha)),
+    }
+    return NextResponse.json({ items, tie_out, ageing, paid_via, class_meta: CLASS_META, journal_tie_out })
   } catch (err: any) {
     console.error('[accounts] payables GET failed:', err?.message || err)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

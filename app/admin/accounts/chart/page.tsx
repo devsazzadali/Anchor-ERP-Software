@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic'
 import React, { useCallback, useEffect, useState } from 'react'
 import { ListTree, RefreshCw, Plus, Pencil, CheckCircle2, AlertTriangle, Lock } from 'lucide-react'
 import { PageHead } from '../ui'
-import { useLanguage } from '@/lib/i18n/provider'
+import { useLanguage, fill } from '@/lib/i18n/provider'
 
 // Accounts A1 — Chart of Accounts. Data: GET /api/accounts/chart
 // (accounts with trial-balance figures). Admins may ADD accounts
@@ -33,6 +33,7 @@ export default function ChartOfAccountsPage() {
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [showAdd, setShowAdd] = useState(false)
+  const [showAllAccounts, setShowAllAccounts] = useState(false)
   const [form, setForm] = useState({ code: '', name: '', name_bn: '', type: 'expense', parent_id: '', branch_dimension: false })
   const [editing, setEditing] = useState<Account | null>(null)
   const [editForm, setEditForm] = useState({ name: '', name_bn: '', is_active: true })
@@ -106,11 +107,18 @@ export default function ChartOfAccountsPage() {
   }
 
   const byType = (t: string) => accounts.filter((a) => a.type === t)
+  // Never-used = no journal activity at all (debit and credit both 0).
+  // Hidden by default so the chart reads as the categories actually in
+  // use; a balance-0 account WITH activity stays visible.
+  const isUnused = (a: Account) => Number(a.debit) === 0 && Number(a.credit) === 0
+  const unusedCount = accounts.filter(isUnused).length
+  const visibleByType = (ty: string) => byType(ty).filter((a) => showAllAccounts || !isUnused(a))
+  const shownCount = accounts.length - (showAllAccounts ? 0 : unusedCount)
   const inputCls = 'w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500'
 
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <PageHead icon={<ListTree className="w-6 h-6 text-emerald-600" />} title={t.accounts.head.chart.title} bangla={t.accounts.head.chart.sub} tech={t.accounts.head.chart.tech}>
+      <PageHead icon={<ListTree className="w-6 h-6 text-emerald-600" />} title={t.accounts.head.chart.title} bangla={t.accounts.head.chart.sub} tech={t.accounts.head.chart.tech} purpose={t.accounts.head.chart.purpose}>
         <div className="flex gap-2">
           <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
@@ -118,10 +126,13 @@ export default function ChartOfAccountsPage() {
           <button onClick={() => setShowAdd((s) => !s)} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700">
             <Plus className="w-4 h-4" /> Add account
           </button>
+          <button onClick={() => setShowAllAccounts((s) => !s)} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+            {showAllAccounts ? t.accounts.chartView.hideUnused : t.accounts.chartView.showAll}
+          </button>
         </div>
       </PageHead>
       <p className="text-sm text-slate-500 -mt-4 mb-6">
-        {loading ? 'Loading…' : `${accounts.length} accounts · Trial balance ${totals?.balanced ? 'balances' : 'DOES NOT BALANCE'} (Dr ${totals ? taka(totals.total_debit) : '—'} / Cr ${totals ? taka(totals.total_credit) : '—'})`}
+        {loading ? 'Loading…' : `${fill(t.accounts.chartView.shownCount, { shown: shownCount, total: accounts.length })}${!showAllAccounts && unusedCount > 0 ? ` · ${fill(t.accounts.chartView.unusedHidden, { count: unusedCount })}` : ''} · Trial balance ${totals?.balanced ? 'balances' : 'DOES NOT BALANCE'} (Dr ${totals ? taka(totals.total_debit) : '—'} / Cr ${totals ? taka(totals.total_credit) : '—'})`}
       </p>
 
       {error && <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 mb-4 text-sm text-rose-700 flex items-center gap-2"><AlertTriangle className="w-4 h-4" /> {error}</div>}
@@ -186,7 +197,9 @@ export default function ChartOfAccountsPage() {
         </div>
       )}
 
-      {TYPES.map((t) => (
+      {TYPES.map((t) => {
+        if (byType(t).length > 0 && visibleByType(t).length === 0) return null
+        return (
         <div key={t} className="mb-6">
           <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-2">{TYPE_LABEL[t]}</h2>
           <div className="rounded-2xl border border-slate-200 overflow-x-auto bg-white">
@@ -202,7 +215,7 @@ export default function ChartOfAccountsPage() {
                 </tr>
               </thead>
               <tbody>
-                {byType(t).map((a) => (
+                {visibleByType(t).map((a) => (
                   <tr key={a.id} className={`border-b border-slate-50 ${a.is_active ? '' : 'opacity-50'}`}>
                     <td className="px-4 py-2.5 font-mono text-xs">{a.code}</td>
                     <td className="px-4 py-2.5">
@@ -226,7 +239,8 @@ export default function ChartOfAccountsPage() {
             </table>
           </div>
         </div>
-      ))}
+        )
+      })}
     </div>
   )
 }

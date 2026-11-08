@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { generatePdf } from '@/lib/pdf-generator'
 import { getCachedData, setCachedData, invalidateBranchCache } from '@/lib/branch-cache'
+import { persistStickyBranch, readStickyBranch } from '@/lib/hooks/use-sticky-branch'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -132,6 +133,9 @@ export default function AdminBranchChalansPage() {
 
   // ─── Navigation helpers ───────────────────────────────────────────────────
   const goToBranch = (branch: Branch | null) => {
+    // Sticky branch (plan §5.1): choosing a branch here is the
+    // shared selection the other operational pages open with.
+    persistStickyBranch(branch?.id ?? '')
     const params = new URLSearchParams(searchParams?.toString() || '')
     if (branch) { params.set('branch', branch.id) } else { params.delete('branch') }
     router.push(pathname + '?' + params.toString())
@@ -193,6 +197,19 @@ export default function AdminBranchChalansPage() {
 
   // Clear search when branch changes
   useEffect(() => { setSearch('') }, [branchParam])
+
+  // Sticky branch (plan §5.1): with no explicit ?branch= in the URL,
+  // open on the branch selected on any other operational page.
+  const stickyAppliedRef = React.useRef(false)
+  useEffect(() => {
+    if (stickyAppliedRef.current || branchParam || !branchesLoaded) return
+    stickyAppliedRef.current = true
+    const sticky = readStickyBranch()
+    if (!sticky) return
+    const target = branches.find(b => b.id === sticky)
+    if (target) goToBranch(target)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [branchesLoaded, branchParam, branches])
 
   // ─── Computed ─────────────────────────────────────────────────────────────
   // Per-branch stats from all chalans

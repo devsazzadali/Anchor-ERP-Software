@@ -290,10 +290,12 @@ export async function profitAndLoss(db: Db, scope: ScopeInfo, branchId?: string 
   const totalIncome = income.reduce((a, r) => a + r.amount, 0)
   const totalExpenses = expenses.reduce((a, r) => a + r.amount, 0)
 
-  // Per-branch breakdown (company view only). Every income/expense
-  // line carries branch_id, so the branch rows sum to the company
+  // Per-branch breakdown (company view only). Lines carry a
+  // branch_id or are company-level (no branch — head-office postings
+  // such as company expenses paid centrally). The company-level
+  // lines form their own row, so the branch rows sum to the company
   // totals exactly — the payload keeps both so the screen (and the
-  // A2 proof) can show the tie.
+  // A2 proof) can show the tie (plan §5.3).
   let byBranch: ProfitAndLoss['by_branch'] = null
   if (!branchId) {
     const branchTotals = new Map<string, { income: number; expenses: number }>()
@@ -308,18 +310,19 @@ export async function profitAndLoss(db: Db, scope: ScopeInfo, branchId?: string 
     const typeById = new Map(all.accounts.map((a: any) => [a.id, a.type]))
     const nameById = new Map(meta.branches.map((b) => [b.id, b.name]))
     for (const l of lines) {
-      if (!ids.has(l.entry_id) || !l.branch_id) continue
+      if (!ids.has(l.entry_id)) continue
       const t = typeById.get(l.account_id)
       if (t !== 'income' && t !== 'expense') continue
-      const cur = branchTotals.get(l.branch_id) ?? { income: 0, expenses: 0 }
+      const key = l.branch_id ?? '__none__'
+      const cur = branchTotals.get(key) ?? { income: 0, expenses: 0 }
       if (t === 'income') cur.income += toPoishaExact(l.credit) - toPoishaExact(l.debit)
       else cur.expenses += toPoishaExact(l.debit) - toPoishaExact(l.credit)
-      branchTotals.set(l.branch_id, cur)
+      branchTotals.set(key, cur)
     }
     byBranch = [...branchTotals.entries()]
       .map(([bid, v]) => ({
         branch_id: bid,
-        branch_name: nameById.get(bid) ?? bid,
+        branch_name: bid === '__none__' ? 'No branch recorded (company-level)' : nameById.get(bid) ?? bid,
         income: v.income,
         expenses: v.expenses,
         net: v.income - v.expenses,

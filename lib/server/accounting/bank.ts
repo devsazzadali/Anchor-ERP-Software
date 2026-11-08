@@ -17,6 +17,7 @@
  *    (the PeriodsError pattern).
  */
 import { type Db } from './post'
+import { toPoishaExact, taka } from './reports'
 
 export class BankError extends Error {
   status: number
@@ -44,6 +45,10 @@ export interface BankAccountListItem {
   opening_balance: string | null
   opening_balance_date: string | null
   derived_hint: string | null
+  confirmed_statement_balance: string | null
+  confirmed_statement_date: string | null
+  confirmed_at: string | null
+  confirmed_by: string | null
   is_draft: boolean
   is_active: boolean
   created_at: string
@@ -63,6 +68,10 @@ export function bankAccountShape(row: any, chartCode: string | null): BankAccoun
     opening_balance: moneyStr(row.opening_balance),
     opening_balance_date: dateStr(row.opening_balance_date),
     derived_hint: moneyStr(row.derived_hint),
+    confirmed_statement_balance: moneyStr(row.confirmed_statement_balance),
+    confirmed_statement_date: dateStr(row.confirmed_statement_date),
+    confirmed_at: row.confirmed_at ? (row.confirmed_at?.toISOString?.() ?? String(row.confirmed_at)) : null,
+    confirmed_by: row.confirmed_by ?? null,
     is_draft: !!row.is_draft,
     is_active: !!row.is_active,
     created_at: row.created_at?.toISOString?.() ?? String(row.created_at),
@@ -221,4 +230,86 @@ export async function confirmBankOpening(
     },
   })
   return { before, after }
+}
+
+/**
+ * Book balance of a bank account AS OF a date: Σ debit − credit
+ * over posted journal lines on its chart account whose entry
+ * date is on or before `date` (YYYY-MM-DD). Poisha-exact.
+ */
+export async function bookBalanceAsOf(db: Db, account: any, date: string): Promise<number> {
+  if (!account.chart_account_id) return 0
+  const entries = await db.journalEntry.findMany({
+    where: { status: 'posted', entry_date: { lte: new Date(`${date}T00:00:00Z`) } },
+    select: { id: true },
+  })
+  const postedIds = new Set(entries.map((e: any) => e.id))
+  if (postedIds.size === 0) return 0
+  const lines = await db.journalLine.findMany({
+    where: { account_id: account.chart_account_id },
+    select: { entry_id: true, debit: true, credit: true },
+  })
+  let sum = 0
+  for (const l of lines) {
+    if (!postedIds.has(l.entry_id)) continue
+    sum += toPoishaExact(l.debit) - toPoishaExact(l.credit)
+  }
+  return sum
+}
+
+/**
+ * Round 2 Step 5 — statement confirmation. The owner enters the
+ * balance printed on the real bank statement (with its date);
+ * the system compares it with the book balance as of that date.
+ * Exact match → the account is stamped (balance, date, when,
+ * who) and leaves draft state. Mismatch → NOTHING is written;
+ * the book balance and the difference are returned so the page
+ * can show them plainly.
+ */
+export async function confirmBankStatement(
+  db: Db,
+  id: string,
+  input: { statement_balance: unknown; statement_date: unknown },
+  callerId: string
+) {
+  const before = await loadBankAccount(db, id)
+  const balStr = input.statement_balance == null ? '' : String(input.statement_balance).trim()
+  if (!balStr || !/^-?\d+(\.\d{1,2})?$/.test(balStr)) {
+    throw new BankError(400, 'statement_balance must be a valid amount')
+  }
+  const date = String(input.statement_date ?? '').trim()
+  if (!isRealDate(date)) {
+    throw new BankError(400, 'statement_date must be a real date (YYYY-MM-DD)')
+  }
+  const statementP = Math.round(Number(balStr) * 100)
+  const bookP = await bookBalanceAsOf(db, before, date)
+  if (statementP !== bookP) {
+    return {
+      matched: false as const,
+      before,
+      after: before,
+      book_balance: taka(bookP),
+      statement_balance: taka(statementP),
+      difference: taka(Math.abs(statementP - bookP)),
+    }
+  }
+  const after = await db.bankAccount.update({
+    where: { id },
+    data: {
+      confirmed_statement_balance: (statementP / 100).toFixed(2),
+      confirmed_statement_date: new Date(`${date}T00:00:00Z`),
+      confirmed_at: new Date(),
+      confirmed_by: callerId,
+      is_draft: false,
+      updated_at: new Date(),
+    },
+  })
+  return {
+    matched: true as const,
+    before,
+    after,
+    book_balance: taka(bookP),
+    statement_balance: taka(statementP),
+    difference: taka(0),
+  }
 }

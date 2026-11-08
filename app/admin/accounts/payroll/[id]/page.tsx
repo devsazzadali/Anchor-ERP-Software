@@ -308,7 +308,7 @@ export default function PayrollRunDetailPage({ params }: { params: Promise<{ id:
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
       <Link href="/admin/accounts/payroll" className="text-sm font-semibold text-emerald-700 hover:underline">← Payroll runs</Link>
       <div className="mt-3">
-        <PageHead icon={<Wallet className="w-6 h-6 text-emerald-600" />} title={`${t.accounts.head.payrollDetail.title} — ${run?.month ?? '…'}`} bangla={t.accounts.head.payrollDetail.sub} tech={t.accounts.head.payrollDetail.tech}>
+        <PageHead icon={<Wallet className="w-6 h-6 text-emerald-600" />} title={`${t.accounts.head.payrollDetail.title} — ${run?.month ?? '…'}`} bangla={t.accounts.head.payrollDetail.sub} tech={t.accounts.head.payrollDetail.tech} purpose={t.accounts.head.payrollDetail.purpose}>
           <div className="flex flex-wrap gap-2">
             <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh

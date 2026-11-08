@@ -11,6 +11,7 @@ import { computeOpeningPosition } from '@/lib/server/accounting/opening'
 import { listOpenExceptions } from '@/lib/server/accounting/exceptions'
 import { chequeSummary, chequeFlags } from '@/lib/server/accounting/cheques'
 import { inboxCounts } from '@/lib/server/accounting/inbox'
+import { dhakaToday } from '@/lib/dhaka-time'
 
 // GET /api/accounts/overview — Accounts A1 section home data:
 // trial-balance health, journal counts, unposted-source counts,
@@ -56,6 +57,42 @@ export async function GET(req: Request) {
         where: { position_id: position.id },
         orderBy: { created_at: 'asc' },
       })
+    }
+
+    // ── Owner's daily check (Round 2 Step 6, plan §5) ────────
+    // Answered live for TODAY (Dhaka): did today's closings
+    // arrive, are they posted, did the counted cash match, are
+    // deposits waiting, is a salary run waiting.
+    const todayStr = dhakaToday()
+    const todayDate = new Date(`${todayStr}T00:00:00.000Z`)
+    const todayClosings = await prisma.branchCashLedger.findMany({
+      where: { ledger_date: todayDate },
+      select: { id: true, cash_difference: true },
+    })
+    const closingIds = todayClosings.map((c: any) => c.id)
+    const postedClosingIds = closingIds.length
+      ? new Set(
+          (await prisma.journalEntry.findMany({
+            where: { source_table: 'branch_cash_ledger', source_id: { in: closingIds } },
+            select: { source_id: true },
+          })).map((e: any) => e.source_id)
+        )
+      : new Set<string>()
+    const [pendingDeposits, pendingPayroll] = await Promise.all([
+      prisma.branchBankDeposit.count({
+        where: { status: { in: ['submitted', 'pending_approval'] }, is_reversed: false },
+      }),
+      prisma.payrollRun.count({ where: { status: { in: ['draft', 'in_review', 'approved'] } } }),
+    ])
+    const daily_check = {
+      date: todayStr,
+      closings_today: todayClosings.length,
+      closings_unposted: closingIds.filter((id: string) => !postedClosingIds.has(id)).length,
+      cash_difference_today: todayClosings
+        .reduce((s: number, c: any) => s + Number(c.cash_difference ?? 0), 0)
+        .toFixed(2),
+      deposits_pending: pendingDeposits,
+      payroll_pending: pendingPayroll,
     }
 
     return NextResponse.json({
@@ -133,6 +170,7 @@ export async function GET(req: Request) {
       },
       // A9: Exceptions Inbox summary (see lib/server/accounting/inbox.ts).
       inbox: inboxSummary,
+      daily_check,
       posting_exceptions: exceptions.map((x: any) => ({
         id: x.id,
         source_table: x.source_table,

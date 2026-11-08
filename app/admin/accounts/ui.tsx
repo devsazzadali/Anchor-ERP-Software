@@ -24,6 +24,7 @@
 
 import React from 'react'
 import { generatePdf } from '@/lib/pdf-generator'
+import { useLanguage } from '@/lib/i18n/provider'
 
 export const taka = (v: string | number) =>
   `৳${Number(v).toLocaleString('en-BD', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
@@ -37,8 +38,10 @@ export function PageHead(props: {
   title: string
   bangla: string
   tech?: string
+  purpose?: string
   children?: React.ReactNode
 }) {
+  const { t } = useLanguage()
   return (
     <div className="flex flex-wrap items-start justify-between gap-4 mb-6 print:hidden">
       <div>
@@ -48,6 +51,12 @@ export function PageHead(props: {
         </h1>
         <p className="text-sm text-slate-600 mt-1 font-bangla">{props.bangla}</p>
         {props.tech && <p className="text-xs text-slate-400 mt-0.5">{props.tech}</p>}
+        {props.purpose && (
+          <p className="text-sm text-slate-700 mt-2">
+            <span className="font-semibold">{t.accounts.headPurposeLabel}</span>{' '}
+            <span className="font-bangla">{props.purpose}</span>
+          </p>
+        )}
       </div>
       {props.children}
     </div>

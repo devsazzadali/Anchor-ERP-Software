@@ -15,6 +15,8 @@ import IssueSalaryModal from '../salaries/IssueSalaryModal'
 import IssueHouseRentModal from '../house-rent/IssueHouseRentModal'
 import IssueUtilityBillModal from './IssueUtilityBillModal'
 import IssueDeveloperBillModal from './IssueDeveloperBillModal'
+import { useStickyBranch } from '@/lib/hooks/use-sticky-branch'
+import { BranchSwitcher } from '@/components/branch-switcher'
 
 // role + branches come from /api/auth/me and
 // /api/branches; ledger heads and expenses were already API-driven
@@ -42,7 +44,10 @@ export default function AdminBranchExpensesPage() {
 
   // Filters (for the detail view)
   const [filterMonth, setFilterMonth] = useState('')
-  const [filterBranch, setFilterBranch] = useState('')
+  // Sticky branch (plan §5.1): shared with the other operational
+  // pages — a branch picked there filters this page too, and the
+  // switcher in the detail header sets it here.
+  const [filterBranch, setFilterBranch] = useStickyBranch()
 
   // Form states
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -354,7 +359,6 @@ export default function AdminBranchExpensesPage() {
                     setSelectedHead(lh)
                     setExpenses([])
                     setFilterMonth('')
-                    setFilterBranch('')
                   }}
                   className="text-left p-5 rounded-3xl bg-white border border-slate-900/5 hover:border-[#1ca34c]/30 hover:bg-[#1ca34c]/5 transition-all group relative overflow-hidden"
                 >
@@ -400,6 +404,7 @@ export default function AdminBranchExpensesPage() {
               </div>
 
               <div className="flex items-center gap-2">
+                <BranchSwitcher value={filterBranch} onChange={setFilterBranch} branches={branches} />
                 <button onClick={handleExportPdf} disabled={expenses.length === 0}
                   className="p-3 rounded-xl bg-slate-900/[0.04] border border-slate-900/5 text-slate-500 hover:text-slate-900 transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
                   title="Export as PDF"

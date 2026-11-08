@@ -6,6 +6,7 @@ import {
   createBankAccount,
   updateBankAccount,
   confirmBankOpening,
+  confirmBankStatement,
   BankError,
 } from '@/lib/server/accounting/bank'
 import { bankSummary, BankRecError } from '@/lib/server/accounting/bankrec'
@@ -37,6 +38,18 @@ export async function GET(req: Request) {
     const rows = await db.bankAccount.findMany({ orderBy: { created_at: 'asc' } })
     const accounts = []
     for (const row of rows) accounts.push(await bankSummary(db, row))
+    // Resolve confirmer names for the Step-5 stamp display.
+    const confirmerIds = [...new Set(accounts.map((a: any) => a.confirmed_by).filter(Boolean))]
+    if (confirmerIds.length > 0) {
+      const profiles = await db.profile.findMany({
+        where: { id: { in: confirmerIds } },
+        select: { id: true, full_name: true },
+      }).catch(() => [])
+      const nameOf = new Map(profiles.map((p: any) => [p.id, p.full_name || null]))
+      for (const a of accounts) {
+        ;(a as any).confirmed_by_name = a.confirmed_by ? (nameOf.get(a.confirmed_by) ?? null) : null
+      }
+    }
     return NextResponse.json({ accounts })
   } catch (err: any) {
     console.error('[accounts] bank GET failed:', err?.message || err)
@@ -124,8 +137,41 @@ export async function POST(req: Request) {
       return NextResponse.json({ account: await bankSummary(db, after) })
     }
 
+    if (action === 'confirm_statement') {
+      const id = String(body.id ?? '')
+      if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
+      const result = await confirmBankStatement(db, id, {
+        statement_balance: body.statement_balance,
+        statement_date: body.statement_date,
+      }, g.caller.id)
+      if (!result.matched) {
+        // Nothing was written — return the figures so the page
+        // can show the difference plainly.
+        return NextResponse.json({
+          matched: false,
+          book_balance: result.book_balance,
+          statement_balance: result.statement_balance,
+          difference: result.difference,
+        })
+      }
+      await logAudit({
+        caller: g.caller,
+        req,
+        action: 'accounts.bank_statement_confirmed',
+        eventType: 'settings',
+        entityTable: 'bank_accounts',
+        entityId: id,
+        fieldChanges: diffFields(result.before as any, result.after as any, [
+          'confirmed_statement_balance', 'confirmed_statement_date', 'confirmed_at', 'confirmed_by', 'is_draft',
+        ]),
+      })
+      const account: any = await bankSummary(db, result.after)
+      account.confirmed_by_name = g.caller.full_name || null
+      return NextResponse.json({ matched: true, account })
+    }
+
     return NextResponse.json(
-      { error: "action must be 'create', 'update' or 'confirm_opening'" },
+      { error: "action must be 'create', 'update', 'confirm_opening' or 'confirm_statement'" },
       { status: 400 }
     )
   } catch (err: any) {

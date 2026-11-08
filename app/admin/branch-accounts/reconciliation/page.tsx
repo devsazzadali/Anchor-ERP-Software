@@ -12,6 +12,8 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { generatePdf } from '@/lib/pdf-generator'
 import { generateExcel } from '@/lib/excel-generator'
+import { useStickyBranch } from '@/lib/hooks/use-sticky-branch'
+import { BranchSwitcher } from '@/components/branch-switcher'
 
 const fmt = (n: number) => '৳' + Number(n ?? 0).toLocaleString('en-BD', { minimumFractionDigits: 0, maximumFractionDigits: 0 })
 
@@ -81,8 +83,14 @@ export default function AdminReconciliationPage() {
 
   const handleRefresh = async () => { setIsRefreshing(true); await fetchData(); setIsRefreshing(false) }
 
-  const summary: any[] = data?.summary || []
-  const depositDrift: any[] = data?.deposit_drift || []
+  // Sticky branch (plan §5.1): the shared selection filters this
+  // page's per-branch rows (table, totals and exports all follow
+  // the same filtered set, so screen and export can never disagree).
+  const [stickyBranch, setStickyBranch] = useStickyBranch()
+  const allSummary: any[] = data?.summary || []
+  const allDepositDrift: any[] = data?.deposit_drift || []
+  const summary: any[] = stickyBranch ? allSummary.filter((b) => b.branch_id === stickyBranch) : allSummary
+  const depositDrift: any[] = stickyBranch ? allDepositDrift.filter((d) => d.branch_id === stickyBranch) : allDepositDrift
   const totalCashCollected   = summary.reduce((s, b) => s + Number(b.net_cash_collected || 0), 0)
   const totalApproved        = summary.reduce((s, b) => s + Number(b.total_approved || 0), 0)
   const totalPending         = summary.reduce((s, b) => s + Number(b.total_pending  || 0), 0)
@@ -300,6 +308,7 @@ export default function AdminReconciliationPage() {
           >
             Apply
           </button>
+          <BranchSwitcher value={stickyBranch} onChange={setStickyBranch} />
           <span className="text-[10px] text-slate-500 ml-auto">{fromDate} → {toDate}</span>
         </div>
 

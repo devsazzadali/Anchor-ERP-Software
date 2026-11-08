@@ -28,6 +28,11 @@ type BankAccount = {
   opening_balance: string | null
   opening_balance_date: string | null
   derived_hint: string | null
+  confirmed_statement_balance: string | null
+  confirmed_statement_date: string | null
+  confirmed_at: string | null
+  confirmed_by: string | null
+  confirmed_by_name: string | null
   is_draft: boolean
   is_active: boolean
   journal_balance: string
@@ -69,6 +74,8 @@ export default function BankReconciliationPage() {
   const [editForm, setEditForm] = useState({ label: '', bank_name: '', account_name: '', account_number: '', account_type: 'bank', is_active: true })
 
   const [openingForms, setOpeningForms] = useState<Record<string, { opening_balance: string; opening_balance_date: string }>>({})
+  const [stmtForms, setStmtForms] = useState<Record<string, { statement_balance: string; statement_date: string }>>({})
+  const [stmtResults, setStmtResults] = useState<Record<string, { matched: boolean; book_balance: string; statement_balance: string; difference: string }>>({})
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -168,9 +175,42 @@ export default function BankReconciliationPage() {
     )
   }
 
+  // Step 5 — statement confirmation. A mismatch is a normal 200
+  // result (nothing was stamped), so this posts directly instead
+  // of going through act()'s success path.
+  const submitConfirmStatement = async (a: BankAccount) => {
+    const form = stmtForms[a.id] ?? { statement_balance: '', statement_date: '' }
+    setBusy(`stmt-${a.id}`)
+    setError(null)
+    setNotice(null)
+    try {
+      const res = await fetch('/api/accounts/bank', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'confirm_statement', id: a.id, statement_balance: form.statement_balance, statement_date: form.statement_date }),
+      })
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Confirmation failed')
+      if (json.matched) {
+        setStmtResults((prev) => { const next = { ...prev }; delete next[a.id]; return next })
+        setNotice(`${a.bank_name} — ${t.accounts.bankConfirm.confirmedStamp}`)
+        await load()
+      } else {
+        setStmtResults((prev) => ({
+          ...prev,
+          [a.id]: { matched: false, book_balance: json.book_balance, statement_balance: json.statement_balance, difference: json.difference },
+        }))
+      }
+    } catch (e: any) {
+      setError(e?.message || 'Confirmation failed')
+    } finally {
+      setBusy(null)
+    }
+  }
+
   return (
     <div className="p-6 lg:p-10 max-w-7xl mx-auto">
-      <PageHead icon={<Landmark className="w-6 h-6 text-emerald-600" />} title={t.accounts.head.bank.title} bangla={t.accounts.head.bank.sub} tech={t.accounts.head.bank.tech}>
+      <PageHead icon={<Landmark className="w-6 h-6 text-emerald-600" />} title={t.accounts.head.bank.title} bangla={t.accounts.head.bank.sub} tech={t.accounts.head.bank.tech} purpose={t.accounts.head.bank.purpose}>
         <div className="flex gap-2">
           <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
@@ -290,6 +330,17 @@ export default function BankReconciliationPage() {
                     {a.opening_balance_date ? <> as of {a.opening_balance_date}</> : null}
                   </p>
                 )}
+                {a.confirmed_statement_balance != null && (
+                  <p className="mt-2 inline-flex flex-wrap items-center gap-2 rounded-lg bg-emerald-50 border border-emerald-200 px-3 py-1.5 text-sm text-emerald-800">
+                    <CheckCircle2 className="w-4 h-4 shrink-0" />
+                    <span className="font-semibold font-bangla">{t.accounts.bankConfirm.confirmedStamp}</span>
+                    <span className="font-bangla">{t.accounts.bankConfirm.confirmedDetail
+                      .replace('{amount}', taka(a.confirmed_statement_balance))
+                      .replace('{date}', a.confirmed_statement_date ?? '')
+                      .replace('{name}', a.confirmed_by_name ?? '')
+                      .replace('{when}', a.confirmed_at ? new Date(a.confirmed_at).toLocaleDateString('en-GB') : '')}</span>
+                  </p>
+                )}
               </div>
               <div className="flex gap-2">
                 <button onClick={() => openEdit(a)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50">
@@ -318,6 +369,52 @@ export default function BankReconciliationPage() {
                 <div className="mt-1 text-sm text-slate-600">{a.matched_line_count} matched · {a.unmatched_line_count} unmatched</div>
               </div>
             </div>
+
+            {/* Step 5 — statement confirmation panel */}
+            {(() => {
+              const stmtForm = stmtForms[a.id] ?? { statement_balance: '', statement_date: '' }
+              const stmtResult = stmtResults[a.id]
+              return (
+                <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50/50 p-4">
+                  <p className="text-sm font-semibold text-slate-800 font-bangla">{t.accounts.bankConfirm.title}</p>
+                  <p className="mt-1 text-sm text-slate-600 font-bangla">{t.accounts.bankConfirm.sub}</p>
+                  <div className="mt-3 flex flex-wrap items-end gap-3">
+                    <label className="text-xs font-semibold text-slate-500 font-bangla">{t.accounts.bankConfirm.statementBalance}
+                      <input
+                        type="number" step="0.01" className={inputCls}
+                        value={stmtForm.statement_balance}
+                        onChange={(e) => setStmtForms({ ...stmtForms, [a.id]: { ...stmtForm, statement_balance: e.target.value } })}
+                        placeholder="0.00"
+                      />
+                    </label>
+                    <label className="text-xs font-semibold text-slate-500 font-bangla">{t.accounts.bankConfirm.statementDate}
+                      <input
+                        type="date" className={inputCls}
+                        value={stmtForm.statement_date}
+                        onChange={(e) => setStmtForms({ ...stmtForms, [a.id]: { ...stmtForm, statement_date: e.target.value } })}
+                      />
+                    </label>
+                    <button
+                      disabled={busy === `stmt-${a.id}` || !stmtForm.statement_balance || !stmtForm.statement_date}
+                      onClick={() => submitConfirmStatement(a)}
+                      className="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 disabled:opacity-50 font-bangla"
+                    >
+                      {t.accounts.bankConfirm.confirmButton}
+                    </button>
+                  </div>
+                  {stmtResult && !stmtResult.matched && (
+                    <div className="mt-3 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">
+                      <span className="font-semibold font-bangla">{t.accounts.bankConfirm.mismatchTitle}</span>
+                      <span className="block mt-0.5 font-bangla">{t.accounts.bankConfirm.mismatchDetail
+                        .replace('{statement}', taka(stmtResult.statement_balance))
+                        .replace('{book}', taka(stmtResult.book_balance))
+                        .replace('{difference}', taka(stmtResult.difference))}</span>
+                      <span className="block mt-0.5 text-xs">{t.accounts.bankConfirm.bookBalanceAsOf}: {taka(stmtResult.book_balance)}</span>
+                    </div>
+                  )}
+                </div>
+              )
+            })()}
 
             {a.is_draft && (
               <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4">

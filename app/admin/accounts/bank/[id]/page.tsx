@@ -494,8 +494,8 @@ export default function BankReconciliationWorkbenchPage() {
                   <th className="px-4 py-3 font-semibold">Date</th>
                   <th className="px-4 py-3 font-semibold">Description</th>
                   <th className="px-4 py-3 font-semibold">Reference</th>
-                  <th className="px-4 py-3 font-semibold text-right">Debit</th>
-                  <th className="px-4 py-3 font-semibold text-right">Credit</th>
+                  <th className="px-4 py-3 font-semibold text-right">টাকা গেল <span className="normal-case font-normal text-slate-400">(Debit)</span></th>
+                  <th className="px-4 py-3 font-semibold text-right">টাকা এল <span className="normal-case font-normal text-slate-400">(Credit)</span></th>
                   <th className="px-4 py-3 font-semibold text-right">Balance</th>
                   <th className="px-4 py-3 font-semibold">Status</th>
                   <th className="px-4 py-3 font-semibold text-right">Actions</th>
@@ -613,8 +613,8 @@ export default function BankReconciliationWorkbenchPage() {
                 <tr className="text-left text-xs uppercase tracking-wider text-slate-400 border-b border-slate-100">
                   <th className="px-4 py-3 font-semibold">Date</th>
                   <th className="px-4 py-3 font-semibold">Memo</th>
-                  <th className="px-4 py-3 font-semibold text-right">Debit</th>
-                  <th className="px-4 py-3 font-semibold text-right">Credit</th>
+                  <th className="px-4 py-3 font-semibold text-right">টাকা এল <span className="normal-case font-normal text-slate-400">(Debit)</span></th>
+                  <th className="px-4 py-3 font-semibold text-right">টাকা গেল <span className="normal-case font-normal text-slate-400">(Credit)</span></th>
                   <th className="px-4 py-3 font-semibold">Status</th>
                   <th className="px-4 py-3 font-semibold text-right">Actions</th>
                 </tr>

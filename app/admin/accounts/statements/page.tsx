@@ -3,38 +3,23 @@
 export const dynamic = 'force-dynamic'
 import React, { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
-import { FileBarChart2, Scale, TrendingUp, Landmark, RefreshCw, AlertTriangle, BookOpen } from 'lucide-react'
+import { FileBarChart2, Scale, TrendingUp, Landmark, RefreshCw, AlertTriangle, BookOpen, CalendarClock } from 'lucide-react'
 import { PeriodScopeBar, stmtUrl, taka, type StmtMeta } from './ui'
 import { PageHead } from '../ui'
 import { useLanguage } from '@/lib/i18n/provider'
 
-// Accounts A2 — Statements index. Period picker + the three
-// statements, the journal-coverage strip, and the read-only
-// posting-map viewer (blueprint §B.4: settings/posting-map viewer
-// lands with A2). All figures on the linked screens are computed
-// from journal_lines only (lib/server/accounting/statements.ts).
-
-const POSTING_MAP: Array<{ id: string; event: string; debit: string; credit: string; status: string }> = [
-  { id: 'P1', event: 'Daily closing saved/closed', debit: 'Cash — Branch (cash sales + other cash-in); MFS & Card Clearing (digital sales)', credit: 'Sales Revenue; Other Income (other cash-in / counted excess); Cash Shortage is Dr on shortage', status: 'Live (A1)' },
-  { id: 'P2', event: 'Branch cash expense (branch stream only)', debit: 'Branch Operating Expenses / mapped head account', credit: 'Cash — Branch (the drawer that bore it)', status: 'Live (A1)' },
-  { id: 'P3', event: 'Ledger-head branch expense', debit: 'Expense account mapped from the ledger head', credit: 'Cash — Head Office (settled centrally; never the drawer)', status: 'Live (A1)' },
-  { id: 'P4', event: 'Company expense created / paid', debit: 'Company Operating / Setup Expenses (accrual); Accounts Payable (settlement)', credit: 'Accounts Payable (accrual); Cash — Head Office (settlement)', status: 'Live (A1)' },
-  { id: 'P5', event: 'Salary issued / voided', debit: 'Salary - Basic (5010)', credit: 'Cash — Head Office', status: 'Live (A1)' },
-  { id: 'P6', event: 'Expense request paid', debit: 'Employee Expense Requests (5350)', credit: 'Cash — Branch (cash / mirror-booked) or MFS & Card Clearing', status: 'Live (A1)' },
-  { id: 'P7', event: 'Deposit approved / reversed', debit: 'Bank — <account> (lump on deposit date)', credit: 'Cash — Branch', status: 'Live (A1)' },
-  { id: 'P8', event: 'Chalan created (costed only)', debit: 'Inventory — receiving branch (at cost)', credit: 'Inventory — head-office pool (at cost)', status: 'Live (A1)' },
-  { id: 'P9', event: 'Partner payout completed', debit: 'Partner Drawings — <partner>', credit: 'Cash — Head Office', status: 'Live (A1), no historical rows' },
-  { id: 'P10', event: 'Bundle request completed', debit: 'Cash in Transit', credit: 'Cash — Head Office', status: 'Live (A1), no historical rows' },
-  { id: 'P11', event: 'VAT / TDS on flagged events', debit: '—', credit: '—', status: 'Staged — A7 (register tables exist; dormant until rates are configured)' },
-  { id: 'P12', event: 'Opening entry (one-time)', debit: 'Assets as confirmed', credit: 'Liabilities + Equity (balancing figure shown explicitly)', status: 'Live (A3) — confirming the opening position posts this entry, dated the cutover (1st of the month after the as-of month)' },
-  { id: 'P13', event: 'Period-end adjustments', debit: 'As entered', credit: 'As entered', status: 'Live (A3) — fiscal-year rollover carries P&L balances to Retained Earnings from Accounts → Periods; other adjustments via manual entries in a later stage' },
-]
+// Accounts A2 — Reports hub. Period picker + the three big
+// reports + a month-end door to Periods, and the journal-coverage
+// strip. The posting map lives on its own Advanced page
+// (/admin/accounts/posting-map). All figures on the linked screens
+// are computed from journal_lines only
+// (lib/server/accounting/statements.ts).
 
 export default function StatementsIndexPage() {
   const { t } = useLanguage()
   const [meta, setMeta] = useState<StmtMeta | null>(null)
   const [period, setPeriod] = useState('')
-  const [scope, setScope] = useState<'period' | 'fytd'>('fytd')
+  const [scope, setScope] = useState<'period' | 'fytd'>('period')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -79,6 +64,13 @@ export default function StatementsIndexPage() {
       bangla: t.accounts.head.balanceSheet.sub,
       text: t.accounts.statementsIndex.balanceSheetText,
     },
+    {
+      href: '/admin/accounts/periods',
+      icon: CalendarClock,
+      title: t.accounts.head.periods.title,
+      bangla: t.accounts.head.periods.sub,
+      text: t.accounts.statementsIndex.monthEndText,
+    },
   ]
 
   return (
@@ -87,7 +79,7 @@ export default function StatementsIndexPage() {
         icon={<FileBarChart2 className="w-6 h-6 text-emerald-600" />}
         title={t.accounts.head.statements.title}
         bangla={t.accounts.head.statements.sub}
-        tech={t.accounts.head.statements.tech}
+        tech={t.accounts.head.statements.tech} purpose={t.accounts.head.statements.purpose}
       >
         <button onClick={load} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm font-semibold text-slate-700 hover:bg-slate-50 print:hidden">
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
@@ -103,7 +95,7 @@ export default function StatementsIndexPage() {
             <PeriodScopeBar periods={meta.periods} period={period} onPeriod={setPeriod} scope={scope} onScope={setScope} />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
             {cards.map((c) => (
               <Link key={c.href} href={c.href} className="rounded-2xl border border-slate-200 bg-white p-5 hover:border-emerald-300 hover:shadow-sm transition">
                 <div className="flex items-center gap-2 text-base font-bold text-slate-900">
@@ -144,31 +136,6 @@ export default function StatementsIndexPage() {
             </p>
           </div>
 
-          <h2 className="text-lg font-bold text-slate-900 mb-3">Posting map — how module events become journal entries (read-only)</h2>
-          <div className="rounded-2xl border border-slate-200 overflow-x-auto bg-white">
-            <table className="w-full text-sm min-w-[860px]">
-              <thead>
-                <tr className="text-left text-xs uppercase tracking-wider text-slate-400 border-b border-slate-100">
-                  <th className="px-4 py-3 font-semibold">Map</th>
-                  <th className="px-4 py-3 font-semibold">Source event</th>
-                  <th className="px-4 py-3 font-semibold">Debit</th>
-                  <th className="px-4 py-3 font-semibold">Credit</th>
-                  <th className="px-4 py-3 font-semibold">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {POSTING_MAP.map((r) => (
-                  <tr key={r.id} className="border-b border-slate-50 align-top">
-                    <td className="px-4 py-3 font-mono text-xs font-semibold text-slate-500">{r.id}</td>
-                    <td className="px-4 py-3 font-medium text-slate-800">{r.event}</td>
-                    <td className="px-4 py-3 text-slate-600">{r.debit}</td>
-                    <td className="px-4 py-3 text-slate-600">{r.credit}</td>
-                    <td className="px-4 py-3 text-slate-500">{r.status}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
         </>
       )}
     </div>
